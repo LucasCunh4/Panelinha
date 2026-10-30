@@ -59,7 +59,7 @@ O HTML gerado tem aproximadamente 27 MiB; não é necessário versioná-lo. Ele 
 
 O jogo também tem um contêiner **Capacitor**, mantendo esta versão web independente e seus arquivos originais.
 
-[Baixar o primeiro APK v0.1](distribuicao/Panelinha-Teste-v0.1-c100.apk?raw=true) · [Configurar assinatura e próximas versões](ANDROID.md) · [Histórico Android](VERSOES_ANDROID.md)
+[Baixar APK recomendado v0.1.1](distribuicao/Panelinha-Teste-v0.1.1-c102.apk?raw=true) · [Configurar assinatura e próximas versões](ANDROID.md) · [Histórico Android](VERSOES_ANDROID.md)
 
 No Android 7.0 ou posterior, com WebView atualizado, baixe o APK e abra-o para instalar. Se o sistema pedir, permita a instalação pelo navegador usado. As próximas versões devem ser instaladas por cima, escolhendo **Atualizar**, sem desinstalar nem limpar dados. O jogo contra três bots e o laboratório usam os arquivos locais do APK e não dependem de internet.
 

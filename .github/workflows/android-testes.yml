@@ -26,6 +26,18 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
+      - name: Conferir assinatura antes de baixar ferramentas
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          set +x
+          test -n "$KEYSTORE" && test -n "$STORE_PASSWORD" && test -n "$KEY_PASSWORD" && test -n "$KEY_ALIAS" || {
+            echo 'Faltam Secrets da assinatura ORIGINAL. Consulte ANDROID.md; não gere outra chave.' >&2
+            exit 1
+          }
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
@@ -40,19 +52,13 @@ jobs:
         run: sdkmanager 'platforms;android-36' 'build-tools;35.0.0' 'build-tools;36.0.0'
       - name: Instalar dependências fixadas
         run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Calcular versão
+      - name: Calcular versão acima do histórico publicado
         id: version
-        shell: python
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          import os
-          run = int(os.environ['GITHUB_RUN_NUMBER'])
-          attempt = int(os.environ['GITHUB_RUN_ATTEMPT'])
-          assert attempt < 50
-          code = 1000 + run * 100 + attempt * 2
-          assert code < 2100000000
-          name = f'0.1.{run}' + (f'-r{attempt}' if attempt > 1 else '')
-          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
-              out.write(f'code={code}\nnextcode={code + 1}\nname={name}\n')
+          python3 testes/versao_android.py
+          python3 ferramentas/versao_android.py >> "$GITHUB_OUTPUT"
       - name: Restaurar assinatura persistente
         env:
           KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -117,6 +123,13 @@ jobs:
           RELEASE_CODE: ${{ steps.version.outputs.code }}
         run: |
           python3 ferramentas/notas_release.py "$RELEASE_NAME" "$RELEASE_CODE" > "$RUNNER_TEMP/panelinha-release.md"
+          if git ls-remote --exit-code --tags origin "refs/tags/v$RELEASE_NAME" >/dev/null; then
+            echo 'Tag já existe; publicação interrompida para não anexar um APK a outro código-fonte.' >&2
+            exit 1
+          else
+            ref_status=$?
+            test "$ref_status" -eq 2 || exit "$ref_status"
+          fi
           gh release create "v$RELEASE_NAME" "artifacts/Panelinha-Teste-v$RELEASE_NAME-c$RELEASE_CODE.apk" "artifacts/Panelinha-Teste-v$RELEASE_NAME-c$RELEASE_CODE.json" --target "$GITHUB_SHA" --title "Panelinha Teste v$RELEASE_NAME" --prerelease --notes-file "$RUNNER_TEMP/panelinha-release.md"
       - name: Limpar material de assinatura do runner
         if: always()

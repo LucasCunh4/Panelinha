@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 // Identidade e assinatura são persistentes. Nunca gerar chave de CI aqui.
 def signingNames = ['PANELINHA_KEYSTORE_PATH', 'PANELINHA_STORE_PASSWORD', 'PANELINHA_KEY_ALIAS', 'PANELINHA_KEY_PASSWORD']
 def signingReady = signingNames.every { System.getenv(it) }
+def versionReady = System.getenv('PANELINHA_VERSION_CODE') && System.getenv('PANELINHA_VERSION_NAME')
 def buildCode = (System.getenv('PANELINHA_VERSION_CODE') ?: '100').toInteger()
 def buildName = System.getenv('PANELINHA_VERSION_NAME') ?: '0.1'
 if (buildCode < 100 || buildCode > 2100000000) throw new GradleException('versionCode fora do intervalo reservado ao Panelinha')
@@ -80,5 +81,8 @@ try {
 gradle.taskGraph.whenReady { graph ->
     if (graph.allTasks.any { it.path in [':app:packageRelease', ':app:packageDebug'] } && !signingReady) {
         throw new GradleException('Assinatura persistente ausente. Consulte ANDROID.md; não use outra chave.')
+    }
+    if (graph.allTasks.any { it.path in [':app:packageRelease', ':app:packageDebug'] } && !versionReady) {
+        throw new GradleException('Versão explícita ausente. Use o workflow ou compilar_android.py; não reutilize o código inicial por engano.')
     }
 }

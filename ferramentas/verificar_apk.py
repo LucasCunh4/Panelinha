@@ -39,15 +39,24 @@ with zipfile.ZipFile(apk) as archive:
     assert len(pngs) == 52, f'Quantidade incorreta no APK: {len(pngs)}'
     for entry in manifest['files']:
         assert hashlib.sha256(archive.read(prefix + entry['path'])).hexdigest() == entry['sha256'], entry['path']
-    for name in ['index.html', 'mesa.css', 'mesa.js']:
+    for name in ['mesa.css', 'mesa.js']:
         assert archive.read(prefix + name) == (root / 'IMPORTACAO_PANELAS' / name).read_bytes(), f'Jogo alterado no APK: {name}'
+    original_html = (root / 'IMPORTACAO_PANELAS/index.html').read_bytes()
+    has_compat = prefix + 'android-compat.js' in archive.namelist()
+    if has_compat:
+        expected_html = original_html.replace(b'<script src="mesa.js"></script>', b'<script src="android-compat.js"></script>\n<script src="mesa.js"></script>')
+        assert archive.read(prefix + 'index.html') == expected_html, 'HTML do jogo divergiu além da inclusão de compatibilidade'
+        assert archive.read(prefix + 'android-compat.js') == (root / 'dist/android-compat.js').read_bytes(), 'Bundle de compatibilidade divergente'
+    else:
+        assert int(package[2]) == 100, 'APKs seguintes precisam da compatibilidade para WebView antigo'
+        assert archive.read(prefix + 'index.html') == original_html, 'HTML original alterado'
     config = json.loads(archive.read('assets/capacitor.config.json'))
     assert config['server']['hostname'] == 'localhost' and config['server']['androidScheme'] == 'https'
     assert 'url' not in config['server'], 'O APK não deve depender de servidor remoto'
 info = {
     'file': apk.name, 'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
     'applicationId': package[1], 'versionCode': int(package[2]), 'versionName': package[3],
-    'certificateSha256': match[1].lower(), 'pngsVerified': len(pngs), 'origin': identity['origin'],
+    'certificateSha256': match[1].lower(), 'pngsVerified': len(pngs), 'origin': identity['origin'], 'androidCompat': has_compat,
 }
 apk.with_suffix('.json').write_text(json.dumps(info, indent=2) + '\n')
 print(json.dumps(info, indent=2))

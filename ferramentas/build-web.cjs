@@ -14,4 +14,14 @@ for (const entry of manifest.files) {
 fs.rmSync(output, {recursive:true, force:true});
 fs.mkdirSync(output, {recursive:true});
 for (const name of ['index.html', 'mesa.css', 'mesa.js', 'assets']) fs.cpSync(path.join(source, name), path.join(output, name), {recursive:true});
-console.log('Web preparado: jogo original e 52 PNGs, sem alterar a origem.');
+require('esbuild').buildSync({
+  entryPoints:[path.join(__dirname, 'android-compat.js')],
+  outfile:path.join(output, 'android-compat.js'),
+  bundle:true, minify:true, format:'iife', target:'chrome80', legalComments:'inline'
+});
+const originalHTML = fs.readFileSync(path.join(source, 'index.html'), 'utf8');
+const marker = '<script src="mesa.js"></script>';
+if (originalHTML.split(marker).length !== 2) throw Error('Ponto de inclusão da compatibilidade alterado');
+fs.writeFileSync(path.join(output, 'index.html'), originalHTML.replace(marker, '<script src="android-compat.js"></script>\n' + marker));
+fs.copyFileSync(require.resolve('core-js/LICENSE'), path.join(output, 'android-compat.LICENSE.txt'));
+console.log('Web preparado: jogo e 52 PNGs originais, com compatibilidade do host Android. Origem inalterada.');

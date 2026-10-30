@@ -1,6 +1,6 @@
 # Panelinha Teste — Android
 
-O Android é um contêiner Capacitor 8.6.0 do jogo existente. `IMPORTACAO_PANELAS/` permanece a versão web independente. `npm run build` confere as 52 imagens e copia `index.html`, `mesa.css`, `mesa.js` e `assets/` para `dist/`, sem reescrever o jogo. `npm run sync:android` sincroniza esse pacote com o aplicativo. Não usa servidor remoto, conta ou multiplayer.
+O Android é um contêiner Capacitor 8.6.0 do jogo existente. `IMPORTACAO_PANELAS/` permanece a versão web independente. `npm run build` confere as 52 imagens e copia o jogo para `dist/`. Apenas no pacote gerado, inclui `android-compat.js` antes dos scripts originais: APIs padronizadas ausentes em WebViews antigos, sem reescrever regras ou alterar os arquivos de `IMPORTACAO_PANELAS/`. `npm run sync:android` sincroniza esse pacote com o aplicativo. Não usa servidor remoto, conta ou multiplayer.
 
 ## Identidade permanente de atualização
 
@@ -8,7 +8,7 @@ O Android é um contêiner Capacitor 8.6.0 do jogo existente. `IMPORTACAO_PANELA
 - applicationId/namespace: **`com.lucascunha.panelinha.teste`**.
 - Origem local do WebView: **`https://localhost`**.
 - Certificado público SHA-256 registrado em `android-identity.json`.
-- Android mínimo: **7.0 (API 24)**, com Android System WebView atualizado; target/compile API 36; retrato e paisagem por sensor.
+- Android mínimo: **7.0 (API 24)**, com Android System WebView atualizado (validação também em WebView 83); target/compile API 36; retrato e paisagem por sensor.
 
 Para atualizar sem desinstalar, todos os APKs precisam conservar o applicationId, o certificado e essa origem. `versionCode` precisa crescer. O verificador rejeita outro certificado, outro pacote ou outra origem. Não rode `adb uninstall`, não limpe os dados e não use outra chave de debug.
 
@@ -56,12 +56,12 @@ Requisitos: Node.js 22+, JDK 21, Android SDK com `platforms;android-36`, `build-
 
 ```sh
 npm ci --ignore-scripts --no-audit --no-fund
-python3 ferramentas/compilar_android.py --secrets-dir /caminho/privado --code 100 --name 0.1 --test-apk
+python3 ferramentas/compilar_android.py --secrets-dir /caminho/privado --code 102 --name 0.1.1 --test-apk
 ```
 
-O código 100 é da **primeira versão somente**. Para compilações locais posteriores, escolha um código maior do que todos os APKs já distribuídos; nunca volte a 100. O método normal de atualização é o workflow, que calcula isso automaticamente.
+O comando acima reproduz a correção entregue, não gera uma versão nova. O código 100 pertence à primeira v0.1 e o 102 à correção v0.1.1. Para uma versão local posterior, escolha um código maior do que todos os APKs já distribuídos; nunca volte a um código anterior. A criação de APK por Gradle sem versão explícita também é recusada. O método normal de atualização é o workflow, que calcula isso automaticamente.
 
-A saída fica em `artifacts/Panelinha-Teste-v0.1-c100.apk` e em um JSON com hash/metadados. A compilação executa `apksigner verify`, verifica a assinatura v2, o certificado fixo, o pacote, a origem e cada um dos 52 PNGs/jogo original dentro do APK. Não distribui APK sem assinatura. O código do app de testes Android é separado e não entra no APK do jogo.
+A saída segue `artifacts/Panelinha-Teste-vVERSAO-cCODIGO.apk`, acompanhada de um JSON com hash/metadados. A compilação executa `apksigner verify`, verifica a assinatura v2, o certificado fixo, o pacote, a origem e cada um dos 52 PNGs e o jogo original dentro do APK. O HTML só pode diferir pela inclusão única do script de compatibilidade; os scripts e CSS originais permanecem íntegros. Não distribui APK sem assinatura. O código do app de testes Android é separado e não entra no APK do jogo.
 
 ## Próximas versões pelo GitHub
 
@@ -72,9 +72,9 @@ A saída fica em `artifacts/Panelinha-Teste-v0.1-c100.apk` e em um JSON com hash
 5. Executa testes reais em Android 35 offline e instala uma segunda compilação por cima da primeira para conferir os dados locais. Só publica depois que os testes passam.
 6. Baixe o APK em **Releases**, numa versão marcada **Pre-release**. Também fica nos artifacts da execução por 90 dias. No celular, toque no APK e aceite **Atualizar**. Não desinstale antes.
 
-Cada execução gera `v0.1.N`, onde N é o `GITHUB_RUN_NUMBER`; reexecuções usam sufixo `-rT`. `versionCode = 1000 + 100*N + 2*T`, acima do 100 inicial. O código seguinte (+1) é reservado para o teste automático de atualização e não é publicado. O mesmo workflow serializa publicações para impedir duas assinaturas/publicações concorrentes.
+Cada execução gera `v0.1.(N+1)`, onde N é o `GITHUB_RUN_NUMBER` (o patch 1 foi reservado à correção inicial de WebView); reexecuções usam sufixo `-rT`. `versionCode` usa como base `1000 + 100*N + 2*T` e consulta todas as Releases para ficar também acima do maior código já publicado (+2, reservando +1 ao teste). O patch do nome também supera o histórico. Assim, execuções fora de ordem não publicam downgrade. A falha de consulta da API aborta o cálculo, sem assumir histórico vazio. O código seguinte (+1) é reservado para o teste automático de atualização e não é publicado. Uma tag que já exista faz a publicação falhar, evitando anexar APK a outro código-fonte. O mesmo workflow serializa publicações para impedir duas assinaturas/publicações concorrentes.
 
-**Não renomeie/exclua/recrie `.github/workflows/android-testes.yml` nem reinicie sua sequência.** Isso pode reiniciar `run_number`. Se precisar mudar o mecanismo, aumente a base de `versionCode` acima de todos os códigos anteriores. Não recrie tags/Releases existentes para ocultar uma falha; a reexecução produz outra identificação.
+**Não renomeie/exclua/recrie `.github/workflows/android-testes.yml` nem reinicie sua sequência.** Isso pode reiniciar `run_number`. A consulta ao histórico oferece uma proteção adicional, mas não apague o histórico de Releases. Se precisar mudar o mecanismo, aumente a base de `versionCode` acima de todos os códigos anteriores. Não recrie tags/Releases existentes para ocultar uma falha; a reexecução produz outra identificação.
 
 O workflow não usa chave de debug descartável. Se faltar algum Secret, ele falha com orientação e não gera outro certificado. Os arquivos privados temporários são apagados do runner ao finalizar. A chave privada não é anexada aos artifacts ou Releases.
 
@@ -82,10 +82,16 @@ O workflow não usa chave de debug descartável. Se faltar algum Secret, ele fal
 
 Testes web existentes continuam disponíveis por HTTP: `node testes/integracao.cjs`, `node testes/mesa.cjs`. O código web original não foi modificado.
 
-A instrumentação Android (`OfflineGameTest`, 4 testes) verifica no APK real: ausência de rede, decodificação de todos os 52 PNGs, quatro jogadores/três bots, toques Android em carta/corte/compra +20, ação automática de bot e orientações retrato/paisagem. Também grava sentinelas em localStorage/SharedPreferences. A classe `UpdatePersistenceTest` (1 teste) confere essas sentinelas após `adb install -r` de um APK com código maior e a mesma assinatura. O script confirma também que o UID do aplicativo foi preservado.
+A instrumentação Android (`OfflineGameTest`, 4 testes) verifica no APK real: ausência de rede, decodificação de todos os 52 PNGs, quatro jogadores/três bots, toques Android em carta/Última Carta/corte/compra +20, ação automática de bot e orientações retrato/paisagem. Também grava sentinelas em localStorage/SharedPreferences. A classe `UpdatePersistenceTest` (1 teste) confere essas sentinelas após `adb install -r` de um APK com código maior e a mesma assinatura. O script confirma também que o UID do aplicativo foi preservado.
 
 ```sh
 bash ferramentas/testar_android.sh primeiro.apk seguinte.apk instrumentacao.apk
 ```
 
 Esse script destina-se a um emulador/dispositivo exclusivo de testes: desliga Wi-Fi/dados e ativa modo avião. Não roda no celular pessoal sem essa intenção. Os resultados completos ficam em `artifacts/testes-android/`; a presença de `OK (4 tests)`/`OK (1 test)` é validada porque o comando de instrumentação pode retornar status 0 mesmo com falhas. Consulte `testes/ANDROID_RESULTADOS.md` para o que efetivamente foi executado nesta entrega.
+
+## Compatibilidade Android sem alterar o jogo
+
+O WebView 83 da imagem Android 11 não possui `String.prototype.replaceAll`, usado no histórico do protótipo. A falha interrompia o render antes do agendamento do bot. A versão **0.1.1 / código 102** inclui o polyfill padronizado de core-js e a compatibilidade de `Element.getAnimations` no pacote gerado. Não altera regras, bot, arquivos PNG nem a interface. A v0.1 / código 100 permanece no histórico; prefira instalar a 0.1.1 ou posterior, inclusive por cima da v0.1.
+
+`node testes/android-compat.cjs`, apontado ao `dist/` servido por HTTP, simula a ausência dessas APIs e verifica mesa completa, turno automático de bot e Inverter. A instrumentação Android valida o pacote real. Ao substituir artes aprovadas no futuro, atualize também os hashes do manifesto de 52 PNGs para o build verificar os novos arquivos.

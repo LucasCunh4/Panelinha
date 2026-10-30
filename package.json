@@ -12,6 +12,8 @@
     "@capacitor/core": "8.6.0"
   },
   "devDependencies": {
-    "@capacitor/cli": "8.6.0"
+    "@capacitor/cli": "8.6.0",
+    "core-js": "3.51.0",
+    "esbuild": "0.28.2"
   }
 }

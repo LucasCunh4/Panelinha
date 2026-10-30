@@ -1,0 +1,2 @@
+# Wrapper Windows: texto normalizado no Git, CRLF no checkout.
+android/gradlew.bat text eol=crlf whitespace=cr-at-eol
