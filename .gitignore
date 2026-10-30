@@ -16,5 +16,8 @@ android/app/src/main/assets/capacitor.plugins.json
 .env
 .env.*
 *.password
+.panelinha-private/
+*signing-backup*
+*assinatura-backup*
 __pycache__/
 *.pyc

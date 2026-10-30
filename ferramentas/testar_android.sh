@@ -30,15 +30,26 @@ if adb shell service check phone | grep -q '^Service phone: found'; then
   adb shell svc data disable
 fi
 adb shell cmd connectivity airplane-mode enable
-adb shell dumpsys connectivity > "$output/rede-offline.txt"
 python3 - "$output/rede-offline.txt" <<'PYTHON'
 from pathlib import Path
+import subprocess
 import sys
-assert 'Active default network: none' in Path(sys.argv[1]).read_text(), 'O Android ainda tem rede ativa'
+import time
+# Desligar o rádio é assíncrono, especialmente no emulador sem KVM.
+# Exigir desconexão real antes de instalar/testar, sem relaxar a verificação.
+deadline = time.monotonic() + 90
+while True:
+    snapshot = subprocess.check_output(['adb', 'shell', 'dumpsys', 'connectivity'], text=True)
+    Path(sys.argv[1]).write_text(snapshot)
+    if 'Active default network: none' in snapshot:
+        break
+    if time.monotonic() >= deadline:
+        raise SystemExit('O Android ainda tem rede ativa após aguardar a desconexão')
+    time.sleep(2)
 PYTHON
 if [[ "${PANELINHA_VERIFY_EXISTING_DATA:-0}" = 1 ]]; then original_uid="$(app_uid)"; fi
-adb install -r "$first_apk"
-adb install -r -t "$test_apk"
+adb install --no-streaming -r "$first_apk"
+adb install --no-streaming -r -t "$test_apk"
 if [[ "${PANELINHA_VERIFY_EXISTING_DATA:-0}" = 1 ]]; then
   test -n "$original_uid" && test "$original_uid" = "$(app_uid)"
   run_tests UpdatePersistenceTest 1 "$output/update-anterior.txt"
@@ -46,7 +57,7 @@ fi
 run_tests OfflineGameTest 4 "$output/offline.txt"
 uid_before="$(app_uid)"
 adb shell am force-stop "$app"
-adb install -r "$next_apk"
+adb install --no-streaming -r "$next_apk"
 uid_after="$(app_uid)"
 test -n "$uid_before" && test "$uid_before" = "$uid_after"
 run_tests UpdatePersistenceTest 1 "$output/update.txt"

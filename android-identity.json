@@ -2,7 +2,18 @@
   "applicationId": "com.lucascunha.panelinha.teste",
   "appName": "Panelinha Teste",
   "origin": "https://localhost",
-  "certificateSha256": "de8156cd330a1b7088ce1a84340c91a3c249e34c5ad76660d8c2294b7ff41ba4",
-  "firstVersionName": "0.1",
-  "firstVersionCode": 100
+  "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+  "firstVersionName": "0.2.0",
+  "firstVersionCode": 2000,
+  "signingGeneration": 2,
+  "signingReplacedOn": "2026-10-30",
+  "previousCertificates": [
+    {
+      "certificateSha256": "de8156cd330a1b7088ce1a84340c91a3c249e34c5ad76660d8c2294b7ff41ba4",
+      "status": "retired-private-key-inaccessible",
+      "lastDistributedVersion": "0.1.1",
+      "lastDistributedVersionCode": 102
+    }
+  ],
+  "migrationRequiresReinstall": true
 }

@@ -1,5 +1,11 @@
 # Panelinha Teste — Android
 
+> Assinatura ativa: **geração 2**, autorizada em 30/10/2026 após perda da chave
+> anterior. Identidade pública e certificado aposentado em `android-identity.json`.
+> v0.2.0/código 2000 inicia a nova família; 2001 é reservado ao teste de atualização.
+> A instalação antiga exige reinstalação manual única, com perda de dados locais.
+> Não há desinstalação automática. Veja `BACKUP_ASSINATURA.md`.
+
 O Android é um contêiner Capacitor 8.6.0 do jogo existente. `IMPORTACAO_PANELAS/` permanece a versão web independente. `npm run build` confere as 52 imagens e copia o jogo para `dist/`. Apenas no pacote gerado, inclui `android-compat.js` antes dos scripts originais: APIs padronizadas ausentes em WebViews antigos, sem reescrever regras ou alterar os arquivos de `IMPORTACAO_PANELAS/`. `npm run sync:android` sincroniza esse pacote com o aplicativo. Não usa servidor remoto, conta ou multiplayer.
 
 ## Identidade permanente de atualização
@@ -16,7 +22,7 @@ O protótipo atual não grava a partida em andamento. Seu fechamento já reinici
 
 ## Assinatura exclusiva de testes
 
-A chave **já foi criada** fora do repositório, no diretório privado da máquina de trabalho `/workspace/.panelinha-private/`, com acesso restrito ao dono. Não há senha ou chave privada no Git, no APK ou no código. Não gere outra chave: ela não conseguiria atualizar o primeiro APK instalado.
+A chave **da geração 2 já foi criada** fora do repositório, no diretório privado da máquina de trabalho `/workspace/.panelinha-private/`, com acesso restrito ao dono. Não há senha ou chave privada no Git, no APK ou no código. Não gere outra chave: ela não conseguiria atualizar os APKs da geração 2. O primeiro APK antigo usa um certificado aposentado e não pode ser atualizado por esta chave.
 
 Arquivos privados necessários, nunca versionar:
 
@@ -56,23 +62,23 @@ Requisitos: Node.js 22+, JDK 21, Android SDK com `platforms;android-36`, `build-
 
 ```sh
 npm ci --ignore-scripts --no-audit --no-fund
-python3 ferramentas/compilar_android.py --secrets-dir /caminho/privado --code 102 --name 0.1.1 --test-apk
+python3 ferramentas/compilar_android.py --secrets-dir /caminho/privado --code 2000 --name 0.2.0 --test-apk
 ```
 
-O comando acima reproduz a correção entregue, não gera uma versão nova. O código 100 pertence à primeira v0.1 e o 102 à correção v0.1.1. Para uma versão local posterior, escolha um código maior do que todos os APKs já distribuídos; nunca volte a um código anterior. A criação de APK por Gradle sem versão explícita também é recusada. O método normal de atualização é o workflow, que calcula isso automaticamente.
+O comando acima reproduz a primeira versão da geração 2. O código 100 pertence à v0.1 e o 102 à v0.1.1, ambas da assinatura aposentada. O código 2001 fica reservado ao teste de atualização da nova família. Para uma versão local posterior, escolha um código maior do que todos os APKs já distribuídos; nunca volte a um código anterior. A criação de APK por Gradle sem versão explícita também é recusada. O método normal de atualização é o workflow, que calcula isso automaticamente.
 
 A saída segue `artifacts/Panelinha-Teste-vVERSAO-cCODIGO.apk`, acompanhada de um JSON com hash/metadados. A compilação executa `apksigner verify`, verifica a assinatura v2, o certificado fixo, o pacote, a origem e cada um dos 52 PNGs e o jogo original dentro do APK. O HTML só pode diferir pela inclusão única do script de compatibilidade; os scripts e CSS originais permanecem íntegros. Não distribui APK sem assinatura. O código do app de testes Android é separado e não entra no APK do jogo.
 
 ## Próximas versões pelo GitHub
 
-1. Configure os quatro Secrets com **a mesma chave do primeiro APK**.
-2. Integre a branch `android/apk-testes` à `main` para disponibilizar o botão manual de Actions.
+1. Configure os quatro Secrets com **a chave ativa da geração 2**.
+2. Integre a branch de recuperação `android/assinatura-permanente-v2` (baseada em `android/apk-testes` e com a `main` preservada) à `main` para disponibilizar o workflow com a identidade ativa. Faça isso somente após confirmar backup e secrets da geração 2.
 3. Após alterações no jogo pelo Codex, envie o código à `main`. O workflow **APK Android de testes** começa automaticamente. Também pode usar **Actions → APK Android de testes → Run workflow**.
 4. O workflow instala dependências pelo lockfile, prepara a web, sincroniza o Capacitor, compila/assina o APK e verifica seu conteúdo/certificado.
 5. Executa testes reais em Android 35 offline e instala uma segunda compilação por cima da primeira para conferir os dados locais. Só publica depois que os testes passam.
-6. Baixe o APK em **Releases**, numa versão marcada **Pre-release**. Também fica nos artifacts da execução por 90 dias. No celular, toque no APK e aceite **Atualizar**. Não desinstale antes.
+6. Baixe o APK em **Releases**, numa versão marcada **Pre-release**. Também fica nos artifacts da execução por 90 dias. Entre APKs da geração 2, toque no APK e aceite **Atualizar**. Não desinstale antes. Para migrar da assinatura antiga, consulte `BACKUP_ASSINATURA.md` e só faça a reinstalação manual após validar o APK e guardar o backup.
 
-Cada execução gera `v0.1.(N+1)`, onde N é o `GITHUB_RUN_NUMBER` (o patch 1 foi reservado à correção inicial de WebView); reexecuções usam sufixo `-rT`. `versionCode` usa como base `1000 + 100*N + 2*T` e consulta todas as Releases para ficar também acima do maior código já publicado (+2, reservando +1 ao teste). O patch do nome também supera o histórico. Assim, execuções fora de ordem não publicam downgrade. A falha de consulta da API aborta o cálculo, sem assumir histórico vazio. O código seguinte (+1) é reservado para o teste automático de atualização e não é publicado. Uma tag que já exista faz a publicação falhar, evitando anexar APK a outro código-fonte. O mesmo workflow serializa publicações para impedir duas assinaturas/publicações concorrentes.
+Cada execução gera `v0.2.N`, onde N é o `GITHUB_RUN_NUMBER`; reexecuções usam sufixo `-rT`. `versionCode` usa como base `1000 + 100*N + 2*T` e consulta todas as Releases para ficar também acima do maior código já publicado e do piso local 2001 (+2, reservando +1 ao teste). O patch do nome também supera o histórico. Assim, execuções fora de ordem não publicam downgrade. A falha de consulta da API aborta o cálculo, sem assumir histórico vazio. O código seguinte (+1) é reservado para o teste automático de atualização e não é publicado. Uma tag que já exista faz a publicação falhar, evitando anexar APK a outro código-fonte. O mesmo workflow serializa publicações para impedir duas assinaturas/publicações concorrentes.
 
 **Não renomeie/exclua/recrie `.github/workflows/android-testes.yml` nem reinicie sua sequência.** Isso pode reiniciar `run_number`. A consulta ao histórico oferece uma proteção adicional, mas não apague o histórico de Releases. Se precisar mudar o mecanismo, aumente a base de `versionCode` acima de todos os códigos anteriores. Não recrie tags/Releases existentes para ocultar uma falha; a reexecução produz outra identificação.
 

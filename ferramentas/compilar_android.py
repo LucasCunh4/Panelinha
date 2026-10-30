@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+from verificar_assinatura import verify
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--secrets-dir', type=Path)
@@ -19,6 +20,7 @@ root = Path(__file__).resolve().parent.parent
 env = os.environ.copy()
 if args.secrets_dir:
     folder = args.secrets_dir.resolve()
+    verify(folder)
     env.update({
         'PANELINHA_KEYSTORE_PATH': str(folder / 'panelinha-test.p12'),
         'PANELINHA_STORE_PASSWORD': (folder / 'store.password').read_text().strip(),

@@ -12,9 +12,10 @@ import subprocess
 def allocate(releases, run, attempt):
     if run < 1 or not 1 <= attempt < 50:
         raise ValueError('Sequência/attempt inválidos')
-    highest_code, highest_patch = 103, 1
+    # 2000/2001: primeira entrega local e teste de atualização da assinatura v2.
+    highest_code, highest_patch = 2001, 0
     for release in releases:
-        tag = re.fullmatch(r'v0\.1\.(\d+)(?:-r\d+)?', release.get('tag_name', ''))
+        tag = re.fullmatch(r'v0\.2\.(\d+)(?:-r\d+)?', release.get('tag_name', ''))
         if tag:
             highest_patch = max(highest_patch, int(tag[1]))
         for asset in release.get('assets', []):
@@ -24,7 +25,7 @@ def allocate(releases, run, attempt):
     code = max(1000 + run * 100 + attempt * 2, highest_code + 2)
     if code + 1 > 2100000000:
         raise ValueError('Limite Android de versionCode atingido')
-    name = f'0.1.{max(run + 1, highest_patch + 1)}' + (f'-r{attempt}' if attempt > 1 else '')
+    name = f'0.2.{max(run, highest_patch + 1)}' + (f'-r{attempt}' if attempt > 1 else '')
     return code, name
 
 

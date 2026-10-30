@@ -17,12 +17,15 @@ if not (tools / 'apksigner').is_file():
     raise SystemExit('Configure ANDROID_HOME e instale build-tools;36.0.0.')
 result = subprocess.check_output([str(tools / 'apksigner'), 'verify', '--verbose', '--print-certs', str(apk)], text=True)
 match = re.search(r'Signer #1 certificate SHA-256 digest: ([a-fA-F0-9]+)', result)
-assert match and match[1].lower() == identity['certificateSha256'], 'Certificado diferente: este APK não atualiza os anteriores'
+assert match and match[1].lower() == identity['certificateSha256'], 'Certificado diferente da assinatura ativa: APK recusado'
+assert match[1].lower() not in {c['certificateSha256'] for c in identity.get('previousCertificates', [])}, 'Certificado aposentado: APK recusado'
+assert identity['applicationId'] == 'com.lucascunha.panelinha.teste', 'Pacote permanente alterado'
 assert 'Verified using v2 scheme (APK Signature Scheme v2): true' in result, 'Assinatura v2 ausente'
 aapt = tools / 'aapt'
 metadata = subprocess.check_output([str(aapt), 'dump', 'badging', str(apk)], text=True)
 package = re.search(r"package: name='([^']+)' versionCode='(\d+)' versionName='([^']+)'", metadata)
 assert package and package[1] == identity['applicationId'], 'applicationId divergente'
+assert int(package[2]) >= identity['firstVersionCode'], 'versionCode anterior à geração de assinatura ativa'
 assert "application-label:'Panelinha Teste'" in metadata, 'Nome do app incorreto'
 assert "sdkVersion:'24'" in metadata and "targetSdkVersion:'36'" in metadata
 assert 'application-debuggable' not in metadata, 'Distribuir somente APK release'
@@ -57,6 +60,7 @@ info = {
     'file': apk.name, 'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
     'applicationId': package[1], 'versionCode': int(package[2]), 'versionName': package[3],
     'certificateSha256': match[1].lower(), 'pngsVerified': len(pngs), 'origin': identity['origin'], 'androidCompat': has_compat,
+    'signingGeneration': identity.get('signingGeneration', 1),
 }
 apk.with_suffix('.json').write_text(json.dumps(info, indent=2) + '\n')
 print(json.dumps(info, indent=2))

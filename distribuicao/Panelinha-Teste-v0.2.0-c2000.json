@@ -1,0 +1,12 @@
+{
+  "file": "Panelinha-Teste-v0.2.0-c2000.apk",
+  "sha256": "9116dda852c089231d2826b642eab605bb9994d078d712d617902da1a7203140",
+  "applicationId": "com.lucascunha.panelinha.teste",
+  "versionCode": 2000,
+  "versionName": "0.2.0",
+  "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+  "pngsVerified": 52,
+  "origin": "https://localhost",
+  "androidCompat": true,
+  "signingGeneration": 2
+}

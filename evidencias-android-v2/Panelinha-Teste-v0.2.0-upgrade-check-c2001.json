@@ -1,0 +1,12 @@
+{
+  "file": "Panelinha-Teste-v0.2.0-upgrade-check-c2001.apk",
+  "sha256": "3a4d1b2cbb51af72f29b48d2a8e4080747d0e6d7193c833b2ca5cff756673281",
+  "applicationId": "com.lucascunha.panelinha.teste",
+  "versionCode": 2001,
+  "versionName": "0.2.0-upgrade-check",
+  "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+  "pngsVerified": 52,
+  "origin": "https://localhost",
+  "androidCompat": true,
+  "signingGeneration": 2
+}

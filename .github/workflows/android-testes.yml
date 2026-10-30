@@ -35,7 +35,7 @@ jobs:
         run: |
           set +x
           test -n "$KEYSTORE" && test -n "$STORE_PASSWORD" && test -n "$KEY_PASSWORD" && test -n "$KEY_ALIAS" || {
-            echo 'Faltam Secrets da assinatura ORIGINAL. Consulte ANDROID.md; não gere outra chave.' >&2
+            echo 'Faltam Secrets da assinatura ATIVA da geração 2. Consulte ANDROID.md; não gere outra chave.' >&2
             exit 1
           }
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4

@@ -1,5 +1,9 @@
 # Android — resultados da entrega
 
+> Registro histórico da assinatura aposentada (v0.1/v0.1.1). Estes resultados
+> não comprovam a geração 2 e não devem ser interpretados como testes atuais.
+> A recuperação de 30/10/2026 está em `ASSINATURA_V2_RESULTADOS.md`.
+
 ## APKs reais
 
 - v0.1 / código 100: primeiro APK compilado, assinado, instalado e preservado na tag v0.1.
