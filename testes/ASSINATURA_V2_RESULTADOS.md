@@ -45,15 +45,22 @@
 - Backup definitivo criado fora do Git e cifrado para a chave pública OpenKeychain
   fornecida pelo usuário. Subchave destinatária conferida internamente; nenhum
   segredo ou arquivo decifrado foi publicado.
-- Isso ainda **não comprova backup externo recuperável**: aguardando confirmação
-  de download e decifragem no celular. A chave privada OpenKeychain permanece
-  somente com o usuário. Procedimento em `BACKUP_ASSINATURA.md`.
+- **Recuperação externa confirmada pelo usuário:** download, decifragem no
+  OpenKeychain do Android e visualização dos cinco arquivos dentro do ZIP,
+  sem extrair nem compartilhar seu conteúdo. A chave privada OpenKeychain
+  permanece somente com o usuário. Procedimento em `BACKUP_ASSINATURA.md`.
 - Configuração dos quatro GitHub Secrets tentada. A consulta prévia respondeu
   `Forbidden` em `api.github.com`; nenhum valor foi enviado. Presença e permissões
   de escrita permanecem sem confirmação. Script pronto para enviar a mesma chave
   quando a API estiver liberada e autorizada.
 - Rascunho de rede salvo com `api.github.com` e `uploads.github.com`, sem publicação.
-  Não descartar/republicar a máquina antes de verificar o backup externo.
+  A política em execução ainda não permite esses hosts. A consulta HTTPS direta
+  falhou no túnel do proxy com `403 Forbidden`, antes de chegar ao GitHub.
+- `gh auth login --web` verificado preservando o ambiente: CLI recusou login
+  adicional por já usar `GH_TOKEN` gerenciado. Nenhuma credencial foi removida
+  ou substituída e nenhum token/código de dispositivo foi exibido.
+- Secrets e execução hospedada do workflow continuam pendentes de acesso à API
+  e autorização de escrita. Consulte `AUTOMACAO_ANDROID.md` para as alternativas.
 
 ## Android instalado
 

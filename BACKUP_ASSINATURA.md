@@ -5,6 +5,11 @@ O certificado ativo está em `android-identity.json`; o certificado antigo perma
 registrado como aposentado. O applicationId continua `com.lucascunha.panelinha.teste`.
 Nunca gere outra chave para restaurar uma máquina: recupere o backup desta chave.
 
+O usuário confirmou a recuperação fora do Codex: decifragem no OpenKeychain do
+Android e visualização dos cinco arquivos do ZIP, sem extrair nem compartilhar
+o conteúdo. A configuração dos GitHub Secrets ainda depende da liberação de
+acesso descrita em `AUTOMACAO_ANDROID.md`.
+
 ## Somente pelo celular Android (recomendado para este projeto)
 
 1. Instale o OpenKeychain a partir de uma loja confiável. Crie uma chave pessoal
