@@ -1,0 +1,17 @@
+{
+  "name": "panelinha",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "node ferramentas/build-web.cjs",
+    "sync:android": "npm run build && cap sync android",
+    "verify:apk": "python3 ferramentas/verificar_apk.py"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.6.0",
+    "@capacitor/core": "8.6.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.0"
+  }
+}

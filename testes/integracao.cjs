@@ -138,7 +138,7 @@ const base = process.env.PANELAS_TEST_URL || 'http://127.0.0.1:8000/';
   console.log('PASS laboratório: revelar bots e desligar PNGs');
   // O cronômetro deve cobrar a punição inteira, não apenas uma carta.
   await page.evaluate(()=>{
-   const s=CartasTest.getState();s.current=0;s.unlockAt=0;s.drawn=null;s.phase='playing';s.finisher=null;s.token++;s.o.timeout=15;s.deadline=Date.now()+100;
+   const s=CartasTest.getState();s.current=0;s.direction=1;s.unlockAt=0;s.drawn=null;s.phase='playing';s.finisher=null;s.token++;s.o.timeout=15;s.deadline=Date.now()+100;
    document.querySelector('#testPenalty').click();s.deadline=Date.now()+100;
    window.beforeTimeout=s.players[0].hand.length;
   });

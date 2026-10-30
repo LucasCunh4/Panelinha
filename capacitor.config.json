@@ -1,0 +1,20 @@
+{
+  "appId": "com.lucascunha.panelinha.teste",
+  "appName": "Panelinha Teste",
+  "webDir": "dist",
+  "server": {
+    "hostname": "localhost",
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false,
+    "backgroundColor": "#100d1d"
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "disable",
+      "style": "DARK"
+    }
+  }
+}

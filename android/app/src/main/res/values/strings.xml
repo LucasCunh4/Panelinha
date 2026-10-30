@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Panelinha Teste</string>
+    <string name="title_activity_main">Panelinha Teste</string>
+    <string name="package_name">com.lucascunha.panelinha.teste</string>
+    <string name="custom_url_scheme">com.lucascunha.panelinha.teste</string>
+</resources>
