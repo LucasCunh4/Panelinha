@@ -1,0 +1,213 @@
+{
+  "count": 52,
+  "files": [
+    {
+      "path": "assets/cartas/amarelo/0.png",
+      "sha256": "49ce401ba3a971d0422eda90b878ba615761eeaa4f2c50cda5be5dd5130635b6"
+    },
+    {
+      "path": "assets/cartas/amarelo/1.png",
+      "sha256": "7a37b9a0546cdab87e6f96e4801b7b31522f0990352d1d90d77d71f20bf31048"
+    },
+    {
+      "path": "assets/cartas/amarelo/2.png",
+      "sha256": "a98786917bdda369f3e6e057f253f88ff5c72aba18974f57bdcabccc97c7c621"
+    },
+    {
+      "path": "assets/cartas/amarelo/3.png",
+      "sha256": "284f917eaaa0eaa34565d0ad1bec721e08be1ba777eae0c7d6ce7ca4592e1718"
+    },
+    {
+      "path": "assets/cartas/amarelo/4.png",
+      "sha256": "c4d526f14cd7bfeb42011ef5e3c99be6310ba5cc8ee4702c1bf5ac271f9d51d7"
+    },
+    {
+      "path": "assets/cartas/amarelo/5.png",
+      "sha256": "ea3c4d1e3ec4df80ded724032565957c8f5e3158014439c1a8c0bdc60c8ab74e"
+    },
+    {
+      "path": "assets/cartas/amarelo/6.png",
+      "sha256": "141499d4b0ff082b351ef0f3b22207699ec63c0cdb7e9e4cb1fe872d5cdf8eae"
+    },
+    {
+      "path": "assets/cartas/amarelo/7.png",
+      "sha256": "0c9bb5f6aceb7bb4b6c56bd30bbdaadf21fc2e9547e0ee78aab61da9418502ca"
+    },
+    {
+      "path": "assets/cartas/amarelo/8.png",
+      "sha256": "454f61a18acc4024d8526221c310212e3f1350380ad32ae407e378daccd1605e"
+    },
+    {
+      "path": "assets/cartas/amarelo/9.png",
+      "sha256": "0b40dcc4870e011f81d467fd2376c9ec983fbfc021814fc41a216e52e720f5ab"
+    },
+    {
+      "path": "assets/cartas/amarelo/bloqueio.png",
+      "sha256": "5ecf216906f6d201d0cae7280a5f415a7fc96e0f8a5665dd8cecf5dbd5c83dbb"
+    },
+    {
+      "path": "assets/cartas/amarelo/inverter.png",
+      "sha256": "3f4456dcdecdbae50a34e1c34dfe61cfafca52f52db84540532ca203d9fb9193"
+    },
+    {
+      "path": "assets/cartas/amarelo/mais_2.png",
+      "sha256": "930f75cab2bd53d051d14a66e97fdf9950a2cdb3dffa00142e8ad7573af0c788"
+    },
+    {
+      "path": "assets/cartas/azul/0.png",
+      "sha256": "fc56af95da738af77350d287639a23dbcfaee7873d2d98122aabac3e0eb8532a"
+    },
+    {
+      "path": "assets/cartas/azul/1.png",
+      "sha256": "1f96fd455001f30ad369c14785fc75930313f16d081e1af627f03f7716b0ae49"
+    },
+    {
+      "path": "assets/cartas/azul/2.png",
+      "sha256": "262027e8ca774a4636540ebb5f6095fdac77e22eabb373c896096170d41142e3"
+    },
+    {
+      "path": "assets/cartas/azul/3.png",
+      "sha256": "b7aa9e7f4fdca3aa2fda1dd5cc648b8f0042b307db45ec41106bff03263d2ce6"
+    },
+    {
+      "path": "assets/cartas/azul/4.png",
+      "sha256": "59d8131808c7842503051819ea3eb6f7972a86100c92229f7d4e11046bdcf3de"
+    },
+    {
+      "path": "assets/cartas/azul/5.png",
+      "sha256": "4303e316dbeb718cc91a1ba3dc3b47cc60de67744a9d9257410fcbfe6ca404e0"
+    },
+    {
+      "path": "assets/cartas/azul/6.png",
+      "sha256": "00601aa962e1bc385ca0f015e52320fa41c7bf8d0f6e9f417eced47a9d6e8ba9"
+    },
+    {
+      "path": "assets/cartas/azul/7.png",
+      "sha256": "cce1b08623f2b353434bd8dd5279cdb1a2cf5a627ad76fc71a955c98dfb8ab59"
+    },
+    {
+      "path": "assets/cartas/azul/8.png",
+      "sha256": "6ff1b8db805c135f8462330c37e72f174a3fbd06d315eaf8ff6c38ca8570fc0a"
+    },
+    {
+      "path": "assets/cartas/azul/9.png",
+      "sha256": "0c55a2567daacc13b870981bf3568a81473f70d3483f97c6f066b0b7f9f3bf18"
+    },
+    {
+      "path": "assets/cartas/azul/bloqueio.png",
+      "sha256": "44771969aa796f0f1f4f91b9869c2f2d8282cab0949e28bd4bf23d6559ae65ed"
+    },
+    {
+      "path": "assets/cartas/azul/inverter.png",
+      "sha256": "6f0c72f9074c2af401d4dad27c3cd93454c90eff689603e7fa1a32ee0df6e66f"
+    },
+    {
+      "path": "assets/cartas/azul/mais_2.png",
+      "sha256": "0efabc83dcc154357d36ed9e9e5f6a47f30999fb6b02a7eb43e27d3cc6b0216a"
+    },
+    {
+      "path": "assets/cartas/verde/0.png",
+      "sha256": "dbf0d22247b4716869f19c4c0bf9b7162e0e58bf40e67eb55e6bc31b712327c6"
+    },
+    {
+      "path": "assets/cartas/verde/1.png",
+      "sha256": "3656c89dd06b649081d1f50c776f2f111270b0c02589fa7929e236bb5e27575d"
+    },
+    {
+      "path": "assets/cartas/verde/2.png",
+      "sha256": "485b1dfd634268bf6afc5a3407d7cefc7f242c880daabef8f074d77d0a7afca2"
+    },
+    {
+      "path": "assets/cartas/verde/3.png",
+      "sha256": "abcc1e0938f02509ac87f8ace5fe4d60bd11abef7861ac7ad2e4680fd0f61f74"
+    },
+    {
+      "path": "assets/cartas/verde/4.png",
+      "sha256": "0314fe8dff3c6eed5582d397cac3c7de663a8f156f9c3d0d8ddbb099802de428"
+    },
+    {
+      "path": "assets/cartas/verde/5.png",
+      "sha256": "d599fd6353d0e6576f4e344bef615b86a27c2fe5a2374a20b968b558bbde0808"
+    },
+    {
+      "path": "assets/cartas/verde/6.png",
+      "sha256": "196c4a2fe522a354509f508a730eb3b2b0fefd1377518809ff38849ef5fd74a6"
+    },
+    {
+      "path": "assets/cartas/verde/7.png",
+      "sha256": "4970e21877f58ec0839f1dc2662e0202cf369dd76f2285a1c496e84d08bfe711"
+    },
+    {
+      "path": "assets/cartas/verde/8.png",
+      "sha256": "ed1282b6bb7e99957f7c6d7fa9ce8750168c9297d02cb24ac3ac9381b70be20a"
+    },
+    {
+      "path": "assets/cartas/verde/9.png",
+      "sha256": "123bac589a87ddb3fd740e852f3c239501616fc021c9c4937ae2a1ed3cd7d8da"
+    },
+    {
+      "path": "assets/cartas/verde/bloqueio.png",
+      "sha256": "8694a0253bc25d06b6b5a22cfc9765db33b5e47aaf16ab4dbb3df6637f92963b"
+    },
+    {
+      "path": "assets/cartas/verde/inverter.png",
+      "sha256": "e064e54acd105370637e8add0c7059ffede897499bf7f94a55c03517cf9f624a"
+    },
+    {
+      "path": "assets/cartas/verde/mais_2.png",
+      "sha256": "6d3cb38b88d3d2e61ff5df882e729037542efe70f6cef690d1795d021febd218"
+    },
+    {
+      "path": "assets/cartas/vermelho/0.png",
+      "sha256": "53c0002c2cd30ed9696393c7591927ff0b30bc2ec67d91b10b4596a59562558d"
+    },
+    {
+      "path": "assets/cartas/vermelho/1.png",
+      "sha256": "ffe32dad426b3c7a61c8123cb6eab8c520af66fd5f9285b26290a64885817f6f"
+    },
+    {
+      "path": "assets/cartas/vermelho/2.png",
+      "sha256": "efb2fb6655d03bfc051afb2d57efb993d915f0edda1d376edc1c2adb1fbd05c2"
+    },
+    {
+      "path": "assets/cartas/vermelho/3.png",
+      "sha256": "4c15d656c7522631ef9ce8fa4330d5ee207501c3e7dcabcbd27a37db0d053b35"
+    },
+    {
+      "path": "assets/cartas/vermelho/4.png",
+      "sha256": "c87d326561c786d21124a3c2f9596736a08455aa5a83de3b1a6ba42294435d8b"
+    },
+    {
+      "path": "assets/cartas/vermelho/5.png",
+      "sha256": "62f23e14724f83aa4cd85d44a05b341b6b33c32ca9519eda4216cad86ddd1c5f"
+    },
+    {
+      "path": "assets/cartas/vermelho/6.png",
+      "sha256": "da939d1193e5e8b1e8cbdf128ceaf3400254a1cb1f2f2acc57965e3c84ff7056"
+    },
+    {
+      "path": "assets/cartas/vermelho/7.png",
+      "sha256": "fcb87aa3f27995da15f57a5f4481267b965d768bee4669c7c38cbe6039615569"
+    },
+    {
+      "path": "assets/cartas/vermelho/8.png",
+      "sha256": "20b122e70dc0cb8bb89fd2e370ef4929053a35b315e699c97112deb3c3be206a"
+    },
+    {
+      "path": "assets/cartas/vermelho/9.png",
+      "sha256": "72c23be6ee74ba5a7efcb3e0fe61cb5cef250b0a3a9b9a3a93a55ab5ff201bee"
+    },
+    {
+      "path": "assets/cartas/vermelho/bloqueio.png",
+      "sha256": "ee247c6e103e3923056ab373829d3e363605a31124c8ade1dcddf078f6a5d36e"
+    },
+    {
+      "path": "assets/cartas/vermelho/inverter.png",
+      "sha256": "9712239854785cb8b0e58afc7b8bee4439788a9886631174928eb0f54fe16536"
+    },
+    {
+      "path": "assets/cartas/vermelho/mais_2.png",
+      "sha256": "6d9cab1f527210232b9d813f48df8c390fc03b43f2ae847077902e4e12f27a1f"
+    }
+  ]
+}

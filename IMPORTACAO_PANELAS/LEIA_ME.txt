@@ -1,0 +1,37 @@
+CARTAS EM QUATRO — PROTÓTIPO LOCAL V3 COM ARTES PNG
+
+INSTRUÇÕES:
+1. Extraia o arquivo ZIP INTEIRO, mantendo as pastas.
+2. Abra index.html no Chrome, Edge ou outro navegador moderno; pode funcionar direto pelo arquivo local.
+3. Se o navegador bloquear carregamento local de imagens, rode um servidor simples a partir desta pasta:
+   python -m http.server 8000
+   depois acesse http://localhost:8000/
+4. Inicie uma partida com três bots e teste os PNGs de 0 a 9, +2, Bloqueio e Inverter.
+5. No Laboratório de testes, desmarque 'Artes PNG' para alternar para as cartas do protótipo anterior.
+
+ARQUIVOS EXTRAÍDOS SEM ALTERAR NOMES:
+- assets/cartas/vermelho/0.png ... 9.png, mais_2.png, bloqueio.png, inverter.png
+- assets/cartas/azul/0.png ...
+- assets/cartas/verde/0.png ...
+- assets/cartas/amarelo/0.png ...
+
+MAPEAMENTO INTERNO:
+  num -> 0.png ... 9.png
+  draw2 -> mais_2.png   (ATENÇÃO: não é mais2.png nem mais_2_2.png)
+  skip -> bloqueio.png
+  reverse -> inverter.png
+  wild4, wild6, wild, dist, rotate -> visuais anteriores, sem PNG nesta etapa.
+
+REGRAS:
+- O protótipo foi baseado em prototipo_cartas_bots_v2.html, preservando a lógica de turnos,
+  penalidades, Distribuidora, Giro, cortes e bots.
+- Se faltar uma imagem, é exibida a face textual antiga daquela carta.
+- As artes são as mesmas 52 imagens do pacote de PRÉVIA panelas_cartas_0a9_mais2_bloqueio_inverter_v2.zip.
+  Elas são recortes ampliados de uma prancha e não são arte final HD ou camadas editáveis.
+- A pasta assets deve acompanhar index.html. Se enviar somente o HTML, as imagens não aparecem.
+
+PARA CODEX:
+- Abra esta pasta como projeto, preserve `index.html` e `assets/cartas` juntos.
+- A função `cardAssetPath(c)` traduz os tipos do baralho para os NOMES EXATOS dos PNGs.
+- Não reescreva as regras apenas para trocar as artes.
+- Substituir futuras artes por arquivos novos com os mesmos nomes troca o visual sem alterar a lógica.
