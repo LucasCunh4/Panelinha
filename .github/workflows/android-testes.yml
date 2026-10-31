@@ -100,6 +100,8 @@ jobs:
           profile: pixel_6
           # Limita a RAM do AVD para caber no runner hospedado junto ao WebView.
           ram-size: 2048M
+          # Evita incompatibilidades do backend Vulkan com o WebView no runner.
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -Vulkan
           disable-animations: true
           script: bash ferramentas/testar_android.sh 'artifacts/Panelinha-Teste-v${{ steps.version.outputs.name }}-c${{ steps.version.outputs.code }}.apk' 'artifacts/Panelinha-Teste-v${{ steps.version.outputs.name }}-upgrade-check-c${{ steps.version.outputs.nextcode }}.apk' "$RUNNER_TEMP/panelinha-instrumentation.apk"
       - name: Diagnosticar falha do emulador
