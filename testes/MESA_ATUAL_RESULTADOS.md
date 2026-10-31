@@ -29,6 +29,18 @@ Os ajustes são feitos por CSS/JS e pelo host Android existente. Há mudança de
 
 ## Android e entrega
 
-A execução desta atualização será registrada aqui após o GitHub Actions. A assinatura/pacote/origem devem ser verificados no APK real antes de disponibilizá-lo. Os seis testes Android e o teste de atualização continuam obrigatórios para aprovar a Release. Se houver falha de infraestrutura, o APK validado fica disponível no artefato direto, com metadados/diagnósticos separados e o resultado real informado.
+- **APK 0.2.18 / versionCode 3802**, gerado pelo workflow #18, commit de código `9e6389c205691e205b90b22a892f1ef3e2026c9a`.
+- [Download direto do APK, sem ZIP](https://github.com/LucasCunh4/Panelinha/actions/runs/41235454746/artifacts/13055970426). Requer login no GitHub; disponível até 29/01/2027.
+- [Execução e resultados reais](https://github.com/LucasCunh4/Panelinha/actions/runs/41235454746); [diagnósticos Android](https://github.com/LucasCunh4/Panelinha/actions/runs/41235454746/artifacts/13055356321).
+- Compilação release, compilação dos testes Android e candidato de atualização c3803: **aprovadas**. O candidato não foi distribuído.
+- APK baixado e verificado novamente com `ferramentas/verificar_apk.py`: assinatura v2, pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`, 52 PNGs de cartas e seis PNGs oficiais da mesa íntegros; HTML/JS/CSS atuais no pacote.
+- Certificado SHA-256: `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509` (geração 2), idêntico ao APK 0.2.17/c3702. O código 3802 é maior: **atualização direta compatível**, sem desinstalar. Não houve mudança de chave, origem ou diretório de dados.
+- SHA-256 do arquivo APK: `6f98284ab002b229d31d9ec468a440b9c1a57d6707068b88a10421ce537696f3`. Igual ao digest do artefato; o conteúdo entregue contém `AndroidManifest.xml`/`classes.dex` na raiz, sem ZIP externo.
+
+**Android: não aprovado nesta execução.** O primeiro dos seis testes começou (`a_imagesAndThreeBotsOffline`), mas nenhum terminou. Às 19:45:45 UTC o kernel Linux do runner registrou `RenderThread[3712]: segfault`, após erros `Failed to find ColorBuffer` / `invalid color buffer` no renderizador do emulador. Em seguida o dispositivo ficou `offline` e a porta 5554 recusou conexão. A coleta disponível não registra asserção reprovada do aplicativo nem `FATAL EXCEPTION` do app. Isso evidencia falha do emulador no host; a causa interna do renderizador não foi resolvida nesta rodada.
+
+Continuam **pendentes em Android real/emulador estável**: os seis testes completos, comprovação prática da imersão permanente/recortes/retomada/orientações, execução offline e teste de instalação por cima com preservação de localStorage/SharedPreferences/UID. A compatibilidade de atualização foi verificada por identidade e código; a execução prática desse teste não foi concluída. A partida em andamento continua somente em memória, como antes.
+
+O workflow preserva todos os testes e a aprovação exigida para Release; por isso não criou uma Release após a falha. O APK assinado e validado foi disponibilizado pelo mecanismo existente de artefato direto (`actions/upload-artifact@v7`, `archive: false`, somente `.apk`), com metadados e diagnósticos em artefatos separados. Nenhum teste foi desativado e nenhuma nova assinatura foi criada.
 
 Capturas desta build: `evidencias-mesa-atual/` (320×568, 390×844 e 568×320).
