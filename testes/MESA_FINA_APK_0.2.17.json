@@ -1,0 +1,13 @@
+{
+  "file": "Panelinha-Teste-v0.2.17-c3702.apk",
+  "sha256": "29fa6724d5d11e939ae858c056eda22c2c4c9d6242403cf65d85db1d15f8f9b0",
+  "applicationId": "com.lucascunha.panelinha.teste",
+  "versionCode": 3702,
+  "versionName": "0.2.17",
+  "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+  "pngsVerified": 52,
+  "origin": "https://localhost",
+  "androidCompat": true,
+  "signingGeneration": 2,
+  "mesaAssetsVerified": 6
+}

@@ -46,3 +46,12 @@ histórico publicado. Evidências atuais em `testes/ASSINATURA_V2_RESULTADOS.md`
 - Web aprovada. Android: carregamento offline/imagens/três bots aprovado; emulador interrompeu durante o segundo teste, após erros de buffer gráfico. Demais testes e atualização com persistência pendentes, sem remover testes. Release bloqueada; APK disponível em artefato.
 - 0.2.15/c3502 foi a compilação intermediária da mesma atualização, também em artefato após a mesma interrupção.
 - [Relatório completo e confirmação do certificado](testes/ATUALIZACAO_REGRAS_MESA_RESULTADOS.md).
+
+## Refinamentos e APK direto — 0.2.17 / código 3702
+
+- Fonte: `47aabea52088e081ea556b785e248d49cba892fa`, branch `android/apk-testes`.
+- **[Download direto do arquivo .apk](https://github.com/LucasCunh4/Panelinha/actions/runs/41231985219/artifacts/13053923557)**, sem ZIP externo; `upload-artifact@v7` com `archive: false`. Metadados e diagnósticos separados.
+- Distribuidora com mínimo 1, teto do autor e conservação; última carta inviável é recusada. Mesa com monte interno, amarelo +15%, cartas maiores, mãos reposicionadas, brilho na moldura e compras mais lentas.
+- APK real verificado: assinatura da geração 2, pacote/origem fixos, código maior que 3602. Candidato 3703 somente para teste.
+- Web aprovada; Android interrompido no primeiro teste por perda do emulador, sem resultado de asserção. Suíte/persistência pendentes; workflow vermelho e Release bloqueada, APK disponível para teste.
+- [Relatório completo, hashes, capturas e limitações](testes/MESA_FINA_MINIMO_RESULTADOS.md).

@@ -50,9 +50,30 @@ Capturas Chromium, não de aparelho físico:
 
 ## Android e APK
 
-A execução e a verificação independente do APK serão registradas após o workflow. Os seis testes Android e os controles de persistência após reinício/atualização continuam obrigatórios, sem desinstalar ou limpar dados. Eventual interrupção do emulador será registrada separadamente de asserções do aplicativo.
+Os seis testes Android e os controles de persistência após reinício/atualização continuam obrigatórios, sem desinstalar ou limpar dados. Nenhum teste foi removido ou marcado como aprovação artificial.
 
 Certificado ativo esperado: `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`, geração 2. applicationId `com.lucascunha.panelinha.teste`, origem `https://localhost`. O próximo código supera 3602 e o candidato 3603.
+
+### Execução #17 — 0.2.17/c3702
+
+- [Workflow](https://github.com/LucasCunh4/Panelinha/actions/runs/41231985219), fonte `47aabea52088e081ea556b785e248d49cba892fa`. Compilação e assinatura aprovadas, incluindo o APK de instrumentação e o candidato de atualização 3703.
+- O emulador deixou de responder durante `a_imagesAndThreeBotsOffline`: ADB ficou offline e a porta de controle 5554 recusou conexão. **0/6 testes concluídos nesta execução**; não houve resultado de asserção desse primeiro teste. Os diagnósticos não registram exceção fatal do Panelinha antes da interrupção. A causa exata do encerramento do emulador não foi estabelecida.
+- Offline em execução Android, toques, orientações, imersão, novas regras nativas e persistência após reinício/atualização permanecem pendentes nesta rodada. Não foram geradas novas capturas Android. [Diagnósticos preservados](https://github.com/LucasCunh4/Panelinha/actions/runs/41231985219/artifacts/13053824223).
+- O workflow permanece com conclusão **failure** e a Release foi bloqueada. O resumo da execução informa o resultado real da etapa Android junto do link de download; disponibilizar o APK compilado/verificado não equivale a aprovar a suíte.
+
+### Download direto e validação do APK real
+
+**[Baixar Panelinha-Teste-v0.2.17-c3702.apk diretamente](https://github.com/LucasCunh4/Panelinha/actions/runs/41231985219/artifacts/13053923557)** — requer sessão no GitHub, sem extração de ZIP. Retenção até 29/01/2027.
+
+O action v7 registrou `archive: false` e criou o artefato com o nome do arquivo `.apk`, contendo **31.933.423 bytes**. O arquivo baixado já contém `AndroidManifest.xml` e DEX na raiz do pacote Android; não contém outro `.apk` nem um ZIP externo. Foi passado diretamente ao verificador, sem extração prévia. O SHA-256 coincide com o digest do artefato publicado:
+
+`29fa6724d5d11e939ae858c056eda22c2c4c9d6242403cf65d85db1d15f8f9b0`
+
+Validação local independente com `ferramentas/verificar_apk.py`/`apksigner`: assinatura v2 válida, certificado ativo da geração 2, versão 0.2.17/c3702, pacote/origem, SDKs 24/36, release/fullSensor, HTML/CSS/JS exatos, compatibilidade e os 52+6 PNGs aprovados. [Metadados verificados](MESA_FINA_APK_0.2.17.json).
+
+Os APKs reais 0.2.16/c3602 e 0.2.17/c3702 foram comparados: mesmo certificado SHA-256 `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`, mesmo pacote e origem, código maior. **Identidade compatível com atualização direta, sem desinstalar.** O teste prático de instalação por cima e dados locais não concluiu devido à indisponibilidade do emulador.
+
+O [artefato de metadados](https://github.com/LucasCunh4/Panelinha/actions/runs/41231985219/artifacts/13053868923) e os diagnósticos são separados do APK. O candidato 3703 não é distribuído. As alterações seguintes neste checkout são somente documentação/evidências; o código do APK corresponde à fonte acima.
 
 ## Limitações
 
