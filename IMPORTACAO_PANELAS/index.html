@@ -36,7 +36,7 @@
   <section id="menu" class="panel"><h2>Iniciar simulação</h2><p class="muted">Configure uma partida de testes. Nenhum jogador precisa se conectar.</p>
     <div class="grid">
       <div><label class="setting">Formato <select id="mode"><option value="solo">Todos contra todos</option><option value="duo">Duplas (você + Bot 2)</option></select></label><label class="setting">Duração <select id="duration"><option value="points">Partida por pontos</option><option value="single">Rodada única</option></select></label><label class="setting">Pontuação-meta <select id="goal"></select></label><label class="setting">Tempo por turno <select id="timeout"><option value="0">Sem limite</option><option value="15">15 s</option><option value="30">30 s</option><option value="45">45 s</option><option value="60">60 s</option></select></label></div>
-      <div><label class="setting">Compra infinita <input id="infinite" type="checkbox"></label><label class="setting">Cortes + cartas idênticas <input id="cut" type="checkbox" checked></label><label class="setting">Desafiar +4 e +6 <input id="challenge" type="checkbox" checked></label><label class="setting">Distribuidora <input id="dist" type="checkbox" checked></label><label class="setting">Giro <input id="rotate" type="checkbox" checked></label></div>
+      <div><label class="setting">Compra infinita <input id="infinite" type="checkbox"></label><label class="setting">Cortes + cartas idênticas <input id="cut" type="checkbox" checked></label><label class="setting">Desafiar +4 e +6 <input id="challenge" type="checkbox" checked></label><label class="setting">Panela de Pressão <input id="dist" type="checkbox" checked></label><label class="setting">Liquidificador <input id="rotate" type="checkbox" checked></label></div>
     </div>
     <div class="row menu-header"><button class="btn" id="startBtn">Começar com 3 bots</button></div>
   </section>
@@ -83,7 +83,7 @@
         <div class="row between"><h2 id="tableMenuTitle">Sua mesa</h2><button id="closeTableMenu" class="btn alt" aria-label="Fechar opções e voltar à mesa">Fechar ✕</button></div>
         <p class="help">Os bots e o tempo de turno continuam enquanto este menu está aberto.</p>
         <div class="panel"><strong id="roundLabel">Rodada 1</strong><span id="status" class="pill"></span><div class="score" id="score"></div><div class="topline" id="stateText"></div></div>
-    <details class="panel debug"><summary>Laboratório de testes (ferramentas de depuração)</summary><p class="help">Mostre as mãos dos bots ou adicione cartas à sua mão. Cartas injetadas podem ultrapassar a quantidade normal do baralho; isso é proposital para testar efeitos. Com cortes ativados, o balão de faca aparece sobre a carta idêntica; os bots normais respeitam uma pausa de 2,8 segundos.</p><div class="controls"><label class="row"><input id="useCardArt" type="checkbox" checked> Artes PNG (ligar/desligar)</label><label class="row"><input id="reveal" type="checkbox"> Ver mãos dos bots</label><select id="injectType"><option value="num">Número 7</option><option value="draw2">+2</option><option value="wild4">+4</option><option value="wild6">+6</option><option value="wild">Coringa</option><option value="skip">Bloqueio</option><option value="reverse">Inverter</option><option value="dist">Distribuidora</option><option value="rotate">Giro</option></select><select id="injectColor"><option value="red">Vermelho</option><option value="blue">Azul</option><option value="green">Verde</option><option value="yellow">Amarelo</option></select><button class="btn alt" id="injectBtn">Dar carta de teste</button><button class="btn alt" id="testPenalty">Simular +20 para você</button><label class="row"><input id="quickBots" type="checkbox"> Bots rápidos</label></div></details>
+    <details class="panel debug"><summary>Laboratório de testes (ferramentas de depuração)</summary><p class="help">Mostre as mãos dos bots ou adicione cartas à sua mão. Cartas injetadas podem ultrapassar a quantidade normal do baralho; isso é proposital para testar efeitos. Com cortes ativados, o balão de faca aparece sobre a carta idêntica; os bots normais respeitam uma pausa de 2,8 segundos.</p><div class="controls"><label class="row"><input id="useCardArt" type="checkbox" checked> Artes PNG (ligar/desligar)</label><label class="row"><input id="reveal" type="checkbox"> Ver mãos dos bots</label><select id="injectType"><option value="num">Número 7</option><option value="draw2">+2</option><option value="wild4">+4</option><option value="wild6">+6</option><option value="wild">Coringa</option><option value="skip">Bloqueio</option><option value="reverse">Inverter</option><option value="dist">Panela de Pressão</option><option value="rotate">Liquidificador</option></select><select id="injectColor"><option value="red">Vermelho</option><option value="blue">Azul</option><option value="green">Verde</option><option value="yellow">Amarelo</option></select><button class="btn alt" id="injectBtn">Dar carta de teste</button><button class="btn alt" id="testPenalty">Simular +20 para você</button><label class="row"><input id="quickBots" type="checkbox"> Bots rápidos</label></div></details>
     <details class="panel" open><summary>Histórico da partida</summary><div class="history" id="history"></div></details>
         <button id="backBtn" class="btn alt hide">Encerrar e voltar às configurações</button>
       </div>
@@ -97,8 +97,8 @@
 const $=id=>document.getElementById(id);
 const COLORS=['red','blue','green','yellow'];
 const CN={red:'Vermelho',blue:'Azul',green:'Verde',yellow:'Amarelo'};
-const TYPES={num:'Número',draw2:'+2',wild4:'+4',wild6:'+6',skip:'Bloqueio',reverse:'Inverter',wild:'Coringa',dist:'Distribuidora',rotate:'Giro'};
-const SHORT={skip:'BLOQ',reverse:'INV',wild:'COR',dist:'DIST',rotate:'GIRO'};
+const TYPES={num:'Número',draw2:'+2',wild4:'+4',wild6:'+6',skip:'Bloqueio',reverse:'Inverter',wild:'Coringa',dist:'Panela de Pressão',rotate:'Liquidificador'};
+const SHORT={skip:'BLOQ',reverse:'INV',wild:'COR',dist:'PANELA DE PRESSÃO',rotate:'LIQUIDIFICADOR'};
 const WILD=new Set(['wild','wild4','wild6','dist','rotate']);
 const SPECIAL=new Set(['draw2','wild4','wild6','wild','dist','rotate']);
 const VALUE={num:2,draw2:4,skip:4,reverse:4,wild4:6,wild6:8,wild:10,dist:10,rotate:10};
@@ -122,7 +122,7 @@ function cardAssetPath(c){
 }
 function cardHTML(c,small=false,selected=false,invalid=false){
   const cls=c.color||'wild', name=description(c), base=`card ${cls}${small?' mini':''}${selected?' selected':''}${invalid?' is-invalid':''}`;
-  const label=`<small>${c.color?CN[c.color]:''}</small><span>${SHORT[c.type]||descriptor(c)}</span><small>${c.type==='num'?'':(c.color?'⇄':'★')}</small>`;
+  const label=`<small>${c.color?CN[c.color]:''}</small><span class="${c.type==='dist'||c.type==='rotate'?'special-name':''}">${SHORT[c.type]||descriptor(c)}</span><small>${c.type==='num'?'':(c.color?'⇄':'★')}</small>`;
   const path=$('useCardArt')?.checked?cardAssetPath(c):null;
   if(!path)return `<span class="${base}" title="${name}">${label}</span>`;
   return `<span class="${base} art-card" title="${name}" data-asset="${path}"><img class="card-image" src="${path}" alt="${name}" loading="lazy" draggable="false" onerror="this.parentNode.classList.add('asset-unavailable')"><span class="art-fallback">${label}</span></span>`;
@@ -161,15 +161,15 @@ function redistribute(extra=0,exclude=[],actor=null){
   others.forEach((p,i)=>counts.set(p.id,1+cuts[i+1]-cuts[i]));
   let offset=0;
   for(const p of eligible){const n=counts.get(p.id);p.hand=collected.slice(offset,offset+n);offset+=n;}
-  if(offset!==collected.length||eligible.some(p=>p.hand.length<1)||(author&&author.hand.length>cap))throw Error('Distribuidora: conservação/limites inválidos');
+  if(offset!==collected.length||eligible.some(p=>p.hand.length<1)||(author&&author.hand.length>cap))throw Error('Panela de Pressão: conservação/limites inválidos');
   const penaltyIds=new Set(added.map(c=>c.id));
   for(const p of eligible)for(const c of p.hand)if(penaltyIds.has(c.id))PanelasMesa.recordDraw(s,p.id,c);
   const text=eligible.map(p=>`${names(p.id)}: ${p.hand.length}`).join(' · ');
   s.lastDistribution={counts:text,penaltyAdded:added.length,active:eligible.map(p=>p.id),actor,actorLimit:cap,total:collected.length};
   if(s.unoWindow&&s.players[s.unoWindow.id].hand.length!==1)s.unoWindow=null;
-  log(`Distribuidora ALEATÓRIA (${text})${extra?` · punição: ${added.length}/${extra} cartas adicionadas`:''}.`);
+  log(`Panela de Pressão ALEATÓRIA (${text})${extra?` · punição: ${added.length}/${extra} cartas adicionadas`:''}.`);
 }
-function rotateHands(exclude=[]){let order=[];for(let i=0;i<4;i++)if(s.players[i].hand.length>0&&!exclude.includes(i))order.push(i);if(order.length<2)return;const next={};for(const id of order){let to=id;let count=0;do{to=(to+4+s.direction)%4;count++;}while(!order.includes(to)&&count<4);next[to]=s.players[id].hand;}for(let id of order)s.players[id].hand=next[id];log(`Giro: mãos transferidas no sentido ${s.direction===1?'horário':'anti-horário'}.`);}
+function rotateHands(exclude=[]){let order=[];for(let i=0;i<4;i++)if(s.players[i].hand.length>0&&!exclude.includes(i))order.push(i);if(order.length<2)return;const next={};for(const id of order){let to=id;let count=0;do{to=(to+4+s.direction)%4;count++;}while(!order.includes(to)&&count<4);next[to]=s.players[id].hand;}for(let id of order)s.players[id].hand=next[id];log(`Liquidificador: mãos transferidas no sentido ${s.direction===-1?'horário':'anti-horário'}.`);}
 function newRound(){clearJobs();s.token++;s.round++;s.players.forEach(p=>p.hand=[]);s.deck=buildDeck(s.o);s.discard=[];s.direction=1;s.current=0;s.penalty=0;s.highest=0;s.lastPenalty=null;s.finisher=null;s.drawn=null;s.preUno=false;s.unoWindow=null;s.cutOpen=false;s.unlockAt=0;s.lastActor=null;s.lastDistribution=null;s.pendingAction=null;s.phase='playing';s.message='';for(let j=0;j<7;j++)for(const p of s.players)drawCard(p.id);let first=s.deck.pop();s.discard.push(first);s.activeColor=first.color||pick(COLORS);log(`Rodada ${s.round}: carta inicial ${description(first)}.`);
 if(first.type==='skip'){s.current=1;log('Bloqueio inicial: primeiro jogador pulado.');}
 else if(first.type==='reverse'){s.direction=-1;s.current=3;log('Inverter inicial: sentido invertido.');}
@@ -190,7 +190,7 @@ function findHumanCut(){
   if(!s||s.phase!=='playing'||!s.o.cut||!s.cutOpen||Date.now()>=s.unlockAt||s.finisher!==null||s.current===0||s.pendingAction)return null;
   return s.players[0].hand.find(c=>equals(c,top())&&canPlay(c))||null;
 }
-function penaltyText(){return `PENALIDADE +${s.penalty}: é obrigatório comprar ${s.penalty} cartas e perder o turno, ou rebater com +${s.highest} ou maior${s.o.dist?' / Distribuidora':''}. Não é permitido jogar cartas comuns.`;}
+function penaltyText(){return `PENALIDADE +${s.penalty}: é obrigatório comprar ${s.penalty} cartas e perder o turno, ou rebater com +${s.highest} ou maior${s.o.dist?' / Panela de Pressão':''}. Não é permitido jogar cartas comuns.`;}
 
 function closeUnoOnAction(){if(s.unoWindow)s.unoWindow=null;}
 function canDistribute(c){
@@ -209,7 +209,7 @@ function checkCards(id,ids,isCut){
   if(isCut)return !!(s.o.cut&&s.cutOpen&&Date.now()<s.unlockAt&&s.finisher===null&&id!==s.current&&equals(c,top())&&canPlay(c));
   if(id!==s.current||!canActNow())return false;
   if(s.drawn!==null&&ids[0]!==s.drawn)return false;
-  return canPlay(c); // Se há punição, SOMENTE + válido ou Distribuidora.
+  return canPlay(c); // Se há punição, SOMENTE + válido ou Panela de Pressão.
 }
 function chooseCards(id,ids){
   const isCut=id!==s.current;
@@ -252,7 +252,7 @@ function applyPlay(id,ids,isCut,color){
   if(c.type==='reverse'&&!repeatedOwnCut)s.direction*=-1;
   if(s.finisher!==null&&(!s.penalty||s.players.every(q=>q.hand.length===0))){finishRound();return true;}
   s.current=nextActive(id,c.type==='skip'?2:1);
-  s.message=c.type==='dist'&&s.lastDistribution?'Distribuidora aleatória: '+s.lastDistribution.counts:(isCut?'Corte executado. A sequência agora segue de quem cortou.':'');
+  s.message=c.type==='dist'&&s.lastDistribution?'Panela de Pressão aleatória: '+s.lastDistribution.counts:(isCut?'Corte executado. A sequência agora segue de quem cortou.':'');
   startTurn(CUT_PAUSE_MS); // corte imediato; próximo jogador aguarda a pausa.
   return true;
 }
@@ -326,7 +326,7 @@ function showColors(){let root=$('modalRoot');root.innerHTML=`<div class="modal-
 function finishControlHTML(){let ranks=s.summary.map(x=>`<div class="notice"><strong>${x.place}º — ${names(x.id)}</strong> · ${x.cost} pontos nas cartas restantes (${x.remaining} cartas)</div>`).join('');return `<div class="banner">${s.phase==='gameOver'?(s.winner?`🏆 ${s.winner} venceu a partida!`:'🏆 Rodada única concluída!'):'Rodada concluída.'}</div>${ranks}<div class="controls">${s.phase==='roundOver'?'<button id="nextRound" class="btn good">Próxima rodada</button>':'<button id="newMatch" class="btn good">Nova partida</button>'}<button id="backLobby" class="btn alt">Voltar às configurações</button></div>`;}
 function render(){if(!s)return;PanelasMesa.beforeRender(s);$('roundLabel').textContent=`Rodada ${s.round} · ${s.o.duo?'Duplas':'Individual'}`;$('status').textContent=s.phase==='playing'?`Vez de ${names(s.current)}`:s.phase==='roundOver'?'Fim da rodada':'Fim da partida';
 $('score').innerHTML=s.o.duo?`<span>Você + Bot 2: ${s.teams[0]}</span><span>Bot 1 + Bot 3: ${s.teams[1]}</span>`:s.players.map(p=>`<span>${names(p.id)}: ${p.score}</span>`).join('');
-$('stateText').textContent=s.phase==='playing'?`Sentido: ${s.direction===1?'horário':'anti-horário'} · Cor: ${CN[s.activeColor]} · Monte: ${s.deck.length} · ${s.penalty?'PENALIDADE OBRIGATÓRIA +'+s.penalty:'Sem penalidade'}${s.o.timeout&&s.deadline?' · Tempo: '+Math.max(0,Math.ceil((s.deadline-Date.now())/1000))+'s':''}`:s.message;
+$('stateText').textContent=s.phase==='playing'?`Sentido: ${s.direction===-1?'horário':'anti-horário'} · Cor: ${CN[s.activeColor]} · Monte: ${s.deck.length} · ${s.penalty?'PENALIDADE OBRIGATÓRIA +'+s.penalty:'Sem penalidade'}${s.o.timeout&&s.deadline?' · Tempo: '+Math.max(0,Math.ceil((s.deadline-Date.now())/1000))+'s':''}`:s.message;
 for(let i=0;i<4;i++){const p=s.players[i],active=s.current===i&&s.phase==='playing';const show=s.reveal||(s.o.duo&&i===2);let node=$('player'+i);node.classList.toggle('active',active);node.innerHTML=`<div class="name">${names(i)} ${active?'⏳':''}${s.o.duo?' <span class="tag">'+(i%2?'B':'A')+'</span>':''}</div><div class="sub">${p.hand.length} cartas${i===0?'':' · bot'}</div>${i!==0?(show?'<div class="subhand">'+p.hand.map(c=>cardHTML(c,true)).join('')+'</div>':'<div class="back">'+'▰ '.repeat(Math.min(6,p.hand.length))+'</div>'):''}`;}
 $('pile').innerHTML=`<div class="card" style="background:#283f68;color:#b9d1ff;border:2px solid #718cbb"><small>MONTE</small><span>⬚</span><small>${s.deck.length}</small></div>`;$('discard').innerHTML=PanelasMesa.discardHTML(s.discard,cardHTML,s);$('centerMsg').innerHTML=`Cor: <strong>${CN[s.activeColor]}</strong><div>${s.penalty?'⚠️ OBRIGATÓRIO +'+s.penalty:'Carta central'}</div>`;
 $('handCount').textContent=s.players[0].hand.length+' cartas';
@@ -336,7 +336,7 @@ const cutCard=findHumanCut(), handScroll=$('hand').scrollLeft;
 $('hand').innerHTML=cards.map(c=>{
   const enabled=s.phase==='playing'&&s.current===0&&!locked&&(s.drawn===null||c.id===s.drawn)&&canPlay(c);
   const cutting=cutCard?.id===c.id;
-  const reason=c.type==='dist'&&!canDistribute(c)?(s.players[0].hand.length<2?'Distribuidora exige outra carta na mão: todos recebem no mínimo 1.':'Distribuidora indisponível: não há outro destinatário para absorver a penalidade.'):(cutting?'Cortar':enabled?'Jogar':'Indisponível')+' '+description(c);
+  const reason=c.type==='dist'&&!canDistribute(c)?(s.players[0].hand.length<2?'Panela de Pressão exige outra carta na mão: todos recebem no mínimo 1.':'Panela de Pressão indisponível: não há outro destinatário para absorver a penalidade.'):(cutting?'Cortar':enabled?'Jogar':'Indisponível')+' '+description(c);
   return `<button type="button" ${cutting?'id="cutBtn" class="cut-eligible"':''} style="border:0;background:none;padding:0" data-card="${c.id}" aria-label="${reason}" title="${reason}" ${enabled||cutting?'':'disabled'}>${cardHTML(c,false,false,!(enabled||cutting))}${cutting?'<span class="cut-bubble"><img src="assets/mesa/corte_faca_balao.png" alt="CORTAR" draggable="false"></span>':''}</button>`;
 }).join('');
 $('hand').querySelectorAll('[data-card]').forEach(b=>b.onclick=()=>b.id==='cutBtn'?cutHuman():clickHandCard(Number(b.dataset.card)));
@@ -347,7 +347,7 @@ if(s.phase!=='playing'){
   const mine=s.current===0;
   const canCall=s.players[0].hand.length===2||(s.players[0].hand.length===1&&s.unoWindow?.id===0);
   const canReport=s.unoWindow&&s.unoWindow.id!==0;
-  const distributionHint=mine&&s.players[0].hand.length===1&&s.players[0].hand[0].type==='dist'?'<span class="pill">Distribuidora exige manter ao menos 1 carta na mão.</span>':'';
+  const distributionHint=mine&&s.players[0].hand.length===1&&s.players[0].hand[0].type==='dist'?'<span class="pill">Panela de Pressão exige manter ao menos 1 carta na mão.</span>':'';
   const penaltyBanner=mine&&s.penalty?`<div class="penalty-alert">⚠️ ${penaltyText()}</div>`:'';
   const actionHint=mine&&locked?`<span class="pill">Próxima jogada liberada em ${Math.max(0,((s.unlockAt-Date.now())/1000)).toFixed(1)}s · cortes abertos</span>`:'';
   $('controls').innerHTML=`${penaltyBanner}${distributionHint}${actionHint}${mine&&s.drawn!==null?'<button id="passBtn" class="btn alt">Guardar e passar</button>':''}${mine&&canChallenge(0)?`<button id="challengeBtn" class="btn warn" ${locked?'disabled':''}>Desafiar +4/+6</button>`:''}${canCall?`<button id="unoBtn" class="btn good" ${s.preUno?'disabled':''}>ÚLTIMA CARTA!</button>`:''}${canReport?'<button id="reportBtn" class="btn warn">Denunciar última carta</button>':''}`;
@@ -369,7 +369,7 @@ $('injectBtn').onclick=()=>{if(!s||s.phase!=='playing')return;let type=$('inject
 $('testPenalty').onclick=()=>{if(!s||s.phase!=='playing'||s.finisher!==null)return;clearJobs();s.current=0;s.penalty=20;s.highest=2;s.lastPenalty=null;s.drawn=null;s.cutOpen=false;s.unlockAt=0;s.deadline=s.o.timeout?Date.now()+s.o.timeout*1000:0;s.token++;log('Teste: penalidade acumulada +20 direcionada a você.');render();};
 // Atualiza cronômetro sem recriar toda a interface. Estouro: compra automática e turno perdido.
 ticker=setInterval(()=>{if(!s||s.phase!=='playing')return;PanelasMesa.updateClock(s,Date.now());if(s.cutOpen&&Date.now()>=s.unlockAt){s.cutOpen=false;render();}if(s.current===0&&s.unlockAt&&Date.now()>=s.unlockAt){s.unlockAt=0;render();}
-if(s.o.timeout&&s.deadline){let left=Math.max(0,Math.ceil((s.deadline-Date.now())/1000));let el=$('stateText');if(el){let base=`Sentido: ${s.direction===1?'horário':'anti-horário'} · Cor: ${CN[s.activeColor]} · Monte: ${s.deck.length} · ${s.penalty?'PENALIDADE +'+s.penalty:'Sem penalidade'}`;el.textContent=base+' · Tempo: '+left+'s';}
+if(s.o.timeout&&s.deadline){let left=Math.max(0,Math.ceil((s.deadline-Date.now())/1000));let el=$('stateText');if(el){let base=`Sentido: ${s.direction===-1?'horário':'anti-horário'} · Cor: ${CN[s.activeColor]} · Monte: ${s.deck.length} · ${s.penalty?'PENALIDADE +'+s.penalty:'Sem penalidade'}`;el.textContent=base+' · Tempo: '+left+'s';}
 if(left===0&&!s.pendingAction&&canActNow()){let id=s.current;clearJobs();s.token++;log(`Tempo de ${names(id)} esgotado.`);if(s.penalty){finishPenaltyDraw(id);}else{closeUnoOnAction();drawMany(id,1);s.current=nextActive(id);startTurn();}}}},250);
 // Ganchos de inspeção para testes automatizados pelo Codex.
 window.CartasTest={getState:()=>s,createDeck:o=>buildDeck(o),newRound:()=>s&&newRound(),describe:description,assetFor:cardAssetPath};

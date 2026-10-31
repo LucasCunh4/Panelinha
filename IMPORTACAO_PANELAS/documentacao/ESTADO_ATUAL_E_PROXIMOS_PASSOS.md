@@ -28,3 +28,8 @@
 - Não mudar valor de pontuação ou baralho para regras oficiais de UNO, pois são personalizadas.
 - Não dizer que PNG individual foi criado em alta definição: veio de prancha recortada.
 - Não usar dependências desnecessárias na etapa inicial.
+
+
+## Atualização da mesa funcional (31/10/2026)
+
+As seções de planejamento acima registram o protótipo original. Hoje a Mesa V1 web/Android, bots e laboratório estão implementados; confira `ANDROID.md` e os relatórios em `testes/` para validações e limitações atuais. Os nomes especiais visíveis são **Panela de Pressão** (`dist`) e **Liquidificador** (`rotate`), com as regras documentadas na especificação completa. Esta rodada muda apresentação e nomes; não altera os efeitos dessas cartas.

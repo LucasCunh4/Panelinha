@@ -32,17 +32,17 @@ const output=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mesa-fina-evidenc
   console.log('PASS monte no interior esquerdo do fogão, alvo direto vertical e nome/avatar humano no rodapé, seis tamanhos');
   await page.setViewportSize({width:390,height:844});await fixture();
   const widths=await page.evaluate(()=>({human:document.querySelector('#hand .card').offsetWidth,opponent:document.querySelector('#player1 .hidden-card').offsetWidth,partner:document.querySelector('#player2 .card').offsetWidth,discard:document.getElementById('discard').offsetWidth}));
-  assert.ok(widths.human>68&&widths.human<74&&widths.opponent>42&&widths.opponent<47&&widths.partner>44&&widths.partner<49&&widths.discard>74&&widths.discard<82,JSON.stringify(widths));
+  assert.ok(widths.human>76&&widths.human<82&&widths.opponent===widths.human&&widths.partner===widths.human&&widths.discard===widths.human,JSON.stringify(widths));
   console.log('PASS aumento moderado das cartas humanas, oponentes, parceiro e descarte');
   const orbit=await page.locator('.stove-glint').evaluate(el=>{
    const a=el.getAnimations()[0];a.pause();a.currentTime=1000;const first=parseFloat(getComputedStyle(el).strokeDashoffset);a.currentTime=1500;const second=parseFloat(getComputedStyle(el).strokeDashoffset);
    const bg=document.getElementById('stoveScene').getBoundingClientRect(),svg=document.getElementById('stoveDirection').getBoundingClientRect(),box=el.getBBox();
    return {first,second,forever:a.effect.getTiming().iterations===Infinity,aligned:Math.abs(svg.x-bg.x)<1&&Math.abs(svg.y-bg.y)<1&&Math.abs(svg.width-bg.width)<1&&Math.abs(svg.height-bg.height)<1,box:{x:box.x,y:box.y,width:box.width,height:box.height}};
   });
-  assert.ok(orbit.forever&&orbit.aligned&&orbit.second<orbit.first&&orbit.box.x===326&&orbit.box.y===218&&orbit.box.width===1012);
+  assert.ok(orbit.forever&&orbit.aligned&&orbit.second>orbit.first&&orbit.box.x===326&&orbit.box.y===218&&orbit.box.width===1012);
   await page.evaluate(()=>{CartasTest.getState().direction=-1;document.getElementById('useCardArt').onchange()});
   const reverse=await page.locator('.stove-glint').evaluate(el=>{const a=el.getAnimations()[0],before=parseFloat(getComputedStyle(el).strokeDashoffset);a.currentTime+=500;return {before,after:parseFloat(getComputedStyle(el).strokeDashoffset),direction:a.effect.getTiming().direction};});
-  assert.equal(reverse.direction,'reverse');assert.ok(Math.abs(reverse.before-orbit.second)<1&&reverse.after>reverse.before,JSON.stringify(reverse));
+  assert.equal(reverse.direction,'normal');assert.ok(Math.abs(reverse.before-orbit.second)<1&&reverse.after<reverse.before,JSON.stringify(reverse));
   console.log('PASS brilho branco no plano da moldura, giro nos dois sentidos e inversão sem salto de fase');
   const opacity=async color=>{
    await page.evaluate(color=>{const s=CartasTest.getState();s.activeColor=color;document.getElementById('useCardArt').onchange()},color);

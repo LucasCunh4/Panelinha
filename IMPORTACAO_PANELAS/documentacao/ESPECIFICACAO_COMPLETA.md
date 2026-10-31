@@ -32,11 +32,11 @@
 | +6 | 2 | Incolor |
 | Coringa | 4 | Incolor |
 | **Total obrigatório** | **114** | |
-| Distribuidora | +2 | Incolor; host ativa individualmente |
-| Giro | +2 | Incolor; host ativa individualmente |
+| Panela de Pressão | +2 | Incolor; host ativa individualmente |
+| Liquidificador | +2 | Incolor; host ativa individualmente |
 | **Com as duas opcionais** | **118** | |
 
-Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**. Cartas +4, +6, Coringa, Distribuidora e Giro **não têm cor impressa**.
+Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**. Cartas +4, +6, Coringa, Panela de Pressão e Liquidificador **não têm cor impressa**.
 
 ## 3. Jogada padrão, compra e liberdade de estratégia
 
@@ -45,12 +45,12 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 - Compra normal: pode comprar **uma** carta e jogá-la se desejar; pode **guardar** a carta comprada mesmo que seja válida e encerrar o turno. Também pode comprar voluntariamente mesmo tendo uma jogada na mão.
 - Compra infinita (opção do host): compra até obter uma carta jogável. Especial incolor comprada pode ser **guardada**, encerrando imediatamente a compra/turno sem jogar. Não obrigar uso de especiais que usuário decidiu segurar.
 - Quando não há cartas no monte, embaralhar **todas as cartas do descarte, exceto a carta superior**, formando novo monte.
-- Quando a primeira carta revelada é especial, o efeito deve ser aplicado. Se for +4/+6, sortear cor; se for Distribuidora/Giro, aplicar aos quatro e sortear cor. Casos sem autor (desafio de +4 inicial, direção/turno do Bloqueio inicial) exigem definição técnica explícita e testes, sem punir um autor inexistente.
+- Quando a primeira carta revelada é especial, o efeito deve ser aplicado. Se for +4/+6, sortear cor; se for Panela de Pressão/Liquidificador, aplicar aos quatro e sortear cor. Casos sem autor (desafio de +4 inicial, direção/turno do Bloqueio inicial) exigem definição técnica explícita e testes, sem punir um autor inexistente.
 - Bloqueio **pula apenas o jogador seguinte** (no modo duplas pode entregar a vez ao parceiro do autor). Inverter só muda o sentido, sem turno extra.
 
 ## 4. +2/+4/+6 e acúmulo OBRIGATÓRIO
 
-- Uma sequência de penalidade fica **pendente**: destinatário NÃO pode descartar carta comum nem ignorar a penalidade. Precisa usar +N de mesmo valor ou maior, Distribuidora se ativa, ou comprar **toda a penalidade** e perder o turno.
+- Uma sequência de penalidade fica **pendente**: destinatário NÃO pode descartar carta comum nem ignorar a penalidade. Precisa usar +N de mesmo valor ou maior, Panela de Pressão se ativa, ou comprar **toda a penalidade** e perder o turno.
 - É permitida resposta conforme valor **igual ou superior**: +2→+2/+4/+6; +4→+4/+6; +6→+6. **A cor NÃO importa** durante essa cadeia, nem de um +2.
 - Penalidades **somam** (ex.: +2,+4,+6 = 12 cartas). Se ninguém responder, destinatário compra o acumulado integral e perde vez.
 - +4 e +6 podem iniciar penalidade livremente, inclusive escolhendo a nova cor. Não é necessário escolher nova cor quando forem a última carta do vencedor.
@@ -84,23 +84,23 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 - A janela fecha quando o próximo jogador **realiza a jogada**, não apenas no começo da animação. Tratar situações com cortes/penalidades sem criar burla.
 - Não confundir ficar com uma carta com zerar a mão.
 
-## 8. Distribuidora e Giro
+## 8. Panela de Pressão e Liquidificador
 
-- **Distribuidora (incolor, 2 opcionais):** recolhe as mãos dos participantes ainda ativos, embaralha e redistribui **quantidades aleatórias**, com mínimo de uma carta por participante, conservando todas as cartas. O autor recebe entre uma carta e a quantidade que tinha imediatamente após jogar a Distribuidora; portanto não pode utilizá-la como última carta; quem já terminou fica excluído. Os demais não têm limite de igualdade ou equilíbrio.
+- **Panela de Pressão (incolor, 2 opcionais):** recolhe as mãos dos participantes ainda ativos, embaralha e redistribui **quantidades aleatórias**, com mínimo de uma carta por participante, conservando todas as cartas. O autor recebe entre uma carta e a quantidade que tinha imediatamente após jogar a Panela de Pressão; portanto não pode utilizá-la como última carta; quem já terminou fica excluído. Os demais não têm limite de igualdade ou equilíbrio.
 - Se usada para defender-se de uma penalidade +N pendente: retirar N cartas do monte, incluir no pool de redistribuição, redistribuir aleatoriamente com o mesmo limite do autor e **encerrar completamente** a punição. Ex. +20: acrescentar 20 ao pool, não cobrar +20 de alguém depois.
-- **Giro (incolor, 2 opcionais):** gira as mãos entre os ainda ativos no sentido corrente; **não pode** ser usado contra penalidade acumulada.
-- Nas jogadas normais, usuário de Distribuidora escolhe a nova cor. Giro nunca abre seleção nem altera a cor ativa anterior. Distribuidora não pode ser jogada como última carta. Se sua **última carta** foi Giro, não precisa selecionar cor; individual: efeito aplica-se entre os outros três antes de calcular classificação. Duplas: equipe vencedora encerra a rodada; não precisa aplicar efeito ao parceiro/outros para pontuação individual inexistente.
+- **Liquidificador (incolor, 2 opcionais):** gira as mãos entre os ainda ativos no sentido corrente; **não pode** ser usado contra penalidade acumulada.
+- Nas jogadas normais, usuário de Panela de Pressão escolhe a nova cor. Liquidificador nunca abre seleção nem altera a cor ativa anterior. Panela de Pressão não pode ser jogada como última carta. Se sua **última carta** foi Liquidificador, não precisa selecionar cor; individual: efeito aplica-se entre os outros três antes de calcular classificação. Duplas: equipe vencedora encerra a rodada; não precisa aplicar efeito ao parceiro/outros para pontuação individual inexistente.
 - Próximo turno após giro/distribuição normal: jogador seguinte a quem usou a carta, conforme sentido atual.
 
 - A redistribuição nunca produz zeros nem novo finalizador. Um finalizador já existente durante a resolução de penalidades continua excluído; o encerramento/pontuação anteriores permanecem válidos.
-- Caso limite sem outro destinatário ativo: uma Distribuidora não pode absorver penalidade mantendo o limite do autor; essa resposta inviável fica indisponível. O jogador pode rebater com outra carta válida ou comprar a penalidade. Sem penalidade, conservar a mão do único destinatário é a única partilha possível.
+- Caso limite sem outro destinatário ativo: uma Panela de Pressão não pode absorver penalidade mantendo o limite do autor; essa resposta inviável fica indisponível. O jogador pode rebater com outra carta válida ou comprar a penalidade. Sem penalidade, conservar a mão do único destinatário é a única partilha possível.
 
 ## 9. Rodadas e classificação
 
 - A rodada encerra quando um jogador zerar a mão, **após** resolver punições finais, efeitos relevantes e denúncias aplicáveis.
-- Pontuação **das cartas restantes na mão** usada para ordenar do 2º ao 4º: cada número 0–9=2; +2=4; Bloqueio=4; Inverter=4; +4=6; +6=8; Coringa=10; Distribuidora=10; Giro=10.
+- Pontuação **das cartas restantes na mão** usada para ordenar do 2º ao 4º: cada número 0–9=2; +2=4; Bloqueio=4; Inverter=4; +4=6; +6=8; Coringa=10; Panela de Pressão=10; Liquidificador=10.
 - Menor soma residual = 2º, maior = 4º.
-- Desempates residuais por: (1) menos **especiais de efeito** (+2,+4,+6,Coringa,Distribuidora,Giro); (2) menos Bloqueio/Inverter; (3) menos cartas numéricas. Empates ainda perfeitos depois desses critérios precisam de regra estável a acordar; não inventar sorteio silencioso.
+- Desempates residuais por: (1) menos **especiais de efeito** (+2,+4,+6,Coringa,Panela de Pressão,Liquidificador); (2) menos Bloqueio/Inverter; (3) menos cartas numéricas. Empates ainda perfeitos depois desses critérios precisam de regra estável a acordar; não inventar sorteio silencioso.
 - Individual: 1º lugar recebe **3 pontos da partida**, 2º=2, 3º=1, 4º=0, por rodada. O host define meta 10/20/30/50. Rodada única também possível, com pódio completo ao fim.
 - Duplas: equipe cujo jogador zera primeiro recebe **1 ponto**, oponente 0; meta definida 5/10/15, ou rodada única. Uma equipe pode ganhar mesmo que companheiro tenha cartas.
 - Ao atingir a meta, vence quem tiver **mais pontos totais** se mais de um ultrapassar na mesma rodada; se empatar em pontos totais, vence quem tiver **mais rodadas vencidas**. Persistindo empate, critério final pendente.
@@ -128,7 +128,7 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 - Compra infinita ON/OFF.
 - Corte + sequência de idênticas ON/OFF (uma mesma opção).
 - Desafio +4/+6 ON/OFF (uma mesma opção).
-- Distribuidora ON/OFF e Giro ON/OFF **independentes**.
+- Panela de Pressão ON/OFF e Liquidificador ON/OFF **independentes**.
 - Formação de duplas manual pelos participantes.
 
 ## 12. Aparência/UX aprovadas (objetivo futuro, não estado do V3)
@@ -141,7 +141,7 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 - Toque direto na carta joga. No desktop, hover **eleva levemente** a carta. Corte deve aparecer **em cima da carta correspondente**, não em botão separado longe da mão. Pequena pausa real após cada descarte para corte; jogador da vez destacado por brilho/contorno no avatar.
 - Mostrar SEMPRE carta central, direção do jogo, cor ativa, quem joga, quantidade de cartas e penalidade pendente. Mostrar penalidades grandes como **+12** no centro, com impacto visual e cartas voando; animação temática: panela derrama cartas sobre jogador punido.
 - Coringa/+4/+6: escolha entre **quatro botões grandes tradicionais** de cor.
-- Cartas: estilo cartoon colorido com **número/símbolo grande**, detalhes culinários sem atrapalhar legibilidade; especiais coloridas +2, Bloqueio (círculo com barra diagonal), Inverter (duas setas curvas opostas formando círculo). +4,+6,Coringa,Distribuidora,Giro incolores ainda não têm arte definitiva.
+- Cartas: estilo cartoon colorido com **número/símbolo grande**, detalhes culinários sem atrapalhar legibilidade; especiais coloridas +2, Bloqueio (círculo com barra diagonal), Inverter (duas setas curvas opostas formando círculo). +4,+6,Coringa,Panela de Pressão,Liquidificador incolores ainda não têm arte definitiva.
 - Cada cor terá panela com **mesmo desenho e proporções**, mas pigmentação acompanha cor: vermelho, azul, amarelo, verde.
 - Elementos alimentares **EXCLUSIVOS POR COR**: vermelho tomates; azul mirtilos/blueberries; amarelo queijos; verde alfaces. **NÃO incluir folhas verdes genéricas nas cartas vermelha, azul ou amarela!** Fundo padrão, consistente; usuário achou cartas anteriores estreitas demais, quer **mais largas**. Imagens atuais do V3 são só para testar PNG no jogo, **não aprovadas como definitivas**.
 - Verso futuro: roxo com panela estilizada ao centro, idêntico para todas as cartas.
@@ -167,6 +167,6 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 
 1. Imagens locais não apareceram quando usuário abriu `index.html` diretamente no Android (`file://`): **servir com HTTP** (ex.: `python3 -m http.server 8000` na pasta). Testar caminhos/erros, CSS, script e servidor; verificar em navegador Android real ou equivalente, não apenas assumir que funciona por duplo toque.
 2. Arte futura: obter PNG individual por carta, na proporção mais larga e detalhes corretos; não fazer novos recortes de pranchas como se fossem assets finais.
-3. Revisar possíveis bugs do V3, com testes automáticos em compras +N, cortes simultâneos, múltiplas cartas idênticas, bot conservador, Distribuidora aleatória com limite do autor e pontuação de final de rodada.
+3. Revisar possíveis bugs do V3, com testes automáticos em compras +N, cortes simultâneos, múltiplas cartas idênticas, bot conservador, Panela de Pressão aleatória com limite do autor e pontuação de final de rodada.
 4. Definir com usuário critérios residuais de empate e casos extremos de abertura/primeira carta especial sem autor (antes de partida online).
 5. Depois: UI fogão, menus/lobby e só então servidor online/Android, em etapas testáveis.

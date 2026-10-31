@@ -88,7 +88,7 @@ O workflow não usa chave de debug descartável. Se faltar algum Secret, ele fal
 
 Testes web existentes continuam disponíveis por HTTP: `node testes/integracao.cjs`, `node testes/mesa.cjs`. As mudanças de regras autorizadas e a apresentação usam a mesma fonte web do APK; veja o relatório da atualização atual.
 
-A instrumentação Android (`OfflineGameTest`, 6 testes) verifica no APK real: ausência de rede, decodificação de todos os 52 PNGs, quatro jogadores/três bots, toques Android em carta/Última Carta/corte/compra +20, ação automática de bot e orientações retrato/paisagem. Também grava sentinelas em localStorage/SharedPreferences. Acrescenta imersão/retorno ao menu, proteção dos recortes, nova Distribuidora, Giro sem cor e cronômetro. A classe `UpdatePersistenceTest` (1 teste) confere essas sentinelas após `adb install -r` de um APK com código maior e a mesma assinatura. O script confirma também que o UID do aplicativo foi preservado.
+A instrumentação Android (`OfflineGameTest`, 6 testes) verifica no APK real: ausência de rede, decodificação de todos os 52 PNGs, quatro jogadores/três bots, toques Android em carta/Última Carta/corte/compra +20, ação automática de bot e orientações retrato/paisagem. Também grava sentinelas em localStorage/SharedPreferences. Acrescenta imersão/retorno ao menu, proteção dos recortes, Panela de Pressão, Liquidificador sem cor e cronômetro. A classe `UpdatePersistenceTest` (1 teste) confere essas sentinelas após `adb install -r` de um APK com código maior e a mesma assinatura. O script confirma também que o UID do aplicativo foi preservado.
 
 ```sh
 bash ferramentas/testar_android.sh primeiro.apk seguinte.apk instrumentacao.apk
@@ -120,7 +120,7 @@ Distribuidora agora redistribui quantidades aleatórias, com limite da mão do a
 
 Compras e descarte têm camadas visuais independentes do motor; até três jogadas permanecem representadas mesmo após reciclar o monte. Leques mostram todas as cartas; mãos humanas grandes começam centralizadas e preservam rolagem para acessar qualquer carta. Nenhum PNG foi alterado.
 
-O plugin local `TableWindow` usa `WindowInsetsControllerCompat` durante a mesa, com barras transitórias por gesto. Ao sair para configurações, as barras voltam. O host reserva recortes e teclado; não muda a origem nem o diretório de dados. A versão web ignora a ponte nativa.
+Na implementação anterior, o plugin local `TableWindow` usava imersão apenas na mesa. A seção “Mesa atual” abaixo registra a substituição por imersão permanente, inclusive nas configurações. O host reserva recortes e teclado; não muda a origem nem o diretório de dados. A versão web ignora a ponte nativa.
 
 Resultados, decisões de casos limite e limitações em `testes/ATUALIZACAO_REGRAS_MESA_RESULTADOS.md`.
 
@@ -131,3 +131,14 @@ Distribuidora conserva o baralho, dá no mínimo uma carta a cada participante e
 O workflow existente usa `actions/upload-artifact@v7` com `archive: false` **apenas para o arquivo APK**. Metadados e diagnósticos ficam em artefatos separados. O output `artifact-url` é registrado no resumo da execução; o download exige sessão no GitHub e entrega o próprio `.apk`, sem ZIP externo. A publicação em Release continua dependente da aprovação dos testes, e falhas permanecem visíveis.
 
 O APK continua sendo verificado com a assinatura da geração 2 antes de ser disponibilizado; chave, pacote, origem e sequência de versionCode não mudaram. Resultados desta rodada em `testes/MESA_FINA_MINIMO_RESULTADOS.md`.
+
+
+## Mesa atual: tamanho comum, sentido e imersão permanente
+
+A disposição é 0 embaixo, 1 à direita, 2 em cima, 3 à esquerda. O valor interno +1 percorre esses assentos em sentido **anti-horário**; -1 é horário. Texto, seta, brilho da moldura e mensagens do Liquidificador seguem essa correspondência, sem inverter a ordem do motor. Os identificadores `dist`/`rotate` e as regras permanecem; os nomes visíveis são Panela de Pressão e Liquidificador.
+
+Cartas humanas, adversários, parceiro, descarte e monte usam o mesmo tamanho-base responsivo. Leques laterais ficam em pé em retrato para deixar o centro livre, e girados nas laterais em paisagem. A centralização inclui nome/avatar. A pilha de compra tem seis camadas decorativas e um único contador real. O cronômetro final 5–1 fica à direita no mesmo eixo do monte e lê o prazo existente.
+
+`MainActivity` mantém status/navigation bars ocultas no menu e na partida, na retomada/foco e após orientação. Usa `BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE`, com retorno automático se o sistema mostrar barras transitórias. Gestos do Android continuam possíveis; não há promessa de impedir barras temporárias exigidas pelo sistema. Recortes e teclado são reservados. Testes nativos continuam obrigatórios para aprovação da Release.
+
+Verificações e resultados desta atualização: `testes/MESA_ATUAL_RESULTADOS.md`.

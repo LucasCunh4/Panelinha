@@ -58,7 +58,7 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
   await page.locator('.debug summary').tap();await page.locator('#reveal').check();assert.equal(await page.locator('#player1 .subhand').count(),1);
   await page.locator('#reveal').uncheck();await page.keyboard.press('Escape');assert.ok(await page.locator('#tableMenu').isHidden());
   assert.equal(await page.evaluate(()=>document.activeElement.id),'tableMenuBtn');
-  await page.locator('[data-card="50001"]').tap();assert.equal(await page.evaluate(()=>CartasTest.getState().direction),-1);assert.equal(await page.locator('#directionGlyph').innerText(),'↺');
+  await page.locator('[data-card="50001"]').tap();assert.equal(await page.evaluate(()=>CartasTest.getState().direction),-1);assert.equal(await page.locator('#directionGlyph').innerText(),'↻');
   assert.equal(await page.locator('#directionGlyph').evaluate(el=>el.getAnimations().length),1);
   await page.emulateMedia({reducedMotion:'reduce'});await page.waitForFunction(()=>document.querySelector('#directionGlyph').getAnimations().length===0);assert.equal(await page.locator('#directionGlyph').evaluate(el=>el.getAnimations().length),0);
   console.log('PASS menu sobreposto, foco/ESC, laboratório e retorno à mesa; Inverter por toque e movimento reduzido');

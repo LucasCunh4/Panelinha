@@ -10,47 +10,59 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
-    private boolean gamePlaying;
+    private final Runnable restoreImmersive = this::applyImmersive;
 
     @Override public void onCreate(Bundle savedInstanceState) {
         registerPlugin(TableWindowPlugin.class);
         super.onCreate(savedInstanceState);
-        gamePlaying = savedInstanceState != null && savedInstanceState.getBoolean("gamePlaying", false);
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         View decor = getWindow().getDecorView();
         ViewCompat.setOnApplyWindowInsetsListener(decor, (view, insets) -> {
             int types = WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout();
-            // Durante a partida as barras transitórias sobrepõem a cena, sem
-            // reposicionar a mesa. Recortes físicos e teclado continuam reservados.
-            Insets safe = insets.getInsets(gamePlaying ? WindowInsetsCompat.Type.displayCutout() : types);
+            // Barras transitórias sobrepõem a cena; recortes físicos e teclado
+            // continuam reservados tanto no menu quanto durante a partida.
+            Insets safe = insets.getInsets(WindowInsetsCompat.Type.displayCutout());
             Insets keyboard = insets.getInsets(WindowInsetsCompat.Type.ime());
             view.setPadding(safe.left, safe.top, safe.right, Math.max(safe.bottom, keyboard.bottom));
+            view.removeCallbacks(restoreImmersive);
+            if (insets.isVisible(WindowInsetsCompat.Type.statusBars()) ||
+                    insets.isVisible(WindowInsetsCompat.Type.navigationBars())) {
+                view.postDelayed(restoreImmersive, 1800);
+            }
             return new WindowInsetsCompat.Builder(insets).setInsets(types, Insets.NONE).build();
         });
         applyImmersive();
     }
 
-    public void setGamePlaying(boolean playing) {
-        gamePlaying = playing;
-        applyImmersive();
-    }
+    // Compatibilidade com a ponte web existente: a imersão agora vale sempre.
+    public void setGamePlaying(boolean playing) { applyImmersive(); }
 
     private void applyImmersive() {
+        if (isFinishing() || isDestroyed()) return;
         View decor = getWindow().getDecorView();
         WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(getWindow(), decor);
         controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-        if (gamePlaying) controller.hide(WindowInsetsCompat.Type.systemBars());
-        else controller.show(WindowInsetsCompat.Type.systemBars());
+        controller.hide(WindowInsetsCompat.Type.systemBars());
         ViewCompat.requestApplyInsets(decor);
+    }
+
+    @Override public void onResume() {
+        super.onResume();
+        applyImmersive();
+    }
+
+    @Override public void onPause() {
+        getWindow().getDecorView().removeCallbacks(restoreImmersive);
+        super.onPause();
     }
 
     @Override public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus && gamePlaying) applyImmersive();
+        if (hasFocus) applyImmersive();
     }
 
-    @Override public void onSaveInstanceState(Bundle state) {
-        state.putBoolean("gamePlaying", gamePlaying);
-        super.onSaveInstanceState(state);
+    @Override public void onDestroy() {
+        getWindow().getDecorView().removeCallbacks(restoreImmersive);
+        super.onDestroy();
     }
 }

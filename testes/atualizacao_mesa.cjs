@@ -12,7 +12,7 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/atualizacao-evidence
  const finish=async()=>{await page.locator('.flying-card,.block-effect').evaluateAll(nodes=>{nodes.forEach(n=>n.getAnimations().forEach(a=>a.finish()))});await page.waitForFunction(()=>!document.querySelector('.flying-card,.block-effect'));};
  const refresh=()=>page.evaluate(()=>document.getElementById('useCardArt').onchange());
  try{
-  await page.clock.install();await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();
+  await page.clock.install();await page.clock.pauseAt(new Date());await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();
   for(const [width,height] of [[320,568],[390,844],[412,915],[568,320],[844,390],[1280,800]]){
    await page.setViewportSize({width,height});
    for(const n of [7,15,20,30,60,100]){
@@ -94,20 +94,22 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/atualizacao-evidence
    assert.equal(await page.locator('.block-effect').getAttribute('data-blocked'),String(direction===1?1:3));assert.equal(await page.evaluate(()=>CartasTest.getState().current),2);await page.locator('.block-effect').evaluate(el=>{const a=el.getAnimations()[0];a.pause();a.currentTime=650});await page.screenshot({path:path.join(out,`bloqueio-${direction}.png`)});await finish();
   }
   console.log('PASS efeito Bloqueio aponta para o jogador correto nos dois sentidos; regra preservada');
-  // O ticker existente alimenta 5..0; sem segundo relógio de jogo.
+  // Novo documento elimina tarefas/agendas dos cenários de animação anteriores.
+  await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();
+  // O ticker existente alimenta 5..1; sem segundo relógio de jogo.
   for(const actor of [0,1,2,3]){
-   await fixture();await page.evaluate(actor=>{const s=CartasTest.getState();s.current=actor;s.o.timeout=15;s.deadline=Date.now()+5500;s.token++;document.getElementById('useCardArt').onchange();window.timerValues=[];const original=PanelasMesa.updateClock;PanelasMesa.updateClock=(state,now)=>{original(state,now);const b=document.querySelector('.turn-clock');if(b)window.timerValues.push(b.textContent)}},actor);
-   assert.equal(await page.locator('.turn-clock').count(),0);await page.clock.runFor(600);assert.equal(await page.locator('.turn-clock').textContent(),'5');assert.equal(await page.locator('.turn-clock').getAttribute('data-actor'),String(actor));
+   await fixture();await page.evaluate(actor=>{const s=CartasTest.getState();s.current=actor;s.o.timeout=15;s.deadline=Date.now()+5500;s.token++;document.getElementById('useCardArt').onchange();s.token++;/* Segura o bot deste cenário pelo token, sem mudar a lógica. */window.timerValues=[];const original=PanelasMesa.updateClock;PanelasMesa.updateClock=(state,now)=>{original(state,now);const b=document.querySelector('.turn-clock');if(b)window.timerValues.push(b.textContent)}},actor);
+   assert.equal(await page.locator('.turn-clock:visible').count(),0);await page.clock.runFor(750);assert.equal(await page.locator('.turn-clock').textContent(),'5',`ator ${actor}, estado: ${await page.evaluate(()=>JSON.stringify({current:CartasTest.getState().current,deadline:CartasTest.getState().deadline,now:Date.now(),phase:CartasTest.getState().phase,values:window.timerValues}))}`);assert.equal(await page.locator('.turn-clock').getAttribute('data-actor'),String(actor));
    const badge=await page.locator('.turn-clock').boundingBox();assert.ok(badge.x>=0&&badge.y>=0&&badge.x+badge.width<=390&&badge.y+badge.height<=844);
    assert.ok(await page.locator('.turn-clock').evaluate(el=>{const a=el.getBoundingClientRect(),b=document.getElementById('buyBtn').getBoundingClientRect();return a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom}));
    await page.setViewportSize({width:844,height:390});
    assert.ok(await page.locator('.turn-clock').evaluate(el=>{const a=el.getBoundingClientRect(),b=document.getElementById('buyBtn').getBoundingClientRect();return a.left>=0&&a.top>=0&&a.right<=innerWidth&&a.bottom<=innerHeight&&(a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom)}));
    await page.setViewportSize({width:390,height:844});
-   await page.clock.runFor(5000);const values=await page.evaluate(()=>window.timerValues);for(const n of ['5','4','3','2','1','0'])assert.ok(values.includes(n),`${actor}: ${values}`);
-   assert.equal(await page.locator(`#player${actor} .turn-clock`).count(),0);
+   await page.clock.runFor(5000);const values=await page.evaluate(()=>window.timerValues);for(const n of ['5','4','3','2','1'])assert.ok(values.includes(n),`${actor}: ${values}`);
+   assert.equal(await page.locator('.turn-clock:visible').count(),0);
   }
-  await fixture();assert.equal(await page.locator('.turn-clock').count(),0);
-  console.log('PASS cronômetro 5/4/3/2/1/0 humano e três bots, some após turno e não aparece sem limite habilitado');
+  await fixture();assert.equal(await page.locator('.turn-clock:visible').count(),0);
+  console.log('PASS cronômetro 5/4/3/2/1 humano e três bots, some após turno e não aparece sem limite habilitado');
   // Cancelamento das camadas visuais não muda o estado das cartas.
   await fixture();await page.locator('[data-card="620000"]').tap();const state=await page.evaluate(()=>JSON.stringify(CartasTest.getState()));
   await page.setViewportSize({width:844,height:390});await page.waitForFunction(()=>!document.querySelector('.flying-card'));assert.equal(await page.evaluate(()=>JSON.stringify(CartasTest.getState())),state);

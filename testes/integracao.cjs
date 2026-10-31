@@ -70,14 +70,14 @@ const base = process.env.PANELAS_TEST_URL || 'http://127.0.0.1:8000/';
     const s=fixture();s.penalty=6;s.highest=6;const card=c('draw2','blue');s.players[0].hand.push(card);render();
     ok(document.querySelector(`[data-card="${card.id}"]`).disabled,'+2 contra +6');s.highest=2;render();ok(!document.querySelector(`[data-card="${card.id}"]`).disabled,'cor indevida');
    });
-   test('Distribuidora incorpora +20, respeita limite e encerra punição',()=>{
+   test('Panela de Pressão incorpora +20, respeita limite e encerra punição',()=>{
     const s=fixture();const card=c('dist',null);s.players[0].hand.push(card);s.penalty=20;s.highest=2;play(card);clickColor('red');
-    const sizes=s.players.map(p=>p.hand.length);ok(sizes[0]<=2&&sizes.every(n=>n>=1),'limites da Distribuidora');
+    const sizes=s.players.map(p=>p.hand.length);ok(sizes[0]<=2&&sizes.every(n=>n>=1),'limites da Panela de Pressão');
     ok(sizes.reduce((a,b)=>a+b)===28&&s.penalty===0&&s.lastDistribution.penaltyAdded===20,'pool/punição');
    });
-   test('Giro transfere mãos na direção e é bloqueado contra +N',()=>{
-    const s=fixture();const card=c('rotate',null);s.players[0].hand.push(card);s.penalty=2;s.highest=2;render();ok(document.querySelector(`[data-card="${card.id}"]`).disabled,'Giro na punição');
-    s.penalty=0;const previous=s.players[3].hand.map(c=>c.id).join();play(card);ok(!s.pendingAction&&s.activeColor==='red','Giro escolheu/mudou cor');ok(s.players[0].hand.map(c=>c.id).join()===previous,'direção');
+   test('Liquidificador transfere mãos na direção e é bloqueado contra +N',()=>{
+    const s=fixture();const card=c('rotate',null);s.players[0].hand.push(card);s.penalty=2;s.highest=2;render();ok(document.querySelector(`[data-card="${card.id}"]`).disabled,'Liquidificador na punição');
+    s.penalty=0;const previous=s.players[3].hand.map(c=>c.id).join();play(card);ok(!s.pendingAction&&s.activeColor==='red','Liquidificador escolheu/mudou cor');ok(s.players[0].hand.map(c=>c.id).join()===previous,'direção');
    });
    test('corte próprio de +2 em dois cliques aplica efeito uma vez',()=>{
     const s=fixture(),a=c('draw2'),b=c('draw2');s.players[0].hand.push(a,b);play(a);

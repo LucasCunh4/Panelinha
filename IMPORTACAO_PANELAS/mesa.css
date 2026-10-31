@@ -228,7 +228,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 .table[data-active-color=yellow] .flame-yellow {opacity:min(.96,calc(var(--heat-opacity,.74)*1.15))}
 .stove-direction {position:absolute;inset:0;width:1672px;height:941px;pointer-events:none;overflow:visible}
 .stove-glint {fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-dasharray:36 964;filter:drop-shadow(0 0 3px #fff9);opacity:.76;animation:stove-orbit 7.5s linear infinite}
-.table[data-direction="-1"] .stove-glint {animation-direction:reverse}
+.table[data-direction="1"] .stove-glint {animation-direction:reverse}
 @keyframes stove-orbit {from{stroke-dashoffset:0}to{stroke-dashoffset:-1000}}
 @media(orientation:landscape) and (max-height:600px){
  .table{--card-width:clamp(44px,12.35vh,65px);--opponent-card:clamp(29px,8.9vh,38px)}
@@ -243,3 +243,32 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 .hand-panel>.hand-heading {order:2;transform:none}
 .table>.draw-stack {left:max(var(--pile-left,14px),14px,env(safe-area-inset-left))}
 @media(orientation:landscape) and (max-height:600px){.hand-panel{display:block}.hand-panel>.hand-heading{transform:translateY(4px)}}
+
+/* Tamanho-base comum: o leque adapta a sobreposição, sem miniaturizar adversários. */
+.table {--card-width:clamp(54px,9.3vh,92px);--discard-width:var(--card-width);--pile-width:var(--card-width);--opponent-card:var(--card-width)}
+.seat.top .subhand {--opponent-card:var(--card-width)}
+#pile::before {display:none}
+#pile .pile-layer {position:absolute;inset:0;transform:translate(calc(var(--depth)*-1px),calc(var(--depth)*1.5px));z-index:calc(6 - var(--depth));pointer-events:none}
+#pile>.card {position:relative;z-index:6}
+#pile .pan-avatar {width:calc(var(--card-width)*.5)}
+#pile .deck-brand {font-size:7px}#pile .deck-count {font-size:12px}
+.card .special-name {font-size:clamp(7px,calc(var(--card-width)*.12),11px);line-height:1.25;white-space:normal;overflow-wrap:anywhere;text-align:center}
+/* Inclui nome/avatar na caixa centralizada, em vez de pendurá-los fora dela. */
+.seat.left,.seat.right {--side-fan:calc(var(--card-width)*3);--identity-height:36px;top:50%;height:calc(var(--side-fan) + var(--identity-height) + 4px);padding:0;width:calc(var(--card-width)*2.025 + 24px)}
+.seat.left .back,.seat.right .back,.seat.left .subhand,.seat.right .subhand {width:var(--side-fan);top:calc(var(--side-fan)*.5)}
+.seat.left .seat-identity,.seat.right .seat-identity {top:auto;bottom:0;height:var(--identity-height);margin:0}
+/* Em telas estreitas, cartas em pé deixam livre o centro e conservam o tamanho. */
+@media(orientation:portrait){
+ .seat.left,.seat.right {--side-fan:calc(var(--card-width)*2.025 + 24px);width:calc(var(--card-width)*1.25)}
+ .seat.left .back,.seat.right .back,.seat.left .subhand,.seat.right .subhand {width:100%;height:var(--side-fan);transform:translate(-50%,-50%);padding:10px 3px}
+}
+@media(orientation:landscape) and (max-height:600px){
+ .table {--card-width:clamp(46px,13.7vh,72px);--opponent-card:var(--card-width)}
+ .seat.top .subhand {--opponent-card:var(--card-width)}
+ .seat.top .seat-identity {position:absolute;left:auto;right:calc(100% + 6px);top:8px;width:76px}
+ .seat.top .back,.seat.top .subhand {margin:0;padding:3px 8px;height:calc(var(--card-width)*2.025 + 8px)}
+ .seat.left,.seat.right {--identity-height:30px;--side-fan:calc(var(--card-width)*2.6);top:50%}
+}
+/* O cronômetro usa o mesmo eixo do monte, espelhado à direita da mesa. */
+.table>.turn-clock {left:auto;right:var(--pile-left,14px);top:var(--pile-top,var(--burner-y));transform:translateY(-50%);width:var(--card-width);height:var(--card-width);min-width:0;padding:0;font-size:calc(var(--card-width)*.72);line-height:1;display:grid;place-items:center;z-index:7}
+.table>.turn-clock[hidden] {display:none}

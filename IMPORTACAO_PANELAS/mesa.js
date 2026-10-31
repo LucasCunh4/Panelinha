@@ -41,11 +41,14 @@
     const cards=[...container.children], n=cards.length;
     if(!n){container.classList.remove('scroll-hand','hand-overflow');return;}
     const self=container.id==='hand';
+    const sidePortrait=!self&&innerHeight>innerWidth&&container.closest('.seat.left,.seat.right');
+    const spread=self?6:sidePortrait?3:8;
     const style=getComputedStyle(container);
     const room=container.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
-    const width=cards[0].offsetWidth;
+    // Largura fracionária evita acumular erro de arredondamento em leques longos.
+    const width=parseFloat(getComputedStyle(cards[0]).width);
     let compact=self&&n>largeAt;
-    let step=n<2?width:Math.min(width*.60,Math.max(0,(room-width-(self?10:22))/(n-1)));
+    let step=n<2?width:Math.min(width*.60,Math.max(0,(room-width-(self?10:sidePortrait?12:Math.max(22,width*.7)))/(n-1)));
     if(self&&step<22)compact=true;
     if(self&&compact)step=Math.max(24,step);
     const overflow=self&&width+step*(n-1)>room+1;
@@ -54,7 +57,7 @@
     cards.forEach((card,i)=>{
       const position=n<2?0:(i/(n-1)-.5)*2;
       card.style.marginLeft=i?`${step-width}px`:'0px';
-      card.style.setProperty('--fan-angle',`${compact?0:position*(self?6:8)}deg`);
+      card.style.setProperty('--fan-angle',`${compact?0:position*spread}deg`);
       card.style.setProperty('--fan-lift',`${compact?0:position*position*(self?6:3)}px`);
     });
     if(self){
@@ -91,7 +94,7 @@
     const seat=$(`player${actor}`),area=actor===0?$('hand'):(seat.querySelector('.subhand,.back')||seat);
     let node=actor===0?area.querySelector(`[data-card="${id}"]`):area.querySelector(`[data-hand-card="${id}"]`);
     node=node||area.lastElementChild||area;
-    let angle=(actor===3?90:actor===1?-90:actor===2&&!seat.querySelector('.subhand')?180:0)+rotation(node);
+    const angle=(area===node?0:rotation(area))+rotation(node);
     if(actor===0)node=node.querySelector('.card')||node;
     const r=node.getBoundingClientRect(),clip=area.getBoundingClientRect();
     const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
@@ -128,17 +131,20 @@
     maskCards();return ends;
   }
   function updateClock(state,now=Date.now()) {
-    document.querySelectorAll('.turn-clock').forEach(el=>{if(Number(el.dataset.actor)!==state.current)el.remove();});
     const remaining=state.deadline-now;
-    if(state.phase!=='playing'||!state.o.timeout||!state.deadline||remaining>5000){document.querySelectorAll('.turn-clock').forEach(el=>el.remove());clockKey=null;return;}
-    const value=Math.max(0,Math.ceil(remaining/1000)),seat=$(`player${state.current}`);
-    let badge=seat.querySelector('.turn-clock');
-    if(!badge){badge=document.createElement('span');badge.className='turn-clock';badge.dataset.actor=String(state.current);badge.setAttribute('role','timer');seat.append(badge);}
-    badge.textContent=String(value);badge.setAttribute('aria-label',`${value} segundos restantes`);
+    let badge=$('turnClock');
+    if(!badge){badge=document.createElement('span');badge.id='turnClock';badge.className='turn-clock';badge.setAttribute('role','timer');$('table').append(badge);}
+    const visible=state.phase==='playing'&&state.o.timeout&&state.deadline&&remaining>0&&remaining<=5000;
+    badge.hidden=!visible;
+    if(!visible){badge.textContent='';badge.removeAttribute('data-actor');clockKey=null;return;}
+    const value=Math.ceil(remaining/1000);
+    badge.dataset.actor=String(state.current);
+    badge.textContent=String(value);badge.setAttribute('aria-label',`${value} segundos restantes no turno`);
     const key=`${state.token}:${state.current}:${value}`;
-    if(key!==clockKey&&!reducedMotion.matches)badge.animate([{transform:'scale(1.16)'},{transform:'scale(1)'}],{duration:180,easing:'ease-out'});
+    if(key!==clockKey&&!reducedMotion.matches)badge.animate([{transform:'translateY(-50%) scale(1.12)'},{transform:'translateY(-50%) scale(1)'}],{duration:180,easing:'ease-out'});
     clockKey=key;
   }
+
   function animateBlock(play,delay) {
     if(play.blocked===null||reducedMotion.matches)return;
     const seat=$(`player${play.blocked}`),r=seat.getBoundingClientRect(),cx=innerWidth/2,cy=parseFloat($('table').style.getPropertyValue('--burner-y'));
@@ -307,7 +313,7 @@
     penalty.textContent = state.penalty ? `+${state.penalty}` : '';
     penalty.setAttribute('aria-label', `Penalidade acumulada: ${state.penalty} cartas`);
 
-    const clockwise = state.direction === 1;
+    const clockwise = state.direction === -1; // 0 embaixo → 1 direita → 2 cima → 3 esquerda é anti-horário.
     $('directionGlyph').textContent = clockwise ? '↻' : '↺';
     $('directionLabel').textContent = clockwise ? 'Horário' : 'Anti-horário';
     $('directionIndicator').setAttribute('aria-label', `Sentido ${clockwise ? 'horário' : 'anti-horário'}`);
@@ -317,13 +323,13 @@
       glyph.getAnimations().forEach(animation => animation.cancel());
       glyph.animate([
         { transform:'rotate(0deg) scale(1)', color:'#e5c9fa' },
-        { offset:.5, transform:`rotate(${state.direction * 180}deg) scale(1.5)`, color:'#ffe0a2' },
-        { transform:`rotate(${state.direction * 360}deg) scale(1)`, color:'#e5c9fa' }
+        { offset:.5, transform:`rotate(${(clockwise?1:-1) * 180}deg) scale(1.5)`, color:'#ffe0a2' },
+        { transform:`rotate(${(clockwise?1:-1) * 360}deg) scale(1)`, color:'#e5c9fa' }
       ], { duration:850, easing:'ease-in-out' });
     }
     previous = { state, round:state.round, direction:state.direction };
 
-    $('pile').innerHTML = `<div class="card deck-back">${panAvatar()}<span class="deck-brand">PANELAS</span><span class="deck-count">${state.deck.length}</span></div>`;
+    $('pile').innerHTML = Array.from({length:5},(_,i)=>`<span class="pile-layer deck-back" aria-hidden="true" style="--depth:${5-i}"></span>`).join('')+`<div class="card deck-back">${panAvatar()}<span class="deck-brand">PANELAS</span><span class="deck-count">${state.deck.length}</span></div>`;
     $('pile').setAttribute('aria-label', `Monte de compra: ${state.deck.length} cartas`);
     document.querySelector('.draw-stack .stack-label').textContent = state.penalty ? `COMPRAR +${state.penalty}` : 'COMPRAR';
     for (const player of state.players) {
@@ -367,5 +373,5 @@
     document.querySelectorAll('.subhand,.back').forEach(hand => fan(hand,Infinity));
   });
   nativeTable(false);
-  window.PanelasMesa = { render, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {clearFlights();nativeTable(false);handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
+  window.PanelasMesa = { render, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {clearFlights();nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
 })();

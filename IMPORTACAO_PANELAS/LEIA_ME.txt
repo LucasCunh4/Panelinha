@@ -24,7 +24,7 @@ MAPEAMENTO INTERNO:
 
 REGRAS:
 - O protótipo foi baseado em prototipo_cartas_bots_v2.html, preservando a lógica de turnos,
-  penalidades, Distribuidora, Giro, cortes e bots.
+  penalidades, Panela de Pressão, Liquidificador, cortes e bots.
 - Se faltar uma imagem, é exibida a face textual antiga daquela carta.
 - As artes são as mesmas 52 imagens do pacote de PRÉVIA panelas_cartas_0a9_mais2_bloqueio_inverter_v2.zip.
   Elas são recortes ampliados de uma prancha e não são arte final HD ou camadas editáveis.

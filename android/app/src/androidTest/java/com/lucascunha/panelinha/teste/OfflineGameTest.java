@@ -197,6 +197,7 @@ public class OfflineGameTest {
         assertEquals("Visibilidade das barras do sistema", expected, barsVisible());
     }
     @Test public void e_immersiveAndReturnToMenu() throws Exception {
+        waitBars(false); // Menu inicial também é imersivo.
         startControlled(); waitBars(false);
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
             android.view.View decor = activity.getActivity().getWindow().getDecorView();
@@ -207,11 +208,19 @@ public class OfflineGameTest {
             control.show(androidx.core.view.WindowInsetsCompat.Type.systemBars());
         });
         waitBars(true);
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activity.getActivity().setGamePlaying(true));
-        waitBars(false);
-        tap("#tableMenuBtn");tap("#backBtn");waitFor("document.getElementById('menu').getClientRects().length>0",15000);waitBars(true);
+        waitBars(false); // Retorno automático, sem chamada da ponte web.
+        tap("#tableMenuBtn");tap("#backBtn");waitFor("document.getElementById('menu').getClientRects().length>0",15000);waitBars(false);
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activity.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE));
+        waitFor("innerWidth>innerHeight",15000);waitBars(false);
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activity.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT));
+        waitFor("innerHeight>innerWidth",15000);waitBars(false);
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activity.getActivity().moveTaskToBack(true));
+        android.content.Context target = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        android.content.Intent launch = target.getPackageManager().getLaunchIntentForPackage(target.getPackageName());
+        assertNotNull(launch);launch.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        target.startActivity(launch);waitFor("document.getElementById('menu').getClientRects().length>0",15000);waitBars(false);
     }
-    @Test public void f_distributionGiroAndClock() throws Exception {
+    @Test public void f_pressureBlenderAndClock() throws Exception {
         startControlled();
         js("(()=>{const s=CartasTest.getState();Object.assign(s,{phase:'playing',current:0,penalty:20,highest:6,finisher:null,unlockAt:0,cutOpen:false,pendingAction:null,activeColor:'blue',deadline:0,token:s.token+1});s.o.duo=false;s.o.timeout=0;s.players.forEach((p,a)=>p.hand=Array.from({length:10},(_,i)=>({id:87000+a*100+i,type:'num',color:'green',num:7})));s.players[0].hand.push({id:87900,type:'dist',color:null});s.discard=[{id:87901,type:'num',color:'blue',num:2}];s.deck=Array.from({length:60},(_,i)=>({id:88000+i,type:'num',color:'red',num:1}));window.originalIds=[...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort().join();document.getElementById('useCardArt').onchange()})()");
         tap("[data-card='87900']");
@@ -221,9 +230,9 @@ public class OfflineGameTest {
         js("(()=>{const s=CartasTest.getState();Object.assign(s,{phase:'playing',current:0,penalty:0,finisher:null,unlockAt:0,cutOpen:false,pendingAction:null,activeColor:'blue',deadline:0,token:s.token+1});s.players.forEach((p,a)=>p.hand=[{id:89000+a,type:'num',color:'green',num:7}]);s.players[0].hand.push({id:89900,type:'rotate',color:null});document.getElementById('useCardArt').onchange();document.querySelector('[data-card=\"89900\"]').addEventListener('click',()=>s.token++,{once:true})})()");
         tap("[data-card='89900']");assertEquals("true",js("CartasTest.getState().activeColor==='blue'&&!CartasTest.getState().pendingAction&&document.querySelectorAll('.colorbtn').length===0"));
         js("(()=>{const s=CartasTest.getState();s.current=0;s.token++;s.unlockAt=0;s.cutOpen=false;s.o.timeout=15;s.deadline=Date.now()+4000;document.getElementById('useCardArt').onchange()})()");
-        waitFor("document.querySelector('#player0 .turn-clock')!==null",15000);
+        waitFor("document.querySelector('#turnClock:not([hidden])')!==null",15000);
         waitFor("CartasTest.getState().current!==0",15000);
-        assertEquals("true",js("document.querySelector('#player0 .turn-clock')===null"));
+        assertEquals("true",js("document.querySelector('#turnClock:not([hidden])')===null"));
     }
     @Test public void d_writeUpdateSentinels() throws Exception {
         js("localStorage.setItem('panelinha-upgrade-check','preservado-v0.1')");

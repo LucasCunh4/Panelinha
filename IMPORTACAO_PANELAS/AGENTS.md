@@ -5,7 +5,7 @@
 - **Não** implementar modo power-ups sem definição do usuário.
 - As cartas V3 existentes são apenas **ilustrações temporárias**. Os defeitos visuais conhecidos foram registrados, não tentar consertar com recortes de prancha sem autorização.
 - Não substituir as regras personalizadas pelas regras oficiais do UNO.
-- Validar comportamento com testes, em especial penalidades acumuladas obrigatórias, corte numa jogada separada, bot, Distribuidora aleatória com mínimo 1 e limite do autor e soma de pontos.
+- Validar comportamento com testes, em especial penalidades acumuladas obrigatórias, corte numa jogada separada, bot, Panela de Pressão aleatória com mínimo 1 e limite do autor e soma de pontos.
 - Corrigir a exibição de PNGs rodando o app sob servidor HTTP, não presumir acesso a `file://` no Android.
 - Manter o código legível; se reorganizar, fazê-lo em passos com teste de regressão e possibilidade de rollback.
 - Não expor mãos secretas em eventos públicos do multiplayer; servidor autoritativo no futuro.

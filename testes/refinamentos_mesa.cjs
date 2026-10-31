@@ -30,7 +30,8 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
      leftAngle:m('player3'),rightAngle:m('player1')};
    });
    assert.ok(layout.vertical&&layout.left&&layout.panels,JSON.stringify(layout));
-   assert.match(layout.leftAngle,/matrix\(0, 1, -1, 0,/);assert.match(layout.rightAngle,/matrix\(0, -1, 1, 0,/);
+   if(height>width){assert.match(layout.leftAngle,/matrix\(1, 0, 0, 1,/);assert.match(layout.rightAngle,/matrix\(1, 0, 0, 1,/);}
+   else{assert.match(layout.leftAngle,/matrix\(0, 1, -1, 0,/);assert.match(layout.rightAngle,/matrix\(0, -1, 1, 0,/);}
   }
   console.log('PASS monte vertical na lateral esquerda, mãos sobre a mesa sem painéis e orientação coerente nas laterais');
   await page.setViewportSize({width:390,height:844});await fixture();
