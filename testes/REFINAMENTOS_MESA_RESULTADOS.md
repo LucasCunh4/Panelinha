@@ -9,6 +9,7 @@ Base: `android/apk-testes`, commit `91e24df`. A implementação continua no jogo
 - Oponentes: cartas apoiadas diretamente na mesa, sem painel de fundo. Mão superior na borda de cima; laterais giradas em ±90°. Somente nome/avatar/contagem usam um rótulo pequeno, com destaque de turno. Até sete versos representam a mão oculta; o rótulo conserva a contagem real. Parceiro aberto em duplas; adversários ocultos em individual. Revelação explícita do laboratório preservada.
 - Jogada: captura da geometria da carta antes de substituir o DOM da mão, seguida de cópia visual com voo de 560 ms até o descarte e assentamento de 150 ms. Funciona para humano e três bots, incluindo corte. Carta oculta começa pelo verso e revela apenas a carta jogada durante o percurso. O novo topo do descarte fica oculto até o pouso. A camada não intercepta toques nem posterga o motor. Movimento reduzido mostra o resultado imediatamente; rotação cancela somente o efeito e mantém o estado.
 - Corte: balão oficial de faca ampliado de 44 para 58 px, com espaço na mão para não recortar o alvo. Carta inteira e balão continuam acionando o corte original.
+- Rolagem de foco: corrigido um deslocamento interno da mesa ao tocar cartas. `overflow:clip` impede esse movimento; WebViews antigos que ignoram essa propriedade recebem restauração de rolagem somente no contêiner da mesa. As mãos e o menu mantêm sua rolagem própria. A regressão usa toque real e verifica também o fallback.
 
 ## Código e estrutura
 
@@ -22,7 +23,7 @@ Comparação com a base: a única função modificada no script principal é `re
 
 - `node testes/integracao.cjs`: 16/16 regressões, incluindo penalidades acumuladas, Distribuidora, Giro, corte, pontuação, bots, laboratório e 52 imagens.
 - `node testes/mesa.cjs`: 320×568, 360×640, 390×844, 412×915, 568×320, 667×375, 844×390, 915×412, 1280×800 e 1920×1080. Sem rolagem da mesa; registro fundo/chama, compra, menu, cores, corte, privacidade e mãos grandes aprovados.
-- `node testes/refinamentos_mesa.cjs`: monte à esquerda/vertical, mãos físicas e orientação, máscara/intensidade/animação da chama, origem real do toque humano, voo dos três bots, versos e privacidade, pouso no descarte, rotação durante o voo e movimento reduzido. Motor avança sem esperar o efeito; pausa de corte preservada. Nenhuma exceção JS.
+- `node testes/refinamentos_mesa.cjs`: monte à esquerda/vertical, mãos físicas e orientação, máscara/intensidade/animação da chama, origem real do toque humano, voo dos três bots, versos e privacidade, pouso no descarte, rotação durante o voo, rolagem de foco e movimento reduzido. Motor avança sem esperar o efeito; pausa de corte preservada. Nenhuma exceção JS.
 - `npm run build`: pacote web e hashes aprovados.
 - `node testes/android-compat.cjs`: bundle de distribuição com APIs antigas simuladas, imagens e bot aprovados.
 - `python3 testes/versao_android.py`: 5/5 verificações de sequência de versão.

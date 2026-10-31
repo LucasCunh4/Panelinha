@@ -8,6 +8,12 @@
   let snapshot = null, pendingPlay = null;
   let displayedTop = null;
   const flights = new Set();
+  // WebViews antigos ignoram overflow:clip. Foco/toque não deve deslocar a mesa;
+  // as mãos e o menu conservam seus próprios contêineres de rolagem.
+  $('table').addEventListener('scroll', () => {
+    if ($('table').scrollLeft) $('table').scrollLeft = 0;
+    if ($('table').scrollTop) $('table').scrollTop = 0;
+  });
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const stopDirectionAnimation = () => $('directionGlyph').getAnimations().forEach(animation => animation.cancel());
   reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) {stopDirectionAnimation();clearFlights();} });

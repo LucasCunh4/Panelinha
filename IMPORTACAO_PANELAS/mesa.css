@@ -79,6 +79,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 /* Refinamentos V1.1 — PNGs originais preservados. */
+.table {overflow:clip}
 .flame {
  -webkit-mask-image:radial-gradient(circle closest-side,#000 0 73%,rgba(0,0,0,.68) 80%,transparent 89%);
  mask-image:radial-gradient(circle closest-side,#000 0 73%,rgba(0,0,0,.68) 80%,transparent 89%);

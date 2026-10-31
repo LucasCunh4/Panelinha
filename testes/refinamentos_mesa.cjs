@@ -42,6 +42,7 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
   await page.locator('#unoBtn').tap();
   await page.locator('[data-card="70100"]').evaluate(button=>button.addEventListener('click',()=>{const r=button.querySelector('.card').getBoundingClientRect();window.expectedFlightOrigin={x:r.x+r.width/2,y:r.y+r.height/2}},{once:true,capture:true}));
   await page.locator('[data-card="70100"]').tap();
+  assert.equal(await page.locator('#table').evaluate(el=>el.scrollLeft+el.scrollTop),0);
   const human=page.locator('.played-card[data-card-id="70100"]');await human.waitFor();
   const coordinates=await human.evaluate(el=>({...el.dataset}));
   const origin=await page.evaluate(()=>window.expectedFlightOrigin);
@@ -79,9 +80,16 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
   await fixture();await page.locator('#unoBtn').tap();await page.locator('[data-card="70100"]').tap();
   assert.equal(await page.locator('.played-card').count(),1);
   const before=await page.evaluate(()=>JSON.stringify(CartasTest.getState()));
-  await page.setViewportSize({width:844,height:390});assert.equal(await page.locator('.played-card').count(),0);
+  await page.setViewportSize({width:844,height:390});await page.waitForFunction(()=>document.querySelectorAll('.played-card').length===0);
   assert.equal(await page.evaluate(()=>JSON.stringify(CartasTest.getState())),before);assert.ok(await page.locator('#discard>.card').isVisible());
   console.log('PASS rotação encerra somente o efeito visual e conserva o estado/descartes');
+  // Reproduz a rolagem de foco de WebViews que ainda não suportam overflow:clip.
+  await page.setViewportSize({width:390,height:844});await page.addStyleTag({content:'.table{overflow:hidden}'});await fixture();
+  await page.locator('#unoBtn').tap();await page.locator('[data-card="70100"]').tap();
+  await page.waitForFunction(()=>{const t=document.getElementById('table');return t.scrollLeft===0&&t.scrollTop===0});
+  await finishFlights();
+  assert.ok(await page.locator('#player2').evaluate(el=>{const r=el.getBoundingClientRect();return Math.abs(r.x+r.width/2-innerWidth/2)<1}));
+  console.log('PASS foco/toque não desloca a mesa, inclusive no fallback sem overflow:clip');
   await page.emulateMedia({reducedMotion:'reduce'});await fixture();
   await page.waitForFunction(()=>document.querySelector('.flame-red').getAnimations().length===0);
   await page.locator('[data-card="70100"]').tap();assert.equal(await page.locator('.played-card').count(),0);assert.ok(await page.locator('#discard>.card').isVisible());

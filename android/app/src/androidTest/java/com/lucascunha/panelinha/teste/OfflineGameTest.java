@@ -142,6 +142,7 @@ public class OfflineGameTest {
         InstrumentationRegistry.getInstrumentation().waitForIdleSync();
         InstrumentationRegistry.getInstrumentation().getUiAutomation().waitForIdle(300, 5000);
         assertEquals("true", js("document.documentElement.scrollWidth<=innerWidth && document.documentElement.scrollHeight<=innerHeight"));
+        assertEquals("true", js("document.getElementById('table').scrollLeft===0 && document.getElementById('table').scrollTop===0"));
         assertEquals("true", js("(()=>{const r=document.getElementById('buyBtn').getBoundingClientRect();return r.right<innerWidth*.25&&r.height>r.width*1.8})()"));
         assertEquals("true", js("(()=>{const bg=document.getElementById('stoveScene').getBoundingClientRect(),f=document.getElementById('burner').getBoundingClientRect();return Math.abs(f.x+f.width/2-(bg.x+bg.width*836/1672))<1&&Math.abs(f.y+f.height/2-(bg.y+bg.height*451/941))<1&&Math.abs(f.width-f.height)<1})()"));
         Bitmap bitmap = InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();
