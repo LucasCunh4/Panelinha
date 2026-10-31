@@ -16,6 +16,10 @@ collect_diagnostics() {
   if [[ "$status" != 0 ]]; then
     timeout 10s adb devices -l > "$output/adb-devices.txt" 2>&1 || true
     timeout 10s adb shell dumpsys activity processes > "$output/android-processes.txt" 2>&1 || true
+    timeout 10s adb shell dumpsys window > "$output/android-windows.txt" 2>&1 || true
+    for orientation in portrait landscape; do
+      timeout 10s adb pull "/sdcard/Android/data/$app/files/mesa-v1-$orientation.png" "$output/mesa-v1-$orientation.png" >/dev/null 2>&1 || true
+    done
   fi
   exit "$status"
 }
@@ -38,6 +42,16 @@ app_uid() {
 adb wait-for-device
 adb logcat -v threadtime > "$output/logcat.txt" 2>&1 &
 logcat_pid=$!
+# Somente no emulador descartável do CI: o Pixel Launcher do sistema apresentou
+# ANR e tomou o foco do jogo (#7). Nenhum erro/diálogo do aplicativo é suprimido.
+if [[ "${GITHUB_ACTIONS:-}" == true && "$(adb get-serialno)" == emulator-* ]]; then
+  ci_launcher='com.google.android.apps.nexuslauncher'
+  ci_launcher_path="$(adb shell pm path "$ci_launcher")"
+  if [[ "$ci_launcher_path" == package:* ]]; then
+    adb shell am force-stop "$ci_launcher"
+    adb shell pm disable-user --user 0 "$ci_launcher"
+  fi
+fi
 adb shell input keyevent KEYCODE_WAKEUP
 adb shell wm dismiss-keyguard
 adb shell svc wifi disable

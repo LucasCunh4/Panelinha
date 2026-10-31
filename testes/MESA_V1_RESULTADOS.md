@@ -43,7 +43,15 @@ A execução anterior (#6) compilou/assinou corretamente, mas o emulador encerro
 
 O roteiro agora coleta logcat desde antes da instalação, status de saída e estado do ADB/processos em falha. As quatro verificações offline e a atualização continuam obrigatórias. O teste de orientação também verifica ausência de rolagem, registro da chama e salva capturas Android para os artefatos quando alcançar essa etapa. Nenhum teste foi desativado.
 
-A compilação hospedada desta implementação será registrada abaixo após sua conclusão. Não houve teste em celular físico nesta etapa.
+### Execução #7 — 0.2.7/c2702
+
+- [Workflow](https://github.com/LucasCunh4/Panelinha/actions/runs/41154312603) / [APK em artefato](https://github.com/LucasCunh4/Panelinha/actions/runs/41154312603/artifacts/13024752332).
+- Compilação e assinatura aprovadas; APK baixado e novamente validado localmente com `apksigner`/`verificar_apk.py`: certificado ativo, pacote/origem, código 2702, 52 cartas e 6 assets oficiais. SHA-256 do APK: `7f9636071b3b3d8aeee0e050b70d21ea36d19e6a541be68f4dec3f86e9f9082a`.
+- O emulador permaneceu ativo; passaram imagens/offline, retrato/paisagem e sentinelas (3/4). O teste de toque falhou em `web.hasWindowFocus()`; a atualização não executou e a Release não publicou.
+- O logcat identifica **ANR do `com.google.android.apps.nexuslauncher`**, com janela `Application Not Responding` persistente durante a suíte. Essa é evidência de um bloqueio do launcher do emulador, separado de uma falha nas asserções de compra/corte do jogo.
+- A preparação foi ajustada para parar/desativar somente esse launcher, somente em emulador descartável sob `GITHUB_ACTIONS=true`. Não suprime erros/ANRs do aplicativo nem remove testes. A próxima execução registrará o resultado dessa correção.
+
+Não houve teste em celular físico nesta etapa.
 
 ## Identidade e atualização
 
