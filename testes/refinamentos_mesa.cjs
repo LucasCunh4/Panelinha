@@ -25,7 +25,7 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
    const layout=await page.evaluate(()=>{
     const pile=document.getElementById('buyBtn').getBoundingClientRect(),discard=document.getElementById('discard').getBoundingClientRect();
     const m=id=>getComputedStyle(document.querySelector(`#${id} .back`)).transform;
-    return {vertical:document.getElementById('pile').getBoundingClientRect().height>document.getElementById('pile').getBoundingClientRect().width*1.8,left:pile.right<discard.left-8&&discard.left-pile.right<35,
+    return {vertical:document.getElementById('pile').getBoundingClientRect().height>document.getElementById('pile').getBoundingClientRect().width*1.8,left:pile.right<discard.left-8&&discard.left-pile.right<innerWidth*.46,
      panels:[1,2,3].every(i=>{const st=getComputedStyle(document.getElementById('player'+i));return st.backgroundColor==='rgba(0, 0, 0, 0)'&&st.boxShadow==='none'}),
      leftAngle:m('player3'),rightAngle:m('player1')};
    });

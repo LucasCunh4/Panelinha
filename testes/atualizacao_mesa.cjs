@@ -20,7 +20,7 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/atualizacao-evidence
     const metrics=await page.evaluate(n=>{
      const r=id=>document.getElementById(id).getBoundingClientRect();const buy=r('buyBtn'),discard=r('discard'),hand=document.getElementById('hand');
      const hands=[1,2,3].map(i=>{const cards=[...document.querySelectorAll(`#player${i} .hidden-card,#player${i} .subhand>.card`)];return {count:cards.length,inside:cards.every(c=>{const t=c.getBoundingClientRect();return t.left>=-1&&t.top>=-1&&t.right<=innerWidth+1&&t.bottom<=innerHeight+1}),faces:document.querySelectorAll(`#player${i} .card-image`).length};});
-     return {hands,scroll:Math.abs(hand.scrollLeft-(hand.scrollWidth-hand.clientWidth)/2),noScroll:document.documentElement.scrollWidth<=innerWidth&&document.documentElement.scrollHeight<=innerHeight&&r('table').x===0&&document.getElementById('table').scrollLeft===0,buyLeft:buy.right<discard.left-8,buyNear:discard.left-buy.right<35&&Math.abs((buy.y+buy.height/2)-(discard.y+discard.height/2))<38,buyVertical:r('pile').height>r('pile').width*1.8,hit:document.getElementById('buyBtn').contains(document.elementFromPoint(buy.x+buy.width/2,buy.y+buy.height/2)),topClear:r('player2').bottom<discard.top+1};
+     return {hands,scroll:Math.abs(hand.scrollLeft-(hand.scrollWidth-hand.clientWidth)/2),noScroll:document.documentElement.scrollWidth<=innerWidth&&document.documentElement.scrollHeight<=innerHeight&&r('table').x===0&&document.getElementById('table').scrollLeft===0,buyLeft:buy.right<discard.left-8,buyNear:discard.left-buy.right<innerWidth*.46&&Math.abs((buy.y+buy.height/2)-(discard.y+discard.height/2))<Math.max(120,innerHeight*.2),buyVertical:r('pile').height>r('pile').width*1.8,hit:document.getElementById('buyBtn').contains(document.elementFromPoint(buy.x+buy.width/2,buy.y+buy.height/2)),topClear:r('player2').bottom<discard.top+1};
     },n);
     assert.ok(metrics.noScroll&&metrics.buyLeft&&metrics.buyNear&&metrics.buyVertical&&metrics.hit&&metrics.topClear,`${width}x${height}/${n}: ${JSON.stringify(metrics)}`);
     assert.ok(metrics.hands.every(h=>h.count===n&&h.inside),`leque ${width}x${height}/${n}: ${JSON.stringify(metrics)}`);
@@ -47,17 +47,17 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/atualizacao-evidence
   await page.locator('#buyBtn').tap();assert.equal(await page.evaluate(()=>CartasTest.getState().players[0].hand.length),before+20);
   assert.equal(await page.locator('.drawn-card').count(),20);
   const timing=await page.locator('.drawn-card').evaluateAll(nodes=>nodes.map(n=>({delay:Number(n.dataset.delay),duration:Number(n.dataset.duration)})));
-  assert.ok(timing.every((t,i)=>i===0||t.delay>timing[i-1].delay));assert.ok(timing.at(-1).delay+timing.at(-1).duration<1500);
+  assert.ok(timing.every((t,i)=>i===0||t.delay>timing[i-1].delay));assert.ok(timing.at(-1).delay+timing.at(-1).duration<1850);
   assert.ok(timing[2].delay-timing[1].delay>timing.at(-1).delay-timing.at(-2).delay);
   await page.screenshot({path:path.join(out,'compra-20.png')});await finish();assert.equal(await page.locator('.drawing-card').count(),0);
-  console.log('PASS +20: vinte cartas individuais, sequência progressivamente acelerada <1.5s; lógica registra imediatamente e sem fantasmas');
+  console.log('PASS +20: vinte cartas individuais, sequência progressivamente acelerada <1.85s; lógica registra imediatamente e sem fantasmas');
   for(const count of [40,80,100]){
    await fixture();await page.evaluate(count=>{const s=CartasTest.getState();s.penalty=count;s.highest=6;window.allIds=[...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort().join();document.getElementById('useCardArt').onchange()},count);
    await page.locator('#buyBtn').tap();assert.equal(await page.locator('.drawn-card').count(),count);
    assert.equal(await page.evaluate(()=>[...CartasTest.getState().deck,...CartasTest.getState().discard,...CartasTest.getState().players.flatMap(p=>p.hand)].map(c=>c.id).sort().join()),await page.evaluate(()=>window.allIds));
-   assert.ok(await page.locator('.drawn-card').evaluateAll(nodes=>nodes.every(n=>Number(n.dataset.delay)+Number(n.dataset.duration)<1500)));await finish();
+   assert.ok(await page.locator('.drawn-card').evaluateAll(nodes=>nodes.every(n=>Number(n.dataset.delay)+Number(n.dataset.duration)<1850)));await finish();
   }
-  console.log('PASS compras +40/+80/+100: conservação exata e todas as cartas individuais em menos de 1.5s');
+  console.log('PASS compras +40/+80/+100: conservação exata e todas as cartas individuais em menos de 1.85s');
   // Bot sem jogada paga +20 pelo fluxo real, mantendo os versos ocultos.
   await fixture();await page.evaluate(()=>{const s=CartasTest.getState();s.players[0].hand=[{id:630001,type:'num',color:'blue',num:1},{id:630002,type:'num',color:'green',num:9},{id:630003,type:'num',color:'green',num:6}];document.getElementById('useCardArt').onchange();document.querySelector('[data-card="630001"]').click();s.penalty=20;s.highest=6;s.lastPenalty=null;document.getElementById('useCardArt').onchange()});
   await page.clock.runFor(2250);assert.equal(await page.locator('.drawn-card[data-actor="1"]').count(),20);assert.equal(await page.locator('.drawn-card[data-actor="1"] .card-image').count(),0);await finish();

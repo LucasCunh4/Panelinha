@@ -45,6 +45,9 @@
       <div class="table" id="table" aria-label="Mesa de jogo vista de cima">
         <div class="stove-scene" id="stoveScene" aria-hidden="true">
           <img class="stove-background" src="assets/mesa/fogao_fundo.png" alt="" draggable="false">
+          <svg id="stoveDirection" class="stove-direction" viewBox="0 0 1672 941" aria-hidden="true">
+            <path class="stove-glint" pathLength="1000" d="M430 218H1234C1300 218 1338 255 1338 326V602C1338 662 1300 691 1242 691H420C354 691 326 653 326 599V327C326 257 362 218 430 218Z"/>
+          </svg>
           <div id="burner" class="burner" role="img" aria-label="Cor ativa">
             <img class="flame flame-red" src="assets/mesa/chama_vermelha.png" alt="">
             <img class="flame flame-blue" src="assets/mesa/chama_azul.png" alt="">
@@ -146,28 +149,23 @@ function redistribute(extra=0,exclude=[],actor=null){
   const added=[];
   for(let i=0;i<extra;i++){refill();const c=s.deck.pop();if(!c)break;collected.push(c);added.push(c);}
   shuffle(collected);
-  // Sorteia a quantidade do autor dentro de seu limite. As demais quantidades
-  // são intervalos entre cortes aleatórios do total restante; zeros são possíveis.
-  const counts=new Map();let remaining=collected.length;
+  // Reserva uma carta para cada participante antes de sortear os excedentes.
+  const counts=new Map(eligible.map(p=>[p.id,1]));
+  let remaining=collected.length-eligible.length;
   const author=eligible.find(p=>p.id===actor);
-  if(author){const n=rnd(Math.min(cap,remaining)+1);counts.set(actor,n);remaining-=n;}
+  if(author){const extraForAuthor=rnd(Math.min(cap-1,remaining)+1);counts.set(actor,1+extraForAuthor);remaining-=extraForAuthor;}
   const others=shuffle(eligible.filter(p=>p!==author));
-  // Quando existe somente o autor, conservar a mão é a única partilha possível.
+  // Sem outro destinatário, conservar a mão é a única partilha possível.
   if(author&&!others.length){counts.set(actor,collected.length);remaining=0;}
   const cuts=[0,...Array.from({length:Math.max(0,others.length-1)},()=>rnd(remaining+1)),remaining].sort((a,b)=>a-b);
-  others.forEach((p,i)=>counts.set(p.id,cuts[i+1]-cuts[i]));
+  others.forEach((p,i)=>counts.set(p.id,1+cuts[i+1]-cuts[i]));
   let offset=0;
-  for(const p of eligible){const n=counts.get(p.id)||0;p.hand=collected.slice(offset,offset+n);offset+=n;}
-  if(offset!==collected.length||(author&&author.hand.length>cap))throw Error('Distribuidora: conservação/limite inválido');
+  for(const p of eligible){const n=counts.get(p.id);p.hand=collected.slice(offset,offset+n);offset+=n;}
+  if(offset!==collected.length||eligible.some(p=>p.hand.length<1)||(author&&author.hand.length>cap))throw Error('Distribuidora: conservação/limites inválidos');
   const penaltyIds=new Set(added.map(c=>c.id));
   for(const p of eligible)for(const c of p.hand)if(penaltyIds.has(c.id))PanelasMesa.recordDraw(s,p.id,c);
   const text=eligible.map(p=>`${names(p.id)}: ${p.hand.length}`).join(' · ');
   s.lastDistribution={counts:text,penaltyAdded:added.length,active:eligible.map(p=>p.id),actor,actorLimit:cap,total:collected.length};
-  // Preserva o finalizador anterior. Novos zeros simultâneos seguem autor/sentido.
-  if(s.finisher===null){
-    const first=actor===null?s.current:actor;
-    for(let i=0;i<4;i++){const id=(first+i*s.direction+4)%4;if(eligible.some(p=>p.id===id)&&s.players[id].hand.length===0){s.finisher=id;break;}}
-  }
   if(s.unoWindow&&s.players[s.unoWindow.id].hand.length!==1)s.unoWindow=null;
   log(`Distribuidora ALEATÓRIA (${text})${extra?` · punição: ${added.length}/${extra} cartas adicionadas`:''}.`);
 }
@@ -196,12 +194,14 @@ function penaltyText(){return `PENALIDADE +${s.penalty}: é obrigatório comprar
 
 function closeUnoOnAction(){if(s.unoWindow)s.unoWindow=null;}
 function canDistribute(c){
-  if(!s.penalty)return true;
   const author=s.players.find(p=>p.hand.some(q=>q.id===c.id));
-  // Sem outro destinatário, o excedente não cabe sem violar o limite do autor.
-  return !author||author.hand.length===1||s.players.some(p=>p.id!==author.id&&p.hand.length>0);
+  if(!author)return true;
+  // Mínimo 1 e teto após descartar tornam a última carta inviável.
+  if(author.hand.length<2)return false;
+  // Sem outro destinatário, o excedente de uma penalidade não cabe no teto.
+  return !s.penalty||s.players.some(p=>p.id!==author.id&&p.hand.length>0);
 }
-function canPlay(c){if(s.penalty){return (power(c)>0&&power(c)>=s.highest)||(c.type==='dist'&&canDistribute(c));}let t=top();if(isWild(c))return true;return c.color===s.activeColor||(!isWild(t)&&c.type===t.type&&(c.type==='num'?c.num===t.num:true));}
+function canPlay(c){if(c.type==='dist'&&!canDistribute(c))return false;if(s.penalty){return (power(c)>0&&power(c)>=s.highest)||c.type==='dist';}let t=top();if(isWild(c))return true;return c.color===s.activeColor||(!isWild(t)&&c.type===t.type&&(c.type==='num'?c.num===t.num:true));}
 function checkCards(id,ids,isCut){
   if(!s||s.phase!=='playing'||ids.length!==1)return false;
   const c=s.players[id].hand.find(q=>q.id===ids[0]);
@@ -336,7 +336,8 @@ const cutCard=findHumanCut(), handScroll=$('hand').scrollLeft;
 $('hand').innerHTML=cards.map(c=>{
   const enabled=s.phase==='playing'&&s.current===0&&!locked&&(s.drawn===null||c.id===s.drawn)&&canPlay(c);
   const cutting=cutCard?.id===c.id;
-  return `<button type="button" ${cutting?'id="cutBtn" class="cut-eligible"':''} style="border:0;background:none;padding:0" data-card="${c.id}" aria-label="${cutting?'Cortar':enabled?'Jogar':'Indisponível'} ${description(c)}" title="${cutting?'Cortar':enabled?'Jogar':'Indisponível'} ${description(c)}" ${enabled||cutting?'':'disabled'}>${cardHTML(c,false,false,!(enabled||cutting))}${cutting?'<span class="cut-bubble"><img src="assets/mesa/corte_faca_balao.png" alt="CORTAR" draggable="false"></span>':''}</button>`;
+  const reason=c.type==='dist'&&!canDistribute(c)?(s.players[0].hand.length<2?'Distribuidora exige outra carta na mão: todos recebem no mínimo 1.':'Distribuidora indisponível: não há outro destinatário para absorver a penalidade.'):(cutting?'Cortar':enabled?'Jogar':'Indisponível')+' '+description(c);
+  return `<button type="button" ${cutting?'id="cutBtn" class="cut-eligible"':''} style="border:0;background:none;padding:0" data-card="${c.id}" aria-label="${reason}" title="${reason}" ${enabled||cutting?'':'disabled'}>${cardHTML(c,false,false,!(enabled||cutting))}${cutting?'<span class="cut-bubble"><img src="assets/mesa/corte_faca_balao.png" alt="CORTAR" draggable="false"></span>':''}</button>`;
 }).join('');
 $('hand').querySelectorAll('[data-card]').forEach(b=>b.onclick=()=>b.id==='cutBtn'?cutHuman():clickHandCard(Number(b.dataset.card)));
 if(s.phase!=='playing'){
@@ -346,9 +347,10 @@ if(s.phase!=='playing'){
   const mine=s.current===0;
   const canCall=s.players[0].hand.length===2||(s.players[0].hand.length===1&&s.unoWindow?.id===0);
   const canReport=s.unoWindow&&s.unoWindow.id!==0;
+  const distributionHint=mine&&s.players[0].hand.length===1&&s.players[0].hand[0].type==='dist'?'<span class="pill">Distribuidora exige manter ao menos 1 carta na mão.</span>':'';
   const penaltyBanner=mine&&s.penalty?`<div class="penalty-alert">⚠️ ${penaltyText()}</div>`:'';
   const actionHint=mine&&locked?`<span class="pill">Próxima jogada liberada em ${Math.max(0,((s.unlockAt-Date.now())/1000)).toFixed(1)}s · cortes abertos</span>`:'';
-  $('controls').innerHTML=`${penaltyBanner}${actionHint}${mine&&s.drawn!==null?'<button id="passBtn" class="btn alt">Guardar e passar</button>':''}${mine&&canChallenge(0)?`<button id="challengeBtn" class="btn warn" ${locked?'disabled':''}>Desafiar +4/+6</button>`:''}${canCall?`<button id="unoBtn" class="btn good" ${s.preUno?'disabled':''}>ÚLTIMA CARTA!</button>`:''}${canReport?'<button id="reportBtn" class="btn warn">Denunciar última carta</button>':''}`;
+  $('controls').innerHTML=`${penaltyBanner}${distributionHint}${actionHint}${mine&&s.drawn!==null?'<button id="passBtn" class="btn alt">Guardar e passar</button>':''}${mine&&canChallenge(0)?`<button id="challengeBtn" class="btn warn" ${locked?'disabled':''}>Desafiar +4/+6</button>`:''}${canCall?`<button id="unoBtn" class="btn good" ${s.preUno?'disabled':''}>ÚLTIMA CARTA!</button>`:''}${canReport?'<button id="reportBtn" class="btn warn">Denunciar última carta</button>':''}`;
   $('buyBtn').disabled=!mine||s.drawn!==null||locked||!!s.pendingAction;
   $('buyBtn').setAttribute('aria-label',s.penalty?'Comprar penalidade de '+s.penalty+' cartas':'Comprar carta');
   $('buyBtn').onclick=buyHuman;

@@ -49,7 +49,7 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
    await page.evaluate(color=>{CartasTest.getState().activeColor=color;document.querySelector('#useCardArt').onchange()},color);await page.clock.runFor(220);
    await page.locator('.flame').evaluateAll(els=>Promise.all(els.flatMap(el=>el.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished))));
    assert.equal(await page.locator('.flame').evaluateAll(els=>els.filter(el=>Number(getComputedStyle(el).opacity)>.1).length),color?1:0);
-   if(color){await page.locator(`.flame-${color}`).evaluate(el=>Promise.all(el.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished)));assert.equal(await page.locator(`.flame-${color}`).evaluate(el=>getComputedStyle(el).opacity),'0.74');}
+   if(color){await page.locator(`.flame-${color}`).evaluate(el=>Promise.all(el.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished)));assert.ok(Math.abs(Number(await page.locator(`.flame-${color}`).evaluate(el=>getComputedStyle(el).opacity))-(color==='yellow'?.851:.74))<.001);}
   }
   console.log('PASS quatro chamas por estado, crossfade e ausência de chama sem cor ativa');
   await page.setViewportSize({width:390,height:844});await fixture();

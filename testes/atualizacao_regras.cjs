@@ -22,29 +22,46 @@ const assert=require('node:assert/strict');
    const play=(card,color='red')=>{refresh();document.querySelector(`[data-card="${card.id}"]`).click();document.querySelector(`[data-color="${color}"]`)?.click();};
    const check=(condition,message)=>{if(!condition)throw Error(message)};
    const tests=[];const test=(name,fn)=>{fn();tests.push(name)};
-   for(const total of [20,40,80,118])test(`Distribuidora ${total} cartas: conservação, limite, aleatoriedade e zeros`,()=>{
-    const sizes=new Set();let unequal=false,zero=false;
+   for(const total of [20,40,80,118])test(`Distribuidora ${total} cartas: conservação, teto do autor, mínimo 1 e aleatoriedade`,()=>{
+    const sizes=new Set();let unequal=false;
     for(let attempt=0;attempt<60;attempt++){
      const s=setup(total),card=c('dist',null);s.players[0].hand.push(card);const before=all(s),cap=s.players[0].hand.length-1;
      play(card);const lengths=s.players.map(p=>p.hand.length);sizes.add(lengths.join());
      check(all(s)===before,'perda/duplicação');check(new Set([...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id)).size===total+102,'ID duplicado');
-     check(lengths.reduce((a,b)=>a+b,0)===total,'total incorreto');check(lengths[0]<=cap,'autor ganhou além do limite');
-     unequal ||= Math.max(...lengths)-Math.min(...lengths)>1;zero ||= lengths.some(n=>n===0);
-     if(lengths.some(n=>n===0)){check(s.finisher!==null&&s.phase==='gameOver','zero não finalizou');check(s.players[s.finisher].hand.length===0,'vencedor com cartas');}
+     check(lengths.reduce((a,b)=>a+b,0)===total,'total incorreto');check(lengths[0]<=cap,'autor ganhou além do limite');check(lengths.every(n=>n>=1),'mínimo 1 violado');check(s.finisher===null&&s.phase==='playing','vitória produzida pela redistribuição');
+     unequal ||= Math.max(...lengths)-Math.min(...lengths)>1;
     }
-    check(sizes.size>8&&unequal&&zero,'quantidades não aleatórias/zeros ausentes');
+    check(sizes.size>8&&unequal,'quantidades não aleatórias');
    });
    for(const penalty of [2,6,12,20,40,80])test(`Distribuidora resolve +${penalty} sem exceder mão do autor`,()=>{
     const s=setup(20),card=c('dist',null);s.players[0].hand.push(card);s.penalty=penalty;s.highest=6;
     const before=all(s),cap=5;play(card);
-    check(all(s)===before,'cartas perdidas na penalidade');check(s.players.flatMap(p=>p.hand).length===20+penalty,'total pool');check(s.players[0].hand.length<=cap,'limite durante penalidade');
+    check(all(s)===before,'cartas perdidas na penalidade');check(s.players.flatMap(p=>p.hand).length===20+penalty,'total pool');check(s.players[0].hand.length<=cap,'limite durante penalidade');check(s.players.every(p=>p.hand.length>=1)&&s.finisher===null,'mínimo/vitória durante penalidade');
     check(s.penalty===0&&s.highest===0&&!s.lastPenalty&&s.lastDistribution.penaltyAdded===penalty,'penalidade não encerrada');
    });
-   test('Distribuidora final mantém vencedor e não devolve cartas ao autor',()=>{
-    const s=setup(20),card=c('dist',null);s.players[0].hand=[card];const before=all(s);play(card);check(s.finisher===0&&s.players[0].hand.length===0&&s.phase==='gameOver','vitória alterada');check(all(s)===before,'conservação final');
+   for(const duo of [false,true])for(const penalty of [0,20])test(`Última Distribuidora recusada sem perda de cartas (${duo?'duplas':'individual'}, +${penalty})`,()=>{
+    const s=setup(20),card=c('dist',null);s.o.duo=duo;s.players[0].hand=[card];s.penalty=penalty;s.highest=penalty?2:0;const before=all(s);refresh();
+    const button=document.querySelector(`[data-card="${card.id}"]`);check(button.disabled,'última Distribuidora habilitada');button.onclick();
+    check(all(s)===before&&s.finisher===null&&s.phase==='playing'&&!s.pendingAction,'última carta removeu/venceu');
+    check(s.teams.every(n=>n===0)&&s.players.every(p=>p.score===0),'pontuação alterada');
+    document.getElementById('buyBtn').click();check(s.players[0].hand.length===(penalty?21:2),'não permitiu compra alternativa');
    });
-   test('Duplas encerra quando um participante fica com zero',()=>{
-    const s=setup(20);s.o.duo=true;const card=c('dist',null);s.players[0].hand=[card];play(card);check(s.finisher===0&&s.teams[0]===1&&s.phase==='gameOver','vitória duplas');
+   for(const penalty of [0,20,40])test(`Autor com teto 1 recebe exatamente 1 (+${penalty})`,()=>{
+    const s=setup(20),card=c('dist',null);s.players[0].hand=[c(),card];s.penalty=penalty;s.highest=penalty?6:0;const before=all(s);play(card);
+    check(s.players[0].hand.length===1&&s.players.every(p=>p.hand.length>=1),'mínimo/teto 1');check(all(s)===before&&s.finisher===null&&s.phase==='playing','conservação/finalização');
+   });
+   test('Distribuidora inicial reserva uma carta para cada participante',()=>{
+    const s=setup(20),seededRandom=Math.random;let index=117;
+    try{Math.random=()=>{if(index>=1){const i=index--;return i===114?89.25/(i+1):.999999}return .999999};CartasTest.newRound();}
+    finally{Math.random=seededRandom;}
+    check(s.discard.at(-1).type==='dist'&&s.lastDistribution.actor===null,'abertura não controlada');
+    check(s.players.every(p=>p.hand.length>=1)&&s.finisher===null&&s.phase==='playing','abertura gerou zero/vitória');
+    check([...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].length===118&&new Set([...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id)).size===118,'baralho inicial');
+   });
+   test('Distribuidora recicla descarte e conserva mínimo mesmo com monte curto',()=>{
+    const s=setup(20),card=c('dist',null);s.players[0].hand.push(card);s.deck=s.deck.slice(0,3);s.discard=[c(),c(),c(),c()];s.penalty=40;s.highest=6;const before=all(s);play(card);
+    check(s.lastDistribution.penaltyAdded===7&&s.players.flatMap(p=>p.hand).length===27,'pool real do reabastecimento');
+    check(all(s)===before&&s.players.every(p=>p.hand.length>=1)&&s.players[0].hand.length<=5&&s.penalty===0,'conservação/limites');
    });
    test('Distribuidora exclui finalizador anterior e mantém o resultado',()=>{
     const s=setup(20);s.players[3].hand=[];s.finisher=3;s.penalty=20;s.highest=2;const card=c('dist',null);s.players[0].hand.push(card);const before=all(s);play(card);check(s.finisher===3&&s.players[3].hand.length===0&&!s.lastDistribution.active.includes(3),'finalizador retornou');check(all(s)===before,'conservação');

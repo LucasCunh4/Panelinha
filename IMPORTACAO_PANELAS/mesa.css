@@ -218,3 +218,28 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 .seat.top .turn-clock {top:0}
 .seat.left .turn-clock {left:auto;right:-20px;top:calc(50% - 17px)}
 .seat.right .turn-clock {left:-20px;right:auto;top:calc(50% - 17px)}
+
+/* Refinamentos: o mesmo PNG e os mesmos controles, com dimensões moderadas. */
+.table {--card-width:clamp(50px,8.25vh,84px);--discard-width:calc(var(--card-width)*1.1);--opponent-card:clamp(34px,5.15vh,49px);--pile-safe-left:max(14px,env(safe-area-inset-left))}
+.table>.draw-stack {left:var(--pile-left,14px);top:var(--pile-top,var(--burner-y))}
+.seat.top .subhand {--opponent-card:clamp(38px,5.35vh,55px)}
+.seat.left,.seat.right {top:calc(var(--burner-y) + clamp(52px,7.5vh,76px))}
+.hand-heading {transform:translateY(18px)}
+.table[data-active-color=yellow] .flame-yellow {opacity:min(.96,calc(var(--heat-opacity,.74)*1.15))}
+.stove-direction {position:absolute;inset:0;width:1672px;height:941px;pointer-events:none;overflow:visible}
+.stove-glint {fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-dasharray:36 964;filter:drop-shadow(0 0 3px #fff9);opacity:.76;animation:stove-orbit 7.5s linear infinite}
+.table[data-direction="-1"] .stove-glint {animation-direction:reverse}
+@keyframes stove-orbit {from{stroke-dashoffset:0}to{stroke-dashoffset:-1000}}
+@media(orientation:landscape) and (max-height:600px){
+ .table{--card-width:clamp(44px,12.35vh,65px);--opponent-card:clamp(29px,8.9vh,38px)}
+ .seat.top{top:max(4px,env(safe-area-inset-top))}.seat.top .subhand{--opponent-card:clamp(26px,8.8vh,36px)}
+ .seat.left,.seat.right{top:48%}
+ .hand-heading{transform:translateY(4px)}
+}
+@media(prefers-reduced-motion:reduce){.stove-glint{animation:none;opacity:.5}}
+/* O nome/avatar fica no rodapé da mão, longe da boca central. */
+.hand-panel {display:flex;flex-direction:column}
+.hand-panel>.controls {order:0}.hand-panel>.hand {order:1}
+.hand-panel>.hand-heading {order:2;transform:none}
+.table>.draw-stack {left:max(var(--pile-left,14px),14px,env(safe-area-inset-left))}
+@media(orientation:landscape) and (max-height:600px){.hand-panel{display:block}.hand-panel>.hand-heading{transform:translateY(4px)}}

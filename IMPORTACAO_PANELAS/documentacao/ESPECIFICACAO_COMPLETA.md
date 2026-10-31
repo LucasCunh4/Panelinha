@@ -86,13 +86,13 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 
 ## 8. Distribuidora e Giro
 
-- **Distribuidora (incolor, 2 opcionais):** recolhe as mãos dos participantes ainda ativos, embaralha e redistribui **quantidades aleatórias**, incluindo zero, conservando todas as cartas. O autor recebe no máximo a quantidade que tinha imediatamente após jogar a Distribuidora; quem já terminou fica excluído. Os demais não têm limite de igualdade ou equilíbrio.
+- **Distribuidora (incolor, 2 opcionais):** recolhe as mãos dos participantes ainda ativos, embaralha e redistribui **quantidades aleatórias**, com mínimo de uma carta por participante, conservando todas as cartas. O autor recebe entre uma carta e a quantidade que tinha imediatamente após jogar a Distribuidora; portanto não pode utilizá-la como última carta; quem já terminou fica excluído. Os demais não têm limite de igualdade ou equilíbrio.
 - Se usada para defender-se de uma penalidade +N pendente: retirar N cartas do monte, incluir no pool de redistribuição, redistribuir aleatoriamente com o mesmo limite do autor e **encerrar completamente** a punição. Ex. +20: acrescentar 20 ao pool, não cobrar +20 de alguém depois.
 - **Giro (incolor, 2 opcionais):** gira as mãos entre os ainda ativos no sentido corrente; **não pode** ser usado contra penalidade acumulada.
-- Nas jogadas normais, usuário de Distribuidora escolhe a nova cor. Giro nunca abre seleção nem altera a cor ativa anterior. Se sua **última carta** foi uma delas, não precisa selecionar cor; individual: efeito aplica-se entre os outros três antes de calcular classificação. Duplas: equipe vencedora encerra a rodada; não precisa aplicar efeito ao parceiro/outros para pontuação individual inexistente.
+- Nas jogadas normais, usuário de Distribuidora escolhe a nova cor. Giro nunca abre seleção nem altera a cor ativa anterior. Distribuidora não pode ser jogada como última carta. Se sua **última carta** foi Giro, não precisa selecionar cor; individual: efeito aplica-se entre os outros três antes de calcular classificação. Duplas: equipe vencedora encerra a rodada; não precisa aplicar efeito ao parceiro/outros para pontuação individual inexistente.
 - Próximo turno após giro/distribuição normal: jogador seguinte a quem usou a carta, conforme sentido atual.
 
-- Zeros produzidos pela redistribuição usam o encerramento/pontuação existentes. Um finalizador anterior tem prioridade; sem ele, a verificação começa no autor e segue o sentido atual em caso de zeros simultâneos.
+- A redistribuição nunca produz zeros nem novo finalizador. Um finalizador já existente durante a resolução de penalidades continua excluído; o encerramento/pontuação anteriores permanecem válidos.
 - Caso limite sem outro destinatário ativo: uma Distribuidora não pode absorver penalidade mantendo o limite do autor; essa resposta inviável fica indisponível. O jogador pode rebater com outra carta válida ou comprar a penalidade. Sem penalidade, conservar a mão do único destinatário é a única partilha possível.
 
 ## 9. Rodadas e classificação

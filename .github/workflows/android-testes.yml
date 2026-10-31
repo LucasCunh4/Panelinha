@@ -92,6 +92,7 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
       - name: Testar APK offline e atualização preservando dados
+        id: android_tests
         uses: reactivecircus/android-emulator-runner@4c44018e59b437e86cdfc41da381398f93ed8808 # v2
         with:
           api-level: 35
@@ -125,19 +126,41 @@ jobs:
               esac
             done < <(find /tmp/android-runner -type f)
           fi
-      - name: Upload de APK e metadados
+      - name: Upload do APK direto (sem ZIP)
+        id: apk_download
         if: always() && steps.build.outcome == 'success'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@v7
         with:
-          name: Panelinha-Teste-v${{ steps.version.outputs.name }}
-          path: |
-            artifacts/Panelinha-Teste-v${{ steps.version.outputs.name }}-c${{ steps.version.outputs.code }}.apk
-            artifacts/Panelinha-Teste-v${{ steps.version.outputs.name }}-c${{ steps.version.outputs.code }}.json
+          path: artifacts/Panelinha-Teste-v${{ steps.version.outputs.name }}-c${{ steps.version.outputs.code }}.apk
+          archive: false
           if-no-files-found: error
           retention-days: 90
+      - name: Guardar metadados do APK separadamente
+        if: always() && steps.build.outcome == 'success'
+        uses: actions/upload-artifact@v7
+        with:
+          name: metadados-apk-${{ github.run_number }}-${{ github.run_attempt }}
+          path: artifacts/Panelinha-Teste-v${{ steps.version.outputs.name }}-c${{ steps.version.outputs.code }}.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Registrar link direto e resultado dos testes
+        if: always() && steps.apk_download.outcome == 'success'
+        env:
+          APK_URL: ${{ steps.apk_download.outputs.artifact-url }}
+          APK_NAME: Panelinha-Teste-v${{ steps.version.outputs.name }}-c${{ steps.version.outputs.code }}.apk
+          ANDROID_RESULT: ${{ steps.android_tests.outcome }}
+        run: |
+          python3 - <<'PYTHON'
+          import os
+          from pathlib import Path
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as report:
+              report.write(f"[Baixar {os.environ['APK_NAME']} diretamente, sem extração]({os.environ['APK_URL']})\n\n")
+              report.write('O download do artefato exige sessão no GitHub. Metadados e diagnósticos ficam em artefatos separados.\n\n')
+              report.write(f"Resultado da etapa de testes Android: **{os.environ['ANDROID_RESULT']}**. Compilação/assinatura não substituem a aprovação dos testes.\n")
+          PYTHON
       - name: Guardar resultados Android
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@v7
         with:
           name: resultados-android-${{ github.run_number }}-${{ github.run_attempt }}
           path: artifacts/testes-android/

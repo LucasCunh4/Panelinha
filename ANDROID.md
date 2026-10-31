@@ -94,7 +94,7 @@ A instrumentação Android (`OfflineGameTest`, 6 testes) verifica no APK real: a
 bash ferramentas/testar_android.sh primeiro.apk seguinte.apk instrumentacao.apk
 ```
 
-Esse script destina-se a um emulador/dispositivo exclusivo de testes: desliga Wi-Fi/dados e ativa modo avião. Não roda no celular pessoal sem essa intenção. Os resultados completos ficam em `artifacts/testes-android/`; a presença de `OK (4 tests)`/`OK (1 test)` é validada porque o comando de instrumentação pode retornar status 0 mesmo com falhas. Consulte `testes/ANDROID_RESULTADOS.md` para o que efetivamente foi executado nesta entrega.
+Esse script destina-se a um emulador/dispositivo exclusivo de testes: desliga Wi-Fi/dados e ativa modo avião. Não roda no celular pessoal sem essa intenção. Os resultados completos ficam em `artifacts/testes-android/`; a presença de `OK (6 tests)`/`OK (1 test)` é validada porque o comando de instrumentação pode retornar status 0 mesmo com falhas. Consulte `testes/ANDROID_RESULTADOS.md` para o que efetivamente foi executado nesta entrega.
 
 ## Compatibilidade Android sem alterar o jogo
 
@@ -123,3 +123,11 @@ Compras e descarte têm camadas visuais independentes do motor; até três jogad
 O plugin local `TableWindow` usa `WindowInsetsControllerCompat` durante a mesa, com barras transitórias por gesto. Ao sair para configurações, as barras voltam. O host reserva recortes e teclado; não muda a origem nem o diretório de dados. A versão web ignora a ponte nativa.
 
 Resultados, decisões de casos limite e limitações em `testes/ATUALIZACAO_REGRAS_MESA_RESULTADOS.md`.
+
+## Refinamentos e download direto após 0.2.16
+
+Distribuidora conserva o baralho, dá no mínimo uma carta a cada participante e mantém o teto do autor após descartar. Não é utilizável como última carta, pois mínimo 1 e teto 0 seriam incompatíveis.
+
+O workflow existente usa `actions/upload-artifact@v7` com `archive: false` **apenas para o arquivo APK**. Metadados e diagnósticos ficam em artefatos separados. O output `artifact-url` é registrado no resumo da execução; o download exige sessão no GitHub e entrega o próprio `.apk`, sem ZIP externo. A publicação em Release continua dependente da aprovação dos testes, e falhas permanecem visíveis.
+
+O APK continua sendo verificado com a assinatura da geração 2 antes de ser disponibilizado; chave, pacote, origem e sequência de versionCode não mudaram. Resultados desta rodada em `testes/MESA_FINA_MINIMO_RESULTADOS.md`.

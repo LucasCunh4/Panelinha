@@ -72,7 +72,7 @@ const base = process.env.PANELAS_TEST_URL || 'http://127.0.0.1:8000/';
    });
    test('Distribuidora incorpora +20, respeita limite e encerra punição',()=>{
     const s=fixture();const card=c('dist',null);s.players[0].hand.push(card);s.penalty=20;s.highest=2;play(card);clickColor('red');
-    const sizes=s.players.map(p=>p.hand.length);ok(sizes[0]<=2,'limite do autor');
+    const sizes=s.players.map(p=>p.hand.length);ok(sizes[0]<=2&&sizes.every(n=>n>=1),'limites da Distribuidora');
     ok(sizes.reduce((a,b)=>a+b)===28&&s.penalty===0&&s.lastDistribution.penaltyAdded===20,'pool/punição');
    });
    test('Giro transfere mãos na direção e é bloqueado contra +N',()=>{

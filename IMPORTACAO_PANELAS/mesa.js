@@ -45,7 +45,7 @@
     const room=container.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
     const width=cards[0].offsetWidth;
     let compact=self&&n>largeAt;
-    let step=n<2?width:Math.min(width*.60,Math.max(0,(room-width-10)/(n-1)));
+    let step=n<2?width:Math.min(width*.60,Math.max(0,(room-width-(self?10:22))/(n-1)));
     if(self&&step<22)compact=true;
     if(self&&compact)step=Math.max(24,step);
     const overflow=self&&width+step*(n-1)>room+1;
@@ -77,7 +77,7 @@
       discardTrail=previousIndex<0?cards.slice(-3).map(entry):[...discardTrail,...cards.slice(previousIndex+1).map(entry)].slice(-3);
     }
     return [...discardTrail].reverse().map(({card,key,pose},i)=>{
-      const x=pose.x-i*7,y=pose.y+i*3,angle=pose.angle-i*3;
+      const x=pose.x-i*9,y=pose.y+i*4,angle=pose.angle-i*4.5;
       return `<div class="discard-layer ${i?'discard-under':'discard-top'}" data-discard-id="${card.id}" data-visual-key="${key}" style="z-index:${3-i};transform:translate(${x}px,${y}px) rotate(${angle}deg)">${format(card)}</div>`;
     }).join('');
   }
@@ -106,11 +106,11 @@
   function animateDraws(events,state) {
     if(!events.length||reducedMotion.matches||typeof $('pile').animate!=='function')return new Map();
     const count=events.length,ends=new Map();let elapsed=0;
-    const intervals=events.map((_,i)=>4+66*Math.pow(.89,i));
-    const factor=Math.min(1,1000/intervals.reduce((a,b)=>a+b,0));
+    const intervals=events.map((_,i)=>8+84*Math.pow(.91,i));
+    const factor=Math.min(1,1400/intervals.reduce((a,b)=>a+b,0));
     events.forEach((event,i)=>{
       const delay=elapsed;elapsed+=intervals[i]*factor;
-      const duration=Math.max(180,340-count*2);
+      const duration=Math.max(240,420-count*1.6);
       const end=handPoint(event.actor,event.id),present=state.players[event.actor].hand.some(c=>c.id===event.id);
       if(!end.width||!end.height)return;
       const face=event.actor===0||state.reveal||(state.o.duo&&event.actor===2);
@@ -228,6 +228,20 @@
     animateBlock(play,delay+duration*.7);
   }
 
+  function tableDirection(direction) {
+    const table=$('table'),glint=document.querySelector('.stove-glint');
+    const animation=glint.getAnimations()[0];
+    const changed=table.dataset.direction&&table.dataset.direction!==String(direction);
+    const elapsed=Number(animation?.currentTime)||0;
+    const duration=Number(animation?.effect.getTiming().duration)||7500;
+    table.dataset.direction=String(direction);
+    // Espelha a fase ao inverter: o brilho muda de sentido sem saltar de lugar.
+    if(changed&&animation&&!reducedMotion.matches){
+      const updated=glint.getAnimations()[0];
+      if(updated)updated.currentTime=Math.floor(elapsed/duration)*duration+duration-elapsed%duration;
+    }
+  }
+
   function layout() {
     const table = $('table');
     const width = table.clientWidth, height = table.clientHeight;
@@ -239,6 +253,14 @@
     table.style.setProperty('--scene-x', `${x}px`);
     table.style.setProperty('--scene-y', `${y}px`);
     table.style.setProperty('--burner-y', `${y + 451 * scale}px`);
+    const pileWidth=Math.max(44,$('buyBtn').offsetWidth),pileHeight=$('buyBtn').offsetHeight;
+    const safeLeft=parseFloat(getComputedStyle(table).getPropertyValue('--pile-safe-left'))||14;
+    const nativeX=x+500*scale;
+    const px=Math.max(safeLeft+pileWidth/2,Math.min(nativeX,width/2-100));
+    const portrait=height>width;
+    const py=portrait?y+451*scale-Math.max(88,($('hand').querySelector('.card')?.offsetWidth||50)*1.55):y+451*scale;
+    table.style.setProperty('--pile-left',`${px-pileWidth/2}px`);
+    table.style.setProperty('--pile-top',`${Math.max(pileHeight/2+12,py)}px`);
   }
 
   function closeMenu() {
@@ -269,6 +291,7 @@
     const center = document.querySelector('.center');
     $('table').dataset.activeColor = state.activeColor || '';
     $('table').dataset.phase = state.phase;
+    tableDirection(state.direction);
     const heat=Math.min(1,Math.log1p(Math.max(0,state.penalty))/Math.log(21));
     $('burner').style.setProperty('--heat-scale',String(1+heat*.16));
     $('burner').style.setProperty('--heat-opacity',String(.74+heat*.18));

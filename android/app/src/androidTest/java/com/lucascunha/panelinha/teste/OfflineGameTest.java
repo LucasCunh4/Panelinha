@@ -143,7 +143,7 @@ public class OfflineGameTest {
         InstrumentationRegistry.getInstrumentation().getUiAutomation().waitForIdle(300, 5000);
         assertEquals("true", js("document.documentElement.scrollWidth<=innerWidth && document.documentElement.scrollHeight<=innerHeight"));
         assertEquals("true", js("document.getElementById('table').scrollLeft===0 && document.getElementById('table').scrollTop===0"));
-        assertEquals("true", js("(()=>{const r=document.getElementById('pile').getBoundingClientRect(),d=document.getElementById('discard').getBoundingClientRect(),b=document.getElementById('buyBtn').getBoundingClientRect();return b.right<d.left-8&&d.left-b.right<35&&r.height>r.width*1.8&&b.width>=44})()"));
+        assertEquals("true", js("(()=>{const r=document.getElementById('pile').getBoundingClientRect(),d=document.getElementById('discard').getBoundingClientRect(),b=document.getElementById('buyBtn').getBoundingClientRect();return b.right<d.left-8&&d.left-b.right<innerWidth*.46&&r.height>r.width*1.8&&b.width>=44})()"));
         assertEquals("true", js("(()=>{const bg=document.getElementById('stoveScene').getBoundingClientRect(),f=document.getElementById('burner').getBoundingClientRect();return Math.abs(f.x+f.width/2-(bg.x+bg.width*836/1672))<1&&Math.abs(f.y+f.height/2-(bg.y+bg.height*451/941))<1&&Math.abs(f.width-f.height)<1})()"));
         Bitmap bitmap = InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();
         assertNotNull("Captura Android da mesa", bitmap);
@@ -217,7 +217,7 @@ public class OfflineGameTest {
         tap("[data-card='87900']");
         js("document.querySelector('[data-color=blue]').addEventListener('click',()=>CartasTest.getState().token++,{once:true})");
         tap("[data-color='blue']");
-        assertEquals("true",js("(()=>{const s=CartasTest.getState();return s.players[0].hand.length<=10&&s.players.flatMap(p=>p.hand).length===60&&s.penalty===0&&[...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort().join()===window.originalIds})()"));
+        assertEquals("true",js("(()=>{const s=CartasTest.getState();return s.players.every(p=>p.hand.length>=1)&&s.players[0].hand.length<=10&&s.players.flatMap(p=>p.hand).length===60&&s.penalty===0&&[...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort().join()===window.originalIds})()"));
         js("(()=>{const s=CartasTest.getState();Object.assign(s,{phase:'playing',current:0,penalty:0,finisher:null,unlockAt:0,cutOpen:false,pendingAction:null,activeColor:'blue',deadline:0,token:s.token+1});s.players.forEach((p,a)=>p.hand=[{id:89000+a,type:'num',color:'green',num:7}]);s.players[0].hand.push({id:89900,type:'rotate',color:null});document.getElementById('useCardArt').onchange();document.querySelector('[data-card=\"89900\"]').addEventListener('click',()=>s.token++,{once:true})})()");
         tap("[data-card='89900']");assertEquals("true",js("CartasTest.getState().activeColor==='blue'&&!CartasTest.getState().pendingAction&&document.querySelectorAll('.colorbtn').length===0"));
         js("(()=>{const s=CartasTest.getState();s.current=0;s.token++;s.unlockAt=0;s.cutOpen=false;s.o.timeout=15;s.deadline=Date.now()+4000;document.getElementById('useCardArt').onchange()})()");
