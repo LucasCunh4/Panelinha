@@ -5,6 +5,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
+import android.os.ParcelFileDescriptor;
 import android.net.ConnectivityManager;
 import android.content.pm.ActivityInfo;
 import android.os.SystemClock;
@@ -140,9 +142,26 @@ public class OfflineGameTest {
         Bitmap bitmap = InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();
         assertNotNull("Captura Android da mesa", bitmap);
         File folder = InstrumentationRegistry.getInstrumentation().getTargetContext().getExternalFilesDir(null);
-        try (FileOutputStream file = new FileOutputStream(new File(folder, "mesa-v1-" + orientation + ".png"))) {
+        try (FileOutputStream file = new FileOutputStream(new File(folder, "mesa-v1-" + orientation + "-uiautomation.png"))) {
             assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG, 100, file));
         } finally { bitmap.recycle(); }
+        // screencap fornece uma segunda leitura do display físico, independente
+        // da transformação usada por UiAutomation durante rotações do emulador.
+        ParcelFileDescriptor screen = InstrumentationRegistry.getInstrumentation().getUiAutomation().executeShellCommand("screencap -p");
+        File target = new File(folder, "mesa-v1-" + orientation + ".png");
+        try (java.io.InputStream input = new ParcelFileDescriptor.AutoCloseInputStream(screen);
+             FileOutputStream output = new FileOutputStream(target)) {
+            byte[] buffer = new byte[8192]; int count;
+            while ((count = input.read(buffer)) != -1) output.write(buffer, 0, count);
+        }
+        assertTrue("Captura física PNG", target.length() > 8);
+        String details = new JSONArray("[" + js("JSON.stringify({width:innerWidth,height:innerHeight,dpr:devicePixelRatio,landscape:matchMedia('(orientation:landscape)').matches,table:document.getElementById('table').getBoundingClientRect().toJSON(),hand:document.getElementById('hand').getBoundingClientRect().toJSON()})") + "]").getString(0);
+        org.json.JSONObject geometry = new org.json.JSONObject(details);
+        geometry.put("nativeWidth", web.getWidth()); geometry.put("nativeHeight", web.getHeight());
+        try (FileOutputStream output = new FileOutputStream(new File(folder, "mesa-v1-" + orientation + ".json"))) {
+            output.write(geometry.toString(2).getBytes(StandardCharsets.UTF_8));
+        }
+        assertEquals("true", js("(()=>{const r=document.getElementById('table').getBoundingClientRect();return Math.abs(r.width-innerWidth)<1&&Math.abs(r.height-innerHeight)<1})()"));
     }
     @Test public void c_portraitAndLandscape() throws Exception {
         startControlled();

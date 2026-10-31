@@ -45,12 +45,14 @@ logcat_pid=$!
 # Somente no emulador descartável do CI: o Pixel Launcher do sistema apresentou
 # ANR e tomou o foco do jogo (#7). Nenhum erro/diálogo do aplicativo é suprimido.
 if [[ "${GITHUB_ACTIONS:-}" == true && "$(adb get-serialno)" == emulator-* ]]; then
-  ci_launcher='com.google.android.apps.nexuslauncher'
-  ci_launcher_path="$(adb shell pm path "$ci_launcher")"
-  if [[ "$ci_launcher_path" == package:* ]]; then
-    adb shell am force-stop "$ci_launcher"
-    adb shell pm disable-user --user 0 "$ci_launcher"
-  fi
+  # O assistente de primeiro boot religou o Wi-Fi após o modo avião (#10).
+  for ci_component in com.google.android.apps.nexuslauncher com.google.android.googlesdksetup; do
+    ci_component_path="$(adb shell pm path "$ci_component")"
+    if [[ "$ci_component_path" == package:* ]]; then
+      adb shell am force-stop "$ci_component"
+      adb shell pm disable-user --user 0 "$ci_component"
+    fi
+  done
 fi
 adb shell input keyevent KEYCODE_WAKEUP
 adb shell wm dismiss-keyguard
@@ -86,7 +88,9 @@ fi
 ci_test_status=0
 if ! run_tests OfflineGameTest 4 "$output/offline.txt"; then ci_test_status=1; fi
 for orientation in portrait landscape; do
-  if ! adb pull "/sdcard/Android/data/$app/files/mesa-v1-$orientation.png" "$output/mesa-v1-$orientation.png"; then ci_test_status=1; fi
+  for suffix in .png .json -uiautomation.png; do
+    if ! adb pull "/sdcard/Android/data/$app/files/mesa-v1-$orientation$suffix" "$output/mesa-v1-$orientation$suffix"; then ci_test_status=1; fi
+  done
 done
 uid_before="$(app_uid)"
 adb shell am force-stop "$app"

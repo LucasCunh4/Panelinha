@@ -58,6 +58,14 @@ O roteiro agora coleta logcat desde antes da instalação, status de saída e es
 - O teste gravava a sentinela e terminava o processo dentro de cerca de 1 s. O [Chromium 124 usado pelo WebView](https://github.com/chromium/chromium/blob/124.0.6367.219/components/services/storage/dom_storage/local_storage_impl.cc) usa `kCommitDefaultDelaySecs = base::Seconds(5)` para agrupar gravações. A fixture agora aguarda esse commit e o roteiro exige também leitura após reinício a frio **antes** de trocar o APK. As verificações depois da atualização continuam obrigatórias.
 - Capturas em rotação foram ajustadas para aguardar orientação nativa e `postVisualStateCallback` antes de ler o quadro. Isso evita salvar o quadro anterior durante a transição.
 
+### Execuções #9 e #10 — sincronização e persistência
+
+- #9 apontou um toque intermitente em Última carta. O navegador reproduziu e aprovou a sequência +2 → anúncio → corte em retrato/paisagem. O teste nativo agora aguarda `postVisualStateCallback` antes de medir/injetar o toque, sem substituir o toque por chamada JS.
+- [#10](https://github.com/LucasCunh4/Panelinha/actions/runs/41156458341) aprovou os toques, orientações e as duas leituras de persistência: **reinício anterior ao upgrade e atualização c3002→c3003**. UID, SharedPreferences e localStorage preservados, sem desinstalar/limpar dados.
+- O teste offline de #10 permaneceu vermelho: o log registra `WifiService: setWifiEnabled package=com.google.android.googlesdksetup ... enable=true` após a preparação offline. O assistente de primeiro boot do SDK foi acrescentado ao isolamento do emulador descartável; a asserção de ausência de rede permanece.
+- As etapas independentes são executadas e registradas mesmo se outra falhar; qualquer falha conserva status final não zero. A publicação não ignora falhas.
+- A próxima execução compara também `UiAutomation` com `screencap` e registra dimensões nativas/DOM, para separar artefatos de rotação do display de problemas reais de layout.
+
 Não houve teste em celular físico nesta etapa.
 
 ## Identidade e atualização
