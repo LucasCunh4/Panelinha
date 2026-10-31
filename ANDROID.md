@@ -153,3 +153,14 @@ Mãos humanas grandes continuam em um único leque de botões, ordenado por cor.
 O card superior fica ao lado do leque. Somente cartas dos bots/parceiro ficam um pouco menores (90% e 94% da base); humano, descarte e monte mantêm o tamanho. Textos redundantes centrais ficam fora da apresentação visual, com informação acessível nas opções/leitor de tela. O fluxo da moldura ganha cauda de 155/1000 do percurso e acompanha o mesmo `direction` do motor.
 
 A instrumentação acrescenta `g_continuousFanTouch`: são **7 testes** de `OfflineGameTest`, além do teste de atualização/persistência. Mantém imersão permanente, assinatura, pacote, origem offline e publicação por APK direto. Resultados em `testes/PANELA_LEQUE_RESULTADOS.md`.
+
+
+## Tela inicial e navegação após 0.2.19
+
+`menu.css` e `navegacao.js` acrescentam a tela inicial Panelinha, caminhos de Um jogador e preparação de Multiplayer. A configuração é o `#menu` existente; todos os campos/valores e as regras continuam no mesmo `index.html`. Não há backend, autenticação, sala ou código real. Lilita One e licença OFL ficam em `assets/fonts/`, incluídas e verificadas offline pelo manifesto `MANIFESTO_MENU_V1.json`. A cozinha usa vetores derivados das formas de panelas existentes, sem copiar a mesa completa ou trocar as artes das cartas.
+
+O histórico usa fragmentos da mesma origem e não altera localStorage/SharedPreferences. Voltar fecha escolha de cor/opções antes de pedir saída da mesa; cancelar conserva o estado. Uma partida encerrada não é recriada pelo Avançar do navegador. O Android usa `OnBackPressedDispatcher` para a mesma hierarquia; em início, pede confirmação para ir ao segundo plano. O teclado recebe prioridade para recolher antes da navegação. Imersão permanente e áreas seguras continuam no host existente.
+
+A transição de até 240 ms usa apenas apresentação/opacidade, sem retardar o motor, o deadline ou desativar controles. O card superior passa a ter largura/altura naturais e quebra de nomes longos. O indicador luminoso percorre um círculo centrado em (836,451), raio 206 no plano nativo do fogão, atrás das cartas. A direção continua derivada do motor (+1 anti-horário, -1 horário).
+
+Há **8 testes** de `OfflineGameTest`, incluindo navegação inicial, Back do sistema e swipe pela borda em navegação gestual no dispositivo exclusivo de teste; o teste de atualização/persistência continua exigido. O APK real também verifica os dois novos scripts/estilos e os recursos da fonte, além das 52 cartas, seis PNGs da mesa e identidade de assinatura. Resultados atuais em `testes/INICIO_MENU_RESULTADOS.md`.

@@ -327,7 +327,13 @@
     });
   }
 
+  function fitTopIdentity(){
+    const identity=$('player2').querySelector('.seat-identity');
+    if(identity)identity.classList.toggle('long-name',(identity.querySelector('.name')?.textContent.trim().length||0)>26);
+  }
+
   function layout() {
+    fitTopIdentity();
     const table = $('table');
     const width = table.clientWidth, height = table.clientHeight;
     if (!width || !height) return;
@@ -423,6 +429,7 @@
         if(name)identity.append(name);if(sub)identity.append(sub);
         seat.prepend(identity);
       }
+      if(player.id===2)fitTopIdentity();
       seat.setAttribute('aria-label', `${player.id === 0 ? 'Você' : `Bot ${player.id}`}, ${player.hand.length} cartas${state.current === player.id && state.phase === 'playing' ? ', na vez' : ''}`);
       const back = seat.querySelector('.back');
       if (back) {

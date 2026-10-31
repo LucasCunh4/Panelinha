@@ -312,3 +312,26 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 .table[data-direction="-1"] .tail-clockwise.tail-mid,.table[data-direction="1"] .tail-counterclockwise.tail-mid {opacity:.48}
 @keyframes stove-flow {from{stroke-dashoffset:var(--flow-shift,0px)}to{stroke-dashoffset:calc(var(--flow-shift,0px) - 1000px)}}
 @media(prefers-reduced-motion:reduce){.hand.grouped-hand>button{transition:none!important}.stove-flow{animation:none}.stove-tail{display:none}.stove-glint{opacity:.65}}
+
+/* Nome/avatar superior: largura negociada com o leque, texto contido e altura natural. */
+.seat.top .seat-identity {flex:0 1 38%;width:max-content;min-width:82px;max-width:160px;padding:6px 8px;grid-template-columns:24px minmax(0,1fr);grid-template-rows:auto auto;gap:2px 4px;box-sizing:border-box}
+.seat.top .seat-identity>.name {min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.2}
+.seat.top .seat-identity>.sub {min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.25}
+.seat.top .seat-identity.long-name>.name {font-size:9.5px;line-height:1.15}
+/* A mesma direção anima a órbita circular da boca; as cartas ficam na camada acima. */
+.stove-flow {stroke-width:3.5;filter:drop-shadow(0 0 4px #fff)}
+.stove-glint {stroke-dasharray:32 968;opacity:1;filter:drop-shadow(0 0 6px #fff)}
+.stove-tail.tail-long {stroke-dasharray:220 780;--flow-shift:0px}
+.stove-tail.tail-mid {stroke-dasharray:140 860;--flow-shift:0px}
+.stove-tail.tail-near {stroke-dasharray:85 915;--flow-shift:0px}
+.tail-clockwise.tail-long {--flow-shift:188px}.tail-clockwise.tail-mid {--flow-shift:108px}.tail-clockwise.tail-near {--flow-shift:53px}
+.table[data-direction="-1"] .tail-clockwise.tail-long,.table[data-direction="1"] .tail-counterclockwise.tail-long {opacity:.13}
+.table[data-direction="-1"] .tail-clockwise.tail-mid,.table[data-direction="1"] .tail-counterclockwise.tail-mid {opacity:.28}
+.table[data-direction="-1"] .tail-clockwise.tail-near,.table[data-direction="1"] .tail-counterclockwise.tail-near {opacity:.55}
+.seat.top{align-items:flex-start}.seat.top .seat-identity{align-self:center}.seat.top .seat-identity.long-name{flex-basis:44%;max-width:176px}
+
+/* Cabeça mais luminosa; a cauda dissipa sem iluminar a circunferência inteira. */
+.stove-flow{stroke-width:4.2}.stove-glint{filter:drop-shadow(0 0 8px #fff)}
+.table[data-direction="-1"] .tail-clockwise.tail-long,.table[data-direction="1"] .tail-counterclockwise.tail-long{opacity:.2}
+.table[data-direction="-1"] .tail-clockwise.tail-mid,.table[data-direction="1"] .tail-counterclockwise.tail-mid{opacity:.4}
+.table[data-direction="-1"] .tail-clockwise.tail-near,.table[data-direction="1"] .tail-counterclockwise.tail-near{opacity:.7}

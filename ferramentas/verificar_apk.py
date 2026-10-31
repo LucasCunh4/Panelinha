@@ -45,7 +45,10 @@ with zipfile.ZipFile(apk) as archive:
     mesa = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_MESA_V1.json').read_text())
     for entry in mesa['asset_files']:
         assert hashlib.sha256(archive.read(prefix + entry['path'])).hexdigest() == entry['sha256'], entry['path']
-    for name in ['mesa.css', 'mesa.js']:
+    menu = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_MENU_V1.json').read_text())
+    for entry in menu['assets']:
+        assert hashlib.sha256(archive.read(prefix + entry['path'])).hexdigest() == entry['sha256'], entry['path']
+    for name in ['mesa.css', 'mesa.js', 'menu.css', 'navegacao.js']:
         assert archive.read(prefix + name) == (root / 'IMPORTACAO_PANELAS' / name).read_bytes(), f'Jogo alterado no APK: {name}'
     original_html = (root / 'IMPORTACAO_PANELAS/index.html').read_bytes()
     has_compat = prefix + 'android-compat.js' in archive.namelist()
@@ -63,7 +66,7 @@ info = {
     'file': apk.name, 'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
     'applicationId': package[1], 'versionCode': int(package[2]), 'versionName': package[3],
     'certificateSha256': match[1].lower(), 'pngsVerified': len(pngs), 'origin': identity['origin'], 'androidCompat': has_compat,
-    'signingGeneration': identity.get('signingGeneration', 1), 'mesaAssetsVerified': len(mesa['asset_files']),
+    'signingGeneration': identity.get('signingGeneration', 1), 'mesaAssetsVerified': len(mesa['asset_files']), 'menuAssetsVerified': len(menu['assets']),
 }
 apk.with_suffix('.json').write_text(json.dumps(info, indent=2) + '\n')
 print(json.dumps(info, indent=2))

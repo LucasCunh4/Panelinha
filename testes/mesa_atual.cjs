@@ -10,7 +10,7 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
  },{n,direction});
  const settle=()=>page.locator('#hand>button,.hidden-card,.subhand>.card').evaluateAll(ns=>Promise.all(ns.flatMap(n=>n.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})))));
  try{
-  await page.clock.install();await page.clock.pauseAt(new Date());await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();
+  await page.clock.install();await page.clock.pauseAt(new Date());await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#singlePlayerBtn').click();await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();
   for(const [width,height] of [[320,568],[390,844],[412,915],[568,320],[844,390],[1280,800]])for(const n of [7,20,100]){
    await page.setViewportSize({width,height});await fixture(n);await settle();
    const metrics=await page.evaluate(()=>{

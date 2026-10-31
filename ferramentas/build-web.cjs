@@ -15,9 +15,13 @@ const mesa = JSON.parse(fs.readFileSync(path.join(source, 'documentacao/MANIFEST
 for (const entry of mesa.asset_files) {
   if (crypto.createHash('sha256').update(fs.readFileSync(path.join(source, entry.path))).digest('hex') !== entry.sha256) throw Error(`Asset oficial da mesa divergente: ${entry.path}`);
 }
+const menu=JSON.parse(fs.readFileSync(path.join(source,'documentacao/MANIFESTO_MENU_V1.json')));
+for (const entry of menu.assets) {
+  if(crypto.createHash('sha256').update(fs.readFileSync(path.join(source,entry.path))).digest('hex')!==entry.sha256)throw Error(`Recurso do menu divergente: ${entry.path}`);
+}
 fs.rmSync(output, {recursive:true, force:true});
 fs.mkdirSync(output, {recursive:true});
-for (const name of ['index.html', 'mesa.css', 'mesa.js', 'assets']) fs.cpSync(path.join(source, name), path.join(output, name), {recursive:true});
+for (const name of ['index.html', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js', 'assets']) fs.cpSync(path.join(source, name), path.join(output, name), {recursive:true});
 require('esbuild').buildSync({
   entryPoints:[path.join(__dirname, 'android-compat.js')],
   outfile:path.join(output, 'android-compat.js'),

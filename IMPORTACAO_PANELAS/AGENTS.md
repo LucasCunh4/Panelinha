@@ -11,3 +11,5 @@
 - Não expor mãos secretas em eventos públicos do multiplayer; servidor autoritativo no futuro.
 - O usuário prefere discutir grupos de decisões importantes, não uma pergunta por microdetalhe.
 - Distinguir claramente **feito / testado / ainda a fazer**. Se houver ambiguidade, registrar e sugerir solução, não inventar regra final silenciosamente.
+
+- Tela inicial e navegação ficam em `menu.css` / `navegacao.js`; reutilize `#menu` e preserve o motor. Telas Criar/Entrar são preparação visual, sem backend/códigos fictícios. Voltar deve confirmar saída de partida ativa e respeitar a hierarquia, inclusive no Android.

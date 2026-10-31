@@ -80,7 +80,7 @@ public class OfflineGameTest {
         }
     }
     void startControlled() throws Exception {
-        js("document.getElementById('startBtn').click();(()=>{const s=CartasTest.getState();Object.assign(s,{current:0,unlockAt:0,penalty:0,highest:0,lastPenalty:null,finisher:null,drawn:null,cutOpen:false,pendingAction:null,activeColor:'red',direction:1,token:s.token+1});s.o.timeout=0;s.o.cut=true;s.o.infinite=false;s.discard=[{id:80000,type:'num',color:'red',num:7}];s.deck=Array.from({length:80},(_,i)=>({id:81000+i,type:'num',color:'red',num:3}));s.players.forEach((p,i)=>p.hand=[{id:82000+i,type:'num',color:'red',num:1},{id:83000+i,type:'num',color:'blue',num:2}]);document.getElementById('useCardArt').onchange()})()");
+        js("if(PanelinhaNavigation.current!=='solo')PanelinhaNavigation.go('solo');document.getElementById('startBtn').click();(()=>{const s=CartasTest.getState();Object.assign(s,{current:0,unlockAt:0,penalty:0,highest:0,lastPenalty:null,finisher:null,drawn:null,cutOpen:false,pendingAction:null,activeColor:'red',direction:1,token:s.token+1});s.o.timeout=0;s.o.cut=true;s.o.infinite=false;s.discard=[{id:80000,type:'num',color:'red',num:7}];s.deck=Array.from({length:80},(_,i)=>({id:81000+i,type:'num',color:'red',num:3}));s.players.forEach((p,i)=>p.hand=[{id:82000+i,type:'num',color:'red',num:1},{id:83000+i,type:'num',color:'blue',num:2}]);document.getElementById('useCardArt').onchange()})()");
     }
     @Test public void a_imagesAndThreeBotsOffline() throws Exception {
         // navigator.onLine é heurístico no WebView sem ACCESS_NETWORK_STATE.
@@ -93,7 +93,7 @@ public class OfflineGameTest {
         } finally { automation.dropShellPermissionIdentity(); }
         assertEquals("\"function\"", js("typeof String.prototype.replaceAll"));
         assertEquals("\"function\"", js("typeof Element.prototype.getAnimations"));
-        js("document.getElementById('startBtn').click()");
+        tap("#singlePlayerBtn");tap("#startBtn");
         js("window.__pngCheck=null;(async()=>{try{const colors=['vermelho','azul','amarelo','verde'];const faces=[...Array.from({length:10},(_,i)=>String(i)),'mais_2','bloqueio','inverter'];await Promise.all(colors.flatMap(c=>faces.map(async f=>{const im=new Image();im.src='assets/cartas/'+c+'/'+f+'.png';await im.decode();if(im.naturalWidth===0)throw Error('PNG');})));window.__pngCheck=52;}catch(e){window.__pngCheck=String(e);}})()");
         waitFor("window.__pngCheck===52", 120000);
         assertEquals("4", js("CartasTest.getState().players.length"));
@@ -209,7 +209,7 @@ public class OfflineGameTest {
         });
         waitBars(true);
         waitBars(false); // Retorno automático, sem chamada da ponte web.
-        tap("#tableMenuBtn");tap("#backBtn");waitFor("document.getElementById('menu').getClientRects().length>0",15000);waitBars(false);
+        tap("#tableMenuBtn");tap("#backBtn");tap("#confirmLeaveBtn");waitFor("document.getElementById('menu').getClientRects().length>0",15000);waitBars(false);
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activity.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE));
         waitFor("innerWidth>innerHeight",15000);waitBars(false);
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activity.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT));
@@ -250,6 +250,42 @@ public class OfflineGameTest {
         assertEquals("39",js("CartasTest.getState().players[0].hand.length"));
         assertEquals("980039",js("CartasTest.getState().discard[CartasTest.getState().discard.length-1].id"));
         assertEquals("true",js("document.getElementById('table').scrollLeft===0&&document.getElementById('table').scrollTop===0"));
+    }
+    void systemBack() { InstrumentationRegistry.getInstrumentation().sendKeyDownUpSync(android.view.KeyEvent.KEYCODE_BACK); }
+    void shell(String command) throws Exception {
+        try (java.io.InputStream input = new ParcelFileDescriptor.AutoCloseInputStream(InstrumentationRegistry.getInstrumentation().getUiAutomation().executeShellCommand(command))) {
+            byte[] buffer = new byte[4096];while (input.read(buffer) != -1) { }
+        }
+    }
+    @Test public void h_homeNavigationAndSystemBack() throws Exception {
+        waitFor("PanelinhaNavigation.current==='home'",15000);waitBars(false);
+        assertEquals("2",js("document.querySelectorAll('#home button').length"));
+        assertEquals("true",js("[...document.fonts].some(f=>f.family==='PanelinhaDisplay'&&f.status==='loaded')"));
+        tap("#multiplayerBtn");tap("#createRoomBtn");waitFor("PanelinhaNavigation.current==='create'",15000);
+        systemBack();waitFor("PanelinhaNavigation.current==='multiplayer'",15000);
+        tap("#joinRoomBtn");assertEquals("true",js("document.getElementById('roomCode').disabled&&document.getElementById('roomCode').value.length===0"));
+        // Somente o emulador/dispositivo de instrumentação: gesto real pela borda.
+        int modeId = activity.getActivity().getResources().getIdentifier("config_navBarInteractionMode", "integer", "android");
+        int previousMode = activity.getActivity().getResources().getInteger(modeId);
+        try {
+            shell("cmd overlay enable --user 0 com.android.internal.systemui.navbar.gestural");SystemClock.sleep(1200);
+            assertEquals("Navegação gestual habilitada no dispositivo de teste",2,activity.getActivity().getResources().getInteger(modeId));
+            android.util.DisplayMetrics metrics = new android.util.DisplayMetrics();
+            activity.getActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+            shell("input swipe 1 "+(metrics.heightPixels/2)+" "+(metrics.widthPixels/3)+" "+(metrics.heightPixels/2)+" 350");
+            waitFor("PanelinhaNavigation.current==='multiplayer'",15000);
+        } finally {
+            if(previousMode!=2)shell("cmd overlay enable --user 0 com.android.internal.systemui.navbar.threebutton");
+        }
+        systemBack();waitFor("PanelinhaNavigation.current==='home'",15000);
+        tap("#singlePlayerBtn");waitFor("PanelinhaNavigation.current==='solo'",15000);tap("#startBtn");
+        js("(()=>{const s=CartasTest.getState();s.current=0;s.deadline=0;s.o.timeout=0;s.token++})()");
+        assertEquals("4",js("CartasTest.getState().players.length"));
+        systemBack();waitFor("!document.getElementById('navDialog').hidden",15000);tap("#cancelLeaveBtn");
+        assertEquals("true",js("PanelinhaNavigation.current==='game'&&CartasTest.getState()!==null"));
+        tap("#tableMenuBtn");systemBack();waitFor("document.getElementById('tableMenu').classList.contains('hide')",15000);
+        systemBack();tap("#confirmLeaveBtn");waitFor("PanelinhaNavigation.current==='solo'&&CartasTest.getState()===null",15000);
+        systemBack();waitFor("PanelinhaNavigation.current==='home'",15000);systemBack();tap("#cancelLeaveBtn");waitBars(false);
     }
     @Test public void d_writeUpdateSentinels() throws Exception {
         js("localStorage.setItem('panelinha-upgrade-check','preservado-v0.1')");

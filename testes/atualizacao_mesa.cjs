@@ -12,7 +12,7 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/atualizacao-evidence
  const finish=async()=>{await page.locator('.flying-card,.block-effect').evaluateAll(nodes=>{nodes.forEach(n=>n.getAnimations().forEach(a=>a.finish()))});await page.waitForFunction(()=>!document.querySelector('.flying-card,.block-effect'));};
  const refresh=()=>page.evaluate(()=>document.getElementById('useCardArt').onchange());
  try{
-  await page.clock.install();await page.clock.pauseAt(new Date());await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();
+  await page.clock.install();await page.clock.pauseAt(new Date());await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#singlePlayerBtn').click();await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();
   for(const [width,height] of [[320,568],[390,844],[412,915],[568,320],[844,390],[1280,800]]){
    await page.setViewportSize({width,height});
    for(const n of [7,15,20,30,60,100]){
@@ -83,7 +83,10 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/atualizacao-evidence
   assert.equal(await page.locator('.discard-layer').count(),3);assert.equal(new Set(await page.locator('.discard-layer').evaluateAll(nodes=>nodes.map(n=>n.dataset.visualKey))).size,3);
   console.log('PASS reciclagem do descarte mantém três representações históricas com identidades visuais distintas');
   await fixture();await page.evaluate(()=>{const s=CartasTest.getState();s.players[0].hand=[{id:635001,type:'draw2',color:'blue'},{id:635002,type:'draw2',color:'blue'},{id:635003,type:'num',color:'blue',num:9}];document.getElementById('useCardArt').onchange()});
-  await page.locator('[data-card="635001"]').tap();await page.locator('#cutBtn .cut-bubble').tap();
+  await page.locator('[data-card="635001"]').tap();
+  // Congela o voo, não o motor: a segunda ação deve ocorrer enquanto a primeira carta ainda está no ar.
+  await page.locator('.played-card[data-card-id="635001"]').evaluate(el=>{const a=el.getAnimations()[0];a.pause();a.currentTime=180});
+  await page.locator('#cutBtn .cut-bubble').tap();
   assert.equal(await page.evaluate(()=>CartasTest.getState().penalty),2);assert.equal(await page.locator('.played-card').count(),2);
   assert.equal(new Set(await page.locator('.played-card').evaluateAll(nodes=>nodes.map(n=>n.dataset.cardId))).size,2);
   await finish();assert.equal(await page.locator('.discard-layer.in-flight').count(),0);assert.equal(await page.locator('.flying-card').count(),0);
@@ -95,7 +98,7 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/atualizacao-evidence
   }
   console.log('PASS efeito Bloqueio aponta para o jogador correto nos dois sentidos; regra preservada');
   // Novo documento elimina tarefas/agendas dos cenários de animação anteriores.
-  await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();
+  await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#singlePlayerBtn').click();await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();
   // O ticker existente alimenta 5..1; sem segundo relógio de jogo.
   for(const actor of [0,1,2,3]){
    await fixture();await page.evaluate(actor=>{const s=CartasTest.getState();s.current=actor;s.o.timeout=15;s.deadline=Date.now()+5500;s.token++;document.getElementById('useCardArt').onchange();s.token++;/* Segura o bot deste cenário pelo token, sem mudar a lógica. */window.timerValues=[];const original=PanelasMesa.updateClock;PanelasMesa.updateClock=(state,now)=>{original(state,now);const b=document.querySelector('.turn-clock');if(b)window.timerValues.push(b.textContent)}},actor);

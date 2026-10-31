@@ -2,6 +2,7 @@ package com.lucascunha.panelinha.teste;
 
 import android.os.Bundle;
 import android.view.View;
+import androidx.activity.OnBackPressedCallback;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
@@ -32,6 +33,19 @@ public class MainActivity extends BridgeActivity {
             return new WindowInsetsCompat.Builder(insets).setInsets(types, Insets.NONE).build();
         });
         applyImmersive();
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override public void handleOnBackPressed() {
+                WindowInsetsCompat insets = ViewCompat.getRootWindowInsets(decor);
+                if (insets != null && insets.isVisible(WindowInsetsCompat.Type.ime())) {
+                    WindowCompat.getInsetsController(getWindow(), decor).hide(WindowInsetsCompat.Type.ime());
+                    return;
+                }
+                if (getBridge() == null || getBridge().getWebView() == null) { moveTaskToBack(true); return; }
+                getBridge().getWebView().evaluateJavascript(
+                    "Boolean(window.PanelinhaNavigation && window.PanelinhaNavigation.back({native:true}))",
+                    handled -> { if (!"true".equals(handled)) moveTaskToBack(true); });
+            }
+        });
     }
 
     // Compatibilidade com a ponte web existente: a imersão agora vale sempre.

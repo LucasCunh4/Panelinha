@@ -18,7 +18,7 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
  });
  const tap=async id=>{let at=await point(id);if(!at){await page.locator(`[data-card="${id}"]`).scrollIntoViewIfNeeded();at=await point(id);}assert.ok(at,`sem ponto tocável ${id}`);await page.touchscreen.tap(at.x,at.y);};
  try{
-  await page.clock.install();await page.clock.pauseAt(new Date());await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();
+  await page.clock.install();await page.clock.pauseAt(new Date());await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#singlePlayerBtn').click();await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();
   for(const [width,height] of [[320,568],[390,844],[568,320],[844,390],[1280,800]])for(const n of [15,20,30,40,60,100]){
    await page.setViewportSize({width,height});await fixture(n);await settle();
    const metrics=await page.evaluate(n=>{
@@ -74,12 +74,12 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
     a.pause();a.currentTime=1000;const first=Number(getComputedStyle(el).strokeDashoffset.match(/-?[\d.]+/)[0]);a.currentTime=1500;
     return {dash:getComputedStyle(el).strokeDasharray,iterations:a.effect.getTiming().iterations,direction:a.effect.getTiming().direction,first,second:Number(getComputedStyle(el).strokeDashoffset.match(/-?[\d.]+/)[0])};
    });
-   assert.match(tail.dash,/155/);assert.equal(tail.direction,dir===1?'reverse':'normal');assert.equal(tail.iterations,Infinity);
+   assert.match(tail.dash,/220/);assert.equal(tail.direction,dir===1?'reverse':'normal');assert.equal(tail.iterations,Infinity);
    assert.ok(Math.abs(Math.abs(tail.second-tail.first)-1000/15)<.1);assert.ok(dir===1?tail.second>tail.first:tail.second<tail.first);
   }
-  console.log('PASS centro sem rótulos redundantes, rastro 155/1000 e animação derivada da direção do motor');
+  console.log('PASS centro sem rótulos redundantes, rastro circular 220/1000 e animação derivada da direção do motor');
   // Desktop: gesto físico do mouse, espera estável e primeiro clique só fixa a expansão.
-  const desktop=await browser.newPage({viewport:{width:1000,height:700}});desktop.on('pageerror',e=>errors.push(e.message));await desktop.clock.install();await desktop.clock.pauseAt(new Date());await desktop.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await desktop.locator('#startBtn').click();
+  const desktop=await browser.newPage({viewport:{width:1000,height:700}});desktop.on('pageerror',e=>errors.push(e.message));await desktop.clock.install();await desktop.clock.pauseAt(new Date());await desktop.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await desktop.locator('#singlePlayerBtn').click();await desktop.locator('#startBtn').click();
   await desktop.evaluate(()=>{const s=CartasTest.getState();s.current=0;s.unlockAt=0;s.penalty=0;s.cutOpen=false;s.token++;s.o.timeout=0;s.activeColor='blue';s.players[0].hand=Array.from({length:40},(_,i)=>({id:960000+i,type:'num',color:['red','blue','green','yellow'][i%4],num:i%7}));document.getElementById('useCardArt').onchange()});
   const at=await point(960001,desktop);assert.ok(at);await desktop.mouse.move(at.x,at.y);await desktop.clock.runFor(179);assert.equal(await desktop.locator('#hand').getAttribute('data-expanded-color'),null);await desktop.clock.runFor(1);assert.equal(await desktop.locator('#hand').getAttribute('data-expanded-color'),'blue');
   await desktop.locator('#hand>button').evaluateAll(ns=>Promise.all(ns.flatMap(n=>n.getAnimations().map(a=>a.finished.catch(()=>{})))));const pinned=await point(960001,desktop);await desktop.mouse.click(pinned.x,pinned.y);assert.equal(await desktop.evaluate(()=>CartasTest.getState().players[0].hand.length),40);await desktop.mouse.move(500,300);await desktop.clock.runFor(600);assert.equal(await desktop.locator('#hand').getAttribute('data-expanded-color'),'blue');await desktop.mouse.click(500,300);assert.equal(await desktop.locator('#hand').getAttribute('data-expanded-color'),null);await desktop.close();

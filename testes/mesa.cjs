@@ -19,7 +19,7 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
   document.querySelector('#useCardArt').onchange();
  });
  try{
-  await page.clock.install();await page.goto(base);await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();await fixture();
+  await page.clock.install();await page.goto(base);await page.locator('#singlePlayerBtn').click();await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();await fixture();
   assert.equal(await page.locator('.seat .pan-avatar').count(),4);
   assert.equal(await page.locator('#player2 .subhand').count(),1);assert.equal(await page.locator('#player1 .back,#player3 .back').count(),2);
   const manifest=JSON.parse(fs.readFileSync(path.join(__dirname,'../IMPORTACAO_PANELAS/documentacao/MANIFESTO_MESA_V1.json')));

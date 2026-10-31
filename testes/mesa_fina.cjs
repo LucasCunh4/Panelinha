@@ -11,7 +11,7 @@ const output=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mesa-fina-evidenc
  });
  const finish=async()=>{await page.locator('.flying-card,.block-effect').evaluateAll(nodes=>nodes.forEach(n=>n.getAnimations().forEach(a=>a.finish())));await page.waitForFunction(()=>!document.querySelector('.flying-card,.block-effect'));};
  try{
-  await page.clock.install();await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();
+  await page.clock.install();await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#singlePlayerBtn').click();await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();
   for(const [width,height] of [[320,568],[390,844],[412,915],[568,320],[844,390],[1280,800]]){
    await page.setViewportSize({width,height});await fixture();
    await page.locator('#hand>button,.subhand>.card,.back>.hidden-card').evaluateAll(nodes=>Promise.all(nodes.flatMap(n=>n.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})))));
@@ -39,11 +39,11 @@ const output=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mesa-fina-evidenc
    const bg=document.getElementById('stoveScene').getBoundingClientRect(),svg=document.getElementById('stoveDirection').getBoundingClientRect(),box=el.getBBox();
    return {first,second,forever:a.effect.getTiming().iterations===Infinity,aligned:Math.abs(svg.x-bg.x)<1&&Math.abs(svg.y-bg.y)<1&&Math.abs(svg.width-bg.width)<1&&Math.abs(svg.height-bg.height)<1,box:{x:box.x,y:box.y,width:box.width,height:box.height}};
   });
-  assert.ok(orbit.forever&&orbit.aligned&&orbit.second>orbit.first&&orbit.box.x===326&&orbit.box.y===218&&orbit.box.width===1012);
+  assert.ok(orbit.forever&&orbit.aligned&&orbit.second>orbit.first&&orbit.box.x===630&&orbit.box.y===245&&orbit.box.width===412);
   await page.evaluate(()=>{CartasTest.getState().direction=-1;document.getElementById('useCardArt').onchange()});
   const reverse=await page.locator('.stove-glint').evaluate(el=>{const a=el.getAnimations()[0],before=parseFloat(getComputedStyle(el).strokeDashoffset);a.currentTime+=500;return {before,after:parseFloat(getComputedStyle(el).strokeDashoffset),direction:a.effect.getTiming().direction};});
   assert.equal(reverse.direction,'normal');assert.ok(Math.abs(reverse.before-orbit.second)<1&&reverse.after<reverse.before,JSON.stringify(reverse));
-  console.log('PASS brilho branco no plano da moldura, giro nos dois sentidos e inversão sem salto de fase');
+  console.log('PASS brilho circular no plano do queimador, giro nos dois sentidos e inversão sem salto de fase');
   const opacity=async color=>{
    await page.evaluate(color=>{const s=CartasTest.getState();s.activeColor=color;document.getElementById('useCardArt').onchange()},color);
    return await page.locator(`.flame-${color}`).evaluate(async el=>{await Promise.all(el.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished));return Number(getComputedStyle(el).opacity)});
