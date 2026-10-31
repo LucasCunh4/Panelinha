@@ -29,3 +29,11 @@ histórico publicado. Evidências atuais em `testes/ASSINATURA_V2_RESULTADOS.md`
 - Mesa com os PNGs oficiais; regras/bots/cartas preservados. Certificado da geração 2 inalterado; pacote e origem permanentes. Código 3103 reservado ao teste de atualização, não distribuído.
 - 4 testes offline + controle de persistência após reinício + teste de atualização aprovados no Android 35.
 - [Relatório, capturas e download](testes/MESA_V1_RESULTADOS.md).
+
+## Refinamentos da mesa — 0.2.14 / código 3402
+
+- Fonte: `44974dd74233ed1700e425a42fb6ff766c898d18`, branch `android/apk-testes`.
+- [APK assinado em artefato do workflow #14](https://github.com/LucasCunh4/Panelinha/actions/runs/41164082119/artifacts/13028780227), compilação e assinatura aprovadas; não publicado em Release porque o emulador caiu no primeiro teste. A suíte Android desta rodada está pendente, sem testes desativados.
+- Chamas suavizadas/animadas, compra à esquerda, mãos físicas orientadas, voo da carta e faca maior. Regras, bots e imagens originais preservados.
+- APK real verificado: geração 2, pacote e origem fixos, código maior que 3102/2003, apto à atualização direta por identidade. Código 3403 reservado ao teste, não distribuído.
+- [Relatório, hashes, testes e limitações](testes/REFINAMENTOS_MESA_RESULTADOS.md). As execuções 0.2.12/c3202 e 0.2.13/c3302 também ficaram somente em artefatos após interrupções do emulador.

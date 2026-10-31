@@ -39,7 +39,9 @@ Capturas Chromium (cenários de teste determinísticos):
 
 ## Android
 
-A compilação assinada e as evidências Android desta rodada serão registradas aqui após a execução do workflow. A instrumentação conserva os quatro testes offline e as duas verificações de persistência (reinício e atualização), acrescentando verificação da origem da animação, toque no próprio balão e posição vertical/esquerda do monte.
+A compilação assinada foi aprovada e o APK real foi verificado. **A suíte de execução Android desta rodada não concluiu: o emulador deixou de responder nas três execuções abaixo.** Não há aprovação dos testes offline, de rotação, de toques ou de atualização desta rodada no Android. As evidências visuais acima são do Chromium.
+
+A instrumentação conserva os quatro testes offline e as duas verificações de persistência (reinício e atualização), acrescentando verificação da origem da animação, toque no próprio balão, posição vertical/esquerda do monte e ausência de rolagem interna da mesa.
 
 Somente no emulador descartável do CI, a escala global de animadores é restaurada para 1 para testar o movimento normal do WebView; transições de janelas continuam desativadas. As correções anteriores de infraestrutura, diagnósticos e agregação de falhas continuam presentes. Nenhum teste foi removido.
 
@@ -60,7 +62,19 @@ Os diagnósticos não mostram OOM do host (14 GiB disponíveis) nem exceção fa
 
 ### Investigação de infraestrutura
 
-O emulador 37.2.13 estava usando `swiftshader_indirect`, modo descontinuado desde 36.4.9 segundo a [documentação oficial de aceleração](https://developer.android.com/studio/run/emulator-acceleration#command-gpu), consultada nesta rodada. A próxima execução usa `-gpu software`, recomendado para ambientes sem GPU, mantendo API 35, KVM, todas as verificações e animações do WebView. Isso testa uma hipótese de incompatibilidade do renderizador; não prova a causa das falhas anteriores. A coleta em falha também passa a guardar kernel completo, CPU e relatórios de crash do emulador, quando existirem.
+O emulador 37.2.13 estava usando `swiftshader_indirect`, modo descontinuado desde 36.4.9 segundo a [documentação oficial de aceleração](https://developer.android.com/studio/run/emulator-acceleration#command-gpu), consultada nesta rodada. A execução #14 usa `-gpu software`, recomendado para ambientes sem GPU, mantendo API 35, KVM, todas as verificações e animações do WebView. Isso testa uma hipótese de incompatibilidade do renderizador; não prova a causa das falhas anteriores. A coleta em falha também passou a guardar kernel completo, CPU e relatórios de crash do emulador, quando existirem.
+
+### Execução #14 — entrega 0.2.14/c3402 em artefato
+
+- [Workflow #14](https://github.com/LucasCunh4/Panelinha/actions/runs/41164082119), fonte `44974dd74233ed1700e425a42fb6ff766c898d18`. Compilação e assinatura aprovadas. Mesmo código de apresentação da #13; alterações seguintes somente na infraestrutura/documentação.
+- [Baixar ZIP com APK e metadados](https://github.com/LucasCunh4/Panelinha/actions/runs/41164082119/artifacts/13028780227). Requer login no GitHub e fica retido até 29/01/2027. Dentro está `Panelinha-Teste-v0.2.14-c3402.apk`, o APK distribuível; o candidato 3403 é somente de teste.
+- SHA-256 do APK: `678c4efd9f32056ad4f7b0328185fbe60e40067cdccdd6992394c71876adc675`.
+- APK baixado do artefato, ZIP conferido pelo digest da API, APK validado localmente com `apksigner` e `ferramentas/verificar_apk.py`: assinatura v2, certificado de geração 2, pacote, origem, versão 0.2.14/c3402, SDKs 24/36, release/fullSensor, código web exato, compatibilidade e 52+6 imagens originais aprovados. [Metadados da verificação](REFINAMENTOS_APK_0.2.14.json).
+- Certificado SHA-256: `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`, igual ao registro ativo e ao APK real 0.2.11/c3102. Mesmo applicationId `com.lucascunha.panelinha.teste`, origem `https://localhost`, código 3402 maior que 3102 e 2003: identidade compatível com atualização direta da geração 2, sem desinstalação. **Não confundir isso com teste de instalação/atualização concluído no Android nesta rodada.**
+- O backend escolhido pelo modo software foi lavapipe/swangle, mas a perda do emulador se repetiu no primeiro teste, sem asserção concluída. A mudança não resolveu a interrupção. Não foram produzidas novas capturas Android; verificações de persistência não concluíram. A Release permaneceu bloqueada, conforme as regras existentes do workflow.
+- [Diagnósticos Android #14](https://github.com/LucasCunh4/Panelinha/actions/runs/41164082119/artifacts/13028345796): kernel completo, CPU AMD EPYC/Hyper-V/KVM, logcat, ADB offline e logs netsim. Nenhum minidump foi encontrado; os logs não mostram exceção fatal do aplicativo nem OOM do host. A causa do encerramento do emulador continua indeterminada. Não houve remoção de testes, supressão de asserções ou alteração das regras para liberar a compilação.
+
+Próxima validação pendente: executar a suíte completa em Android estável (emulador ou aparelho dedicado), incluindo instalação por cima e persistência. O APK assinado está disponível para teste, com a limitação de execução acima explicitada.
 
 ## Limitações
 
