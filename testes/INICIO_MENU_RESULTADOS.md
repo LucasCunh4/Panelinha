@@ -19,6 +19,7 @@ Base: 0.2.19/c3902, assinatura permanente geração 2.
 
 Treze funções centrais foram comparadas com a 0.2.19 e estão idênticas: criação do baralho, avanço de turno, Panela de Pressão, Liquidificador, início de turno, validações, jogada, penalidade, desafio, bot e finalização. Os únicos hooks novos no fluxo do motor são de apresentação/navegação. Pontuação, corte 2200 ms, cronômetro, bots, leque e animações permanecem.
 
+- `preparacao_menu.cjs`: 18 layouts adicionais de Multiplayer/Criar/Entrar nos mesmos seis tamanhos, sem sobreposição, rolagem ou bloqueio dos botões de retorno.
 - `navegacao.cjs`: seis viewports (320×568, 390×844, 412×915, 568×320, 844×390, 1280×800), fonte local carregada, só dois botões, alvos de toque, telas futuras sem rede, configuração reutilizada/valores preservados, três bots, deadline inalterado durante transição, nomes curtos/longos/palavra contínua e 118 cartas, círculo/registro no queimador, Inverter sem salto de fase, Voltar/Avançar, confirmações/cancelamento, movimento reduzido e ausência de erros JS/sockets/requisições externas.
 - `integracao.cjs`: 16/16 regras e PNGs/carregamento, modos, bots, laboratório e fallback.
 - `atualizacao_regras.cjs`: 40 cenários (Panela com reduções, equilíbrio, mínimos, última carta e penalidades; Liquidificador/corte), sem alteração das regras.
@@ -39,6 +40,18 @@ As suítes existentes agora percorrem Um jogador antes de interagir com a config
 
 ## Android e APK
 
-Aguardar a execução do workflow existente após salvar esta atualização. O APK deverá conservar pacote, origem e certificado de `android-identity.json`, com código superior a 3902 (3903 reservado ao teste anterior). Será verificado novamente após download. A instrumentação e o teste de atualização continuam necessários para aprovar a Release; em falha de infraestrutura, o APK validado pode ficar disponível apenas como artefato direto, com resultados reais registrados aqui.
+- **APK 0.2.20 / versionCode 4002**, gerado pelo [workflow #20](https://github.com/LucasCunh4/Panelinha/actions/runs/41254097830), código-fonte `578d33b295b776331261d70df393b9b44780b757`.
+- [Download direto do APK, sem ZIP](https://github.com/LucasCunh4/Panelinha/actions/runs/41254097830/artifacts/13062023253). Requer sessão no GitHub; disponível até 29/01/2027.
+- Compilação release, instrumentação dos oito testes e candidato de atualização c4003: aprovadas. O candidato é apenas interno ao teste e não foi distribuído.
+- APK baixado e novamente aprovado por `ferramentas/verificar_apk.py`: assinatura v2, pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`, 52 PNGs de cartas, seis PNGs da mesa e os dois recursos da fonte íntegros; HTML e quatro arquivos JS/CSS atuais no pacote, além do bundle de compatibilidade.
+- Certificado SHA-256 geração 2: `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`, idêntico à 0.2.19/c3902. O código sobe para 4002: atualização direta compatível, sem desinstalar. Nenhuma alteração de Secrets, chave, pacote ou origem.
+- SHA-256 do APK: `01c9133be6d82aef5c4906df6eaeb1d2fef19fdd820b8b15259753de336228d7`, igual ao digest do artefato. Conteúdo já é o próprio APK (manifesto/classes na raiz, sem ZIP externo).
+- Metadados públicos verificados: `testes/INICIO_MENU_APK_0.2.20.json`.
+
+**Execução Android não aprovada:** o primeiro dos oito testes iniciou (`a_imagesAndThreeBotsOffline`), mas nenhum terminou. O emulador ficou `offline`; o ADB falhou e a porta 5554 recusou conexão. A coleta disponível não registra asserção reprovada do aplicativo nem `FATAL EXCEPTION` do app. A causa raiz da perda do emulador não foi confirmada; não se atribui automaticamente à aplicação nem se declara Android aprovado.
+
+[Diagnósticos Android separados](https://github.com/LucasCunh4/Panelinha/actions/runs/41254097830/artifacts/13061694138). Permanecem pendentes em dispositivo/emulador estável os oito testes completos, incluindo Back/gesto nativo, imersão/recortes/orientações, execução offline real e atualização por cima com preservação de UID/localStorage/SharedPreferences. A compatibilidade de atualização foi verificada por identidade e código; a instalação prática não terminou.
+
+O workflow preservou todas as verificações e bloqueou a Release após a falha, disponibilizando o APK validado como artefato direto (`actions/upload-artifact@v7`, `archive: false`, somente o `.apk`). Metadados e diagnósticos permanecem separados. Nenhum teste foi removido ou desativado para forçar sucesso.
 
 O jogo continua offline e o histórico não altera a origem `https://localhost` nem as chaves de dados. A partida permanece em memória, como antes; não foi criado nem removido um sistema de salvamento de partida.
