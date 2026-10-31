@@ -100,8 +100,9 @@ jobs:
           profile: pixel_6
           # Limita a RAM do AVD para caber no runner hospedado junto ao WebView.
           ram-size: 2048M
-          # Evita incompatibilidades do backend Vulkan com o WebView no runner.
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -feature -Vulkan
+          # Backend atual recomendado para runner sem GPU; indirect foi descontinuado.
+          # Mantém as animações do app e todos os testes, inclusive imagens/offline.
+          emulator-options: -no-window -gpu software -no-snapshot -noaudio -no-boot-anim -feature -Vulkan
           disable-animations: true
           script: bash ferramentas/testar_android.sh 'artifacts/Panelinha-Teste-v${{ steps.version.outputs.name }}-c${{ steps.version.outputs.code }}.apk' 'artifacts/Panelinha-Teste-v${{ steps.version.outputs.name }}-upgrade-check-c${{ steps.version.outputs.nextcode }}.apk' "$RUNNER_TEMP/panelinha-instrumentation.apk"
       - name: Diagnosticar falha do emulador
@@ -109,7 +110,21 @@ jobs:
         run: |
           mkdir -p artifacts/testes-android
           free -h > artifacts/testes-android/runner-memory.txt
-          sudo dmesg --ctime --level=err,warn > artifacts/testes-android/runner-kernel.txt || true
+          sudo dmesg --ctime > artifacts/testes-android/runner-kernel.txt || true
+          lscpu > artifacts/testes-android/runner-cpu.txt
+          # Relatórios do emulador ficam fora do diretório dos Secrets de assinatura.
+          if test -d /tmp/android-runner; then
+            mkdir -p artifacts/testes-android/emulator-crash
+            while IFS= read -r crash_file; do
+              case "$crash_file" in
+                *.dmp|*.log)
+                  if test "$(stat -c%s "$crash_file")" -lt 20971520; then
+                    cp "$crash_file" artifacts/testes-android/emulator-crash/
+                  fi
+                  ;;
+              esac
+            done < <(find /tmp/android-runner -type f)
+          fi
       - name: Upload de APK e metadados
         if: always() && steps.build.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

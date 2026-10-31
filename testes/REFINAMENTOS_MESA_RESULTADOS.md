@@ -17,7 +17,7 @@ Chamas e tamanho da faca foram ajustados por CSS. Nenhum PNG, arte de carta ou m
 
 O monte passou a ser filho direto da mesa no HTML para ficar independente do bloco central. Os oponentes ganharam um agrupamento pequeno para identidade, separado das mãos. A animação acrescenta uma camada visual e um gancho de leitura antes do render existente. Não há novo estado de partida nem espera acrescentada às jogadas.
 
-Comparação com a base: a única função modificada no script principal é `render`, com a chamada de apresentação antes da reconstrução das mãos. As outras 52 funções, inclusive regras, pontuação, compra, corte e bots, são idênticas byte a byte. A pausa de corte permanece em 2800 ms. Pacote Android, origem `https://localhost`, certificado de geração 2, Secrets e workflow permanecem os mesmos.
+Comparação com a base: a única função modificada no script principal é `render`, com a chamada de apresentação antes da reconstrução das mãos. As demais funções, inclusive regras, pontuação, compra, corte e bots, são idênticas byte a byte. A pausa de corte permanece em 2800 ms. Pacote Android, origem `https://localhost`, certificado de geração 2, Secrets e mecanismo de publicação permanecem os mesmos. O workflow conserva nome, arquivo e sequência; o ajuste de infraestrutura do emulador está descrito abaixo.
 
 ## Web: executado e aprovado
 
@@ -42,6 +42,25 @@ Capturas Chromium (cenários de teste determinísticos):
 A compilação assinada e as evidências Android desta rodada serão registradas aqui após a execução do workflow. A instrumentação conserva os quatro testes offline e as duas verificações de persistência (reinício e atualização), acrescentando verificação da origem da animação, toque no próprio balão e posição vertical/esquerda do monte.
 
 Somente no emulador descartável do CI, a escala global de animadores é restaurada para 1 para testar o movimento normal do WebView; transições de janelas continuam desativadas. As correções anteriores de infraestrutura, diagnósticos e agregação de falhas continuam presentes. Nenhum teste foi removido.
+
+### Execução #12 — interrupção do emulador
+
+[Workflow #12](https://github.com/LucasCunh4/Panelinha/actions/runs/41163139348), fonte `78a1304`, compilou e assinou 0.2.12/c3202, mas o emulador perdeu a conexão durante `a_imagesAndThreeBotsOffline`. O ADB ficou `offline` e depois a porta 5554 recusou conexão. Não houve resultado de asserção, conclusão da suíte nem captura Android; a Release foi corretamente bloqueada.
+
+Os diagnósticos não mostram OOM do host (14 GiB disponíveis) nem exceção fatal do aplicativo antes da interrupção. O kernel registra aviso de KVM e mensagens sobre CPU, mas os dados coletados não provam a causa do encerramento. Não é evidência de aprovação do aplicativo nem foi atribuída às regras. Artefatos/diagnósticos foram preservados pelo workflow. A execução seguinte testa também a correção de rolagem de foco encontrada na web, sem desativar verificações.
+
+### Execução #13 — APK 0.2.13/c3302 verificado; emulador interrompido
+
+[Workflow #13](https://github.com/LucasCunh4/Panelinha/actions/runs/41163413018), fonte `d29bbd46a68195850c32fdb04506104dc9a6f04d`, inclui a correção de foco. A compilação e assinatura passaram. O APK foi baixado do [artefato](https://github.com/LucasCunh4/Panelinha/actions/runs/41163413018/artifacts/13028123544) e conferido localmente com `ferramentas/verificar_apk.py`/`apksigner`.
+
+- Certificado SHA-256: `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`, exatamente a geração 2 de `android-identity.json`.
+- SHA-256 do APK: `f67674a8030b6399c92a4cc482c5ece2ac2dfdba308174a5e01fe9014c502716`.
+- Pacote permanente, release, versão/código, SDKs, origem local HTTPS, código web e 52+6 imagens aprovados.
+- O emulador voltou a ficar offline no primeiro teste, sem resultado de asserção; porta de controle recusou conexão. Sem exceção fatal do app nos logs e com 14 GiB livres no host. A Release permaneceu bloqueada; testes Android ainda não concluídos nessa execução.
+
+### Investigação de infraestrutura
+
+O emulador 37.2.13 estava usando `swiftshader_indirect`, modo descontinuado desde 36.4.9 segundo a [documentação oficial de aceleração](https://developer.android.com/studio/run/emulator-acceleration#command-gpu), consultada nesta rodada. A próxima execução usa `-gpu software`, recomendado para ambientes sem GPU, mantendo API 35, KVM, todas as verificações e animações do WebView. Isso testa uma hipótese de incompatibilidade do renderizador; não prova a causa das falhas anteriores. A coleta em falha também passa a guardar kernel completo, CPU e relatórios de crash do emulador, quando existirem.
 
 ## Limitações
 
