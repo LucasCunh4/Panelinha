@@ -66,7 +66,31 @@ O roteiro agora coleta logcat desde antes da instalação, status de saída e es
 - As etapas independentes são executadas e registradas mesmo se outra falhar; qualquer falha conserva status final não zero. A publicação não ignora falhas.
 - A próxima execução compara também `UiAutomation` com `screencap` e registra dimensões nativas/DOM, para separar artefatos de rotação do display de problemas reais de layout.
 
-Não houve teste em celular físico nesta etapa.
+### Resultado final — execução #11 APROVADA
+
+- [Workflow #11](https://github.com/LucasCunh4/Panelinha/actions/runs/41157096344), fonte `4c5e9ac5e3807a410f7d629c0cd466d6af9fb51a`.
+- [Release 0.2.11](https://github.com/LucasCunh4/Panelinha/releases/tag/v0.2.11), publicada automaticamente somente após todos os testes passarem.
+- **[Baixar APK 0.2.11/c3102](https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.11/Panelinha-Teste-v0.2.11-c3102.apk)**. [Artefato alternativo](https://github.com/LucasCunh4/Panelinha/actions/runs/41157096344/artifacts/13025377682).
+- Certificado geração 2 e assinatura v2 aprovados no runner e em verificação independente do APK baixado. SHA-256 do APK: `da87b89083dab0cc43c3bf4dcfa49b1244bb56b1ad5e009dfd1cdea45640a47e`, também igual ao digest do asset da Release.
+- Pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`, release, API mínima 24/target 36, `fullSensor`; 52 cartas e 6 imagens oficiais conferidas por hash, assim como HTML/CSS/JS empacotados.
+- Android 35: **4/4 testes offline aprovados**, incluindo imagens/3 bots, toques em carta/última carta/corte/compra +20, ação de bot, retrato/paisagem e gravação de sentinelas.
+- **1/1 teste após reinício a frio anterior ao upgrade aprovado.**
+- **1/1 teste após instalar c3103 por cima de c3102 aprovado**, usando `adb install -r`; UID, localStorage e SharedPreferences preservados. Nenhuma desinstalação/limpeza de dados.
+- O assistente do SDK era o componente que religava Wi-Fi. Somente o launcher e esse assistente foram isolados no emulador descartável; o teste ainda exige rede nativa ausente. Não houve supressão de erros do app nem remoção de asserções.
+- Capturas físicas via `screencap` e medições do DOM/nativas confirmaram retrato e paisagem corretos. `UiAutomation.takeScreenshot` mostrou um quadro incorreto durante algumas rotações; a comparação independente separou esse artefato de captura do layout real. Ambas as leituras ficam no artefato completo.
+
+Evidências Android reais (emulador; diferentes das capturas Chromium acima):
+
+- [Retrato: display físico](../evidencias-mesa-v1/android/mesa-v1-portrait.png) / [geometria](../evidencias-mesa-v1/android/mesa-v1-portrait.json)
+- [Paisagem: display físico](../evidencias-mesa-v1/android/mesa-v1-landscape.png) / [geometria](../evidencias-mesa-v1/android/mesa-v1-landscape.json)
+- [4 testes offline](../evidencias-mesa-v1/android/offline.txt)
+- [Persistência antes da atualização](../evidencias-mesa-v1/android/baseline-persistence.txt)
+- [Persistência após atualização](../evidencias-mesa-v1/android/update.txt)
+- [Metadados e hash do APK](../evidencias-mesa-v1/Panelinha-Teste-v0.2.11-c3102.json)
+
+## Limites da validação
+
+Não houve teste em celular físico. O upgrade executado no CI foi c3102→c3103; a compatibilidade para instalar c3102 sobre a versão 0.2.6/c2003 foi conferida pelo mesmo pacote, mesmo certificado (também relido do APK 0.2.6) e código maior, sem alteração da origem. A versão web foi validada por HTTP; a branch principal/site público não foi atualizada nesta etapa. Avatares definitivos e refinamentos artísticos continuam para uma etapa posterior.
 
 ## Identidade e atualização
 

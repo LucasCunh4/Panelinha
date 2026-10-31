@@ -21,3 +21,11 @@ foram alterados. v0.2.0/c2000 e o candidato 0.2.0-upgrade-check/c2001 usam a nov
 chave. O candidato 2001 é só para teste, não uma versão distribuída.
 A sequência do workflow foi preservada; futuras versões superam 2001 e todo o
 histórico publicado. Evidências atuais em `testes/ASSINATURA_V2_RESULTADOS.md`.
+
+## Mesa V1 — 0.2.11 / código 3102
+
+- Fonte: `4c5e9ac5e3807a410f7d629c0cd466d6af9fb51a`, branch `android/apk-testes`.
+- Release/compilação automática: [v0.2.11](https://github.com/LucasCunh4/Panelinha/releases/tag/v0.2.11), workflow #11 aprovado.
+- Mesa com os PNGs oficiais; regras/bots/cartas preservados. Certificado da geração 2 inalterado; pacote e origem permanentes. Código 3103 reservado ao teste de atualização, não distribuído.
+- 4 testes offline + controle de persistência após reinício + teste de atualização aprovados no Android 35.
+- [Relatório, capturas e download](testes/MESA_V1_RESULTADOS.md).
