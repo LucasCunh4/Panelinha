@@ -224,15 +224,32 @@ public class OfflineGameTest {
         startControlled();
         js("(()=>{const s=CartasTest.getState();Object.assign(s,{phase:'playing',current:0,penalty:20,highest:6,finisher:null,unlockAt:0,cutOpen:false,pendingAction:null,activeColor:'blue',deadline:0,token:s.token+1});s.o.duo=false;s.o.timeout=0;s.players.forEach((p,a)=>p.hand=Array.from({length:10},(_,i)=>({id:87000+a*100+i,type:'num',color:'green',num:7})));s.players[0].hand.push({id:87900,type:'dist',color:null});s.discard=[{id:87901,type:'num',color:'blue',num:2}];s.deck=Array.from({length:60},(_,i)=>({id:88000+i,type:'num',color:'red',num:1}));window.originalIds=[...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort().join();document.getElementById('useCardArt').onchange()})()");
         tap("[data-card='87900']");
+        if (js("!!document.querySelector('#hand[data-expanded-color=wild]')&&!CartasTest.getState().pendingAction").equals("true")) tap("[data-card='87900']");
         js("document.querySelector('[data-color=blue]').addEventListener('click',()=>CartasTest.getState().token++,{once:true})");
         tap("[data-color='blue']");
-        assertEquals("true",js("(()=>{const s=CartasTest.getState();return s.players.every(p=>p.hand.length>=1)&&s.players[0].hand.length<=10&&s.players.flatMap(p=>p.hand).length===60&&s.penalty===0&&[...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort().join()===window.originalIds})()"));
+        assertEquals("true",js("(()=>{const s=CartasTest.getState();return s.players.every(p=>p.hand.length>=1)&&s.players[0].hand.length>=7&&s.players[0].hand.length<=9&&Math.max(...s.players.slice(1).map(p=>p.hand.length))-Math.min(...s.players.slice(1).map(p=>p.hand.length))<=2&&s.players.flatMap(p=>p.hand).length===60&&s.penalty===0&&[...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort().join()===window.originalIds})()"));
         js("(()=>{const s=CartasTest.getState();Object.assign(s,{phase:'playing',current:0,penalty:0,finisher:null,unlockAt:0,cutOpen:false,pendingAction:null,activeColor:'blue',deadline:0,token:s.token+1});s.players.forEach((p,a)=>p.hand=[{id:89000+a,type:'num',color:'green',num:7}]);s.players[0].hand.push({id:89900,type:'rotate',color:null});document.getElementById('useCardArt').onchange();document.querySelector('[data-card=\"89900\"]').addEventListener('click',()=>s.token++,{once:true})})()");
         tap("[data-card='89900']");assertEquals("true",js("CartasTest.getState().activeColor==='blue'&&!CartasTest.getState().pendingAction&&document.querySelectorAll('.colorbtn').length===0"));
         js("(()=>{const s=CartasTest.getState();s.current=0;s.token++;s.unlockAt=0;s.cutOpen=false;s.o.timeout=15;s.deadline=Date.now()+4000;document.getElementById('useCardArt').onchange()})()");
         waitFor("document.querySelector('#turnClock:not([hidden])')!==null",15000);
         waitFor("CartasTest.getState().current!==0",15000);
         assertEquals("true",js("document.querySelector('#turnClock:not([hidden])')===null"));
+    }
+    @Test public void g_continuousFanTouch() throws Exception {
+        startControlled();
+        js("(()=>{const s=CartasTest.getState();Object.assign(s,{phase:'playing',current:0,penalty:0,highest:0,finisher:null,unlockAt:0,cutOpen:false,pendingAction:null,activeColor:'blue',deadline:0,token:s.token+1});s.o.timeout=0;s.players[0].hand=Array.from({length:40},(_,i)=>({id:980000+i,type:'num',color:'blue',num:i%8}));s.discard=[{id:989000,type:'num',color:'blue',num:9}];document.getElementById('useCardArt').onchange();s.token++})()");
+        assertEquals("40",js("document.querySelectorAll('#hand>button').length"));
+        assertEquals("true",js("document.getElementById('hand').classList.contains('grouped-hand')"));
+        tap("[data-card='980039']");
+        assertEquals("40",js("CartasTest.getState().players[0].hand.length"));
+        assertEquals("blue",js("document.getElementById('hand').dataset.expandedColor"));
+        SystemClock.sleep(350);
+        tap("#turnCue");
+        assertEquals("true",js("!document.getElementById('hand').dataset.expandedColor"));
+        tap("[data-card='980039']");SystemClock.sleep(350);tap("[data-card='980039']");
+        assertEquals("39",js("CartasTest.getState().players[0].hand.length"));
+        assertEquals("980039",js("CartasTest.getState().discard[CartasTest.getState().discard.length-1].id"));
+        assertEquals("true",js("document.getElementById('table').scrollLeft===0&&document.getElementById('table').scrollTop===0"));
     }
     @Test public void d_writeUpdateSentinels() throws Exception {
         js("localStorage.setItem('panelinha-upgrade-check','preservado-v0.1')");

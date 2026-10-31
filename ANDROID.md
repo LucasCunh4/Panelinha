@@ -142,3 +142,14 @@ Cartas humanas, adversários, parceiro, descarte e monte usam o mesmo tamanho-ba
 `MainActivity` mantém status/navigation bars ocultas no menu e na partida, na retomada/foco e após orientação. Usa `BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE`, com retorno automático se o sistema mostrar barras transitórias. Gestos do Android continuam possíveis; não há promessa de impedir barras temporárias exigidas pelo sistema. Recortes e teclado são reservados. Testes nativos continuam obrigatórios para aprovação da Release.
 
 Verificações e resultados desta atualização: `testes/MESA_ATUAL_RESULTADOS.md`.
+
+
+## Atualização posterior à 0.2.18: Panela e leque contínuo
+
+A Panela de Pressão agora reduz a mão do autor em 1–3 cartas quando possível, sem baixar de 1; entre os demais, conserva todas as cartas com diferença máxima de duas. O último descarte pode vencer: o autor fica fora da redistribuição, que continua entre os restantes inclusive com penalidade acumulada, antes da finalização existente. Liquidificador e demais regras não mudaram.
+
+Mãos humanas grandes continuam em um único leque de botões, ordenado por cor. Toque abre uma cor; o próximo toque pode jogar. Mouse usa intenção de 180 ms, clique fixa a abertura e toque/clique fora fecha. Uma cor com dezenas de cartas pode rolar somente dentro da mão. A faca preserva toque direto e janela de 2200 ms. As posições reais da mão alimentam os voos de compra/descarte.
+
+O card superior fica ao lado do leque. Somente cartas dos bots/parceiro ficam um pouco menores (90% e 94% da base); humano, descarte e monte mantêm o tamanho. Textos redundantes centrais ficam fora da apresentação visual, com informação acessível nas opções/leitor de tela. O fluxo da moldura ganha cauda de 155/1000 do percurso e acompanha o mesmo `direction` do motor.
+
+A instrumentação acrescenta `g_continuousFanTouch`: são **7 testes** de `OfflineGameTest`, além do teste de atualização/persistência. Mantém imersão permanente, assinatura, pacote, origem offline e publicação por APK direto. Resultados em `testes/PANELA_LEQUE_RESULTADOS.md`.

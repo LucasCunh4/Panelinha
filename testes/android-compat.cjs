@@ -14,7 +14,7 @@ const assert=require('node:assert/strict');
   assert.ok(await page.evaluate(()=>CartasTest.getState().log.some(x=>/Bot [123] (jogou|comprou)/.test(x))));
   await page.evaluate(()=>{const s=CartasTest.getState();Object.assign(s,{current:0,direction:1,penalty:0,highest:0,phase:'playing',finisher:null,unlockAt:0,drawn:null,activeColor:'blue',token:s.token+1});s.players[0].hand=[{id:94000,type:'reverse',color:'blue',num:null},{id:94001,type:'num',color:'red',num:7}];document.querySelector('#useCardArt').onchange();});
   await page.locator('[data-card="94000"]').tap();
-  assert.equal(await page.locator('#directionGlyph').innerText(),'↻');
+  assert.equal(await page.locator('#directionGlyph').textContent(),'↻');
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.waitForFunction(()=>document.getElementById('directionGlyph').getAnimations().length===0);
   assert.deepEqual(errors,[]);

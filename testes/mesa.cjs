@@ -58,7 +58,7 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
   await page.locator('.debug summary').tap();await page.locator('#reveal').check();assert.equal(await page.locator('#player1 .subhand').count(),1);
   await page.locator('#reveal').uncheck();await page.keyboard.press('Escape');assert.ok(await page.locator('#tableMenu').isHidden());
   assert.equal(await page.evaluate(()=>document.activeElement.id),'tableMenuBtn');
-  await page.locator('[data-card="50001"]').tap();assert.equal(await page.evaluate(()=>CartasTest.getState().direction),-1);assert.equal(await page.locator('#directionGlyph').innerText(),'↻');
+  await page.locator('[data-card="50001"]').tap();assert.equal(await page.evaluate(()=>CartasTest.getState().direction),-1);assert.equal(await page.locator('#directionGlyph').textContent(),'↻');
   assert.equal(await page.locator('#directionGlyph').evaluate(el=>el.getAnimations().length),1);
   await page.emulateMedia({reducedMotion:'reduce'});await page.waitForFunction(()=>document.querySelector('#directionGlyph').getAnimations().length===0);assert.equal(await page.locator('#directionGlyph').evaluate(el=>el.getAnimations().length),0);
   console.log('PASS menu sobreposto, foco/ESC, laboratório e retorno à mesa; Inverter por toque e movimento reduzido');
@@ -87,7 +87,10 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
   }
   console.log('PASS faca na carta elegível, toque no balão e pausa de corte preservada em retrato/paisagem');
   await fixture();await page.evaluate(()=>{const s=CartasTest.getState();s.players[0].hand=Array.from({length:30},(_,i)=>({id:60000+i,type:'num',color:'blue',num:i%10}));s.players[2].hand=Array.from({length:20},(_,i)=>({id:61000+i,type:'num',color:'green',num:i%10}));document.querySelector('#useCardArt').onchange()});
-  assert.ok(await page.locator('#hand').evaluate(el=>el.scrollWidth>el.clientWidth&&el.classList.contains('scroll-hand')));
+  assert.ok(await page.locator('#hand').evaluate(el=>el.scrollWidth<=el.clientWidth+1&&el.classList.contains('grouped-hand')));
+  await page.locator('#hand>button').first().evaluate(el=>el.click());
+  await page.locator('#hand>button').evaluateAll(ns=>Promise.all(ns.flatMap(n=>n.getAnimations().map(a=>a.finished))));
+  assert.ok(await page.locator('#hand').evaluate(el=>el.scrollWidth>el.clientWidth&&el.dataset.expandedColor==='blue'));
   await page.locator('#hand>button').last().scrollIntoViewIfNeeded();assert.ok(await page.locator('#hand>button').last().evaluate(el=>{const r=el.getBoundingClientRect();return r.right<=innerWidth&&r.bottom<=innerHeight}));
   assert.ok(await page.locator('#player2 .subhand').evaluate(el=>el.children.length===20&&el.scrollWidth<=el.clientWidth+1));
   await page.evaluate(()=>{const s=CartasTest.getState();s.o.duo=false;document.querySelector('#useCardArt').onchange()});assert.equal(await page.locator('#player2 .back').count(),1);assert.equal(await page.locator('#player2 .card-image').count(),0);

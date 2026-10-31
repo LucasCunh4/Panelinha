@@ -88,7 +88,7 @@ if [[ "${PANELINHA_VERIFY_EXISTING_DATA:-0}" = 1 ]]; then
   run_tests UpdatePersistenceTest 1 "$output/update-anterior.txt"
 fi
 ci_test_status=0
-if ! run_tests OfflineGameTest 6 "$output/offline.txt"; then ci_test_status=1; fi
+if ! run_tests OfflineGameTest 7 "$output/offline.txt"; then ci_test_status=1; fi
 for orientation in portrait landscape; do
   for suffix in .png .json -uiautomation.png; do
     if ! adb pull "/sdcard/Android/data/$app/files/mesa-v1-$orientation$suffix" "$output/mesa-v1-$orientation$suffix"; then ci_test_status=1; fi

@@ -32,8 +32,8 @@ const output=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mesa-fina-evidenc
   console.log('PASS monte no interior esquerdo do fogão, alvo direto vertical e nome/avatar humano no rodapé, seis tamanhos');
   await page.setViewportSize({width:390,height:844});await fixture();
   const widths=await page.evaluate(()=>({human:document.querySelector('#hand .card').offsetWidth,opponent:document.querySelector('#player1 .hidden-card').offsetWidth,partner:document.querySelector('#player2 .card').offsetWidth,discard:document.getElementById('discard').offsetWidth}));
-  assert.ok(widths.human>76&&widths.human<82&&widths.opponent===widths.human&&widths.partner===widths.human&&widths.discard===widths.human,JSON.stringify(widths));
-  console.log('PASS aumento moderado das cartas humanas, oponentes, parceiro e descarte');
+  assert.ok(widths.human>76&&widths.human<82&&widths.opponent/widths.human>.87&&widths.opponent/widths.human<.93&&widths.partner/widths.human>.92&&widths.partner/widths.human<.97&&widths.discard===widths.human,JSON.stringify(widths));
+  console.log('PASS tamanho humano/descarte preservado e redução discreta dos oponentes/parceiro');
   const orbit=await page.locator('.stove-glint').evaluate(el=>{
    const a=el.getAnimations()[0];a.pause();a.currentTime=1000;const first=parseFloat(getComputedStyle(el).strokeDashoffset);a.currentTime=1500;const second=parseFloat(getComputedStyle(el).strokeDashoffset);
    const bg=document.getElementById('stoveScene').getBoundingClientRect(),svg=document.getElementById('stoveDirection').getBoundingClientRect(),box=el.getBBox();

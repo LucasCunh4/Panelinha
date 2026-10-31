@@ -37,35 +37,116 @@
     return `<span class="pan-avatar" style="--avatar-color:${avatarColors[id]}" aria-hidden="true"><svg viewBox="0 0 72 58" fill="none"><path d="M15 24H5v10h12m40-10h10v10H55" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><path d="M16 23h40l-3 24q-17 10-34 0z" fill="currentColor" stroke="#201326" stroke-width="2"/><path d="M23 28v15" stroke="#fff" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/><path d="M13 23q23-18 46 0z" fill="currentColor" stroke="#201326" stroke-width="2"/><path d="M31 13h10" stroke="#f5e4ff" stroke-width="4" stroke-linecap="round"/>${accessory}</svg></span>`;
   }
 
-  function fan(container, largeAt, savedScroll) {
-    const cards=[...container.children], n=cards.length;
-    if(!n){container.classList.remove('scroll-hand','hand-overflow');return;}
-    const self=container.id==='hand';
-    const sidePortrait=!self&&innerHeight>innerWidth&&container.closest('.seat.left,.seat.right');
-    const spread=self?6:sidePortrait?3:8;
-    const style=getComputedStyle(container);
-    const room=container.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
-    // Largura fracionária evita acumular erro de arredondamento em leques longos.
+  // Organização visual: os botões permanecem filhos do mesmo leque e conservam IDs.
+  let expandedColor=null,handPinned=false,hoverTimer=null,leaveTimer=null,handOwner=null,handRound=null,handScrollFrame=null,handLayoutVersion=0;
+  function cancelHandTimers(){cancelAnimationFrame(handScrollFrame);clearTimeout(hoverTimer);clearTimeout(leaveTimer);hoverTimer=leaveTimer=null;}
+  function layoutHand(savedScroll,instant=true,focusId=null){
+    cancelAnimationFrame(handScrollFrame);const version=++handLayoutVersion;
+    const hand=$('hand'),cards=[...hand.children],n=cards.length;
+    hand.classList.toggle('layout-instant',instant);
+    if(!n){hand.classList.remove('grouped-hand','hand-overflow','scroll-hand');expandedColor=null;delete hand.dataset.expandedColor;return;}
+    const style=getComputedStyle(hand),width=parseFloat(getComputedStyle(cards[0]).width);
+    const room=hand.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
+    const normalStep=n<2?width:Math.min(width*.60,Math.max(0,(room-width-10)/(n-1)));
+    const compact=n>1&&(normalStep<Math.max(22,width*.34)||(n>(innerWidth<360?7:9)&&normalStep<width*.42));
+    if(!compact||!cards.some(c=>c.dataset.handColor===expandedColor)){expandedColor=null;handPinned=false;}
+    hand.classList.toggle('grouped-hand',compact);hand.classList.toggle('scroll-hand',compact);
+    if(expandedColor)hand.dataset.expandedColor=expandedColor;else delete hand.dataset.expandedColor;
+    let steps=Array(n).fill(normalStep);
+    if(compact){
+      if(!expandedColor){steps.fill(Math.max(0,(room-width-24)/(n-1)));}
+      else{
+        const edges=cards.slice(0,-1).filter(c=>c.dataset.handColor===expandedColor).length;
+        const context=n-1-edges,reserve=Math.min(room*.22,context*8);
+        const small=context?reserve/context:0;
+        const fit=edges?(room-width-24-reserve)/edges:width*.6;
+        const large=Math.max(Math.min(30,width*.38),Math.min(width*.62,fit));
+        steps=cards.map((c,i)=>i&&cards[i-1].dataset.handColor===expandedColor?large:small);
+      }
+    }
+    const positions=[0];for(let i=1;i<n;i++)positions[i]=positions[i-1]+steps[i];
+    const total=positions[n-1]+width,overflow=total>room+1;
+    hand.classList.toggle('hand-overflow',overflow);
+    cards.forEach((card,i)=>{
+      if(card.dataset.ruleDisabled===undefined){card.dataset.ruleDisabled=String(card.disabled);card.dataset.ruleLabel=card.getAttribute('aria-label')||'';}
+      const selected=compact&&card.dataset.handColor===expandedColor;
+      card.disabled=compact?false:card.dataset.ruleDisabled==='true';
+      card.setAttribute('aria-disabled',String(selected&&handPinned?card.dataset.ruleDisabled==='true':!compact&&card.disabled));
+      card.setAttribute('aria-label',compact&&!selected?`${card.dataset.ruleLabel} · Expandir ${colorNames[card.dataset.handColor]||'cartas sem cor fixa'}`:card.dataset.ruleLabel);
+      card.classList.toggle('group-expanded',selected);
+      card.style.marginLeft=i?`${steps[i]-width}px`:'0px';
+      const position=n<2?0:(i/(n-1)-.5)*2;
+      card.style.setProperty('--fan-angle',`${position*(compact?3:6)}deg`);
+      card.style.setProperty('--fan-lift',`${position*position*(compact?3:6)+(selected?-8:0)}px`);
+    });
+    // Somente uma cor excepcionalmente grande usa a rolagem interna da mão.
+    if(overflow){
+      const focus=cards.findIndex(c=>c.dataset.card===String(focusId));
+      if(focus>=0)hand.scrollLeft=positions[focus]+width/2-room/2;
+      else if(savedScroll!==undefined&&handLayout?.color===expandedColor)hand.scrollLeft=savedScroll;
+      else{
+        const active=cards.map((c,i)=>c.dataset.handColor===expandedColor?i:-1).filter(i=>i>=0);
+        const midpoint=active.length?(positions[active[0]]+positions[active[active.length-1]]+width)/2:total/2;
+        hand.scrollLeft=midpoint-room/2;
+      }
+    }else hand.scrollLeft=0;
+    if(overflow&&!instant){
+      const anchor=cards.find(c=>c.dataset.card===String(focusId))||cards.find(c=>c.dataset.handColor===expandedColor);
+      const align=()=>{if(!anchor||version!==handLayoutVersion)return;const a=anchor.getBoundingClientRect(),b=hand.getBoundingClientRect();hand.scrollLeft+=(a.left+a.width/2)-(b.left+b.width/2);};
+      let frames=0;const follow=()=>{if(version!==handLayoutVersion)return;align();if(++frames<18)handScrollFrame=requestAnimationFrame(follow);};follow();
+      Promise.all(cards.flatMap(c=>c.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})))).then(()=>{if(version===handLayoutVersion){cancelAnimationFrame(handScrollFrame);align();}});
+    }
+    handLayout={count:n,overflow,compact,color:expandedColor};
+    hand.setAttribute('aria-label',compact?'Suas cartas em um leque contínuo. Toque uma cor para expandir e depois escolha a carta. Deslize a mão se necessário.':'Suas cartas');
+    if(instant){hand.getBoundingClientRect();requestAnimationFrame(()=>hand.classList.remove('layout-instant'));}
+  }
+  function openHandGroup(color,pinned,focusId=null){
+    cancelHandTimers();expandedColor=color;handPinned=pinned;layoutHand(undefined,false,focusId);
+  }
+  function closeHandGroup(){
+    cancelHandTimers();if(!expandedColor)return;expandedColor=null;handPinned=false;layoutHand(undefined,false);
+  }
+  const hand=$('hand');
+  hand.addEventListener('click',event=>{
+    if(!hand.classList.contains('grouped-hand'))return;
+    const card=event.target.closest('[data-card]');if(!card){closeHandGroup();return;}
+    // A faca continua acessível de imediato, inclusive durante a janela de corte.
+    if(event.target.closest('.cut-bubble'))return;
+    if(expandedColor!==card.dataset.handColor||!handPinned){
+      event.preventDefault();event.stopImmediatePropagation();openHandGroup(card.dataset.handColor,true,card.dataset.card);return;
+    }
+    if(card.dataset.ruleDisabled==='true'){event.preventDefault();event.stopImmediatePropagation();$('message').textContent='Esta carta não pode ser jogada agora.';}
+  },true);
+  let lastPointer=null;
+  hand.addEventListener('pointermove',event=>{
+    if(event.pointerType!=='mouse'||event.buttons||!matchMedia('(hover:hover)').matches||!hand.classList.contains('grouped-hand'))return;
+    if(lastPointer&&Math.hypot(event.clientX-lastPointer.x,event.clientY-lastPointer.y)<5)return;
+    lastPointer={x:event.clientX,y:event.clientY};
+    clearTimeout(leaveTimer);clearTimeout(hoverTimer);const card=event.target.closest('[data-card]');
+    if(!card||handPinned||card.dataset.handColor===expandedColor)return;
+    const color=card.dataset.handColor,id=card.dataset.card;
+    hoverTimer=setTimeout(()=>{if(!handPinned&&hand.contains(card))openHandGroup(color,false,id)},180);
+  });
+  hand.addEventListener('pointerenter',()=>{lastPointer=null;clearTimeout(leaveTimer)});
+  hand.addEventListener('pointerleave',()=>{
+    clearTimeout(hoverTimer);if(!handPinned)leaveTimer=setTimeout(()=>closeHandGroup(),500);
+  });
+  document.addEventListener('pointerdown',event=>{if(!hand.contains(event.target))closeHandGroup()},true);
+  document.addEventListener('click',event=>{if(!hand.contains(event.target))closeHandGroup()},true);
+  hand.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();closeHandGroup()}});
+  function fan(container,largeAt,savedScroll){
+    if(container.id==='hand'){layoutHand(savedScroll);return;}
+    const cards=[...container.children],n=cards.length;if(!n)return;
+    const sidePortrait=innerHeight>innerWidth&&container.closest('.seat.left,.seat.right');
+    const style=getComputedStyle(container),room=container.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
     const width=parseFloat(getComputedStyle(cards[0]).width);
-    let compact=self&&n>largeAt;
-    let step=n<2?width:Math.min(width*.60,Math.max(0,(room-width-(self?10:sidePortrait?12:Math.max(22,width*.7)))/(n-1)));
-    if(self&&step<22)compact=true;
-    if(self&&compact)step=Math.max(24,step);
-    const overflow=self&&width+step*(n-1)>room+1;
-    container.classList.toggle('scroll-hand',compact);
-    container.classList.toggle('hand-overflow',overflow);
+    const step=n<2?width:Math.min(width*.60,Math.max(0,(room-width-(sidePortrait?12:Math.max(22,width*.7)))/(n-1)));
     cards.forEach((card,i)=>{
       const position=n<2?0:(i/(n-1)-.5)*2;
       card.style.marginLeft=i?`${step-width}px`:'0px';
-      card.style.setProperty('--fan-angle',`${compact?0:position*spread}deg`);
-      card.style.setProperty('--fan-lift',`${compact?0:position*position*(self?6:3)}px`);
+      card.style.setProperty('--fan-angle',`${position*(sidePortrait?3:8)}deg`);
+      card.style.setProperty('--fan-lift',`${position*position*3}px`);
     });
-    if(self){
-      if(overflow&&(!handLayout||!handLayout.overflow||handLayout.count!==n))container.scrollLeft=(container.scrollWidth-container.clientWidth)/2;
-      else if(savedScroll!==undefined)container.scrollLeft=savedScroll;
-      if(handLayout&&handLayout.compact!==compact&&!reducedMotion.matches)container.animate([{opacity:.82,transform:'translateY(3px)'},{opacity:1,transform:'translateY(0)'}],{duration:140,easing:'ease-out'});
-      handLayout={count:n,overflow,compact};
-    }
   }
 
   function discardPose(id) {
@@ -235,17 +316,15 @@
   }
 
   function tableDirection(direction) {
-    const table=$('table'),glint=document.querySelector('.stove-glint');
-    const animation=glint.getAnimations()[0];
+    const table=$('table'),flows=[...document.querySelectorAll('.stove-flow')];
     const changed=table.dataset.direction&&table.dataset.direction!==String(direction);
-    const elapsed=Number(animation?.currentTime)||0;
-    const duration=Number(animation?.effect.getTiming().duration)||7500;
+    const phases=flows.map(el=>{const a=el.getAnimations().find(a=>a.effect.getTiming().iterations===Infinity);return a?{elapsed:Number(a.currentTime)||0,duration:Number(a.effect.getTiming().duration)||7500}:null});
     table.dataset.direction=String(direction);
-    // Espelha a fase ao inverter: o brilho muda de sentido sem saltar de lugar.
-    if(changed&&animation&&!reducedMotion.matches){
-      const updated=glint.getAnimations()[0];
-      if(updated)updated.currentTime=Math.floor(elapsed/duration)*duration+duration-elapsed%duration;
-    }
+    // A mesma direção do motor orienta todas as camadas; espelha a fase ao inverter.
+    if(changed&&!reducedMotion.matches)flows.forEach((el,i)=>{
+      const a=el.getAnimations().find(a=>a.effect.getTiming().iterations===Infinity),p=phases[i];
+      if(a&&p)a.currentTime=Math.floor(p.elapsed/p.duration)*p.duration+p.duration-p.elapsed%p.duration;
+    });
   }
 
   function layout() {
@@ -293,6 +372,7 @@
 
   function render(state, savedScroll) {
     nativeTable(true);
+    if(handOwner!==state||handRound!==state.round){cancelHandTimers();expandedColor=null;handPinned=false;handLayout=null;handOwner=state;handRound=state.round;}
     document.body.classList.add('playing');
     const center = document.querySelector('.center');
     $('table').dataset.activeColor = state.activeColor || '';
@@ -373,5 +453,5 @@
     document.querySelectorAll('.subhand,.back').forEach(hand => fan(hand,Infinity));
   });
   nativeTable(false);
-  window.PanelasMesa = { render, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {clearFlights();nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
+  window.PanelasMesa = { render, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
 })();

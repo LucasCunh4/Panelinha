@@ -5,6 +5,8 @@ const assert=require('node:assert/strict');
  const page=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  try{
+  // Centenas de sorteios verificam só regras; os voos normais são cobertos pelas suítes de mesa.
+  await page.emulateMedia({reducedMotion:'reduce'});
   const epoch=new Date("2030-01-01T12:00:00Z");await page.clock.install({time:epoch});await page.clock.pauseAt(epoch);await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#startBtn').tap();
   const results=await page.evaluate(()=>{
    const originalRandom=Math.random;let seed=0x50414e4c;
@@ -19,32 +21,33 @@ const assert=require('node:assert/strict');
     s.discard=[c()];s.deck=Array.from({length:100},()=>c('num','blue',2));return s;
    };
    const all=s=>[...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort((a,b)=>a-b).join();
-   const play=(card,color='red')=>{refresh();document.querySelector(`[data-card="${card.id}"]`).click();document.querySelector(`[data-color="${color}"]`)?.click();};
+   const play=(card,color='red')=>{refresh();const button=document.querySelector(`[data-card="${card.id}"]`);button.click();if(document.querySelector('#hand.grouped-hand')&&CartasTest.getState().players[0].hand.some(c=>c.id===card.id)&&!CartasTest.getState().pendingAction)button.click();document.querySelector(`[data-color="${color}"]`)?.click();};
    const check=(condition,message)=>{if(!condition)throw Error(message)};
    const tests=[];const test=(name,fn)=>{fn();tests.push(name)};
-   for(const total of [20,40,80,118])test(`Panela de Pressão ${total} cartas: conservação, teto do autor, mínimo 1 e aleatoriedade`,()=>{
+   for(const total of [20,40,80,118])test(`Panela de Pressão ${total} cartas: conservação, redução do autor, mínimo 1 e equilíbrio`,()=>{
     const sizes=new Set();let unequal=false;
     for(let attempt=0;attempt<60;attempt++){
      const s=setup(total),card=c('dist',null);s.players[0].hand.push(card);const before=all(s),cap=s.players[0].hand.length-1;
      play(card);const lengths=s.players.map(p=>p.hand.length);sizes.add(lengths.join());
      check(all(s)===before,'perda/duplicação');check(new Set([...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id)).size===total+102,'ID duplicado');
-     check(lengths.reduce((a,b)=>a+b,0)===total,'total incorreto');check(lengths[0]<=cap,'autor ganhou além do limite');check(lengths.every(n=>n>=1),'mínimo 1 violado');check(s.finisher===null&&s.phase==='playing','vitória produzida pela redistribuição');
+     check(lengths.reduce((a,b)=>a+b,0)===total,'total incorreto');check(cap-lengths[0]>=1&&cap-lengths[0]<=3,'redução do autor');check(Math.max(...lengths.slice(1))-Math.min(...lengths.slice(1))<=2,'demais desequilibrados');check(lengths.every(n=>n>=1),'mínimo 1 violado');check(s.finisher===null&&s.phase==='playing','vitória produzida pela redistribuição');
      unequal ||= Math.max(...lengths)-Math.min(...lengths)>1;
     }
     check(sizes.size>8&&unequal,'quantidades não aleatórias');
    });
-   for(const penalty of [2,6,12,20,40,80])test(`Panela de Pressão resolve +${penalty} sem exceder mão do autor`,()=>{
+   for(const penalty of [2,6,12,20,40,80])test(`Panela de Pressão resolve +${penalty} com redução e equilíbrio`,()=>{
     const s=setup(20),card=c('dist',null);s.players[0].hand.push(card);s.penalty=penalty;s.highest=6;
     const before=all(s),cap=5;play(card);
-    check(all(s)===before,'cartas perdidas na penalidade');check(s.players.flatMap(p=>p.hand).length===20+penalty,'total pool');check(s.players[0].hand.length<=cap,'limite durante penalidade');check(s.players.every(p=>p.hand.length>=1)&&s.finisher===null,'mínimo/vitória durante penalidade');
+    check(all(s)===before,'cartas perdidas na penalidade');check(s.players.flatMap(p=>p.hand).length===20+penalty,'total pool');check(cap-s.players[0].hand.length>=1&&cap-s.players[0].hand.length<=3,'redução durante penalidade');const rest=s.players.slice(1).map(p=>p.hand.length);check(Math.max(...rest)-Math.min(...rest)<=2,'penalidade desequilibrada');check(s.players.every(p=>p.hand.length>=1)&&s.finisher===null,'mínimo/vitória durante penalidade');
     check(s.penalty===0&&s.highest===0&&!s.lastPenalty&&s.lastDistribution.penaltyAdded===penalty,'penalidade não encerrada');
    });
-   for(const duo of [false,true])for(const penalty of [0,20])test(`Última Panela de Pressão recusada sem perda de cartas (${duo?'duplas':'individual'}, +${penalty})`,()=>{
-    const s=setup(20),card=c('dist',null);s.o.duo=duo;s.players[0].hand=[card];s.penalty=penalty;s.highest=penalty?2:0;const before=all(s);refresh();
-    const button=document.querySelector(`[data-card="${card.id}"]`);check(button.disabled,'última Panela de Pressão habilitada');button.onclick();
-    check(all(s)===before&&s.finisher===null&&s.phase==='playing'&&!s.pendingAction,'última carta removeu/venceu');
-    check(s.teams.every(n=>n===0)&&s.players.every(p=>p.score===0),'pontuação alterada');
-    document.getElementById('buyBtn').click();check(s.players[0].hand.length===(penalty?21:2),'não permitiu compra alternativa');
+   for(const duo of [false,true])for(const penalty of [0,20])test(`Última Panela de Pressão vence pelo descarte e redistribui só restantes (${duo?'duplas':'individual'}, +${penalty})`,()=>{
+    const s=setup(20),card=c('dist',null);s.o.duo=duo;s.players[0].hand=[card];s.penalty=penalty;s.highest=penalty?2:0;const before=all(s);play(card);
+    check(all(s)===before&&s.finisher===0&&s.players[0].hand.length===0&&s.phase==='gameOver','última carta/finalização');
+    check(!s.lastDistribution.active.includes(0)&&s.lastDistribution.actorReceived===null&&s.lastDistribution.penaltyAdded===penalty,'autor voltou/punição');
+    const counts=s.players.slice(1).map(p=>p.hand.length);check(counts.every(n=>n>=1)&&Math.max(...counts)-Math.min(...counts)<=2,'demais desequilibrados');
+    check(s.penalty===0&&s.highest===0&&!s.pendingAction,'punição/cor pendente após bater');
+    check(duo?s.teams[0]===1:s.players[0].score===3,'pontuação da vitória real');
    });
    for(const penalty of [0,20,40])test(`Autor com teto 1 recebe exatamente 1 (+${penalty})`,()=>{
     const s=setup(20),card=c('dist',null);s.players[0].hand=[c(),card];s.penalty=penalty;s.highest=penalty?6:0;const before=all(s);play(card);
@@ -71,6 +74,31 @@ const assert=require('node:assert/strict');
     check(document.querySelector(`[data-card="${card.id}"]`).disabled,'Panela de Pressão inviável permitida');
     document.querySelector(`[data-card="${card.id}"]`).click();check(all(s)===before&&s.penalty===20,'estado mudou na recusa');
     document.getElementById('buyBtn').click();check(s.penalty===0&&s.phase==='gameOver'&&s.finisher===3,'compra final não preservada');
+   });
+   for(const cap of [1,2,3,4,7,20,40,80])test(`Reduções possíveis após descartar com ${cap} cartas, conservando e balanceando`,()=>{
+    const reductions=new Set(),identities=new Set();
+    for(const penalty of [0,2,6,20,80])for(let trial=0;trial<12;trial++){
+     const s=setup(20),card=c('dist',null);s.players[0].hand=[...Array.from({length:cap},()=>c()),card];s.penalty=penalty;s.highest=penalty?6:0;
+     const before=all(s),othersBefore=s.players.slice(1).reduce((sum,p)=>sum+p.hand.length,0);play(card);
+     const received=s.players[0].hand.length,reduction=cap-received;reductions.add(reduction);identities.add(s.players[0].hand.map(c=>c.id).join());
+     check(cap===1?reduction===0:reduction>=1&&reduction<=Math.min(3,cap-1),'redução fora das possibilidades');
+     check(s.players.every(p=>p.hand.length>=1)&&s.finisher===null&&s.phase==='playing','redistribuição gerou vitória');
+     const otherCounts=s.players.slice(1).map(p=>p.hand.length);check(Math.max(...otherCounts)-Math.min(...otherCounts)<=2,'diferença maior que 2');
+     check(all(s)===before&&s.lastDistribution.total===cap+othersBefore+penalty,'pool não conservado');
+     check(s.lastDistribution.actorReduction===reduction&&s.lastDistribution.actorReceived===received,'registro incorreto');
+    }
+    check(reductions.size===(cap===1?1:Math.min(3,cap-1)),'redução não sorteada');check(identities.size>1,'identidades sem variação');
+   });
+   test('Redução exige outro destinatário; mão mínima pode permanecer com 1',()=>{
+    const s=setup(20);s.players.slice(1).forEach(p=>p.hand=[]);const card=c('dist',null);s.players[0].hand=[c(),c(),card];refresh();
+    check(document.querySelector(`[data-card="${card.id}"]`).disabled,'redução sem destinatário permitida');
+    s.players[0].hand=[c(),card];const before=all(s);play(card);check(all(s)===before&&s.players[0].hand.length===1&&s.finisher===null,'mínimo único destinatário');
+   });
+   test('Última Panela durante penalidade preserva finalizador anterior e exclui ambos os vazios',()=>{
+    const s=setup(20),card=c('dist',null);s.finisher=3;s.players[3].hand=[];s.players[0].hand=[card];s.penalty=20;s.highest=6;const before=all(s);play(card);
+    check(s.finisher===3&&s.phase==='gameOver'&&s.players[0].hand.length===0&&s.players[3].hand.length===0,'finalizador anterior mudou');
+    check(all(s)===before&&s.lastDistribution.active.join()===String([1,2])&&s.penalty===0,'pool final');
+    check(Math.abs(s.players[1].hand.length-s.players[2].hand.length)<=2,'demais desequilibrados');
    });
    for(const direction of [1,-1])for(const color of ['red','blue','green','yellow'])test(`Liquidificador preserva ${color}, direção ${direction} e não abre modal`,()=>{
     const s=setup(20);s.direction=direction;s.activeColor=color;const card=c('rotate',null);s.players[0].hand.push(card);

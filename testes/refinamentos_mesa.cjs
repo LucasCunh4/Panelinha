@@ -19,7 +19,7 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
  });
  const finishFlights=()=>page.locator('.played-card').evaluateAll(nodes=>Promise.all(nodes.flatMap(n=>n.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})))));
  try{
-  await page.clock.install();await page.goto(base);await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();await fixture();
+  await page.clock.install();await page.clock.pauseAt(new Date());await page.goto(base);await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();await fixture();
   for(const [width,height] of [[320,568],[390,844],[568,320],[844,390],[1280,800]]){
    await page.setViewportSize({width,height});await fixture();
    const layout=await page.evaluate(()=>{

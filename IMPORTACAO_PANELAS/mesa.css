@@ -272,3 +272,43 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 /* O cronômetro usa o mesmo eixo do monte, espelhado à direita da mesa. */
 .table>.turn-clock {left:auto;right:var(--pile-left,14px);top:var(--pile-top,var(--burner-y));transform:translateY(-50%);width:var(--card-width);height:var(--card-width);min-width:0;padding:0;font-size:calc(var(--card-width)*.72);line-height:1;display:grid;place-items:center;z-index:7}
 .table>.turn-clock[hidden] {display:none}
+
+/* Leque contínuo: só muda a sobreposição dos mesmos botões, sem grupos separados. */
+.hand.grouped-hand {gap:0;justify-content:center;scrollbar-width:thin}
+.hand.grouped-hand.hand-overflow {justify-content:flex-start}
+.hand.grouped-hand.scroll-hand>button {transform:translateY(var(--fan-lift)) rotate(var(--fan-angle));transition:margin-left 220ms ease,transform 220ms ease;cursor:pointer}
+.hand.grouped-hand>button.group-expanded {z-index:auto}
+.hand.grouped-hand>button.cut-eligible {z-index:5}
+.hand.layout-instant>button {transition:none!important}
+@media(hover:hover){.hand.grouped-hand>button:not(:disabled):hover {transform:translateY(calc(var(--fan-lift) - 4px)) rotate(var(--fan-angle));z-index:auto}}
+/* Redução discreta só nas mãos dos bots/parceiro; humano, descarte e monte mantidos. */
+.table {--opponent-card:calc(var(--card-width)*.90)}
+.seat.top .subhand {--opponent-card:calc(var(--card-width)*.94)}
+.seat.left,.seat.right {--side-fan:calc(var(--opponent-card)*3);width:calc(var(--opponent-card)*2.025 + 24px)}
+@media(orientation:portrait){
+ .seat.left,.seat.right {--side-fan:calc(var(--opponent-card)*2.025 + 24px);width:calc(var(--opponent-card)*1.25)}
+}
+.seat.top {display:flex;align-items:center;gap:6px;top:max(6px,env(safe-area-inset-top));width:min(calc(100% - 112px),440px);padding:0}
+.seat.top .seat-identity {position:static;transform:none;left:auto;right:auto;top:auto;flex:0 0 72px;width:72px;padding:2px 3px;grid-template-columns:21px auto;column-gap:2px}
+.seat.top .seat-identity>.pan-avatar {width:21px;height:23px}
+.seat.top .seat-identity>.sub {font-size:8px}
+.seat.top .back,.seat.top .subhand {flex:1 1 0;min-width:0;width:0;max-width:none;margin:0;padding:8px;height:calc(var(--opponent-card)*2.025 + 20px)}
+@media(orientation:landscape) and (max-height:600px){
+ .table {--opponent-card:calc(var(--card-width)*.90)}
+ .seat.top {top:max(4px,env(safe-area-inset-top));width:min(52vw,380px)}
+ .seat.top .subhand {--opponent-card:calc(var(--card-width)*.94)}
+ .seat.top .back,.seat.top .subhand {padding:3px 8px;height:calc(var(--opponent-card)*2.025 + 8px)}
+ .seat.left,.seat.right {--side-fan:calc(var(--opponent-card)*2.6)}
+}
+/* Fluxo fino com cabeça brilhante e duas intensidades de cauda, sem contorno fixo. */
+.stove-flow {fill:none;stroke:#fff;stroke-width:2.8;stroke-linecap:round;animation:stove-flow 7.5s linear infinite}
+.stove-glint {animation-name:stove-orbit;stroke-dasharray:44 956;opacity:.98;filter:drop-shadow(0 0 4px #fff)}
+.stove-tail {opacity:0;transition:opacity 260ms ease;filter:drop-shadow(0 0 3px #fffa)}
+.stove-tail.tail-long {stroke-dasharray:155 845;--flow-shift:0px}
+.stove-tail.tail-mid {stroke-dasharray:90 910;--flow-shift:0px}
+.tail-clockwise.tail-long {--flow-shift:111px}.tail-clockwise.tail-mid {--flow-shift:46px}
+.table[data-direction="1"] .stove-flow {animation-direction:reverse}
+.table[data-direction="-1"] .tail-clockwise.tail-long,.table[data-direction="1"] .tail-counterclockwise.tail-long {opacity:.25}
+.table[data-direction="-1"] .tail-clockwise.tail-mid,.table[data-direction="1"] .tail-counterclockwise.tail-mid {opacity:.48}
+@keyframes stove-flow {from{stroke-dashoffset:var(--flow-shift,0px)}to{stroke-dashoffset:calc(var(--flow-shift,0px) - 1000px)}}
+@media(prefers-reduced-motion:reduce){.hand.grouped-hand>button{transition:none!important}.stove-flow{animation:none}.stove-tail{display:none}.stove-glint{opacity:.65}}
