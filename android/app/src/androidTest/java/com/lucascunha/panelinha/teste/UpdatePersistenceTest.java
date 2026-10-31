@@ -27,6 +27,12 @@ public class UpdatePersistenceTest {
             if("true".equals(result.get()))return;
             SystemClock.sleep(200);
         }
-        fail("localStorage não preservado na mesma origem após atualizar");
+        AtomicReference<String> diagnostic = new AtomicReference<>("sem resposta JS");
+        CountDownLatch diagnosticReady = new CountDownLatch(1);
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> web.evaluateJavascript(
+            "JSON.stringify({origin:location.origin,sentinel:localStorage.getItem('panelinha-upgrade-check')})",
+            value -> { diagnostic.set(value); diagnosticReady.countDown(); }));
+        diagnosticReady.await(15, TimeUnit.SECONDS);
+        fail("localStorage não preservado na mesma origem: " + diagnostic.get());
     }
 }

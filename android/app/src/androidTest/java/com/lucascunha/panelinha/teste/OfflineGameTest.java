@@ -114,6 +114,22 @@ public class OfflineGameTest {
         waitFor("CartasTest.getState().log.some(x=>/Bot [123] (jogou|comprou)/.test(x))", 60000);
     }
     void captureTable(String orientation) throws Exception {
+        // innerWidth muda antes de o SurfaceFlinger terminar a rotação nativa.
+        AtomicReference<Boolean> oriented = new AtomicReference<>(false);
+        long deadline = SystemClock.uptimeMillis() + 15000;
+        while (!oriented.get() && SystemClock.uptimeMillis() < deadline) {
+            InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> oriented.set(
+                (web.getWidth() > web.getHeight()) == orientation.equals("landscape")));
+            if (!oriented.get()) SystemClock.sleep(100);
+        }
+        assertTrue("WebView na orientação nativa esperada", oriented.get());
+        CountDownLatch frame = new CountDownLatch(1);
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> web.postVisualStateCallback(0, new WebView.VisualStateCallback() {
+            @Override public void onComplete(long requestId) { frame.countDown(); }
+        }));
+        assertTrue("Quadro do WebView após rotação", frame.await(15, TimeUnit.SECONDS));
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+        InstrumentationRegistry.getInstrumentation().getUiAutomation().waitForIdle(300, 5000);
         assertEquals("true", js("document.documentElement.scrollWidth<=innerWidth && document.documentElement.scrollHeight<=innerHeight"));
         assertEquals("true", js("(()=>{const bg=document.getElementById('stoveScene').getBoundingClientRect(),f=document.getElementById('burner').getBoundingClientRect();return Math.abs(f.x+f.width/2-(bg.x+bg.width*836/1672))<1&&Math.abs(f.y+f.height/2-(bg.y+bg.height*451/941))<1&&Math.abs(f.width-f.height)<1})()"));
         Bitmap bitmap = InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();
@@ -139,5 +155,9 @@ public class OfflineGameTest {
         js("localStorage.setItem('panelinha-upgrade-check','preservado-v0.1')");
         assertEquals("\"preservado-v0.1\"", js("localStorage.getItem('panelinha-upgrade-check')"));
         InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("upgrade-check", Context.MODE_PRIVATE).edit().putString("sentinel","preservado-v0.1").commit();
+        // Chromium 124 agrupa commits de localStorage com atraso de 5 s. A fixture
+        // precisa existir no disco antes de forçar o encerramento do processo.
+        // O roteiro também verifica um reinício a frio ANTES de instalar outro APK.
+        SystemClock.sleep(7000);
     }
 }

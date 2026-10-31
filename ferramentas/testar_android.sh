@@ -89,6 +89,9 @@ for orientation in portrait landscape; do
 done
 uid_before="$(app_uid)"
 adb shell am force-stop "$app"
+# Controle: prova que a sentinela já era durável antes da troca de APK.
+run_tests UpdatePersistenceTest 1 "$output/baseline-persistence.txt"
+adb shell am force-stop "$app"
 adb install --no-streaming -r "$next_apk"
 uid_after="$(app_uid)"
 test -n "$uid_before" && test "$uid_before" = "$uid_after"

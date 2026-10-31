@@ -51,6 +51,13 @@ O roteiro agora coleta logcat desde antes da instalação, status de saída e es
 - O logcat identifica **ANR do `com.google.android.apps.nexuslauncher`**, com janela `Application Not Responding` persistente durante a suíte. Essa é evidência de um bloqueio do launcher do emulador, separado de uma falha nas asserções de compra/corte do jogo.
 - A preparação foi ajustada para parar/desativar somente esse launcher, somente em emulador descartável sob `GITHUB_ACTIONS=true`. Não suprime erros/ANRs do aplicativo nem remove testes. A próxima execução registrará o resultado dessa correção.
 
+### Execução #8 — 0.2.8/c2802
+
+- [Workflow](https://github.com/LucasCunh4/Panelinha/actions/runs/41154961380): compilação/assinatura e **4/4 testes offline aprovados**, incluindo toques, corte/compra, bot e orientações. O isolamento do launcher resolveu o bloqueio de foco da execução #7.
+- Atualização: instalação por cima e UID/SharedPreferences preservados, mas a sentinela de localStorage não foi recuperada. A Release permaneceu bloqueada. Esse resultado não foi atribuído ao launcher nem tratado como aprovação de persistência.
+- O teste gravava a sentinela e terminava o processo dentro de cerca de 1 s. O [Chromium 124 usado pelo WebView](https://github.com/chromium/chromium/blob/124.0.6367.219/components/services/storage/dom_storage/local_storage_impl.cc) usa `kCommitDefaultDelaySecs = base::Seconds(5)` para agrupar gravações. A fixture agora aguarda esse commit e o roteiro exige também leitura após reinício a frio **antes** de trocar o APK. As verificações depois da atualização continuam obrigatórias.
+- Capturas em rotação foram ajustadas para aguardar orientação nativa e `postVisualStateCallback` antes de ler o quadro. Isso evita salvar o quadro anterior durante a transição.
+
 Não houve teste em celular físico nesta etapa.
 
 ## Identidade e atualização
