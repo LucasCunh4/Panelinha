@@ -1,0 +1,96 @@
+{
+  "project": "Panelinha",
+  "version": "mesa-v1",
+  "description": "Recursos visuais aprovados; sem elementos de interface embutidos no fundo",
+  "background": {
+    "file": "assets/mesa/fogao_fundo.png",
+    "native_size": [
+      1672,
+      941
+    ],
+    "burner_center_px": [
+      836,
+      451
+    ],
+    "burner_center_norm": [
+      0.5,
+      0.47927736450584485
+    ],
+    "flame_preview_diameter_px": 490,
+    "flame_preview_diameter_norm": 0.2930622009569378,
+    "notes": "Coordenadas da prévia, reajustar visualmente no app. Não distorcer a textura; manter transformações co-registradas fundo/chamas."
+  },
+  "flames": {
+    "files": [
+      "assets/mesa/chama_vermelha.png",
+      "assets/mesa/chama_azul.png",
+      "assets/mesa/chama_verde.png",
+      "assets/mesa/chama_amarela.png"
+    ],
+    "size": [
+      1024,
+      1024
+    ],
+    "transparent": true,
+    "place_above_background": true,
+    "place_below_discard": true,
+    "zero_color_state": "ocultar as chamas quando ainda não houver cor ativa"
+  },
+  "cut_overlay": "assets/mesa/corte_faca_balao.png",
+  "asset_files": [
+    {
+      "path": "assets/mesa/fogao_fundo.png",
+      "mode": "RGB",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "c8ade65f961f7e3d2b9f1b482912dfc72ffbdebd96339ed846f6be40a26c032a"
+    },
+    {
+      "path": "assets/mesa/chama_azul.png",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1024
+      ],
+      "sha256": "bd042402b861efdf1fed8c08a119a633957d5eb2515cc8778d0590cf5b7c78f2"
+    },
+    {
+      "path": "assets/mesa/chama_vermelha.png",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1024
+      ],
+      "sha256": "5ad0cae763dbd40f8f695582009e3566619bda8dd1a018794346ba66dcda3df2"
+    },
+    {
+      "path": "assets/mesa/chama_verde.png",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1024
+      ],
+      "sha256": "c6eaa2b6d6a76337e37c97c8d29cd081bc5a39ebb6f7e2133e51e09dd708e137"
+    },
+    {
+      "path": "assets/mesa/chama_amarela.png",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1024
+      ],
+      "sha256": "d273e2fe155c800d54434424749e1b806b5ff19cd5b199961859f3ee238eee7b"
+    },
+    {
+      "path": "assets/mesa/corte_faca_balao.png",
+      "mode": "RGBA",
+      "size": [
+        1254,
+        1254
+      ],
+      "sha256": "be9c2a9eba686cdf6867235690324efe5650824c8bd89685eaff80d0e97d774b"
+    }
+  ]
+}

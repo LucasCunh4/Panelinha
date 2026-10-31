@@ -1,0 +1,90 @@
+{
+  "project": "Panelinha",
+  "version": "mesa-v1",
+  "description": "Recursos visuais aprovados; sem elementos de interface embutidos no fundo",
+  "background": {
+    "file": "assets/mesa/fogao_fundo.png",
+    "native_size": [
+      1672,
+      941
+    ],
+    "burner_center_px": [
+      836,
+      451
+    ],
+    "burner_center_norm": [
+      0.5,
+      0.47927736450584485
+    ],
+    "flame_preview_diameter_px": 490,
+    "flame_preview_diameter_norm": 0.2930622009569378,
+    "notes": "Coordenadas da prévia, reajustar visualmente no app. Não distorcer a textura; manter transformações co-registradas fundo/chamas."
+  },
+  "flames": {
+    "files": [
+      "assets/mesa/chama_vermelha.png",
+      "assets/mesa/chama_azul.png",
+      "assets/mesa/chama_verde.png",
+      "assets/mesa/chama_amarela.png"
+    ],
+    "size": [
+      1024,
+      1024
+    ],
+    "transparent": true,
+    "place_above_background": true,
+    "place_below_discard": true,
+    "zero_color_state": "ocultar as chamas quando ainda não houver cor ativa"
+  },
+  "cut_overlay": "assets/mesa/corte_faca_balao.png",
+  "asset_files": [
+    {
+      "path": "assets/mesa/fogao_fundo.png",
+      "mode": "RGB",
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "path": "assets/mesa/chama_azul.png",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "path": "assets/mesa/chama_vermelha.png",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "path": "assets/mesa/chama_verde.png",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "path": "assets/mesa/chama_amarela.png",
+      "mode": "RGBA",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "path": "assets/mesa/corte_faca_balao.png",
+      "mode": "RGBA",
+      "size": [
+        1254,
+        1254
+      ]
+    }
+  ]
+}

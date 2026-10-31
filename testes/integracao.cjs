@@ -30,7 +30,7 @@ const base = process.env.PANELAS_TEST_URL || 'http://127.0.0.1:8000/';
   assert.equal(await page.evaluate(()=>CartasTest.getState().players.length),4);
   assert.ok(await page.locator('#game').isVisible());
   console.log('PASS início individual com 1 humano + 3 bots');
-  await page.locator('#backBtn').tap(); await page.locator('#mode').selectOption('duo'); await page.locator('#startBtn').tap();
+  await page.locator('#tableMenuBtn').tap();await page.locator('#backBtn').tap(); await page.locator('#mode').selectOption('duo'); await page.locator('#startBtn').tap();
   assert.ok(await page.evaluate(()=>CartasTest.getState().o.duo));
   assert.equal(await page.locator('#player2 .subhand').count(),1);
   console.log('PASS duplas: parceiro oposto com mão visível');
@@ -114,7 +114,7 @@ const base = process.env.PANELAS_TEST_URL || 'http://127.0.0.1:8000/';
   });
   for(const r of results)console.log(r.status,r.name,r.error||'');
   // Resolve a punição final pelo turno real do bot, sem mover a vez ao finalizador.
-  await page.locator('#backBtn').tap();await page.locator('#startBtn').tap();
+  await page.locator('#tableMenuBtn').tap();await page.locator('#backBtn').tap();await page.locator('#startBtn').tap();
   await page.evaluate(()=>{
    const s=CartasTest.getState();s.token++;s.current=0;s.unlockAt=0;s.penalty=0;s.highest=0;s.finisher=null;s.cutOpen=false;s.activeColor='red';s.direction=1;s.o.single=true;s.o.duo=false;
    const card=(id,type='num',color='red')=>({id,type,color,num:7});
@@ -126,7 +126,7 @@ const base = process.env.PANELAS_TEST_URL || 'http://127.0.0.1:8000/';
   assert.ok(await page.evaluate(()=>{const s=CartasTest.getState();return s.phase==='gameOver'&&s.finisher===0&&s.players[1].hand.length===4&&s.players[0].hand.length===0;}));
   console.log('PASS bot resolve +2 final antes de encerrar rodada');
   // Partida real: relógio virtual permite aguardar o turno automático dos bots.
-  await page.locator('#backBtn').tap();await page.locator('#startBtn').tap();
+  await page.locator('#tableMenuBtn').tap();await page.locator('#backBtn').tap();await page.locator('#startBtn').tap();
   await page.evaluate(()=>{document.querySelector('#testPenalty').click();document.querySelector('#buyBtn').click();});
   await page.clock.runFor(1000);
   assert.ok(await page.evaluate(()=>CartasTest.getState().log.some(x=>/Bot [123] (jogou|comprou)/.test(x))));

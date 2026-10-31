@@ -2,6 +2,9 @@ package com.lucascunha.panelinha.teste;
 
 import static org.junit.Assert.*;
 import android.content.Context;
+import android.graphics.Bitmap;
+import java.io.File;
+import java.io.FileOutputStream;
 import android.net.ConnectivityManager;
 import android.content.pm.ActivityInfo;
 import android.os.SystemClock;
@@ -110,13 +113,25 @@ public class OfflineGameTest {
         assertEquals("0", js("CartasTest.getState().penalty"));
         waitFor("CartasTest.getState().log.some(x=>/Bot [123] (jogou|comprou)/.test(x))", 60000);
     }
+    void captureTable(String orientation) throws Exception {
+        assertEquals("true", js("document.documentElement.scrollWidth<=innerWidth && document.documentElement.scrollHeight<=innerHeight"));
+        assertEquals("true", js("(()=>{const bg=document.getElementById('stoveScene').getBoundingClientRect(),f=document.getElementById('burner').getBoundingClientRect();return Math.abs(f.x+f.width/2-(bg.x+bg.width*836/1672))<1&&Math.abs(f.y+f.height/2-(bg.y+bg.height*451/941))<1&&Math.abs(f.width-f.height)<1})()"));
+        Bitmap bitmap = InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();
+        assertNotNull("Captura Android da mesa", bitmap);
+        File folder = InstrumentationRegistry.getInstrumentation().getTargetContext().getExternalFilesDir(null);
+        try (FileOutputStream file = new FileOutputStream(new File(folder, "mesa-v1-" + orientation + ".png"))) {
+            assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG, 100, file));
+        } finally { bitmap.recycle(); }
+    }
     @Test public void c_portraitAndLandscape() throws Exception {
         startControlled();
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activity.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE));
         waitFor("innerWidth>innerHeight", 15000);
+        captureTable("landscape");
         assertEquals("true", js("document.documentElement.scrollWidth<=innerWidth"));
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activity.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT));
         waitFor("innerHeight>innerWidth", 15000);
+        captureTable("portrait");
         assertEquals("true", js("document.documentElement.scrollWidth<=innerWidth"));
         assertEquals("4", js("CartasTest.getState().players.length"));
     }

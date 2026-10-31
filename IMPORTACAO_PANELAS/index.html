@@ -32,7 +32,7 @@
 </head>
 <body>
 <main class="container">
-  <header class="row between"><div><h1 class="brand">PANELAS <span class="pill">Mesa v1</span></h1><small>Uma mesa quente. Uma boa jogada. · Treino com 3 bots</small></div><button id="backBtn" class="btn alt hide">Configurações</button></header>
+  <header class="row between"><div><h1 class="brand">PANELAS <span class="pill">Mesa v1</span></h1><small>Uma mesa quente. Uma boa jogada. · Treino com 3 bots</small></div></header>
   <section id="menu" class="panel"><h2>Iniciar simulação</h2><p class="muted">Configure uma partida de testes. Nenhum jogador precisa se conectar.</p>
     <div class="grid">
       <div><label class="setting">Formato <select id="mode"><option value="solo">Todos contra todos</option><option value="duo">Duplas (você + Bot 2)</option></select></label><label class="setting">Duração <select id="duration"><option value="points">Partida por pontos</option><option value="single">Rodada única</option></select></label><label class="setting">Pontuação-meta <select id="goal"></select></label><label class="setting">Tempo por turno <select id="timeout"><option value="0">Sem limite</option><option value="15">15 s</option><option value="30">30 s</option><option value="45">45 s</option><option value="60">60 s</option></select></label></div>
@@ -41,36 +41,49 @@
     <div class="row menu-header"><button class="btn" id="startBtn">Começar com 3 bots</button></div>
   </section>
   <section id="game" class="hide">
-    <div class="panel"><div class="row between"><strong id="roundLabel">Rodada 1</strong><span id="status" class="pill"></span></div><div class="score" id="score"></div><div class="topline" id="stateText"></div></div>
     <div class="stove-shell">
-      <div class="stove-caption"><span>COZINHA DE JOGADAS</span><span>● FOGÃO 01</span></div>
       <div class="table" id="table" aria-label="Mesa de jogo vista de cima">
+        <div class="stove-scene" id="stoveScene" aria-hidden="true">
+          <img class="stove-background" src="assets/mesa/fogao_fundo.png" alt="" draggable="false">
+          <div id="burner" class="burner" role="img" aria-label="Cor ativa">
+            <img class="flame flame-red" src="assets/mesa/chama_vermelha.png" alt="">
+            <img class="flame flame-blue" src="assets/mesa/chama_azul.png" alt="">
+            <img class="flame flame-green" src="assets/mesa/chama_verde.png" alt="">
+            <img class="flame flame-yellow" src="assets/mesa/chama_amarela.png" alt="">
+          </div>
+        </div>
         <div class="seat top" id="player2"></div>
+        <button id="tableMenuBtn" class="table-menu-btn" aria-label="Abrir opções e laboratório" aria-controls="tableMenu" aria-expanded="false">☰</button>
         <div class="seat left" id="player3"></div>
         <div class="center">
-          <div class="burner" id="burner" role="img" aria-label="Cor ativa"><div class="burner-grate" aria-hidden="true"></div></div>
           <div class="stack">
-            <div class="draw-stack"><div id="pile" title="Monte de compra"></div><span class="stack-label">COMPRA</span></div>
+            <div class="draw-stack"><button id="buyBtn" type="button" aria-label="Comprar carta"><span id="pile"></span></button><span class="stack-label">COMPRAR</span></div>
             <div class="discard-stack"><div id="discard" title="Último descarte"></div><span class="stack-label">DESCARTE</span></div>
           </div>
           <div class="penalty-display" id="penaltyDisplay" role="status" aria-live="polite" hidden></div>
           <div class="direction-indicator" id="directionIndicator"><span id="directionGlyph" aria-hidden="true">↻</span><span id="directionLabel">Horário</span></div>
           <div class="scenter" id="centerMsg"></div>
+          <div id="turnCue" role="status" aria-live="polite"></div>
         </div>
         <div class="seat right" id="player1"></div>
-        <div class="seat self" id="player0"></div>
         <div class="hand-panel">
-          <div class="hand-heading"><strong>Sua mão</strong><span id="handCount" class="muted"></span></div>
-          <div id="hand" class="hand" aria-label="Suas cartas"></div>
           <div class="controls" id="controls"></div>
-          <p class="topline muted" id="message"></p>
+          <div class="hand-heading"><div class="seat self" id="player0"></div><span id="handCount"></span></div>
+          <div id="hand" class="hand" aria-label="Suas cartas"></div>
+          <p class="sr-only" id="message" aria-live="polite"></p>
         </div>
       </div>
-      <div class="stove-knobs" aria-hidden="true"><span></span><span></span><b>PANELAS</b><span></span><span></span></div>
     </div>
-    <p class="art-mode">Mesa e versos provisórios · Artes PNG preservadas. Compare os visuais no laboratório.</p>
-    <details class="panel debug"><summary>Laboratório de testes (ferramentas de depuração)</summary><p class="help">Mostre as mãos dos bots ou adicione cartas à sua mão. Cartas injetadas podem ultrapassar a quantidade normal do baralho; isso é proposital para testar efeitos. Com cortes ativados, o botão CORTAR aparece imediatamente; os bots normais respeitam uma pausa de 2,8 segundos.</p><div class="controls"><label class="row"><input id="useCardArt" type="checkbox" checked> Artes PNG (ligar/desligar)</label><label class="row"><input id="reveal" type="checkbox"> Ver mãos dos bots</label><select id="injectType"><option value="num">Número 7</option><option value="draw2">+2</option><option value="wild4">+4</option><option value="wild6">+6</option><option value="wild">Coringa</option><option value="skip">Bloqueio</option><option value="reverse">Inverter</option><option value="dist">Distribuidora</option><option value="rotate">Giro</option></select><select id="injectColor"><option value="red">Vermelho</option><option value="blue">Azul</option><option value="green">Verde</option><option value="yellow">Amarelo</option></select><button class="btn alt" id="injectBtn">Dar carta de teste</button><button class="btn alt" id="testPenalty">Simular +20 para você</button><label class="row"><input id="quickBots" type="checkbox"> Bots rápidos</label></div></details>
+    <div id="tableMenu" class="table-menu-overlay hide" role="dialog" aria-modal="true" aria-labelledby="tableMenuTitle">
+      <div class="table-menu-panel">
+        <div class="row between"><h2 id="tableMenuTitle">Sua mesa</h2><button id="closeTableMenu" class="btn alt" aria-label="Fechar opções e voltar à mesa">Fechar ✕</button></div>
+        <p class="help">Os bots e o tempo de turno continuam enquanto este menu está aberto.</p>
+        <div class="panel"><strong id="roundLabel">Rodada 1</strong><span id="status" class="pill"></span><div class="score" id="score"></div><div class="topline" id="stateText"></div></div>
+    <details class="panel debug"><summary>Laboratório de testes (ferramentas de depuração)</summary><p class="help">Mostre as mãos dos bots ou adicione cartas à sua mão. Cartas injetadas podem ultrapassar a quantidade normal do baralho; isso é proposital para testar efeitos. Com cortes ativados, o balão de faca aparece sobre a carta idêntica; os bots normais respeitam uma pausa de 2,8 segundos.</p><div class="controls"><label class="row"><input id="useCardArt" type="checkbox" checked> Artes PNG (ligar/desligar)</label><label class="row"><input id="reveal" type="checkbox"> Ver mãos dos bots</label><select id="injectType"><option value="num">Número 7</option><option value="draw2">+2</option><option value="wild4">+4</option><option value="wild6">+6</option><option value="wild">Coringa</option><option value="skip">Bloqueio</option><option value="reverse">Inverter</option><option value="dist">Distribuidora</option><option value="rotate">Giro</option></select><select id="injectColor"><option value="red">Vermelho</option><option value="blue">Azul</option><option value="green">Verde</option><option value="yellow">Amarelo</option></select><button class="btn alt" id="injectBtn">Dar carta de teste</button><button class="btn alt" id="testPenalty">Simular +20 para você</button><label class="row"><input id="quickBots" type="checkbox"> Bots rápidos</label></div></details>
     <details class="panel" open><summary>Histórico da partida</summary><div class="history" id="history"></div></details>
+        <button id="backBtn" class="btn alt hide">Encerrar e voltar às configurações</button>
+      </div>
+    </div>
   </section>
   <div class="foot">Somente para validação local das regras. Bots não precisam de internet; multiplayer online e anti-trapaça serão implementados em etapa posterior.</div>
 </main><div id="modalRoot"></div>
@@ -117,7 +130,7 @@ $('mode').onchange=updateGoals;$('duration').onchange=updateGoals;updateGoals();
 function settings(){return {duo:$('mode').value==='duo',single:$('duration').value==='single',goal:Number($('goal').value),timeout:Number($('timeout').value),infinite:$('infinite').checked,cut:$('cut').checked,challenge:$('challenge').checked,dist:$('dist').checked,rotate:$('rotate').checked};}
 function names(i){return i===0?'Você':'Bot '+i;}
 function clearJobs(){if(botTimer)clearTimeout(botTimer);botTimer=null;}
-function startMatch(){clearJobs();let o=settings();s={o,players:[0,1,2,3].map(i=>({id:i,hand:[],score:0})),teams:[0,0],deck:[],discard:[],activeColor:null,direction:1,current:0,penalty:0,highest:0,lastPenalty:null,finisher:null,round:0,phase:'playing',drawn:null,cutOpen:false,unlockAt:0,lastActor:null,lastDistribution:null,preUno:false,unoWindow:null,log:[],message:'',deadline:0,pendingAction:null,token:0,reveal:false,summary:[],pastWinners:[],modal:null};$('menu').classList.add('hide');$('game').classList.remove('hide');$('backBtn').classList.remove('hide');$('reveal').checked=false;newRound();}
+function startMatch(){clearJobs();let o=settings();s={o,players:[0,1,2,3].map(i=>({id:i,hand:[],score:0})),teams:[0,0],deck:[],discard:[],activeColor:null,direction:1,current:0,penalty:0,highest:0,lastPenalty:null,finisher:null,round:0,phase:'playing',drawn:null,cutOpen:false,unlockAt:0,lastActor:null,lastDistribution:null,preUno:false,unoWindow:null,log:[],message:'',deadline:0,pendingAction:null,token:0,reveal:false,summary:[],pastWinners:[],modal:null};$('menu').classList.add('hide');$('game').classList.remove('hide');$('backBtn').classList.remove('hide');PanelasMesa.closeMenu();$('reveal').checked=false;newRound();}
 function top(){return s.discard[s.discard.length-1];}
 function nextActive(from,steps=1){let i=from;for(let st=0;st<steps;st++){let tries=0;do{i=(i+4+s.direction)%4;tries++;}while(s.players[i].hand.length===0&&tries<4);}return i;}
 function refill(){if(s.deck.length||s.discard.length<=1)return;let t=s.discard.pop();s.deck=shuffle(s.discard);s.discard=[t];log('Monte reabastecido com os descartes.');}
@@ -276,7 +289,7 @@ s.current=nextActive(id);startTurn();}
 function bestColor(cards){let counts=COLORS.map(color=>({color,n:cards.filter(c=>c.color===color).length})).sort((a,b)=>b.n-a.n);return counts[0].n?counts[0].color:pick(COLORS);}
 function clickHandCard(cardId){
   if(!s||s.phase!=='playing')return;
-  if(s.current!==0){s.message='Fora do seu turno, use o botão CORTAR quando aparecer.';render();return;}
+  if(s.current!==0){s.message='Fora do seu turno, toque na carta com o balão de faca quando aparecer.';render();return;}
   chooseCards(0,[cardId]);
 }
 function cutHuman(){
@@ -294,31 +307,36 @@ $('pile').innerHTML=`<div class="card" style="background:#283f68;color:#b9d1ff;b
 $('handCount').textContent=s.players[0].hand.length+' cartas';
 const cards=[...s.players[0].hand].sort((a,b)=>(COLORS.indexOf(a.color)+1||9)-(COLORS.indexOf(b.color)+1||9)||a.type.localeCompare(b.type)||(a.num??0)-(b.num??0));
 const locked=s.phase==='playing'&&s.current===0&&!canActNow();
+const cutCard=findHumanCut(), handScroll=$('hand').scrollLeft;
 $('hand').innerHTML=cards.map(c=>{
   const enabled=s.phase==='playing'&&s.current===0&&!locked&&(s.drawn===null||c.id===s.drawn)&&canPlay(c);
-  return `<button type="button" style="border:0;background:none;padding:0" data-card="${c.id}" aria-label="${enabled?'Jogar':'Indisponível'} ${description(c)}" title="${enabled?'Jogar':'Indisponível'} ${description(c)}" ${enabled?'':'disabled'}>${cardHTML(c,false,false,!enabled)}</button>`;
+  const cutting=cutCard?.id===c.id;
+  return `<button type="button" ${cutting?'id="cutBtn" class="cut-eligible"':''} style="border:0;background:none;padding:0" data-card="${c.id}" aria-label="${cutting?'Cortar':enabled?'Jogar':'Indisponível'} ${description(c)}" title="${cutting?'Cortar':enabled?'Jogar':'Indisponível'} ${description(c)}" ${enabled||cutting?'':'disabled'}>${cardHTML(c,false,false,!(enabled||cutting))}${cutting?'<span class="cut-bubble"><img src="assets/mesa/corte_faca_balao.png" alt="CORTAR" draggable="false"></span>':''}</button>`;
 }).join('');
-$('hand').querySelectorAll('[data-card]').forEach(b=>b.onclick=()=>clickHandCard(Number(b.dataset.card)));
+$('hand').querySelectorAll('[data-card]').forEach(b=>b.onclick=()=>b.id==='cutBtn'?cutHuman():clickHandCard(Number(b.dataset.card)));
 if(s.phase!=='playing'){
   $('controls').innerHTML=finishControlHTML();
   $('nextRound')?.addEventListener('click',newRound);$('newMatch')?.addEventListener('click',startMatch);$('backLobby')?.addEventListener('click',backToMenu);
 }else{
-  const mine=s.current===0,cutCard=findHumanCut();
+  const mine=s.current===0;
   const canCall=s.players[0].hand.length===2||(s.players[0].hand.length===1&&s.unoWindow?.id===0);
   const canReport=s.unoWindow&&s.unoWindow.id!==0;
   const penaltyBanner=mine&&s.penalty?`<div class="penalty-alert">⚠️ ${penaltyText()}</div>`:'';
   const actionHint=mine&&locked?`<span class="pill">Próxima jogada liberada em ${Math.max(0,((s.unlockAt-Date.now())/1000)).toFixed(1)}s · cortes abertos</span>`:'';
-  $('controls').innerHTML=`${penaltyBanner}${cutCard?`<button id="cutBtn" class="btn cut-now">⚡ CORTAR AGORA — ${description(cutCard)}</button>`:''}${actionHint}${mine?`<button id="buyBtn" class="btn ${s.penalty?'warn':'alt'}" ${s.drawn!==null||locked?'disabled':''}>${s.penalty?'COMPRAR +'+s.penalty+' (obrigatório se não rebater)':'Comprar carta'}</button>`:''}${mine&&s.drawn!==null?'<button id="passBtn" class="btn alt">Guardar e passar</button>':''}${mine&&canChallenge(0)?`<button id="challengeBtn" class="btn warn" ${locked?'disabled':''}>Desafiar +4/+6</button>`:''}${canCall?`<button id="unoBtn" class="btn good" ${s.preUno?'disabled':''}>ÚLTIMA CARTA!</button>`:''}${canReport?'<button id="reportBtn" class="btn warn">Denunciar última carta</button>':''}`;
-  $('cutBtn')?.addEventListener('click',cutHuman);
-  $('buyBtn')?.addEventListener('click',buyHuman);
+  $('controls').innerHTML=`${penaltyBanner}${actionHint}${mine&&s.drawn!==null?'<button id="passBtn" class="btn alt">Guardar e passar</button>':''}${mine&&canChallenge(0)?`<button id="challengeBtn" class="btn warn" ${locked?'disabled':''}>Desafiar +4/+6</button>`:''}${canCall?`<button id="unoBtn" class="btn good" ${s.preUno?'disabled':''}>ÚLTIMA CARTA!</button>`:''}${canReport?'<button id="reportBtn" class="btn warn">Denunciar última carta</button>':''}`;
+  $('buyBtn').disabled=!mine||s.drawn!==null||locked||!!s.pendingAction;
+  $('buyBtn').setAttribute('aria-label',s.penalty?'Comprar penalidade de '+s.penalty+' cartas':'Comprar carta');
+  $('buyBtn').onclick=buyHuman;
   $('passBtn')?.addEventListener('click',keepPass);
   $('challengeBtn')?.addEventListener('click',challenge);
   $('unoBtn')?.addEventListener('click',callUno);
   $('reportBtn')?.addEventListener('click',()=>reportUno(0));
 }
-$('message').textContent=s.message||'Toque em uma carta para jogá-la. Se tiver carta idêntica, o botão CORTAR aparece imediatamente após o descarte.';$('history').innerHTML=s.log.slice(0,40).map(x=>`<div>${x.replaceAll('<','&lt;').replaceAll('>','&gt;')}</div>`).join('');
-PanelasMesa.render(s);}
-function backToMenu(){clearJobs();s=null;$('menu').classList.remove('hide');$('game').classList.add('hide');$('backBtn').classList.add('hide');$('modalRoot').innerHTML='';}
+$('message').textContent=s.message||'Toque em uma carta para jogá-la. Se tiver carta idêntica, a faca aparece na carta idêntica imediatamente após o descarte.';$('history').innerHTML=s.log.slice(0,40).map(x=>`<div>${x.replaceAll('<','&lt;').replaceAll('>','&gt;')}</div>`).join('');
+if(s.phase!=='playing')$('buyBtn').disabled=true;
+PanelasMesa.render(s);$('hand').scrollLeft=handScroll;
+$('cutBtn')?.scrollIntoView({block:'nearest',inline:'nearest'});}
+function backToMenu(){clearJobs();s=null;$('menu').classList.remove('hide');$('game').classList.add('hide');$('backBtn').classList.add('hide');$('modalRoot').innerHTML='';PanelasMesa.reset();}
 $('useCardArt').onchange=()=>{if(s)render();};$('startBtn').onclick=startMatch;$('backBtn').onclick=backToMenu;$('reveal').onchange=()=>{if(s){s.reveal=$('reveal').checked;render();}};
 $('injectBtn').onclick=()=>{if(!s||s.phase!=='playing')return;let type=$('injectType').value,color=$('injectColor').value;s.players[0].hand.push(make(type,(['num','draw2','skip','reverse'].includes(type)?color:null),type==='num'?7:null));log(`Teste: carta ${TYPES[type]} adicionada à sua mão.`);render();};
 $('testPenalty').onclick=()=>{if(!s||s.phase!=='playing'||s.finisher!==null)return;clearJobs();s.current=0;s.penalty=20;s.highest=2;s.lastPenalty=null;s.drawn=null;s.cutOpen=false;s.unlockAt=0;s.deadline=s.o.timeout?Date.now()+s.o.timeout*1000:0;s.token++;log('Teste: penalidade acumulada +20 direcionada a você.');render();};

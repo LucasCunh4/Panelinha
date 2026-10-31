@@ -11,6 +11,10 @@ for (const entry of manifest.files) {
   const bytes = fs.readFileSync(path.join(source, entry.path));
   if (crypto.createHash('sha256').update(bytes).digest('hex') !== entry.sha256) throw Error(`PNG divergente: ${entry.path}`);
 }
+const mesa = JSON.parse(fs.readFileSync(path.join(source, 'documentacao/MANIFESTO_MESA_V1.json')));
+for (const entry of mesa.asset_files) {
+  if (crypto.createHash('sha256').update(fs.readFileSync(path.join(source, entry.path))).digest('hex') !== entry.sha256) throw Error(`Asset oficial da mesa divergente: ${entry.path}`);
+}
 fs.rmSync(output, {recursive:true, force:true});
 fs.mkdirSync(output, {recursive:true});
 for (const name of ['index.html', 'mesa.css', 'mesa.js', 'assets']) fs.cpSync(path.join(source, name), path.join(output, name), {recursive:true});

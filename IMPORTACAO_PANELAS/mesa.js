@@ -36,10 +36,51 @@
     }
   }
 
+  function layout() {
+    const table = $('table');
+    const width = table.clientWidth, height = table.clientHeight;
+    if (!width || !height) return;
+    // Cover uniforme: imagem e chamas ficam no mesmo plano nativo 1672 × 941.
+    const scale = Math.max(width / 1672, height / 941);
+    const x = (width - 1672 * scale) / 2, y = (height - 941 * scale) / 2;
+    table.style.setProperty('--scene-scale', scale);
+    table.style.setProperty('--scene-x', `${x}px`);
+    table.style.setProperty('--scene-y', `${y}px`);
+    table.style.setProperty('--burner-y', `${y + 451 * scale}px`);
+  }
+
+  function closeMenu() {
+    const wasOpen = !$('tableMenu').classList.contains('hide');
+    $('tableMenu').classList.add('hide');
+    $('tableMenuBtn').setAttribute('aria-expanded', 'false');
+    if (wasOpen) $('tableMenuBtn').focus({preventScroll:true});
+  }
+  $('tableMenuBtn').onclick = () => {
+    $('tableMenu').classList.remove('hide');
+    $('tableMenuBtn').setAttribute('aria-expanded', 'true');
+    $('closeTableMenu').focus({preventScroll:true});
+  };
+  $('closeTableMenu').onclick = closeMenu;
+  $('tableMenu').onclick = event => { if (event.target === $('tableMenu')) closeMenu(); };
+  $('tableMenu').addEventListener('keydown', event => {
+    if (event.key === 'Escape') { event.preventDefault(); closeMenu(); }
+    if (event.key !== 'Tab') return;
+    const focusable = [...$('tableMenu').querySelectorAll('button,select,input,summary,[tabindex="0"]')].filter(el => !el.disabled && el.getClientRects().length);
+    const first=focusable[0], last=focusable[focusable.length-1];
+    if (event.shiftKey && document.activeElement === first) {event.preventDefault();last.focus();}
+    else if (!event.shiftKey && document.activeElement === last) {event.preventDefault();first.focus();}
+  });
+
   function render(state) {
-    const center = $('burner').parentElement;
+    document.body.classList.add('playing');
+    const center = document.querySelector('.center');
+    $('table').dataset.activeColor = state.activeColor || '';
+    $('table').dataset.phase = state.phase;
+    $('table').setAttribute('aria-label', `Mesa de jogo · ${state.activeColor ? colorNames[state.activeColor] : 'sem cor ativa'}`);
+    layout();
+    $('turnCue').textContent = state.phase === 'playing' ? `Vez de ${state.current === 0 ? 'Você' : 'Bot ' + state.current}` : 'Rodada concluída';
     center.dataset.activeColor = state.activeColor;
-    $('burner').setAttribute('aria-label', `Boca do fogão · cor ativa: ${colorNames[state.activeColor]}`);
+    $('burner').setAttribute('aria-label', `Boca do fogão · cor ativa: ${colorNames[state.activeColor] || 'nenhuma'}`);
     const penalty = $('penaltyDisplay');
     penalty.hidden = !state.penalty;
     penalty.textContent = state.penalty ? `+${state.penalty}` : '';
@@ -63,6 +104,7 @@
 
     $('pile').innerHTML = `<div class="card deck-back">${panAvatar()}<span class="deck-brand">PANELAS</span><span class="deck-count">${state.deck.length}</span></div>`;
     $('pile').setAttribute('aria-label', `Monte de compra: ${state.deck.length} cartas`);
+    document.querySelector('.draw-stack .stack-label').textContent = state.penalty ? `COMPRAR +${state.penalty}` : 'COMPRAR';
     for (const player of state.players) {
       const seat = $(`player${player.id}`);
       seat.insertAdjacentHTML('afterbegin', panAvatar(player.id));
@@ -78,8 +120,9 @@
     fan($('hand'), innerWidth < 360 ? 6 : 8);
   }
   addEventListener('resize', () => {
+    layout();
     fan($('hand'), innerWidth < 360 ? 6 : 8);
     document.querySelectorAll('.subhand').forEach(hand => fan(hand, 9));
   });
-  window.PanelasMesa = { render };
+  window.PanelasMesa = { render, closeMenu, reset:() => {closeMenu();document.body.classList.remove('playing');previous=null;} };
 })();

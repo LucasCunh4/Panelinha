@@ -7,6 +7,19 @@ test_apk="${3:?APK de instrumentação}"
 app='com.lucascunha.panelinha.teste'
 output='artifacts/testes-android'
 mkdir -p "$output"
+logcat_pid=''
+collect_diagnostics() {
+  local status=$?
+  trap - EXIT
+  printf '%s\n' "$status" > "$output/test-exit-status.txt"
+  if [[ -n "$logcat_pid" ]]; then kill "$logcat_pid" 2>/dev/null || true; fi
+  if [[ "$status" != 0 ]]; then
+    timeout 10s adb devices -l > "$output/adb-devices.txt" 2>&1 || true
+    timeout 10s adb shell dumpsys activity processes > "$output/android-processes.txt" 2>&1 || true
+  fi
+  exit "$status"
+}
+trap collect_diagnostics EXIT
 run_tests() {
   local class_name="$1" expected_count="$2" result_file="$3"
   adb shell am instrument -w -r -e class "$app.$class_name" "$app.test/androidx.test.runner.AndroidJUnitRunner" | tee "$result_file"
@@ -23,6 +36,8 @@ app_uid() {
   adb shell dumpsys package "$app" | sed -n 's/.*userId=\([0-9]*\).*/\1/p' | head -1
 }
 adb wait-for-device
+adb logcat -v threadtime > "$output/logcat.txt" 2>&1 &
+logcat_pid=$!
 adb shell input keyevent KEYCODE_WAKEUP
 adb shell wm dismiss-keyguard
 adb shell svc wifi disable
@@ -55,6 +70,9 @@ if [[ "${PANELINHA_VERIFY_EXISTING_DATA:-0}" = 1 ]]; then
   run_tests UpdatePersistenceTest 1 "$output/update-anterior.txt"
 fi
 run_tests OfflineGameTest 4 "$output/offline.txt"
+for orientation in portrait landscape; do
+  adb pull "/sdcard/Android/data/$app/files/mesa-v1-$orientation.png" "$output/mesa-v1-$orientation.png"
+done
 uid_before="$(app_uid)"
 adb shell am force-stop "$app"
 adb install --no-streaming -r "$next_apk"
