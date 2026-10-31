@@ -1,5 +1,7 @@
 // Compatibilidade do contêiner Android; não altera as regras nem os arquivos web.
 import 'core-js/actual/string/replace-all';
+import { registerPlugin } from '@capacitor/core';
+window.PanelinhaWindow = registerPlugin('TableWindow');
 
 // A mesa consulta/cancela as animações WAAPI do indicador de direção.
 // WebViews antigos podem não ter nenhuma das APIs de consulta, embora animate exista.

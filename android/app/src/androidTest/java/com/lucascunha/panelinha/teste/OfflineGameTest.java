@@ -143,7 +143,7 @@ public class OfflineGameTest {
         InstrumentationRegistry.getInstrumentation().getUiAutomation().waitForIdle(300, 5000);
         assertEquals("true", js("document.documentElement.scrollWidth<=innerWidth && document.documentElement.scrollHeight<=innerHeight"));
         assertEquals("true", js("document.getElementById('table').scrollLeft===0 && document.getElementById('table').scrollTop===0"));
-        assertEquals("true", js("(()=>{const r=document.getElementById('buyBtn').getBoundingClientRect();return r.right<innerWidth*.25&&r.height>r.width*1.8})()"));
+        assertEquals("true", js("(()=>{const r=document.getElementById('pile').getBoundingClientRect(),d=document.getElementById('discard').getBoundingClientRect(),b=document.getElementById('buyBtn').getBoundingClientRect();return b.right<d.left-8&&d.left-b.right<35&&r.height>r.width*1.8&&b.width>=44})()"));
         assertEquals("true", js("(()=>{const bg=document.getElementById('stoveScene').getBoundingClientRect(),f=document.getElementById('burner').getBoundingClientRect();return Math.abs(f.x+f.width/2-(bg.x+bg.width*836/1672))<1&&Math.abs(f.y+f.height/2-(bg.y+bg.height*451/941))<1&&Math.abs(f.width-f.height)<1})()"));
         Bitmap bitmap = InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();
         assertNotNull("Captura Android da mesa", bitmap);
@@ -180,6 +180,50 @@ public class OfflineGameTest {
         captureTable("portrait");
         assertEquals("true", js("document.documentElement.scrollWidth<=innerWidth"));
         assertEquals("4", js("CartasTest.getState().players.length"));
+    }
+    boolean barsVisible() {
+        AtomicReference<Boolean> visible = new AtomicReference<>(true);
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            android.view.View decor = activity.getActivity().getWindow().getDecorView();
+            androidx.core.view.WindowInsetsCompat insets = androidx.core.view.ViewCompat.getRootWindowInsets(decor);
+            assertNotNull("Insets nativos", insets);
+            visible.set(insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.statusBars()) || insets.isVisible(androidx.core.view.WindowInsetsCompat.Type.navigationBars()));
+        });
+        return visible.get();
+    }
+    void waitBars(boolean expected) {
+        long until = SystemClock.uptimeMillis() + 15000;
+        while (barsVisible() != expected && SystemClock.uptimeMillis() < until) SystemClock.sleep(150);
+        assertEquals("Visibilidade das barras do sistema", expected, barsVisible());
+    }
+    @Test public void e_immersiveAndReturnToMenu() throws Exception {
+        startControlled(); waitBars(false);
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            android.view.View decor = activity.getActivity().getWindow().getDecorView();
+            androidx.core.view.WindowInsetsControllerCompat control = androidx.core.view.WindowCompat.getInsetsController(activity.getActivity().getWindow(), decor);
+            assertEquals(androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE, control.getSystemBarsBehavior());
+            androidx.core.graphics.Insets cutout = androidx.core.view.ViewCompat.getRootWindowInsets(decor).getInsets(androidx.core.view.WindowInsetsCompat.Type.displayCutout());
+            assertTrue(decor.getPaddingLeft() >= cutout.left && decor.getPaddingTop() >= cutout.top && decor.getPaddingRight() >= cutout.right && decor.getPaddingBottom() >= cutout.bottom);
+            control.show(androidx.core.view.WindowInsetsCompat.Type.systemBars());
+        });
+        waitBars(true);
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activity.getActivity().setGamePlaying(true));
+        waitBars(false);
+        tap("#tableMenuBtn");tap("#backBtn");waitFor("document.getElementById('menu').getClientRects().length>0",15000);waitBars(true);
+    }
+    @Test public void f_distributionGiroAndClock() throws Exception {
+        startControlled();
+        js("(()=>{const s=CartasTest.getState();Object.assign(s,{phase:'playing',current:0,penalty:20,highest:6,finisher:null,unlockAt:0,cutOpen:false,pendingAction:null,activeColor:'blue',deadline:0,token:s.token+1});s.o.duo=false;s.o.timeout=0;s.players.forEach((p,a)=>p.hand=Array.from({length:10},(_,i)=>({id:87000+a*100+i,type:'num',color:'green',num:7})));s.players[0].hand.push({id:87900,type:'dist',color:null});s.discard=[{id:87901,type:'num',color:'blue',num:2}];s.deck=Array.from({length:60},(_,i)=>({id:88000+i,type:'num',color:'red',num:1}));window.originalIds=[...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort().join();document.getElementById('useCardArt').onchange()})()");
+        tap("[data-card='87900']");
+        js("document.querySelector('[data-color=blue]').addEventListener('click',()=>CartasTest.getState().token++,{once:true})");
+        tap("[data-color='blue']");
+        assertEquals("true",js("(()=>{const s=CartasTest.getState();return s.players[0].hand.length<=10&&s.players.flatMap(p=>p.hand).length===60&&s.penalty===0&&[...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort().join()===window.originalIds})()"));
+        js("(()=>{const s=CartasTest.getState();Object.assign(s,{phase:'playing',current:0,penalty:0,finisher:null,unlockAt:0,cutOpen:false,pendingAction:null,activeColor:'blue',deadline:0,token:s.token+1});s.players.forEach((p,a)=>p.hand=[{id:89000+a,type:'num',color:'green',num:7}]);s.players[0].hand.push({id:89900,type:'rotate',color:null});document.getElementById('useCardArt').onchange();document.querySelector('[data-card=\"89900\"]').addEventListener('click',()=>s.token++,{once:true})})()");
+        tap("[data-card='89900']");assertEquals("true",js("CartasTest.getState().activeColor==='blue'&&!CartasTest.getState().pendingAction&&document.querySelectorAll('.colorbtn').length===0"));
+        js("(()=>{const s=CartasTest.getState();s.current=0;s.token++;s.unlockAt=0;s.cutOpen=false;s.o.timeout=15;s.deadline=Date.now()+4000;document.getElementById('useCardArt').onchange()})()");
+        waitFor("document.querySelector('#player0 .turn-clock')!==null",15000);
+        waitFor("CartasTest.getState().current!==0",15000);
+        assertEquals("true",js("document.querySelector('#player0 .turn-clock')===null"));
     }
     @Test public void d_writeUpdateSentinels() throws Exception {
         js("localStorage.setItem('panelinha-upgrade-check','preservado-v0.1')");

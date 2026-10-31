@@ -99,8 +99,8 @@ const SHORT={skip:'BLOQ',reverse:'INV',wild:'COR',dist:'DIST',rotate:'GIRO'};
 const WILD=new Set(['wild','wild4','wild6','dist','rotate']);
 const SPECIAL=new Set(['draw2','wild4','wild6','wild','dist','rotate']);
 const VALUE={num:2,draw2:4,skip:4,reverse:4,wild4:6,wild6:8,wild:10,dist:10,rotate:10};
-const CUT_PAUSE_MS=2800; // tempo mínimo antes de o próximo jogador agir; corte aparece imediatamente
-let uid=0,s=null,botTimer=null,ticker=null;
+const CUT_PAUSE_MS=2200; // tempo mínimo antes de o próximo jogador agir; corte aparece imediatamente
+let uid=0,s=null,botTimer=null,cutTimer=null,ticker=null;
 const rnd=n=>Math.floor(Math.random()*n),pick=a=>a[rnd(a.length)];
 function make(type,color=null,num=null){return {id:++uid,type,color,num};}
 function shuffle(a){for(let i=a.length-1;i>0;i--){let j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
@@ -130,32 +130,46 @@ function updateGoals(){const duo=$('mode').value==='duo';$('goal').innerHTML=(du
 $('mode').onchange=updateGoals;$('duration').onchange=updateGoals;updateGoals();
 function settings(){return {duo:$('mode').value==='duo',single:$('duration').value==='single',goal:Number($('goal').value),timeout:Number($('timeout').value),infinite:$('infinite').checked,cut:$('cut').checked,challenge:$('challenge').checked,dist:$('dist').checked,rotate:$('rotate').checked};}
 function names(i){return i===0?'Você':'Bot '+i;}
-function clearJobs(){if(botTimer)clearTimeout(botTimer);botTimer=null;}
+function clearJobs(){if(botTimer)clearTimeout(botTimer);if(cutTimer)clearTimeout(cutTimer);botTimer=null;cutTimer=null;}
 function startMatch(){clearJobs();let o=settings();s={o,players:[0,1,2,3].map(i=>({id:i,hand:[],score:0})),teams:[0,0],deck:[],discard:[],activeColor:null,direction:1,current:0,penalty:0,highest:0,lastPenalty:null,finisher:null,round:0,phase:'playing',drawn:null,cutOpen:false,unlockAt:0,lastActor:null,lastDistribution:null,preUno:false,unoWindow:null,log:[],message:'',deadline:0,pendingAction:null,token:0,reveal:false,summary:[],pastWinners:[],modal:null};$('menu').classList.add('hide');$('game').classList.remove('hide');$('backBtn').classList.remove('hide');PanelasMesa.closeMenu();$('reveal').checked=false;newRound();}
 function top(){return s.discard[s.discard.length-1];}
 function nextActive(from,steps=1){let i=from;for(let st=0;st<steps;st++){let tries=0;do{i=(i+4+s.direction)%4;tries++;}while(s.players[i].hand.length===0&&tries<4);}return i;}
 function refill(){if(s.deck.length||s.discard.length<=1)return;let t=s.discard.pop();s.deck=shuffle(s.discard);s.discard=[t];log('Monte reabastecido com os descartes.');}
-function drawCard(id){refill();let c=s.deck.pop();if(c)s.players[id].hand.push(c);return c||null;}
+function drawCard(id){refill();let c=s.deck.pop();if(c){s.players[id].hand.push(c);PanelasMesa.recordDraw(s,id,c);}return c||null;}
 function drawMany(id,n){let got=0;for(let i=0;i<n;i++){if(!drawCard(id))break;got++;}return got;}
-function redistribute(extra=0,exclude=[]){
-  // Igualdade é obrigatória: cada participante ativo recebe piso(total/n) ou teto(total/n).
-  // Sorteamos as CARTAS e quem recebe as sobras, nunca quantidades arbitrárias.
+function redistribute(extra=0,exclude=[],actor=null){
   const eligible=s.players.filter(p=>p.hand.length>0&&!exclude.includes(p.id));
   if(!eligible.length)return;
+  const cap=actor===null?null:s.players[actor].hand.length;
   let collected=[];
   for(const p of eligible){collected.push(...p.hand);p.hand=[];}
-  let penaltyAdded=0;
-  for(let i=0;i<extra;i++){refill();const c=s.deck.pop();if(!c)break;collected.push(c);penaltyAdded++;}
+  const added=[];
+  for(let i=0;i<extra;i++){refill();const c=s.deck.pop();if(!c)break;collected.push(c);added.push(c);}
   shuffle(collected);
-  const recipients=shuffle([...eligible]);
-  const base=Math.floor(collected.length/recipients.length),leftover=collected.length%recipients.length;
+  // Sorteia a quantidade do autor dentro de seu limite. As demais quantidades
+  // são intervalos entre cortes aleatórios do total restante; zeros são possíveis.
+  const counts=new Map();let remaining=collected.length;
+  const author=eligible.find(p=>p.id===actor);
+  if(author){const n=rnd(Math.min(cap,remaining)+1);counts.set(actor,n);remaining-=n;}
+  const others=shuffle(eligible.filter(p=>p!==author));
+  // Quando existe somente o autor, conservar a mão é a única partilha possível.
+  if(author&&!others.length){counts.set(actor,collected.length);remaining=0;}
+  const cuts=[0,...Array.from({length:Math.max(0,others.length-1)},()=>rnd(remaining+1)),remaining].sort((a,b)=>a-b);
+  others.forEach((p,i)=>counts.set(p.id,cuts[i+1]-cuts[i]));
   let offset=0;
-  recipients.forEach((p,i)=>{const count=base+(i<leftover?1:0);p.hand=collected.slice(offset,offset+count);offset+=count;});
-  const counts=eligible.map(p=>`${names(p.id)}: ${p.hand.length}`).join(' · ');
-  const sizes=eligible.map(p=>p.hand.length);
-  if(Math.max(...sizes)-Math.min(...sizes)>1||offset!==collected.length)throw Error('Distribuidora desigual: estado inválido');
-  s.lastDistribution={counts,penaltyAdded,active:eligible.map(p=>p.id)};
-  log(`Distribuidora IGUALITÁRIA (${counts})${extra?` · punição: ${penaltyAdded}/${extra} cartas adicionadas`:''}.`);
+  for(const p of eligible){const n=counts.get(p.id)||0;p.hand=collected.slice(offset,offset+n);offset+=n;}
+  if(offset!==collected.length||(author&&author.hand.length>cap))throw Error('Distribuidora: conservação/limite inválido');
+  const penaltyIds=new Set(added.map(c=>c.id));
+  for(const p of eligible)for(const c of p.hand)if(penaltyIds.has(c.id))PanelasMesa.recordDraw(s,p.id,c);
+  const text=eligible.map(p=>`${names(p.id)}: ${p.hand.length}`).join(' · ');
+  s.lastDistribution={counts:text,penaltyAdded:added.length,active:eligible.map(p=>p.id),actor,actorLimit:cap,total:collected.length};
+  // Preserva o finalizador anterior. Novos zeros simultâneos seguem autor/sentido.
+  if(s.finisher===null){
+    const first=actor===null?s.current:actor;
+    for(let i=0;i<4;i++){const id=(first+i*s.direction+4)%4;if(eligible.some(p=>p.id===id)&&s.players[id].hand.length===0){s.finisher=id;break;}}
+  }
+  if(s.unoWindow&&s.players[s.unoWindow.id].hand.length!==1)s.unoWindow=null;
+  log(`Distribuidora ALEATÓRIA (${text})${extra?` · punição: ${added.length}/${extra} cartas adicionadas`:''}.`);
 }
 function rotateHands(exclude=[]){let order=[];for(let i=0;i<4;i++)if(s.players[i].hand.length>0&&!exclude.includes(i))order.push(i);if(order.length<2)return;const next={};for(const id of order){let to=id;let count=0;do{to=(to+4+s.direction)%4;count++;}while(!order.includes(to)&&count<4);next[to]=s.players[id].hand;}for(let id of order)s.players[id].hand=next[id];log(`Giro: mãos transferidas no sentido ${s.direction===1?'horário':'anti-horário'}.`);}
 function newRound(){clearJobs();s.token++;s.round++;s.players.forEach(p=>p.hand=[]);s.deck=buildDeck(s.o);s.discard=[];s.direction=1;s.current=0;s.penalty=0;s.highest=0;s.lastPenalty=null;s.finisher=null;s.drawn=null;s.preUno=false;s.unoWindow=null;s.cutOpen=false;s.unlockAt=0;s.lastActor=null;s.lastDistribution=null;s.pendingAction=null;s.phase='playing';s.message='';for(let j=0;j<7;j++)for(const p of s.players)drawCard(p.id);let first=s.deck.pop();s.discard.push(first);s.activeColor=first.color||pick(COLORS);log(`Rodada ${s.round}: carta inicial ${description(first)}.`);
@@ -164,7 +178,7 @@ else if(first.type==='reverse'){s.direction=-1;s.current=3;log('Inverter inicial
 else if(power(first)){s.penalty=power(first);s.highest=power(first);log(`Penalidade inicial de +${s.penalty}.`);}
 else if(first.type==='dist')redistribute();
 else if(first.type==='rotate')rotateHands();
-startTurn();}
+if(s.finisher!==null){finishRound();return;}startTurn();}
 function startTurn(pauseMs=0){
   if(!s||s.phase!=='playing')return;
   s.drawn=null;s.preUno=false;s.token++;
@@ -175,18 +189,24 @@ function startTurn(pauseMs=0){
 }
 function canActNow(){return !!s&&Date.now()>=s.unlockAt;}
 function findHumanCut(){
-  if(!s||s.phase!=='playing'||!s.o.cut||!s.cutOpen||s.finisher!==null||s.current===0||s.pendingAction)return null;
+  if(!s||s.phase!=='playing'||!s.o.cut||!s.cutOpen||Date.now()>=s.unlockAt||s.finisher!==null||s.current===0||s.pendingAction)return null;
   return s.players[0].hand.find(c=>equals(c,top())&&canPlay(c))||null;
 }
 function penaltyText(){return `PENALIDADE +${s.penalty}: é obrigatório comprar ${s.penalty} cartas e perder o turno, ou rebater com +${s.highest} ou maior${s.o.dist?' / Distribuidora':''}. Não é permitido jogar cartas comuns.`;}
 
 function closeUnoOnAction(){if(s.unoWindow)s.unoWindow=null;}
-function canPlay(c){if(s.penalty){return (power(c)>0&&power(c)>=s.highest)||c.type==='dist';}let t=top();if(isWild(c))return true;return c.color===s.activeColor||(!isWild(t)&&c.type===t.type&&(c.type==='num'?c.num===t.num:true));}
+function canDistribute(c){
+  if(!s.penalty)return true;
+  const author=s.players.find(p=>p.hand.some(q=>q.id===c.id));
+  // Sem outro destinatário, o excedente não cabe sem violar o limite do autor.
+  return !author||author.hand.length===1||s.players.some(p=>p.id!==author.id&&p.hand.length>0);
+}
+function canPlay(c){if(s.penalty){return (power(c)>0&&power(c)>=s.highest)||(c.type==='dist'&&canDistribute(c));}let t=top();if(isWild(c))return true;return c.color===s.activeColor||(!isWild(t)&&c.type===t.type&&(c.type==='num'?c.num===t.num:true));}
 function checkCards(id,ids,isCut){
   if(!s||s.phase!=='playing'||ids.length!==1)return false;
   const c=s.players[id].hand.find(q=>q.id===ids[0]);
   if(!c)return false;
-  if(isCut)return !!(s.o.cut&&s.cutOpen&&s.finisher===null&&id!==s.current&&equals(c,top())&&canPlay(c));
+  if(isCut)return !!(s.o.cut&&s.cutOpen&&Date.now()<s.unlockAt&&s.finisher===null&&id!==s.current&&equals(c,top())&&canPlay(c));
   if(id!==s.current||!canActNow())return false;
   if(s.drawn!==null&&ids[0]!==s.drawn)return false;
   return canPlay(c); // Se há punição, SOMENTE + válido ou Distribuidora.
@@ -199,7 +219,7 @@ function chooseCards(id,ids){
   }
   const c=s.players[id].hand.find(x=>x.id===ids[0]);
   const ending=s.players[id].hand.length===1;
-  if(isWild(c)&&!ending){s.pendingAction={id,ids,isCut};clearJobs();showColors();return;}
+  if(isWild(c)&&c.type!=='rotate'&&!ending){s.pendingAction={id,ids,isCut};clearJobs();showColors();return;}
   applyPlay(id,ids,isCut,s.activeColor);
 }
 function applyPlay(id,ids,isCut,color){
@@ -212,7 +232,7 @@ function applyPlay(id,ids,isCut,color){
   const illegal=(c.type==='wild4'||c.type==='wild6')&&p.hand.some(q=>q.id!==c.id&&q.type!=='wild4'&&q.type!=='wild6'&&canPlay(q));
   closeUnoOnAction();
   p.hand=p.hand.filter(q=>q.id!==c.id);
-  s.discard.push(c);s.activeColor=c.color||color||s.activeColor;
+  s.discard.push(c);if(c.type!=='rotate')s.activeColor=c.color||color||s.activeColor;
   s.drawn=null;s.pendingAction=null;s.lastActor=id;s.lastDistribution=null;
   log(`${names(id)} ${isCut?'CORTOU com':'jogou'} ${description(c)}${!c.color&&p.hand.length?' (cor: '+CN[s.activeColor]+')':''}.`);
   if(p.hand.length===1){const announced=(id===0?s.preUno:Math.random()<.75);if(announced){log(`${names(id)} anunciou ÚLTIMA CARTA.`);}else{s.unoWindow={id};log(`${names(id)} ficou com 1 carta sem anunciar!`);}}
@@ -225,15 +245,15 @@ function applyPlay(id,ids,isCut,color){
     log(`Penalidade acumulada: +${s.penalty}${repeatedOwnCut?' (segunda cópia, sem novo efeito)':''}.`);
   }else if(c.type==='dist'){
     const extra=s.penalty;s.penalty=0;s.highest=0;s.lastPenalty=null;
-    if(!repeatedOwnCut&&!(s.o.duo&&s.finisher!==null))redistribute(extra,[s.finisher].filter(x=>x!==null));
+    if(!repeatedOwnCut&&!(s.o.duo&&s.finisher!==null))redistribute(extra,[s.finisher].filter(x=>x!==null),id);
   }else if(c.type==='rotate'){
     if(!repeatedOwnCut&&!(s.o.duo&&s.finisher!==null))rotateHands([s.finisher].filter(x=>x!==null));
   }else{s.lastPenalty=null;}
   if(c.type==='reverse'&&!repeatedOwnCut)s.direction*=-1;
   if(s.finisher!==null&&(!s.penalty||s.players.every(q=>q.hand.length===0))){finishRound();return true;}
   s.current=nextActive(id,c.type==='skip'?2:1);
-  s.message=c.type==='dist'&&s.lastDistribution?'Distribuidora igualitária: '+s.lastDistribution.counts:(isCut?'Corte executado. A sequência agora segue de quem cortou.':'');
-  startTurn($('quickBots').checked?420:CUT_PAUSE_MS); // corte imediato; próximo jogador aguarda a pausa.
+  s.message=c.type==='dist'&&s.lastDistribution?'Distribuidora aleatória: '+s.lastDistribution.counts:(isCut?'Corte executado. A sequência agora segue de quem cortou.':'');
+  startTurn(CUT_PAUSE_MS); // corte imediato; próximo jogador aguarda a pausa.
   return true;
 }
 function finishPenaltyDraw(id){clearJobs();closeUnoOnAction();let amount=s.penalty;let got=drawMany(id,amount);log(`${names(id)} comprou ${got} cartas da penalidade (+${amount}) e perdeu o turno.`);s.penalty=0;s.highest=0;s.lastPenalty=null;if(s.finisher!==null){finishRound();return;}s.current=nextActive(id);startTurn();}
@@ -266,6 +286,12 @@ function victories(id){return s.pastWinners?s.pastWinners.filter(x=>x===id).leng
 function queueBots(){
   clearJobs();if(!s||s.phase!=='playing'||s.pendingAction)return;
   const token=s.token;
+  if(s.current!==0&&s.cutOpen&&s.finisher===null){
+    cutTimer=setTimeout(()=>{
+      if(!s||s.token!==token||s.phase!=='playing'||s.pendingAction||Date.now()>=s.unlockAt)return;
+      if(Math.random()<.22){const candidates=s.players.filter(p=>p.id!==s.current&&p.id!==0).flatMap(p=>p.hand.filter(c=>equals(c,top())&&canPlay(c)).map(c=>({id:p.id,card:c})));if(candidates.length){const cut=pick(candidates);applyPlay(cut.id,[cut.card.id],true,cut.card.color||pick(COLORS));}}
+    },Math.min(700,Math.max(0,s.unlockAt-Date.now()-1)));
+  }
   if(s.current!==0){
     const minimum=s.unlockAt-Date.now()+20;
     const botDelay=$('quickBots').checked?300:700;
@@ -276,8 +302,6 @@ function queueBots(){
   },850);}
 }
 function botTurn(){if(!s||s.phase!=='playing'||s.current===0||s.pendingAction)return;if(!canActNow()){queueBots();return;}let id=s.current;
-// Bots occasionally exercise the cut rule before the next bot acts.
-if(s.o.cut&&s.finisher===null&&Math.random()<.22){let candidates=s.players.filter(p=>p.id!==id&&p.id!==0).flatMap(p=>p.hand.filter(c=>equals(c,top())&&canPlay(c)).map(c=>({id:p.id,card:c})));if(candidates.length){let cut=pick(candidates);applyPlay(cut.id,[cut.card.id],true,cut.card.color||pick(COLORS));return;}}
 const p=s.players[id];let choices=p.hand.filter(canPlay);let chosen=null;
 if(s.penalty){let defending=choices.filter(c=>power(c));let distributed=choices.find(c=>c.type==='dist');if(distributed&&(!defending.length||s.penalty>=8))chosen=distributed;else if(defending.length)chosen=defending.sort((a,b)=>power(a)-power(b))[0];else chosen=distributed||null;}
 else if(choices.length){let numeric=choices.filter(c=>c.type==='num');let colored=choices.filter(c=>!isWild(c)&&c.type!=='num');let regularWild=choices.filter(c=>c.type==='wild');let specials=choices.filter(c=>isWild(c)&&c.type!=='wild');chosen=pick(numeric.length?numeric:colored.length?colored:regularWild.length?regularWild:specials);}
@@ -304,7 +328,7 @@ function render(){if(!s)return;PanelasMesa.beforeRender(s);$('roundLabel').textC
 $('score').innerHTML=s.o.duo?`<span>Você + Bot 2: ${s.teams[0]}</span><span>Bot 1 + Bot 3: ${s.teams[1]}</span>`:s.players.map(p=>`<span>${names(p.id)}: ${p.score}</span>`).join('');
 $('stateText').textContent=s.phase==='playing'?`Sentido: ${s.direction===1?'horário':'anti-horário'} · Cor: ${CN[s.activeColor]} · Monte: ${s.deck.length} · ${s.penalty?'PENALIDADE OBRIGATÓRIA +'+s.penalty:'Sem penalidade'}${s.o.timeout&&s.deadline?' · Tempo: '+Math.max(0,Math.ceil((s.deadline-Date.now())/1000))+'s':''}`:s.message;
 for(let i=0;i<4;i++){const p=s.players[i],active=s.current===i&&s.phase==='playing';const show=s.reveal||(s.o.duo&&i===2);let node=$('player'+i);node.classList.toggle('active',active);node.innerHTML=`<div class="name">${names(i)} ${active?'⏳':''}${s.o.duo?' <span class="tag">'+(i%2?'B':'A')+'</span>':''}</div><div class="sub">${p.hand.length} cartas${i===0?'':' · bot'}</div>${i!==0?(show?'<div class="subhand">'+p.hand.map(c=>cardHTML(c,true)).join('')+'</div>':'<div class="back">'+'▰ '.repeat(Math.min(6,p.hand.length))+'</div>'):''}`;}
-$('pile').innerHTML=`<div class="card" style="background:#283f68;color:#b9d1ff;border:2px solid #718cbb"><small>MONTE</small><span>⬚</span><small>${s.deck.length}</small></div>`;$('discard').innerHTML=cardHTML(top());$('centerMsg').innerHTML=`Cor: <strong>${CN[s.activeColor]}</strong><div>${s.penalty?'⚠️ OBRIGATÓRIO +'+s.penalty:'Carta central'}</div>`;
+$('pile').innerHTML=`<div class="card" style="background:#283f68;color:#b9d1ff;border:2px solid #718cbb"><small>MONTE</small><span>⬚</span><small>${s.deck.length}</small></div>`;$('discard').innerHTML=PanelasMesa.discardHTML(s.discard,cardHTML,s);$('centerMsg').innerHTML=`Cor: <strong>${CN[s.activeColor]}</strong><div>${s.penalty?'⚠️ OBRIGATÓRIO +'+s.penalty:'Carta central'}</div>`;
 $('handCount').textContent=s.players[0].hand.length+' cartas';
 const cards=[...s.players[0].hand].sort((a,b)=>(COLORS.indexOf(a.color)+1||9)-(COLORS.indexOf(b.color)+1||9)||a.type.localeCompare(b.type)||(a.num??0)-(b.num??0));
 const locked=s.phase==='playing'&&s.current===0&&!canActNow();
@@ -335,14 +359,14 @@ if(s.phase!=='playing'){
 }
 $('message').textContent=s.message||'Toque em uma carta para jogá-la. Se tiver carta idêntica, a faca aparece na carta idêntica imediatamente após o descarte.';$('history').innerHTML=s.log.slice(0,40).map(x=>`<div>${x.replaceAll('<','&lt;').replaceAll('>','&gt;')}</div>`).join('');
 if(s.phase!=='playing')$('buyBtn').disabled=true;
-PanelasMesa.render(s);$('hand').scrollLeft=handScroll;
+PanelasMesa.render(s,handScroll);
 $('cutBtn')?.scrollIntoView({block:'nearest',inline:'nearest'});}
 function backToMenu(){clearJobs();s=null;$('menu').classList.remove('hide');$('game').classList.add('hide');$('backBtn').classList.add('hide');$('modalRoot').innerHTML='';PanelasMesa.reset();}
 $('useCardArt').onchange=()=>{if(s)render();};$('startBtn').onclick=startMatch;$('backBtn').onclick=backToMenu;$('reveal').onchange=()=>{if(s){s.reveal=$('reveal').checked;render();}};
 $('injectBtn').onclick=()=>{if(!s||s.phase!=='playing')return;let type=$('injectType').value,color=$('injectColor').value;s.players[0].hand.push(make(type,(['num','draw2','skip','reverse'].includes(type)?color:null),type==='num'?7:null));log(`Teste: carta ${TYPES[type]} adicionada à sua mão.`);render();};
 $('testPenalty').onclick=()=>{if(!s||s.phase!=='playing'||s.finisher!==null)return;clearJobs();s.current=0;s.penalty=20;s.highest=2;s.lastPenalty=null;s.drawn=null;s.cutOpen=false;s.unlockAt=0;s.deadline=s.o.timeout?Date.now()+s.o.timeout*1000:0;s.token++;log('Teste: penalidade acumulada +20 direcionada a você.');render();};
 // Atualiza cronômetro sem recriar toda a interface. Estouro: compra automática e turno perdido.
-ticker=setInterval(()=>{if(!s||s.phase!=='playing')return;if(s.current===0&&s.unlockAt&&Date.now()>=s.unlockAt){s.unlockAt=0;render();}
+ticker=setInterval(()=>{if(!s||s.phase!=='playing')return;PanelasMesa.updateClock(s,Date.now());if(s.cutOpen&&Date.now()>=s.unlockAt){s.cutOpen=false;render();}if(s.current===0&&s.unlockAt&&Date.now()>=s.unlockAt){s.unlockAt=0;render();}
 if(s.o.timeout&&s.deadline){let left=Math.max(0,Math.ceil((s.deadline-Date.now())/1000));let el=$('stateText');if(el){let base=`Sentido: ${s.direction===1?'horário':'anti-horário'} · Cor: ${CN[s.activeColor]} · Monte: ${s.deck.length} · ${s.penalty?'PENALIDADE +'+s.penalty:'Sem penalidade'}`;el.textContent=base+' · Tempo: '+left+'s';}
 if(left===0&&!s.pendingAction&&canActNow()){let id=s.current;clearJobs();s.token++;log(`Tempo de ${names(id)} esgotado.`);if(s.penalty){finishPenaltyDraw(id);}else{closeUnoOnAction();drawMany(id,1);s.current=nextActive(id);startTurn();}}}},250);
 // Ganchos de inspeção para testes automatizados pelo Codex.

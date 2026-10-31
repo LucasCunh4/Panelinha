@@ -25,7 +25,7 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
    const layout=await page.evaluate(()=>{
     const pile=document.getElementById('buyBtn').getBoundingClientRect(),discard=document.getElementById('discard').getBoundingClientRect();
     const m=id=>getComputedStyle(document.querySelector(`#${id} .back`)).transform;
-    return {vertical:pile.height>pile.width*1.8,left:pile.right<innerWidth*.25&&pile.right<discard.left-20,
+    return {vertical:document.getElementById('pile').getBoundingClientRect().height>document.getElementById('pile').getBoundingClientRect().width*1.8,left:pile.right<discard.left-8&&discard.left-pile.right<35,
      panels:[1,2,3].every(i=>{const st=getComputedStyle(document.getElementById('player'+i));return st.backgroundColor==='rgba(0, 0, 0, 0)'&&st.boxShadow==='none'}),
      leftAngle:m('player3'),rightAngle:m('player1')};
    });
@@ -37,7 +37,7 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
   const flame=await page.locator('.flame-red').evaluate(el=>({mask:getComputedStyle(el).webkitMaskImage,iterations:el.getAnimations().filter(a=>a.effect.getTiming().iterations===Infinity).length}));
   assert.match(flame.mask,/radial-gradient/);assert.equal(flame.iterations,2);
   await page.locator('.flame-red').evaluate(el=>Promise.all(el.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished)));
-  assert.equal(await page.locator('.flame-red').evaluate(el=>getComputedStyle(el).opacity),'0.66');
+  assert.equal(await page.locator('.flame-red').evaluate(el=>getComputedStyle(el).opacity),'0.74');
   console.log('PASS encurtamento radial das pontas, intensidade menor e duas oscilações contínuas suaves por CSS');
   await page.locator('#unoBtn').tap();
   await page.locator('[data-card="70100"]').evaluate(button=>button.addEventListener('click',()=>{const r=button.querySelector('.card').getBoundingClientRect();window.expectedFlightOrigin={x:r.x+r.width/2,y:r.y+r.height/2}},{once:true,capture:true}));
@@ -51,23 +51,23 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
   assert.equal(await page.evaluate(()=>CartasTest.getState().players[0].hand.length),1);
   assert.ok(await page.locator('#discard').evaluate(el=>el.classList.contains('receiving-card')));
   assert.equal(await human.evaluate(el=>getComputedStyle(el).pointerEvents),'none');
-  assert.ok(await page.evaluate(()=>CartasTest.getState().unlockAt-Date.now()>2600));
-  await human.evaluate(el=>{const a=el.getAnimations()[0];a.pause();a.currentTime=280});
+  assert.ok(await page.evaluate(()=>CartasTest.getState().unlockAt-Date.now()>2000));
+  await human.evaluate(el=>{const a=el.getAnimations()[0];a.pause();a.currentTime=180});
   const midway=await human.boundingBox();const mx=midway.x+midway.width/2,my=midway.y+midway.height/2;
   assert.ok(Math.hypot(mx-origin.x,my-origin.y)>20&&Math.hypot(mx-Number(coordinates.targetX),my-Number(coordinates.targetY))>20);
   await page.screenshot({path:path.join(evidence,'voo-humano-meio.png')});
   await human.evaluate(el=>el.getAnimations()[0].play());await finishFlights();
-  assert.equal(await page.locator('.played-card').count(),0);assert.ok(await page.locator('#discard>.card').isVisible());
+  assert.equal(await page.locator('.played-card').count(),0);assert.ok(await page.locator('#discard .discard-top .card').isVisible());
   console.log('PASS carta humana parte da posição real da mão, voa em arco e pousa; motor/pausa continuam independentes');
   for(const actor of [1,2,3]){
-   await page.clock.runFor(3000);
+   await page.clock.runFor(2240);
    const flight=page.locator(`.played-card[data-actor="${actor}"]`);await flight.waitFor();
    const actual=await flight.evaluate(el=>({...el.dataset}));
    assert.equal(Number(actual.cardId),70100+actor);
    assert.equal(await flight.locator('.flight-back').count(),actor===2?0:1);
    assert.equal(await flight.locator('.flight-front .card-image').count(),1);
    assert.ok(await page.evaluate(actor=>actor===2||!document.querySelector(`#player${actor} .card-image`),actor));
-   await flight.evaluate(el=>{const a=el.getAnimations()[0];a.pause();a.currentTime=280});
+   await flight.evaluate(el=>{const a=el.getAnimations()[0];a.pause();a.currentTime=180});
    await page.screenshot({path:path.join(evidence,`voo-bot-${actor}-meio.png`)});
    await flight.evaluate(el=>el.getAnimations()[0].play());await finishFlights();
   }
@@ -75,13 +75,13 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
   await fixture();await page.evaluate(()=>{CartasTest.getState().o.duo=false;document.querySelector('#useCardArt').onchange()});
   assert.match(await page.locator('#player2 .back').evaluate(el=>getComputedStyle(el).transform),/matrix\(-1, 0, 0, -1,/);
   await page.locator('#unoBtn').tap();await page.locator('[data-card="70100"]').tap();await finishFlights();
-  for(const actor of [1,2]){await page.clock.runFor(3000);const f=page.locator(`.played-card[data-actor="${actor}"]`);await f.waitFor();assert.equal(await f.locator('.flight-back').count(),1);await finishFlights();}
+  for(const actor of [1,2]){await page.clock.runFor(2240);const f=page.locator(`.played-card[data-actor="${actor}"]`);await f.waitFor();assert.equal(await f.locator('.flight-back').count(),1);await finishFlights();}
   console.log('PASS individual: mão superior fechada, orientada a 180 graus, com verso até a carta sair da mão');
   await fixture();await page.locator('#unoBtn').tap();await page.locator('[data-card="70100"]').tap();
   assert.equal(await page.locator('.played-card').count(),1);
   const before=await page.evaluate(()=>JSON.stringify(CartasTest.getState()));
   await page.setViewportSize({width:844,height:390});await page.waitForFunction(()=>document.querySelectorAll('.played-card').length===0);
-  assert.equal(await page.evaluate(()=>JSON.stringify(CartasTest.getState())),before);assert.ok(await page.locator('#discard>.card').isVisible());
+  assert.equal(await page.evaluate(()=>JSON.stringify(CartasTest.getState())),before);assert.ok(await page.locator('#discard .discard-top .card').isVisible());
   console.log('PASS rotação encerra somente o efeito visual e conserva o estado/descartes');
   // Reproduz a rolagem de foco de WebViews que ainda não suportam overflow:clip.
   await page.setViewportSize({width:390,height:844});await page.addStyleTag({content:'.table{overflow:hidden}'});await fixture();
@@ -92,7 +92,7 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
   console.log('PASS foco/toque não desloca a mesa, inclusive no fallback sem overflow:clip');
   await page.emulateMedia({reducedMotion:'reduce'});await fixture();
   await page.waitForFunction(()=>document.querySelector('.flame-red').getAnimations().length===0);
-  await page.locator('[data-card="70100"]').tap();assert.equal(await page.locator('.played-card').count(),0);assert.ok(await page.locator('#discard>.card').isVisible());
+  await page.locator('[data-card="70100"]').tap();assert.equal(await page.locator('.played-card').count(),0);assert.ok(await page.locator('#discard .discard-top .card').isVisible());
   assert.equal(await page.evaluate(()=>CartasTest.getState().players[0].hand.length),1);
   assert.deepEqual(errors,[]);console.log('PASS movimento reduzido: chama estática e jogadas imediatas visíveis, sem exceções JS');
  }finally{await browser.close()}

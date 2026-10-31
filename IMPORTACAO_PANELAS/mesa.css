@@ -160,3 +160,57 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 @media(prefers-reduced-motion:reduce){.flame{animation:none!important;transform:none!important;filter:saturate(.84) brightness(.86)}}
 
 .hand button:not(:disabled):hover .card {transform:none}
+
+/* Atualização da mesa: dimensões, pilha física e efeitos ligados ao estado. */
+.table {--card-width:clamp(48px,7.9vh,80px);--discard-width:calc(var(--card-width)*1.08);--pile-width:calc(var(--card-width)*.66);--opponent-card:clamp(32px,4.9vh,46px)}
+.burner {transform:translate(-50%,-50%) scale(var(--heat-scale,1));filter:brightness(var(--heat-brightness,1));transition:transform 420ms ease,filter 420ms ease}
+.table[data-active-color=red] .flame-red,.table[data-active-color=blue] .flame-blue,.table[data-active-color=green] .flame-green,.table[data-active-color=yellow] .flame-yellow {opacity:var(--heat-opacity,.74)}
+.flame {transition:opacity 420ms ease}
+.table>.draw-stack {left:calc(50% - var(--discard-width)*.5 - 32px - max(44px,var(--pile-width)));top:calc(var(--burner-y) - 36px);right:auto;transform:translateY(-50%)}
+#buyBtn {min-width:44px;min-height:44px;display:flex;justify-content:center;align-items:center}
+#pile {width:var(--pile-width);height:calc(var(--pile-width)*2.025)}
+#pile .card {width:var(--pile-width);min-width:var(--pile-width);height:calc(var(--pile-width)*2.025)}
+#pile .pan-avatar {width:24px}#pile .deck-brand{font-size:5px}#pile .deck-count{font-size:10px;bottom:4px}
+#discard {width:var(--discard-width);height:calc(var(--discard-width)*2.025)}
+#discard::before,#discard::after {display:none}
+.discard-layer {position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#discard .card {width:100%;min-width:0;height:100%;transform:none}
+#discard.receiving-card>.card {visibility:visible}
+.discard-layer.in-flight .card {visibility:hidden}
+.seat.top .subhand {--opponent-card:clamp(36px,5.1vh,52px);height:calc(var(--opponent-card)*2.025 + 26px)}
+.seat.top .back,.seat.top .subhand {width:100%;overflow:hidden;justify-content:center;padding:12px 8px 10px}
+.seat.left,.seat.right {width:calc(var(--opponent-card)*2.025 + 24px);top:calc(var(--burner-y) + clamp(70px,10vh,96px))}
+.seat.left .seat-identity,.seat.right .seat-identity {top:calc(100% + 4px)}
+.back,.subhand {gap:0;scrollbar-width:none}
+.back .hidden-card,.subhand .card {margin-left:0;flex-shrink:0;transition:transform 160ms ease}
+.seat.left .back,.seat.right .back,.seat.left .subhand,.seat.right .subhand {overflow:hidden;padding:10px 8px;height:calc(var(--opponent-card)*2.025 + 20px)}
+.hidden-card {transform:translateY(var(--fan-lift,0px)) rotate(var(--fan-angle,0deg))}
+.hand {height:calc(var(--card-width)*2.025 + 80px);padding-top:56px}
+.hand.scroll-hand {justify-content:center;gap:0}
+.hand.hand-overflow {justify-content:flex-start}
+.hand.scroll-hand>button {transform:none}
+.hand>button {transition:transform 160ms ease}
+.cut-bubble {width:68px;height:68px;right:-14px;top:-42px;isolation:isolate}
+.cut-bubble::before {content:'';position:absolute;inset:-3px;border-radius:50%;background:#ffda7820;border:1px solid #ffdf8a88;z-index:-1}
+.cut-bubble img {pointer-events:none}
+.flying-card {position:fixed;pointer-events:none;transform-origin:50% 50%;will-change:transform}
+.flying-card .card,.flying-card .hidden-card {display:flex;width:100%;min-width:0;height:100%;margin:0!important;transform:none!important;aspect-ratio:auto}
+.flying-card .card-image {width:100%;height:100%;object-fit:contain}
+.flying-card .hidden-card {align-items:center;justify-content:center}.flying-card .hidden-card::after{line-height:1}
+.drawn-card {filter:none}.drawn-card>.deck-back{box-shadow:0 3px 5px #0006}
+.drawing-card>.card,.drawing-card.hidden-card,.drawing-card.card {visibility:hidden}
+.turn-clock {position:absolute;z-index:7;right:-8px;top:-10px;min-width:34px;height:34px;padding:3px;border:2px solid #ffdb7d;border-radius:50%;background:#3c2039ef;color:#fff0ba;font-weight:850;font-size:20px;line-height:24px;box-shadow:0 2px 8px #0008;text-align:center;pointer-events:none}
+.seat.left .turn-clock,.seat.right .turn-clock {right:0;top:-54px}
+.block-effect {position:fixed;inset:0;pointer-events:none;filter:drop-shadow(0 2px 4px #211329)}
+.block-effect>span {position:absolute;transform:translate(-50%,-50%);font-size:64px;line-height:1;color:#ffdf91;text-shadow:0 0 18px #ab4b2a;background:#3d203bda;border-radius:50%;padding:5px}
+@media(orientation:landscape) and (max-height:600px){
+ .table{--card-width:clamp(42px,11.9vh,62px);--opponent-card:clamp(28px,8.5vh,36px)}
+ .table>.draw-stack{left:calc(50% - var(--discard-width)*.5 - 32px - max(44px,var(--pile-width)));top:var(--burner-y)}
+ .seat.top .subhand{--opponent-card:clamp(25px,8.5vh,34px);height:calc(var(--opponent-card)*2.025 + 12px)}
+ .seat.top .back,.seat.top .subhand{padding:5px 8px}
+ .seat.left,.seat.right{top:53%}.seat.left .seat-identity,.seat.right .seat-identity{top:calc(100% + 4px)}
+ .hand{height:calc(var(--card-width)*2.025 + 66px);padding-top:50px}
+ .cut-bubble{width:64px;height:64px;top:-40px}
+ .seat.left .turn-clock,.seat.right .turn-clock{top:-10px}
+}
+@media(prefers-reduced-motion:reduce){.burner{transition:none}.flying-card,.block-effect{display:none}}

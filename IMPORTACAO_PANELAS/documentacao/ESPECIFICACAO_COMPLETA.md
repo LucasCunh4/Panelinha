@@ -74,7 +74,7 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 - Cortes simultâneos: **primeira ação que chegar ao servidor** vence.
 - Quando alguém tem duas cartas idênticas e pretende jogar ambas, nunca selecionar duas e apertar botão 'jogar selecionadas'. Primeiro joga uma, depois aparece imediatamente o comando **CORTAR** sobre a carta idêntica para realizar a segunda jogada.
 - Ao fazer duas jogadas idênticas dessa maneira, **efeito especial só é aplicado UMA vez**. Ex.: duas +2 vermelhas descartadas → punição +2, NÃO +4. A funcionalidade precisa distinguir uma jogada dupla do corte externo de outro jogador para não duplicar indevidamente efeitos.
-- Janela de corte deve surgir rápido; turno dos bots deve ter pausa real suficientemente perceptível (o V2 usa cerca de 2,8 s) para o humano conseguir reagir; sem delays desnecessários fora da janela.
+- Janela de corte de exatamente 2,2 segundos a partir da aplicação da jogada, com expiração verificada pelo relógio do motor. O próximo turno aguarda essa janela; efeitos visuais não bloqueiam cortes nem acrescentam espera.
 - Quando o jogador esvazia a mão, **não pode ocorrer corte posterior para impedir sua vitória**. Resolver apenas penalidades finais pertinentes.
 
 ## 7. Última carta / botão equivalente a UNO
@@ -86,11 +86,14 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 
 ## 8. Distribuidora e Giro
 
-- **Distribuidora (incolor, 2 opcionais):** recolhe as mãos de todos os participantes **ainda com cartas**, mistura e redistribui, com quantidades tão iguais quanto possível (diferença máxima = 1). As sobras são distribuídas aleatoriamente entre os elegíveis. **Nunca** entregar quase todas as cartas a um bot.
-- Se usada para defender-se de uma penalidade +N pendente: retirar N cartas do monte, incluir no pool de redistribuição, redistribuir igualmente e **encerrar completamente** a punição. Ex. +20: acrescentar 20 ao pool, não cobrar +20 de alguém depois.
+- **Distribuidora (incolor, 2 opcionais):** recolhe as mãos dos participantes ainda ativos, embaralha e redistribui **quantidades aleatórias**, incluindo zero, conservando todas as cartas. O autor recebe no máximo a quantidade que tinha imediatamente após jogar a Distribuidora; quem já terminou fica excluído. Os demais não têm limite de igualdade ou equilíbrio.
+- Se usada para defender-se de uma penalidade +N pendente: retirar N cartas do monte, incluir no pool de redistribuição, redistribuir aleatoriamente com o mesmo limite do autor e **encerrar completamente** a punição. Ex. +20: acrescentar 20 ao pool, não cobrar +20 de alguém depois.
 - **Giro (incolor, 2 opcionais):** gira as mãos entre os ainda ativos no sentido corrente; **não pode** ser usado contra penalidade acumulada.
-- Nas jogadas normais, usuário de Distribuidora/Giro escolhe a nova cor. Se sua **última carta** foi uma delas, não precisa selecionar cor; individual: efeito aplica-se entre os outros três antes de calcular classificação. Duplas: equipe vencedora encerra a rodada; não precisa aplicar efeito ao parceiro/outros para pontuação individual inexistente.
+- Nas jogadas normais, usuário de Distribuidora escolhe a nova cor. Giro nunca abre seleção nem altera a cor ativa anterior. Se sua **última carta** foi uma delas, não precisa selecionar cor; individual: efeito aplica-se entre os outros três antes de calcular classificação. Duplas: equipe vencedora encerra a rodada; não precisa aplicar efeito ao parceiro/outros para pontuação individual inexistente.
 - Próximo turno após giro/distribuição normal: jogador seguinte a quem usou a carta, conforme sentido atual.
+
+- Zeros produzidos pela redistribuição usam o encerramento/pontuação existentes. Um finalizador anterior tem prioridade; sem ele, a verificação começa no autor e segue o sentido atual em caso de zeros simultâneos.
+- Caso limite sem outro destinatário ativo: uma Distribuidora não pode absorver penalidade mantendo o limite do autor; essa resposta inviável fica indisponível. O jogador pode rebater com outra carta válida ou comprar a penalidade. Sem penalidade, conservar a mão do único destinatário é a única partilha possível.
 
 ## 9. Rodadas e classificação
 
@@ -164,6 +167,6 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 
 1. Imagens locais não apareceram quando usuário abriu `index.html` diretamente no Android (`file://`): **servir com HTTP** (ex.: `python3 -m http.server 8000` na pasta). Testar caminhos/erros, CSS, script e servidor; verificar em navegador Android real ou equivalente, não apenas assumir que funciona por duplo toque.
 2. Arte futura: obter PNG individual por carta, na proporção mais larga e detalhes corretos; não fazer novos recortes de pranchas como se fossem assets finais.
-3. Revisar possíveis bugs do V3, com testes automáticos em compras +N, cortes simultâneos, múltiplas cartas idênticas, bot conservador, Distribuidora equitativa e pontuação de final de rodada.
+3. Revisar possíveis bugs do V3, com testes automáticos em compras +N, cortes simultâneos, múltiplas cartas idênticas, bot conservador, Distribuidora aleatória com limite do autor e pontuação de final de rodada.
 4. Definir com usuário critérios residuais de empate e casos extremos de abertura/primeira carta especial sem autor (antes de partida online).
 5. Depois: UI fogão, menus/lobby e só então servidor online/Android, em etapas testáveis.

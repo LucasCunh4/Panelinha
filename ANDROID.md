@@ -86,9 +86,9 @@ O workflow não usa chave de debug descartável. Se faltar algum Secret, ele fal
 
 ## Testes
 
-Testes web existentes continuam disponíveis por HTTP: `node testes/integracao.cjs`, `node testes/mesa.cjs`. O código web original não foi modificado.
+Testes web existentes continuam disponíveis por HTTP: `node testes/integracao.cjs`, `node testes/mesa.cjs`. As mudanças de regras autorizadas e a apresentação usam a mesma fonte web do APK; veja o relatório da atualização atual.
 
-A instrumentação Android (`OfflineGameTest`, 4 testes) verifica no APK real: ausência de rede, decodificação de todos os 52 PNGs, quatro jogadores/três bots, toques Android em carta/Última Carta/corte/compra +20, ação automática de bot e orientações retrato/paisagem. Também grava sentinelas em localStorage/SharedPreferences. A classe `UpdatePersistenceTest` (1 teste) confere essas sentinelas após `adb install -r` de um APK com código maior e a mesma assinatura. O script confirma também que o UID do aplicativo foi preservado.
+A instrumentação Android (`OfflineGameTest`, 6 testes) verifica no APK real: ausência de rede, decodificação de todos os 52 PNGs, quatro jogadores/três bots, toques Android em carta/Última Carta/corte/compra +20, ação automática de bot e orientações retrato/paisagem. Também grava sentinelas em localStorage/SharedPreferences. Acrescenta imersão/retorno ao menu, proteção dos recortes, nova Distribuidora, Giro sem cor e cronômetro. A classe `UpdatePersistenceTest` (1 teste) confere essas sentinelas após `adb install -r` de um APK com código maior e a mesma assinatura. O script confirma também que o UID do aplicativo foi preservado.
 
 ```sh
 bash ferramentas/testar_android.sh primeiro.apk seguinte.apk instrumentacao.apk
@@ -113,3 +113,13 @@ O monte recebe a ação de compra original; a carta com faca recebe a ação de 
 A rodada seguinte refina as chamas por CSS, posiciona a compra à esquerda, dispõe as mãos dos oponentes diretamente na mesa, anima a carta da mão ao descarte e amplia a faca. Implementação, testes e evidências em `testes/REFINAMENTOS_MESA_RESULTADOS.md`; as imagens originais continuam intactas.
 
 O cálculo de versão continua no mesmo workflow e consulta Releases, mas usa a base 2000 e o piso histórico 2004: uma compilação apenas em artefato também precisa superar o código 2003 já instalado. Execuções e tentativas seguintes crescem mesmo sem Release.
+
+## Atualização de regras e mesa após 0.2.14
+
+Distribuidora agora redistribui quantidades aleatórias, com limite da mão do autor após o descarte; Giro preserva a cor ativa e não abre modal. A janela de corte expira em 2200 ms, inclusive no handler. O ticker existente alimenta o indicador dos últimos cinco segundos.
+
+Compras e descarte têm camadas visuais independentes do motor; até três jogadas permanecem representadas mesmo após reciclar o monte. Leques mostram todas as cartas; mãos humanas grandes começam centralizadas e preservam rolagem para acessar qualquer carta. Nenhum PNG foi alterado.
+
+O plugin local `TableWindow` usa `WindowInsetsControllerCompat` durante a mesa, com barras transitórias por gesto. Ao sair para configurações, as barras voltam. O host reserva recortes e teclado; não muda a origem nem o diretório de dados. A versão web ignora a ponte nativa.
+
+Resultados, decisões de casos limite e limitações em `testes/ATUALIZACAO_REGRAS_MESA_RESULTADOS.md`.

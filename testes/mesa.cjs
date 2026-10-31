@@ -49,7 +49,7 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
    await page.evaluate(color=>{CartasTest.getState().activeColor=color;document.querySelector('#useCardArt').onchange()},color);await page.clock.runFor(220);
    await page.locator('.flame').evaluateAll(els=>Promise.all(els.flatMap(el=>el.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished))));
    assert.equal(await page.locator('.flame').evaluateAll(els=>els.filter(el=>Number(getComputedStyle(el).opacity)>.1).length),color?1:0);
-   if(color){await page.locator(`.flame-${color}`).evaluate(el=>Promise.all(el.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished)));assert.equal(await page.locator(`.flame-${color}`).evaluate(el=>getComputedStyle(el).opacity),'0.66');}
+   if(color){await page.locator(`.flame-${color}`).evaluate(el=>Promise.all(el.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished)));assert.equal(await page.locator(`.flame-${color}`).evaluate(el=>getComputedStyle(el).opacity),'0.74');}
   }
   console.log('PASS quatro chamas por estado, crossfade e ausência de chama sem cor ativa');
   await page.setViewportSize({width:390,height:844});await fixture();
@@ -75,21 +75,21 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
    await page.locator('#cutBtn').tap();assert.equal(await page.evaluate(()=>CartasTest.getState().penalty),2);assert.equal(await page.evaluate(()=>CartasTest.getState().players[0].hand.length),1);
   }
   console.log('PASS sequência por toque: +2, anúncio de última carta e corte da segunda cópia, em retrato/paisagem');
-  // Balão tem a carta como único alvo, inclusive fora do turno; mantém pausa de 2,8s.
+  // Balão tem a carta como único alvo, inclusive fora do turno; mantém pausa de 2,2s.
   for(const [width,height] of [[320,568],[390,844],[568,320],[844,390]]){
    await page.setViewportSize({width,height});await fixture();
-   await page.evaluate(()=>{const s=CartasTest.getState();s.current=2;s.cutOpen=true;s.lastActor=1;s.discard=[{id:58000,type:'num',color:'blue',num:4}];s.players[0].hand.push({id:58001,type:'num',color:'blue',num:4});document.querySelector('#useCardArt').onchange()});
+   await page.evaluate(()=>{const s=CartasTest.getState();s.current=2;s.cutOpen=true;s.unlockAt=Date.now()+2200;s.lastActor=1;s.discard=[{id:58000,type:'num',color:'blue',num:4}];s.players[0].hand.push({id:58001,type:'num',color:'blue',num:4});document.querySelector('#useCardArt').onchange()});
    assert.equal(await page.locator('#controls #cutBtn').count(),0);assert.equal(await page.locator('#hand #cutBtn .cut-bubble img').count(),1);
-   const r=await page.locator('#cutBtn .cut-bubble').boundingBox();assert.ok(r.y>=0&&r.y+r.height<=height&&r.width>=58&&r.height>=58);
+   const r=await page.locator('#cutBtn .cut-bubble').boundingBox();assert.ok(r.y>=0&&r.y+r.height<=height&&r.width>=64&&r.height>=64);
    await page.screenshot({path:path.join(evidence,`${width}x${height}-corte.png`)});
    await page.locator('#cutBtn .cut-bubble').tap();assert.equal(await page.evaluate(()=>CartasTest.getState().discard.at(-1).id),58001);
-   assert.ok(await page.evaluate(()=>CartasTest.getState().unlockAt-Date.now()>=2700&&CartasTest.getState().unlockAt-Date.now()<=2800));
+   assert.ok(await page.evaluate(()=>CartasTest.getState().unlockAt-Date.now()>=2000&&CartasTest.getState().unlockAt-Date.now()<=2200));
   }
   console.log('PASS faca na carta elegível, toque no balão e pausa de corte preservada em retrato/paisagem');
   await fixture();await page.evaluate(()=>{const s=CartasTest.getState();s.players[0].hand=Array.from({length:30},(_,i)=>({id:60000+i,type:'num',color:'blue',num:i%10}));s.players[2].hand=Array.from({length:20},(_,i)=>({id:61000+i,type:'num',color:'green',num:i%10}));document.querySelector('#useCardArt').onchange()});
   assert.ok(await page.locator('#hand').evaluate(el=>el.scrollWidth>el.clientWidth&&el.classList.contains('scroll-hand')));
   await page.locator('#hand>button').last().scrollIntoViewIfNeeded();assert.ok(await page.locator('#hand>button').last().evaluate(el=>{const r=el.getBoundingClientRect();return r.right<=innerWidth&&r.bottom<=innerHeight}));
-  assert.ok(await page.locator('#player2 .subhand').evaluate(el=>el.scrollWidth>el.clientWidth));
+  assert.ok(await page.locator('#player2 .subhand').evaluate(el=>el.children.length===20&&el.scrollWidth<=el.clientWidth+1));
   await page.evaluate(()=>{const s=CartasTest.getState();s.o.duo=false;document.querySelector('#useCardArt').onchange()});assert.equal(await page.locator('#player2 .back').count(),1);assert.equal(await page.locator('#player2 .card-image').count(),0);
   await fixture();await page.evaluate(()=>{const s=CartasTest.getState();s.o.single=true;s.o.duo=false;s.players[0].hand=[{id:65000,type:'num',color:'blue',num:3}];document.querySelector('#useCardArt').onchange()});await page.locator('[data-card="65000"]').tap();
   assert.equal(await page.evaluate(()=>CartasTest.getState().phase),'gameOver');assert.ok(await page.locator('#controls').evaluate(el=>{const r=el.getBoundingClientRect();return r.width>200&&r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight}));

@@ -8,6 +8,14 @@
   let snapshot = null, pendingPlay = null;
   let displayedTop = null;
   const flights = new Set();
+  let pendingDraws = [], handLayout = null, nativePlaying = null, clockKey = null;
+  const drawingIds = new Set();
+  let discardTrail=[],trailState=null,trailRound=null,visualSequence=0;
+  function nativeTable(playing) {
+    if (nativePlaying === playing) return;
+    nativePlaying = playing;
+    window.PanelinhaWindow?.setPlaying({playing}).catch(() => {});
+  }
   // WebViews antigos ignoram overflow:clip. Foco/toque não deve deslocar a mesa;
   // as mãos e o menu conservam seus próprios contêineres de rolagem.
   $('table').addEventListener('scroll', () => {
@@ -29,27 +37,126 @@
     return `<span class="pan-avatar" style="--avatar-color:${avatarColors[id]}" aria-hidden="true"><svg viewBox="0 0 72 58" fill="none"><path d="M15 24H5v10h12m40-10h10v10H55" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><path d="M16 23h40l-3 24q-17 10-34 0z" fill="currentColor" stroke="#201326" stroke-width="2"/><path d="M23 28v15" stroke="#fff" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/><path d="M13 23q23-18 46 0z" fill="currentColor" stroke="#201326" stroke-width="2"/><path d="M31 13h10" stroke="#f5e4ff" stroke-width="4" stroke-linecap="round"/>${accessory}</svg></span>`;
   }
 
-  function fan(container, largeAt) {
-    const children = [...container.children];
-    const scroll = children.length > largeAt;
-    container.classList.toggle('scroll-hand', scroll);
-    children.forEach((card, index) => {
-      const position = children.length < 2 ? 0 : (index / (children.length - 1) - .5) * 2;
-      card.style.setProperty('--fan-angle', `${scroll ? 0 : position * 7}deg`);
-      card.style.setProperty('--fan-lift', `${scroll ? 0 : position * position * 7}px`);
+  function fan(container, largeAt, savedScroll) {
+    const cards=[...container.children], n=cards.length;
+    if(!n){container.classList.remove('scroll-hand','hand-overflow');return;}
+    const self=container.id==='hand';
+    const style=getComputedStyle(container);
+    const room=container.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
+    const width=cards[0].offsetWidth;
+    let compact=self&&n>largeAt;
+    let step=n<2?width:Math.min(width*.60,Math.max(0,(room-width-10)/(n-1)));
+    if(self&&step<22)compact=true;
+    if(self&&compact)step=Math.max(24,step);
+    const overflow=self&&width+step*(n-1)>room+1;
+    container.classList.toggle('scroll-hand',compact);
+    container.classList.toggle('hand-overflow',overflow);
+    cards.forEach((card,i)=>{
+      const position=n<2?0:(i/(n-1)-.5)*2;
+      card.style.marginLeft=i?`${step-width}px`:'0px';
+      card.style.setProperty('--fan-angle',`${compact?0:position*(self?6:8)}deg`);
+      card.style.setProperty('--fan-lift',`${compact?0:position*position*(self?6:3)}px`);
     });
-    // Se o leque não couber, mantenha todas as cartas alcançáveis pela rolagem.
-    if (!scroll && container.scrollWidth > container.clientWidth + 1) {
-      container.classList.add('scroll-hand');
-      children.forEach(card => { card.style.setProperty('--fan-angle', '0deg'); card.style.setProperty('--fan-lift', '0px'); });
+    if(self){
+      if(overflow&&(!handLayout||!handLayout.overflow||handLayout.count!==n))container.scrollLeft=(container.scrollWidth-container.clientWidth)/2;
+      else if(savedScroll!==undefined)container.scrollLeft=savedScroll;
+      if(handLayout&&handLayout.compact!==compact&&!reducedMotion.matches)container.animate([{opacity:.82,transform:'translateY(3px)'},{opacity:1,transform:'translateY(0)'}],{duration:140,easing:'ease-out'});
+      handLayout={count:n,overflow,compact};
     }
   }
 
+  function discardPose(id) {
+    return {x:(id*17%9)-4,y:(id*13%5)-2,angle:(id*37%11)-5};
+  }
+  function discardHTML(cards,format,state) {
+    const entry=card=>({card,key:++visualSequence,pose:discardPose(card.id+visualSequence*11)});
+    const latest=cards[cards.length-1],old=discardTrail[discardTrail.length-1];
+    if(trailState!==state||trailRound!==state.round){discardTrail=cards.slice(-3).map(entry);trailState=state;trailRound=state.round;}
+    else if(latest?.id!==old?.card.id){
+      const previousIndex=cards.findIndex(card=>card.id===old?.card.id);
+      discardTrail=previousIndex<0?cards.slice(-3).map(entry):[...discardTrail,...cards.slice(previousIndex+1).map(entry)].slice(-3);
+    }
+    return [...discardTrail].reverse().map(({card,key,pose},i)=>{
+      const x=pose.x-i*7,y=pose.y+i*3,angle=pose.angle-i*3;
+      return `<div class="discard-layer ${i?'discard-under':'discard-top'}" data-discard-id="${card.id}" data-visual-key="${key}" style="z-index:${3-i};transform:translate(${x}px,${y}px) rotate(${angle}deg)">${format(card)}</div>`;
+    }).join('');
+  }
+  function maskCards() {
+    const playing=new Set([...flights].filter(f=>f.kind==='play').map(f=>f.key));
+    document.querySelectorAll('.discard-layer').forEach(node=>node.classList.toggle('in-flight',playing.has(Number(node.dataset.visualKey))));
+    $('discard').classList.toggle('receiving-card',playing.has(Number($('discard').querySelector('.discard-top')?.dataset.visualKey)));
+    document.querySelectorAll('[data-card],[data-hand-card]').forEach(node=>node.classList.toggle('drawing-card',drawingIds.has(Number(node.dataset.card||node.dataset.handCard))));
+  }
+  function handPoint(actor,id) {
+    const seat=$(`player${actor}`),area=actor===0?$('hand'):(seat.querySelector('.subhand,.back')||seat);
+    let node=actor===0?area.querySelector(`[data-card="${id}"]`):area.querySelector(`[data-hand-card="${id}"]`);
+    node=node||area.lastElementChild||area;
+    let angle=(actor===3?90:actor===1?-90:actor===2&&!seat.querySelector('.subhand')?180:0)+rotation(node);
+    if(actor===0)node=node.querySelector('.card')||node;
+    const r=node.getBoundingClientRect(),clip=area.getBoundingClientRect();
+    const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+    return {x:clamp(r.x+r.width/2,Math.max(0,clip.left),Math.min(innerWidth,clip.right)),y:clamp(r.y+r.height/2,Math.max(0,clip.top),Math.min(innerHeight,clip.bottom)),width:node.offsetWidth||r.width,height:node.offsetHeight||r.height,angle,node};
+  }
+  function recordDraw(state,actor,card) {
+    if(!snapshot||snapshot.state!==state||snapshot.round!==state.round||reducedMotion.matches)return;
+    const r=$('pile').getBoundingClientRect();
+    if(!r.width||!r.height)return;
+    pendingDraws.push({actor,id:card.id,x:r.x+r.width/2,y:r.y+r.height/2,width:r.width,height:r.height});
+  }
+  function animateDraws(events,state) {
+    if(!events.length||reducedMotion.matches||typeof $('pile').animate!=='function')return new Map();
+    const count=events.length,ends=new Map();let elapsed=0;
+    const intervals=events.map((_,i)=>4+66*Math.pow(.89,i));
+    const factor=Math.min(1,1000/intervals.reduce((a,b)=>a+b,0));
+    events.forEach((event,i)=>{
+      const delay=elapsed;elapsed+=intervals[i]*factor;
+      const duration=Math.max(180,340-count*2);
+      const end=handPoint(event.actor,event.id),present=state.players[event.actor].hand.some(c=>c.id===event.id);
+      if(!end.width||!end.height)return;
+      const face=event.actor===0||state.reveal||(state.o.duo&&event.actor===2);
+      const sprite=document.createElement('div');sprite.className='drawn-card flying-card';
+      Object.assign(sprite.dataset,{actor:String(event.actor),cardId:String(event.id),sequence:String(i),delay:String(delay),duration:String(duration)});
+      Object.assign(sprite.style,{left:`${event.x-event.width/2}px`,top:`${event.y-event.height/2}px`,width:`${event.width}px`,height:`${event.height}px`});
+      const back=document.createElement('span');back.className='card deck-back';back.innerHTML=panAvatar();sprite.append(back);
+      if(face&&present){const card=end.node.matches('.card')?end.node:end.node.querySelector('.card');if(card){const front=document.createElement('div');front.className='flight-front';front.append(card.cloneNode(true));sprite.append(front);front.animate([{opacity:0},{offset:.4,opacity:0},{opacity:1}],{duration,delay,fill:'both'});}}
+      $('playAnimations').append(sprite);if(present)drawingIds.add(event.id);
+      const dx=end.x-event.x,dy=end.y-event.y,sx=end.width/event.width,sy=end.height/event.height;
+      const animation=sprite.animate([{opacity:0,transform:'translate(0,0) scale(.96)'},{offset:.08,opacity:1,transform:'translate(0,-4px) scale(1)'},{offset:.87,opacity:1,transform:`translate(${dx}px,${dy}px) rotate(${end.angle}deg) scale(${sx*1.035},${sy*1.035})`},{opacity:1,transform:`translate(${dx}px,${dy}px) rotate(${end.angle}deg) scale(${sx},${sy})`}],{duration,delay,easing:'cubic-bezier(.25,.1,.25,1)',fill:'both'});
+      const flight={node:sprite,animation,kind:'draw',id:event.id};flights.add(flight);ends.set(event.id,delay+duration);
+      animation.onfinish=()=>{sprite.remove();flights.delete(flight);drawingIds.delete(event.id);maskCards();};
+    });
+    maskCards();return ends;
+  }
+  function updateClock(state,now=Date.now()) {
+    document.querySelectorAll('.turn-clock').forEach(el=>{if(Number(el.dataset.actor)!==state.current)el.remove();});
+    const remaining=state.deadline-now;
+    if(state.phase!=='playing'||!state.o.timeout||!state.deadline||remaining>5000){document.querySelectorAll('.turn-clock').forEach(el=>el.remove());clockKey=null;return;}
+    const value=Math.max(0,Math.ceil(remaining/1000)),seat=$(`player${state.current}`);
+    let badge=seat.querySelector('.turn-clock');
+    if(!badge){badge=document.createElement('span');badge.className='turn-clock';badge.dataset.actor=String(state.current);badge.setAttribute('role','timer');seat.append(badge);}
+    badge.textContent=String(value);badge.setAttribute('aria-label',`${value} segundos restantes`);
+    const key=`${state.token}:${state.current}:${value}`;
+    if(key!==clockKey&&!reducedMotion.matches)badge.animate([{transform:'scale(1.16)'},{transform:'scale(1)'}],{duration:180,easing:'ease-out'});
+    clockKey=key;
+  }
+  function animateBlock(play,delay) {
+    if(play.blocked===null||reducedMotion.matches)return;
+    const seat=$(`player${play.blocked}`),r=seat.getBoundingClientRect(),cx=innerWidth/2,cy=parseFloat($('table').style.getPropertyValue('--burner-y'));
+    const tx=r.x+r.width/2,ty=r.y+r.height/2;
+    const effect=document.createElement('div');effect.className='block-effect';effect.dataset.blocked=String(play.blocked);
+    effect.innerHTML=`<svg viewBox="0 0 ${innerWidth} ${innerHeight}" width="100%" height="100%"><defs><marker id="blockArrow-${play.id}" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="#ffe4a0"/></marker></defs><line x1="${cx}" y1="${cy}" x2="${tx}" y2="${ty}" stroke="#ffe4a0" stroke-width="3" stroke-dasharray="7 4" marker-end="url(#blockArrow-${play.id})"/></svg><span style="left:${cx}px;top:${cy}px">⊘</span>`;
+    $('playAnimations').append(effect);
+    const animation=effect.animate([{opacity:0},{offset:.22,opacity:1},{offset:.75,opacity:1},{opacity:0}],{duration:850,delay,fill:'both'});
+    const flight={node:effect,animation,kind:'effect'};flights.add(flight);
+    animation.onfinish=()=>{effect.remove();flights.delete(flight);};
+    (seat.querySelector('.seat-identity')||seat).animate([{filter:'brightness(1)'},{offset:.35,filter:'brightness(1.8)',color:'#ffbe9b'},{filter:'brightness(1)'}],{duration:700,delay,easing:'ease-out'});
+  }
+
   function clearFlights() {
-    pendingPlay = null;
+    pendingPlay = null;pendingDraws=[];drawingIds.clear();
     for (const flight of flights) { flight.animation.cancel(); flight.node.remove(); }
     flights.clear();
-    $('discard').classList.remove('receiving-card');
+    $('discard').classList.remove('receiving-card');maskCards();
   }
 
   function rotation(node) {
@@ -74,69 +181,51 @@
     if (!appended || !Number.isInteger(actor) || actor < 0 || actor > 3) {
       clearFlights(); return;
     }
-    let node, area, angle = 0, hidden = false;
-    if (actor === 0) {
-      node = $('hand').querySelector(`[data-card="${card.id}"]`);
-      area = $('hand');
-      if (node) angle = rotation(node);
-      node = node?.querySelector('.card') || node;
-    } else {
-      const seat = $(`player${actor}`), open = seat.querySelector('.subhand');
-      const index = snapshot.hands[actor].indexOf(card.id);
-      hidden = !open;
-      area = open || seat.querySelector('.back') || seat;
-      node = open && index >= 0 ? open.children[index] : area.lastElementChild;
-      angle = (actor === 3 ? 90 : actor === 1 ? -90 : hidden ? 180 : 0) + rotation(node);
-    }
-    area = area || $(`player${actor}`);
-    node = node || area;
-    const r = node.getBoundingClientRect(), clip = area.getBoundingClientRect();
-    if (!r.width || !r.height) return;
-    const clamp = (n,min,max) => Math.max(min,Math.min(max,n));
-    const x = clamp(r.x+r.width/2,Math.max(0,clip.left),Math.min(innerWidth,clip.right));
-    const y = clamp(r.y+r.height/2,Math.max(0,clip.top),Math.min(innerHeight,clip.bottom));
-    pendingPlay = {id:card.id,actor,x,y,width:node.offsetWidth || r.width,
-      height:node.offsetHeight || r.height,angle,hidden,
-      back: hidden ? node.cloneNode(true) : null};
+    const point=handPoint(actor,card.id),hidden=actor!==0&&!$(`player${actor}`).querySelector('.subhand');
+    if(!point.width||!point.height)return;
+    let blocked=null;
+    const repeated=snapshot.lastActor===actor&&snapshot.topCard?.type===card.type&&snapshot.topCard?.color===card.color&&snapshot.topCard?.num===card.num;
+    if(card.type==='skip'&&!repeated){let id=actor;for(let n=0;n<4;n++){id=(id+state.direction+4)%4;if(state.players[id].hand.length){blocked=id;break;}}}
+    pendingPlay={id:card.id,actor,...point,hidden,back:hidden?point.node.cloneNode(true):null,blocked};
   }
 
-  function animatePlay(play) {
-    const target = $('discard').firstElementChild;
-    if (!target || reducedMotion.matches || typeof target.animate !== 'function') return;
-    const r = target.getBoundingClientRect(), tx = r.x+r.width/2, ty = r.y+r.height/2;
-    const dx = tx-play.x, dy = ty-play.y;
-    const sx = target.offsetWidth/play.width, sy = target.offsetHeight/play.height;
-    const arc = Math.min(54,Math.hypot(dx,dy)*.15);
-    const sprite = document.createElement('div');
-    sprite.className = 'played-card';
+  function animatePlay(play,delay=0) {
+    // Se o humano joga antes de a compra pousar, continua do ponto visual atual.
+    // No fluxo bot compra+jogada do mesmo render, o voo de saída aguarda só a
+    // cópia visual da compra; o motor e a janela de corte continuam independentes.
+    if(!delay)for(const flight of [...flights])if(flight.kind==='draw'&&flight.id===play.id){
+      const r=flight.node.getBoundingClientRect();
+      Object.assign(play,{x:r.x+r.width/2,y:r.y+r.height/2,width:flight.node.offsetWidth,height:flight.node.offsetHeight,angle:rotation(flight.node)});
+      flight.animation.cancel();flight.node.remove();flights.delete(flight);drawingIds.delete(play.id);
+    }
+    const target=$('discard').querySelector('.discard-top');
+    if(!target||reducedMotion.matches||typeof target.animate!=='function')return;
+    const card=target.querySelector('.card'),r=card.getBoundingClientRect();
+    if(!r.width||!r.height||!play.width||!play.height)return;
+    const tx=r.x+r.width/2,ty=r.y+r.height/2;
+    const dx=tx-play.x,dy=ty-play.y,sx=card.offsetWidth/play.width,sy=card.offsetHeight/play.height;
+    const key=Number(target.dataset.visualKey),angle=rotation(target),arc=Math.min(46,Math.hypot(dx,dy)*.12),duration=540;
+    const sprite=document.createElement('div');sprite.className='played-card flying-card';
     Object.assign(sprite.style,{left:`${play.x-play.width/2}px`,top:`${play.y-play.height/2}px`,width:`${play.width}px`,height:`${play.height}px`});
     Object.assign(sprite.dataset,{actor:String(play.actor),cardId:String(play.id),originX:String(play.x),originY:String(play.y),targetX:String(tx),targetY:String(ty)});
-    const front = document.createElement('div');front.className='flight-front';front.append(target.cloneNode(true));
-    front.querySelectorAll('img').forEach(img=>{img.loading='eager';});
-    sprite.append(front);
-    if (play.hidden && play.back) {
-      const back=document.createElement('div');back.className='flight-back';back.append(play.back);sprite.append(back);
-      back.animate([{opacity:1},{offset:.35,opacity:1},{offset:.57,opacity:0},{opacity:0}],{duration:560,fill:'forwards'});
-      front.animate([{opacity:0},{offset:.35,opacity:0},{offset:.57,opacity:1},{opacity:1}],{duration:560,fill:'forwards'});
-    }
+    const front=document.createElement('div');front.className='flight-front';front.append(card.cloneNode(true));front.querySelectorAll('img').forEach(img=>img.loading='eager');sprite.append(front);
+    if(play.hidden&&play.back){const back=document.createElement('div');back.className='flight-back';back.append(play.back);sprite.append(back);back.animate([{opacity:1},{offset:.3,opacity:1},{offset:.6,opacity:0},{opacity:0}],{duration,delay,fill:'both'});front.animate([{opacity:0},{offset:.3,opacity:0},{offset:.6,opacity:1},{opacity:1}],{duration,delay,fill:'both'});}
     $('playAnimations').append(sprite);
-    $('discard').classList.add('receiving-card');
+    const transform=(x,y,a,xs,ys,tilt=0)=>`perspective(700px) translate(${x}px,${y}px) rotate(${a}deg) rotateX(${tilt}deg) scale(${xs},${ys})`;
     const animation=sprite.animate([
-      {transform:`translate(0px,0px) rotate(${play.angle}deg) scale(1)`},
-      {offset:.55,transform:`translate(${dx*.55}px,${dy*.55-arc}px) rotate(${play.angle*.35}deg) scale(${1+(sx-1)*.55},${1+(sy-1)*.55})`},
-      {transform:`translate(${dx}px,${dy}px) rotate(-3deg) scale(${sx},${sy})`}
-    ],{duration:560,easing:'cubic-bezier(.22,.64,.25,1)',fill:'forwards'});
-    const flight={node:sprite,animation};flights.add(flight);
+      {opacity:0,transform:transform(0,0,play.angle,1,1)},
+      {offset:.01,opacity:1,transform:transform(0,0,play.angle,1,1)},
+      {offset:.16,opacity:1,transform:transform(dx*.07,dy*.07-arc*.5,play.angle+6,1.09,1.09,-9)},
+      {offset:.72,opacity:1,transform:transform(dx*.88,dy*.88-arc*.4,angle+3,1+(sx-1)*.88,1+(sy-1)*.88,-4)},
+      {opacity:1,transform:transform(dx,dy,angle,sx,sy)}
+    ],{duration,delay,easing:'cubic-bezier(.22,.55,.25,1)',fill:'both'});
+    const flight={node:sprite,animation,kind:'play',id:play.id,key};flights.add(flight);maskCards();
     animation.onfinish=()=>{
-      sprite.remove();flights.delete(flight);
-      if(displayedTop===play.id){
-        $('discard').classList.remove('receiving-card');
-        const landed=$('discard').firstElementChild;
-        if(landed&&!reducedMotion.matches)landed.animate([
-          {transform:'rotate(-3deg) scale(1.035)'},{transform:'rotate(-3deg) scale(1)'}
-        ],{duration:150,easing:'ease-out'});
-      }
+      sprite.remove();flights.delete(flight);maskCards();
+      const landed=$('discard').querySelector(`[data-visual-key="${key}"] .card`);
+      if(landed&&!reducedMotion.matches)landed.animate([{transform:'scale(1.035)'},{transform:'scale(1)'}],{duration:140,easing:'ease-out'});
     };
+    animateBlock(play,delay+duration*.7);
   }
 
   function layout() {
@@ -174,11 +263,17 @@
     else if (!event.shiftKey && document.activeElement === last) {event.preventDefault();first.focus();}
   });
 
-  function render(state) {
+  function render(state, savedScroll) {
+    nativeTable(true);
     document.body.classList.add('playing');
     const center = document.querySelector('.center');
     $('table').dataset.activeColor = state.activeColor || '';
     $('table').dataset.phase = state.phase;
+    const heat=Math.min(1,Math.log1p(Math.max(0,state.penalty))/Math.log(21));
+    $('burner').style.setProperty('--heat-scale',String(1+heat*.16));
+    $('burner').style.setProperty('--heat-opacity',String(.74+heat*.18));
+    $('burner').style.setProperty('--heat-brightness',String(1+heat*.24));
+    $('table').dataset.penalty=String(state.penalty);
     $('table').setAttribute('aria-label', `Mesa de jogo · ${state.activeColor ? colorNames[state.activeColor] : 'sem cor ativa'}`);
     layout();
     $('turnCue').textContent = state.phase === 'playing' ? `Vez de ${state.current === 0 ? 'Você' : 'Bot ' + state.current}` : 'Rodada concluída';
@@ -223,23 +318,31 @@
       const back = seat.querySelector('.back');
       if (back) {
         back.setAttribute('aria-hidden', 'true');
-        back.innerHTML = Array.from({ length:Math.min(7, player.hand.length) }, (_, i) => `<span class="hidden-card" style="--fan-angle:${(i - Math.min(6, player.hand.length - 1) / 2) * 5}deg"></span>`).join('');
+        back.innerHTML = player.hand.map(card=>`<span class="hidden-card" data-hand-card="${card.id}"></span>`).join('');
+        fan(back,Infinity);
       }
       const subhand = seat.querySelector('.subhand');
-      if (subhand) fan(subhand, 9);
+      if (subhand) {
+        [...subhand.children].forEach((node,i)=>node.dataset.handCard=String(player.hand[i].id));
+        fan(subhand,Infinity);
+      }
     }
-    fan($('hand'), innerWidth < 360 ? 6 : 8);
+    fan($('hand'), innerWidth < 360 ? 7 : 9, savedScroll);
     const top=state.discard[state.discard.length-1];
     displayedTop=top?.id ?? null;
     const play=pendingPlay;pendingPlay=null;
-    snapshot={state,round:state.round,top:displayedTop,art:$('useCardArt').checked,hands:state.players.map(p=>p.hand.map(c=>c.id))};
-    if(play&&play.id===displayedTop)animatePlay(play);
+    snapshot={state,round:state.round,top:displayedTop,art:$('useCardArt').checked,lastActor:state.lastActor,topCard:top,hands:state.players.map(p=>p.hand.map(c=>c.id))};
+    const draws=pendingDraws;pendingDraws=[];
+    const ends=animateDraws(draws,state);
+    if(play&&play.id===displayedTop)animatePlay(play,ends.get(play.id)||0);
+    maskCards();updateClock(state);
   }
   addEventListener('resize', () => {
     clearFlights();
     layout();
-    fan($('hand'), innerWidth < 360 ? 6 : 8);
-    document.querySelectorAll('.subhand').forEach(hand => fan(hand, 9));
+    fan($('hand'), innerWidth < 360 ? 7 : 9);
+    document.querySelectorAll('.subhand,.back').forEach(hand => fan(hand,Infinity));
   });
-  window.PanelasMesa = { render, beforeRender, closeMenu, reset:() => {clearFlights();closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
+  nativeTable(false);
+  window.PanelasMesa = { render, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {clearFlights();nativeTable(false);handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
 })();
