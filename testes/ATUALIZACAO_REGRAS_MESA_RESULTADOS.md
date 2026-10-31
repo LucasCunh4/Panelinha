@@ -50,9 +50,29 @@ Capturas Chromium (não são de celular físico):
 
 ## Execução Android e distribuição
 
-O resultado do workflow e a verificação do APK assinado desta atualização serão registrados após a execução. A instrumentação contém agora **seis testes**, mantendo os quatro anteriores e acrescentando imersão/recortes/retorno ao menu e Distribuidora/Giro/cronômetro. O roteiro exige também persistência após reinício a frio e após `adb install -r`, sem limpar dados ou desinstalar. Nenhum teste foi removido.
+A instrumentação contém agora **seis testes**, mantendo os quatro anteriores e acrescentando imersão/recortes/retorno ao menu e Distribuidora/Giro/cronômetro. O roteiro exige também persistência após reinício a frio e após `adb install -r`, sem limpar dados ou desinstalar. Nenhum teste foi removido.
 
 Identidade preservada: `com.lucascunha.panelinha.teste`, origem `https://localhost`, certificado de geração 2 de `android-identity.json`. Secrets, workflow, sequência de versões e mecanismo de publicação mantidos. A compilação seguinte supera 0.2.14/c3402 e seu candidato c3403.
+
+### Resultado das execuções
+
+- [Workflow #15](https://github.com/LucasCunh4/Panelinha/actions/runs/41226371683), fonte `04fb67aa3db972cbf07a199a26bac4d6ae019aaf`: compilou e assinou 0.2.15/c3502. `a_imagesAndThreeBotsOffline` passou: Android sem rede ativa, compatibilidade JS, decodificação das 52 cartas, quatro participantes e três bots. O emulador registrou `Failed to find ColorBuffer` / `invalid color buffer`, depois perdeu ADB durante `b_touchCutAndBuy`, sem conclusão de asserção desse teste.
+- [Workflow #16](https://github.com/LucasCunh4/Panelinha/actions/runs/41226782036), fonte final `724903b194720c3e9cc45944e3e5162152f49211`: compilou e assinou **0.2.16/c3602**. Inclui o ajuste final de posição do cronômetro. O mesmo primeiro teste passou; o segundo foi interrompido pela perda do emulador após os mesmos erros gráficos. ADB ficou offline e a porta de controle 5554 recusou conexão.
+- Não houve asserção reprovada do aplicativo antes dessas interrupções. Os logs também registram ANR do **Pixel Launcher**, anterior aos testes, sem exceção fatal registrada do Panelinha. A sequência observada aponta para uma interrupção do ambiente de emulação; os diagnósticos não estabelecem a causa exata nem substituem validação em aparelho. [Diagnósticos #16](https://github.com/LucasCunh4/Panelinha/actions/runs/41226782036/artifacts/13052256350).
+- **Android parcial: 1/6 testes concluído/aprovado em cada execução.** Toques/compra/corte não concluíram; retrato/paisagem, sentinelas, imersão e regras/cronômetro nativos não chegaram a executar. Persistência após reinício e atualização não foi validada nesta rodada. Não há novas capturas Android. Todas as capturas deste relatório são do Chromium.
+- A Release foi corretamente bloqueada. Os APKs assinados continuam disponíveis em artefatos, conforme o fluxo existente; nenhum teste ou verificação foi eliminado para publicar um resultado verde.
+
+### APK final e verificação independente
+
+**[Baixar ZIP com APK 0.2.16/c3602 e metadados](https://github.com/LucasCunh4/Panelinha/actions/runs/41226782036/artifacts/13052470841)**. Requer login no GitHub; retenção até 29/01/2027. Extraia `Panelinha-Teste-v0.2.16-c3602.apk`. O candidato 3603 é reservado ao teste e não é distribuído.
+
+O ZIP foi baixado do GitHub Actions e seu digest comparado ao da API. O APK extraído passou localmente em `ferramentas/verificar_apk.py`/`apksigner`: assinatura v2, certificado ativo, versão/código, pacote/origem, SDKs 24/36, release/fullSensor, HTML/CSS/JS exatos, bundle de compatibilidade e SHA-256 dos 52+6 PNGs. A classe do plugin imersivo e a API de controle das barras também estão no DEX assinado. [Metadados completos](ATUALIZACAO_APK_0.2.16.json).
+
+- SHA-256 do certificado: `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509` — idêntico ao registro ativo da geração 2.
+- SHA-256 do APK: `6e2f8523c2b27b055b6cc346c11eec2d6f27780f72c37827273ee76c5c911df9`.
+- Comparação dos APKs reais 0.2.14/c3402 e 0.2.16/c3602: mesmo certificado, pacote e origem; código crescente. **Compatível com atualização direta da geração 2, sem desinstalar.** A verificação de identidade não deve ser confundida com um teste de instalação/atualização e dados locais concluído no Android nesta rodada.
+
+Pendência de execução: repetir a suíte completa em um Android estável, incluindo imersão/recortes, toques, rotação e atualização com persistência. O APK validado acima está disponível para instalação de teste apesar da interrupção de infraestrutura.
 
 ## Limitações
 
