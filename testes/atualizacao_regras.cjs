@@ -7,6 +7,8 @@ const assert=require('node:assert/strict');
  try{
   const epoch=new Date("2030-01-01T12:00:00Z");await page.clock.install({time:epoch});await page.clock.pauseAt(epoch);await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#startBtn').tap();
   const results=await page.evaluate(()=>{
+   const originalRandom=Math.random;let seed=0x50414e4c;
+   Math.random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};
    let serial=200000;const c=(type='num',color='red',num=7)=>({id:serial++,type,color,num});
    const refresh=()=>document.getElementById('useCardArt').onchange();
    const setup=(total=20)=>{
@@ -60,7 +62,7 @@ const assert=require('node:assert/strict');
     check(s.direction===direction&&s.current===(direction===1?1:3),'sentido/turno');
     for(let i=0;i<4;i++)check(s.players[(i+direction+4)%4].hand.map(c=>c.id).join()===hands[i],'rotação incorreta');
    });
-   return tests;
+   Math.random=originalRandom;return tests;
   });
   results.forEach(name=>console.log('PASS',name));
   // A janela é validada no relógio real do motor, inclusive na fronteira exata.

@@ -214,3 +214,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
  .seat.left .turn-clock,.seat.right .turn-clock{top:-10px}
 }
 @media(prefers-reduced-motion:reduce){.burner{transition:none}.flying-card,.block-effect{display:none}}
+/* Cronômetro junto à borda interna de cada mão, livre do monte e dos rótulos. */
+.seat.top .turn-clock {top:0}
+.seat.left .turn-clock {left:auto;right:-20px;top:calc(50% - 17px)}
+.seat.right .turn-clock {left:-20px;right:auto;top:calc(50% - 17px)}

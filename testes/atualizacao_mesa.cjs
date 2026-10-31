@@ -95,14 +95,19 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/atualizacao-evidence
   }
   console.log('PASS efeito Bloqueio aponta para o jogador correto nos dois sentidos; regra preservada');
   // O ticker existente alimenta 5..0; sem segundo relógio de jogo.
-  for(const actor of [0,2]){
+  for(const actor of [0,1,2,3]){
    await fixture();await page.evaluate(actor=>{const s=CartasTest.getState();s.current=actor;s.o.timeout=15;s.deadline=Date.now()+5500;s.token++;document.getElementById('useCardArt').onchange();window.timerValues=[];const original=PanelasMesa.updateClock;PanelasMesa.updateClock=(state,now)=>{original(state,now);const b=document.querySelector('.turn-clock');if(b)window.timerValues.push(b.textContent)}},actor);
    assert.equal(await page.locator('.turn-clock').count(),0);await page.clock.runFor(600);assert.equal(await page.locator('.turn-clock').textContent(),'5');assert.equal(await page.locator('.turn-clock').getAttribute('data-actor'),String(actor));
+   const badge=await page.locator('.turn-clock').boundingBox();assert.ok(badge.x>=0&&badge.y>=0&&badge.x+badge.width<=390&&badge.y+badge.height<=844);
+   assert.ok(await page.locator('.turn-clock').evaluate(el=>{const a=el.getBoundingClientRect(),b=document.getElementById('buyBtn').getBoundingClientRect();return a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom}));
+   await page.setViewportSize({width:844,height:390});
+   assert.ok(await page.locator('.turn-clock').evaluate(el=>{const a=el.getBoundingClientRect(),b=document.getElementById('buyBtn').getBoundingClientRect();return a.left>=0&&a.top>=0&&a.right<=innerWidth&&a.bottom<=innerHeight&&(a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom)}));
+   await page.setViewportSize({width:390,height:844});
    await page.clock.runFor(5000);const values=await page.evaluate(()=>window.timerValues);for(const n of ['5','4','3','2','1','0'])assert.ok(values.includes(n),`${actor}: ${values}`);
    assert.equal(await page.locator(`#player${actor} .turn-clock`).count(),0);
   }
   await fixture();assert.equal(await page.locator('.turn-clock').count(),0);
-  console.log('PASS cronômetro 5/4/3/2/1/0 humano e bot, some após turno e não aparece sem limite habilitado');
+  console.log('PASS cronômetro 5/4/3/2/1/0 humano e três bots, some após turno e não aparece sem limite habilitado');
   // Cancelamento das camadas visuais não muda o estado das cartas.
   await fixture();await page.locator('[data-card="620000"]').tap();const state=await page.evaluate(()=>JSON.stringify(CartasTest.getState()));
   await page.setViewportSize({width:844,height:390});await page.waitForFunction(()=>!document.querySelector('.flying-card'));assert.equal(await page.evaluate(()=>JSON.stringify(CartasTest.getState())),state);
