@@ -46,6 +46,13 @@ public class OfflineGameTest {
         }
         fail("Não ocorreu: " + expression + " / " + js("document.body.innerText.slice(0,1500)"));
     }
+    void awaitVisualFrame() throws Exception {
+        CountDownLatch frame = new CountDownLatch(1);
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> web.postVisualStateCallback(0, new WebView.VisualStateCallback() {
+            @Override public void onComplete(long requestId) { frame.countDown(); }
+        }));
+        assertTrue("Quadro visual atual do WebView", frame.await(15, TimeUnit.SECONDS));
+    }
     void tap(String selector) throws Exception {
         long focusDeadline = SystemClock.uptimeMillis() + 30000;
         while (!web.hasWindowFocus() && SystemClock.uptimeMillis() < focusDeadline) SystemClock.sleep(200);
@@ -55,6 +62,7 @@ public class OfflineGameTest {
         waitFor("(()=>{const e=document.querySelector("+quoted+");return e&&!e.disabled&&e.getBoundingClientRect().height>5&&[...e.querySelectorAll('img')].every(im=>im.complete&&im.naturalWidth>0)})()", 60000);
         js("document.querySelector(" + quoted + ").scrollIntoView({block:'center',inline:'center'})");
         waitFor("(()=>{const e=document.querySelector("+quoted+"),r=e.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return !!hit&&e.contains(hit)})()", 60000);
+        awaitVisualFrame();
         JSONArray point = new JSONArray(js("(()=>{const r=document.querySelector(" + quoted + ").getBoundingClientRect();return [r.x+r.width/2,r.y+r.height/2,innerWidth]})()"));
         int[] origin = new int[2];
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> web.getLocationOnScreen(origin));
@@ -64,6 +72,7 @@ public class OfflineGameTest {
         long now = SystemClock.uptimeMillis();
         for (int action : new int[]{MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP}) {
             MotionEvent event = MotionEvent.obtain(now, SystemClock.uptimeMillis(), action, x, y, 0);
+            event.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);
             InstrumentationRegistry.getInstrumentation().sendPointerSync(event);event.recycle();
             SystemClock.sleep(80);
         }
@@ -123,11 +132,7 @@ public class OfflineGameTest {
             if (!oriented.get()) SystemClock.sleep(100);
         }
         assertTrue("WebView na orientação nativa esperada", oriented.get());
-        CountDownLatch frame = new CountDownLatch(1);
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> web.postVisualStateCallback(0, new WebView.VisualStateCallback() {
-            @Override public void onComplete(long requestId) { frame.countDown(); }
-        }));
-        assertTrue("Quadro do WebView após rotação", frame.await(15, TimeUnit.SECONDS));
+        awaitVisualFrame();
         InstrumentationRegistry.getInstrumentation().waitForIdleSync();
         InstrumentationRegistry.getInstrumentation().getUiAutomation().waitForIdle(300, 5000);
         assertEquals("true", js("document.documentElement.scrollWidth<=innerWidth && document.documentElement.scrollHeight<=innerHeight"));

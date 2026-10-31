@@ -68,6 +68,13 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mesa-v1-evidenc
   await fixture();await page.evaluate(()=>document.querySelector('#testPenalty').click());await page.locator('#buyBtn').tap();
   assert.equal(await page.evaluate(()=>CartasTest.getState().penalty),0);assert.equal(await page.evaluate(()=>CartasTest.getState().players[0].hand.length),27);
   console.log('PASS compra por toque no monte, guardar/passagem e pagamento integral de +20');
+  for(const [width,height] of [[390,844],[844,390]]){
+   await page.setViewportSize({width,height});await fixture();
+   await page.evaluate(()=>{const s=CartasTest.getState();s.activeColor='red';s.discard=[{id:57000,type:'num',color:'red',num:7}];s.players[0].hand=[{id:57001,type:'draw2',color:'red'},{id:57002,type:'draw2',color:'red'},{id:57003,type:'num',color:'blue',num:9}];document.querySelector('#useCardArt').onchange();window.holdCut=()=>{s.unlockAt=Date.now()+120000;document.querySelector('#useCardArt').onchange()};document.querySelector('[data-card="57001"]').addEventListener('click',holdCut,{once:true})});
+   await page.locator('[data-card="57001"]').tap();await page.locator('#unoBtn').tap();assert.ok(await page.evaluate(()=>CartasTest.getState().preUno));
+   await page.locator('#cutBtn').tap();assert.equal(await page.evaluate(()=>CartasTest.getState().penalty),2);assert.equal(await page.evaluate(()=>CartasTest.getState().players[0].hand.length),1);
+  }
+  console.log('PASS sequência por toque: +2, anúncio de última carta e corte da segunda cópia, em retrato/paisagem');
   // Balão tem a carta como único alvo, inclusive fora do turno; mantém pausa de 2,8s.
   for(const [width,height] of [[320,568],[390,844],[568,320],[844,390]]){
    await page.setViewportSize({width,height});await fixture();

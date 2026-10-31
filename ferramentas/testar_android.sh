@@ -26,7 +26,7 @@ collect_diagnostics() {
 trap collect_diagnostics EXIT
 run_tests() {
   local class_name="$1" expected_count="$2" result_file="$3"
-  adb shell am instrument -w -r -e class "$app.$class_name" "$app.test/androidx.test.runner.AndroidJUnitRunner" | tee "$result_file"
+  adb shell am instrument -w -r -e class "$app.$class_name" "$app.test/androidx.test.runner.AndroidJUnitRunner" | tee "$result_file" || return $?
   python3 - "$result_file" "$expected_count" <<'PYTHON'
 from pathlib import Path
 import sys
@@ -83,17 +83,22 @@ if [[ "${PANELINHA_VERIFY_EXISTING_DATA:-0}" = 1 ]]; then
   test -n "$original_uid" && test "$original_uid" = "$(app_uid)"
   run_tests UpdatePersistenceTest 1 "$output/update-anterior.txt"
 fi
-run_tests OfflineGameTest 4 "$output/offline.txt"
+ci_test_status=0
+if ! run_tests OfflineGameTest 4 "$output/offline.txt"; then ci_test_status=1; fi
 for orientation in portrait landscape; do
-  adb pull "/sdcard/Android/data/$app/files/mesa-v1-$orientation.png" "$output/mesa-v1-$orientation.png"
+  if ! adb pull "/sdcard/Android/data/$app/files/mesa-v1-$orientation.png" "$output/mesa-v1-$orientation.png"; then ci_test_status=1; fi
 done
 uid_before="$(app_uid)"
 adb shell am force-stop "$app"
 # Controle: prova que a sentinela já era durável antes da troca de APK.
-run_tests UpdatePersistenceTest 1 "$output/baseline-persistence.txt"
+if ! run_tests UpdatePersistenceTest 1 "$output/baseline-persistence.txt"; then ci_test_status=1; fi
 adb shell am force-stop "$app"
 adb install --no-streaming -r "$next_apk"
 uid_after="$(app_uid)"
 test -n "$uid_before" && test "$uid_before" = "$uid_after"
-run_tests UpdatePersistenceTest 1 "$output/update.txt"
+if ! run_tests UpdatePersistenceTest 1 "$output/update.txt"; then ci_test_status=1; fi
+if [[ "$ci_test_status" != 0 ]]; then
+  echo 'Uma ou mais verificações Android falharam; consulte os resultados individuais.' >&2
+  exit 1
+fi
 echo 'APK offline: 4 testes. Atualização sem desinstalar: 1 teste. UID, localStorage e SharedPreferences preservados.'
