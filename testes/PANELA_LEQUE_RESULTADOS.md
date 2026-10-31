@@ -37,4 +37,16 @@ A bateria de centenas de sorteios isola regras em movimento reduzido para não a
 
 ## APK e Android
 
-Aguardar a execução do mesmo workflow após salvar esta atualização. O APK precisa conservar o certificado de `android-identity.json`, applicationId `com.lucascunha.panelinha.teste`, origem `https://localhost` e versionCode superior ao 3802 distribuído (3803 reservado ao teste anterior). O arquivo será verificado novamente após o download. Resultados do emulador, metadados e link direto serão registrados aqui quando disponíveis; a falha de infraestrutura da execução anterior não aprova a execução atual.
+- **APK 0.2.19 / versionCode 3902**, workflow [#19](https://github.com/LucasCunh4/Panelinha/actions/runs/41250703618), código-fonte `b8ebe6bbb21321c1c139308e10b80b66970d86e5`.
+- [Baixar diretamente o arquivo APK, sem ZIP](https://github.com/LucasCunh4/Panelinha/actions/runs/41250703618/artifacts/13060309535). Requer sessão no GitHub e fica disponível até 29/01/2027.
+- Build release, instrumentação e candidato de atualização c3903: compilados. O candidato é exclusivo do teste, não foi distribuído.
+- APK baixado e novamente aprovado por `ferramentas/verificar_apk.py`: assinatura v2, applicationId `com.lucascunha.panelinha.teste`, origem `https://localhost`, 52 cartas PNG e seis PNGs oficiais íntegros, código web atual e compatibilidade incluídos.
+- Certificado SHA-256 geração 2: `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`, idêntico ao 0.2.18/c3802. O código sobe para 3902: atualização direta compatível, sem desinstalar. Nenhuma chave nova ou alteração de Secrets.
+- SHA-256 do APK: `60334ecc01598a71430b45b13d2a482c208cbaaf61d9d046305a4392f9efcd67`, igual ao digest do artefato. O arquivo entregue já contém manifesto/classes na raiz; não há ZIP externo para extrair.
+- Metadados públicos verificados: `testes/PANELA_LEQUE_APK_0.2.19.json`.
+
+**Android: execução não aprovada.** O primeiro dos sete testes (`a_imagesAndThreeBotsOffline`) iniciou, mas nenhum terminou. O dispositivo ficou `offline`, o ADB falhou e a porta 5554 recusou conexão. Não há resultado de asserção do aplicativo nem `FATAL EXCEPTION` do app na coleta disponível. Ao contrário da execução #18, o kernel desta execução não registrou o mesmo segfault de renderização; portanto a causa raiz atual não foi confirmada. O problema observado é perda do emulador/conexão de teste, não uma asserção reprovada de regra ou interface.
+
+[Diagnósticos completos separados](https://github.com/LucasCunh4/Panelinha/actions/runs/41250703618/artifacts/13060788823). Permanecem pendentes os sete testes Android completos, incluindo toque no leque, modo imersivo/orientações, execução offline em aparelho e instalação por cima com preservação de UID/localStorage/SharedPreferences. A compatibilidade de atualização foi confirmada por identidade e código; a execução prática desse teste não terminou. O estado da partida continua em memória, como antes.
+
+O workflow mantém as verificações e bloqueou a Release após a falha, disponibilizando o APK validado como artefato direto via `actions/upload-artifact@v7`, `archive: false`, somente `.apk`. Metadados e diagnósticos estão separados. Nenhum teste foi removido ou desativado para aprovar a distribuição.
