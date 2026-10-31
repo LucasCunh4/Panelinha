@@ -110,4 +110,6 @@ A fonte de regras continua no script existente de `IMPORTACAO_PANELAS/index.html
 
 O monte recebe a ação de compra original; a carta com faca recebe a ação de corte original. Nenhuma regra, bot, pontuação ou pausa de corte foi alterada. O relatório e as limitações da validação estão em `testes/MESA_V1_RESULTADOS.md`.
 
+A rodada seguinte refina as chamas por CSS, posiciona a compra à esquerda, dispõe as mãos dos oponentes diretamente na mesa, anima a carta da mão ao descarte e amplia a faca. Implementação, testes e evidências em `testes/REFINAMENTOS_MESA_RESULTADOS.md`; as imagens originais continuam intactas.
+
 O cálculo de versão continua no mesmo workflow e consulta Releases, mas usa a base 2000 e o piso histórico 2004: uma compilação apenas em artefato também precisa superar o código 2003 já instalado. Execuções e tentativas seguintes crescem mesmo sem Release.

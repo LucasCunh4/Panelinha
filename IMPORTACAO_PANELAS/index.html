@@ -55,9 +55,10 @@
         <div class="seat top" id="player2"></div>
         <button id="tableMenuBtn" class="table-menu-btn" aria-label="Abrir opções e laboratório" aria-controls="tableMenu" aria-expanded="false">☰</button>
         <div class="seat left" id="player3"></div>
+        <div class="draw-stack"><button id="buyBtn" type="button" aria-label="Comprar carta"><span id="pile"></span></button><span class="stack-label">COMPRAR</span></div>
+        <div id="playAnimations" class="play-animations" aria-hidden="true"></div>
         <div class="center">
           <div class="stack">
-            <div class="draw-stack"><button id="buyBtn" type="button" aria-label="Comprar carta"><span id="pile"></span></button><span class="stack-label">COMPRAR</span></div>
             <div class="discard-stack"><div id="discard" title="Último descarte"></div><span class="stack-label">DESCARTE</span></div>
           </div>
           <div class="penalty-display" id="penaltyDisplay" role="status" aria-live="polite" hidden></div>
@@ -299,7 +300,7 @@ function cutHuman(){
 
 function showColors(){let root=$('modalRoot');root.innerHTML=`<div class="modal-wrap"><div class="modal"><h2>Escolher a próxima cor</h2><p class="muted">Após jogar essa carta, qual será a cor ativa?</p><div class="row" style="justify-content:center;margin:20px 0">${COLORS.map(x=>`<button class="colorbtn ${x}" data-color="${x}" aria-label="${CN[x]}"></button>`).join('')}</div><button class="btn alt" id="cancelColor">Cancelar</button></div></div>`;root.querySelectorAll('[data-color]').forEach(b=>b.onclick=()=>{let data=s.pendingAction;root.innerHTML='';if(data)applyPlay(data.id,data.ids,data.isCut,b.dataset.color);});$('cancelColor').onclick=()=>{s.pendingAction=null;root.innerHTML='';render();queueBots();};}
 function finishControlHTML(){let ranks=s.summary.map(x=>`<div class="notice"><strong>${x.place}º — ${names(x.id)}</strong> · ${x.cost} pontos nas cartas restantes (${x.remaining} cartas)</div>`).join('');return `<div class="banner">${s.phase==='gameOver'?(s.winner?`🏆 ${s.winner} venceu a partida!`:'🏆 Rodada única concluída!'):'Rodada concluída.'}</div>${ranks}<div class="controls">${s.phase==='roundOver'?'<button id="nextRound" class="btn good">Próxima rodada</button>':'<button id="newMatch" class="btn good">Nova partida</button>'}<button id="backLobby" class="btn alt">Voltar às configurações</button></div>`;}
-function render(){if(!s)return;$('roundLabel').textContent=`Rodada ${s.round} · ${s.o.duo?'Duplas':'Individual'}`;$('status').textContent=s.phase==='playing'?`Vez de ${names(s.current)}`:s.phase==='roundOver'?'Fim da rodada':'Fim da partida';
+function render(){if(!s)return;PanelasMesa.beforeRender(s);$('roundLabel').textContent=`Rodada ${s.round} · ${s.o.duo?'Duplas':'Individual'}`;$('status').textContent=s.phase==='playing'?`Vez de ${names(s.current)}`:s.phase==='roundOver'?'Fim da rodada':'Fim da partida';
 $('score').innerHTML=s.o.duo?`<span>Você + Bot 2: ${s.teams[0]}</span><span>Bot 1 + Bot 3: ${s.teams[1]}</span>`:s.players.map(p=>`<span>${names(p.id)}: ${p.score}</span>`).join('');
 $('stateText').textContent=s.phase==='playing'?`Sentido: ${s.direction===1?'horário':'anti-horário'} · Cor: ${CN[s.activeColor]} · Monte: ${s.deck.length} · ${s.penalty?'PENALIDADE OBRIGATÓRIA +'+s.penalty:'Sem penalidade'}${s.o.timeout&&s.deadline?' · Tempo: '+Math.max(0,Math.ceil((s.deadline-Date.now())/1000))+'s':''}`:s.message;
 for(let i=0;i<4;i++){const p=s.players[i],active=s.current===i&&s.phase==='playing';const show=s.reveal||(s.o.duo&&i===2);let node=$('player'+i);node.classList.toggle('active',active);node.innerHTML=`<div class="name">${names(i)} ${active?'⏳':''}${s.o.duo?' <span class="tag">'+(i%2?'B':'A')+'</span>':''}</div><div class="sub">${p.hand.length} cartas${i===0?'':' · bot'}</div>${i!==0?(show?'<div class="subhand">'+p.hand.map(c=>cardHTML(c,true)).join('')+'</div>':'<div class="back">'+'▰ '.repeat(Math.min(6,p.hand.length))+'</div>'):''}`;}

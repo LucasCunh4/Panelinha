@@ -5,7 +5,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const crypto=require('node:crypto');
 const base=process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/';
-const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mesa-v1-evidence';
+const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-evidence';
 (async()=>{
  fs.mkdirSync(evidence,{recursive:true});
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
@@ -29,14 +29,14 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mesa-v1-evidenc
   for(const [width,height] of sizes){
    await page.setViewportSize({width,height});await fixture();await page.clock.runFor(220);
    const geometry=await page.evaluate(()=>{
-    const rect=id=>document.getElementById(id).getBoundingClientRect();const bg=rect('stoveScene'),burner=rect('burner'),discard=rect('discard'),hand=rect('hand'),top=rect('player2'),left=rect('player3'),right=rect('player1');
+    const rect=id=>document.getElementById(id).getBoundingClientRect();const cardTop=Math.min(...[...document.querySelectorAll('#hand>button')].map(c=>c.getBoundingClientRect().top));const bg=rect('stoveScene'),burner=rect('burner'),discard=rect('discard'),hand=rect('hand'),top=rect('player2'),left=rect('player3'),right=rect('player1');
     const near=(a,b)=>Math.abs(a-b)<1;
     const hit=id=>{const el=document.getElementById(id),r=el.getBoundingClientRect();return el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));};
     return {noScroll:document.documentElement.scrollWidth<=innerWidth&&document.documentElement.scrollHeight<=innerHeight,
      registered:near(burner.x+burner.width/2,bg.x+bg.width*836/1672)&&near(burner.y+burner.height/2,bg.y+bg.height*451/941)&&near(burner.width,burner.height),
      discard:near(discard.x+discard.width/2,burner.x+burner.width/2)&&near(discard.y+discard.height/2,burner.y+burner.height/2),
      background:bg.left<=0&&bg.top<=0&&bg.right>=innerWidth-1&&bg.bottom>=innerHeight-1,
-     positions:top.bottom<discard.top&&left.right<discard.left&&right.left>discard.right&&hand.top>=discard.bottom,
+     positions:top.bottom<discard.top&&left.right<discard.left&&right.left>discard.right&&cardTop>=discard.bottom,
      hand:hand.bottom<=innerHeight&&hand.top>0,buyHit:hit('buyBtn'),menuHit:hit('tableMenuBtn')};
    });
    for(const [key,value] of Object.entries(geometry))assert.ok(value,`${key} ${width}x${height}: ${JSON.stringify(geometry)}`);
@@ -47,9 +47,9 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mesa-v1-evidenc
   console.log('PASS 10 tamanhos: sem rolagem da mesa; fundo e chama co-registrados; descarte no queimador; compra/menu alcançáveis; mãos dentro da tela');
   for(const color of ['red','blue','green','yellow',null]){
    await page.evaluate(color=>{CartasTest.getState().activeColor=color;document.querySelector('#useCardArt').onchange()},color);await page.clock.runFor(220);
-   await page.locator('.flame').evaluateAll(els=>Promise.all(els.flatMap(el=>el.getAnimations().map(a=>a.finished))));
-   assert.equal(await page.locator('.flame').evaluateAll(els=>els.filter(el=>Number(getComputedStyle(el).opacity)>.99).length),color?1:0);
-   if(color){await page.locator(`.flame-${color}`).evaluate(el=>Promise.all(el.getAnimations().map(a=>a.finished)));assert.equal(await page.locator(`.flame-${color}`).evaluate(el=>getComputedStyle(el).opacity),'1');}
+   await page.locator('.flame').evaluateAll(els=>Promise.all(els.flatMap(el=>el.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished))));
+   assert.equal(await page.locator('.flame').evaluateAll(els=>els.filter(el=>Number(getComputedStyle(el).opacity)>.1).length),color?1:0);
+   if(color){await page.locator(`.flame-${color}`).evaluate(el=>Promise.all(el.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished)));assert.equal(await page.locator(`.flame-${color}`).evaluate(el=>getComputedStyle(el).opacity),'0.66');}
   }
   console.log('PASS quatro chamas por estado, crossfade e ausência de chama sem cor ativa');
   await page.setViewportSize({width:390,height:844});await fixture();
@@ -80,7 +80,7 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mesa-v1-evidenc
    await page.setViewportSize({width,height});await fixture();
    await page.evaluate(()=>{const s=CartasTest.getState();s.current=2;s.cutOpen=true;s.lastActor=1;s.discard=[{id:58000,type:'num',color:'blue',num:4}];s.players[0].hand.push({id:58001,type:'num',color:'blue',num:4});document.querySelector('#useCardArt').onchange()});
    assert.equal(await page.locator('#controls #cutBtn').count(),0);assert.equal(await page.locator('#hand #cutBtn .cut-bubble img').count(),1);
-   const r=await page.locator('#cutBtn .cut-bubble').boundingBox();assert.ok(r.y>=0&&r.y+r.height<=height);
+   const r=await page.locator('#cutBtn .cut-bubble').boundingBox();assert.ok(r.y>=0&&r.y+r.height<=height&&r.width>=58&&r.height>=58);
    await page.screenshot({path:path.join(evidence,`${width}x${height}-corte.png`)});
    await page.locator('#cutBtn .cut-bubble').tap();assert.equal(await page.evaluate(()=>CartasTest.getState().discard.at(-1).id),58001);
    assert.ok(await page.evaluate(()=>CartasTest.getState().unlockAt-Date.now()>=2700&&CartasTest.getState().unlockAt-Date.now()<=2800));

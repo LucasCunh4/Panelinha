@@ -45,6 +45,8 @@ logcat_pid=$!
 # Somente no emulador descartável do CI: o Pixel Launcher do sistema apresentou
 # ANR e tomou o foco do jogo (#7). Nenhum erro/diálogo do aplicativo é suprimido.
 if [[ "${GITHUB_ACTIONS:-}" == true && "$(adb get-serialno)" == emulator-* ]]; then
+  # Testar movimento normal do WebView; transições de janelas continuam desativadas.
+  adb shell settings put global animator_duration_scale 1
   # O assistente de primeiro boot religou o Wi-Fi após o modo avião (#10).
   for ci_component in com.google.android.apps.nexuslauncher com.google.android.googlesdksetup; do
     ci_component_path="$(adb shell pm path "$ci_component")"

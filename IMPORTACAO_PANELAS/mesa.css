@@ -77,3 +77,85 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 @media(max-width:359px){.table{--seat-width:64px}.seat{padding:5px 2px}.seat .name{font-size:10px}.seat .sub{font-size:9px}.seat.left{left:5px}.seat.right{right:5px}.pan-avatar{width:30px;height:28px}.draw-stack{right:calc(var(--card-width)*.8)}.direction-indicator{left:calc(var(--card-width)*.95)}#directionLabel{font-size:7px}}
 @media(hover:hover){.hand>button:not(:disabled):hover{z-index:6;transform:translateY(-9px) rotate(var(--fan-angle))}.hand button:not(:disabled):hover .card{transform:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* Refinamentos V1.1 — PNGs originais preservados. */
+.flame {
+ -webkit-mask-image:radial-gradient(circle closest-side,#000 0 73%,rgba(0,0,0,.68) 80%,transparent 89%);
+ mask-image:radial-gradient(circle closest-side,#000 0 73%,rgba(0,0,0,.68) 80%,transparent 89%);
+ transform-origin:50% 50%;
+ animation:flame-sway 2.9s ease-in-out infinite alternate,flame-flicker 1.7s ease-in-out infinite;
+ animation-play-state:paused;
+ filter:saturate(.84) brightness(.86);
+}
+.table[data-active-color=red] .flame-red,.table[data-active-color=blue] .flame-blue,
+.table[data-active-color=green] .flame-green,.table[data-active-color=yellow] .flame-yellow {opacity:.66;animation-play-state:running}
+@keyframes flame-sway {
+ 0%{transform:scale(.994,1) rotate(-.35deg)}
+ 31%{transform:scale(1.006,.994) rotate(.2deg)}
+ 64%{transform:scale(.997,1.009) rotate(-.1deg)}
+ 100%{transform:scale(1.005,1.002) rotate(.35deg)}
+}
+@keyframes flame-flicker {
+ 0%,100%{filter:saturate(.84) brightness(.84)}
+ 19%{filter:saturate(.86) brightness(.91)}
+ 43%{filter:saturate(.82) brightness(.82)}
+ 71%{filter:saturate(.85) brightness(.89)}
+}
+/* Monte vertical na lateral, separado do queimador e da mão do adversário. */
+.table>.draw-stack {left:max(12px,env(safe-area-inset-left));right:auto;top:25%;transform:translateY(-50%);z-index:4}
+.table>.draw-stack .stack-label {transform:translateX(-50%)}
+#pile .card {transform:none}
+/* Só o rótulo identifica o participante; as cartas repousam diretamente na mesa. */
+.table {--opponent-card:clamp(30px,4.5vh,42px)}
+.seat:not(.self),.seat:not(.self).active {background:none;border:0;border-radius:0;box-shadow:none;padding:0}
+.seat:not(.self)::after {display:none}
+.seat-identity {position:relative;display:grid;grid-template-columns:24px auto;grid-template-rows:16px 14px;column-gap:4px;align-items:center;width:max-content;max-width:100%;margin:auto;padding:3px 6px;border-radius:16px;background:#211526b8;text-shadow:0 1px 3px #000}
+.seat-identity>.pan-avatar {grid-column:1;grid-row:1/3;width:24px;height:25px;margin:0}
+.seat-identity>.name {grid-column:2;grid-row:1;margin:0;font-size:11px;line-height:16px}
+.seat-identity>.sub {grid-column:2;grid-row:2;margin:0;font-size:9px;line-height:14px;white-space:nowrap}
+.seat.active .seat-identity {color:#ffe6a8;box-shadow:0 0 0 1px #ffdd8799,0 0 14px #ffc95a55}
+.seat.active .seat-identity>.pan-avatar {filter:drop-shadow(0 0 5px #ffd675)}
+.seat.top {width:min(62%,340px)}
+.seat.top .back,.seat.top .subhand {position:relative;width:max-content;max-width:100%;margin:7px auto 0;padding:9px 7px 8px;min-height:0;overflow-x:auto;overflow-y:hidden}
+.seat.top .back {transform:rotate(180deg)}
+.seat.top .subhand.scroll-hand {width:100%;justify-content:flex-start}
+.back {gap:0;align-items:center;letter-spacing:0}
+.hidden-card {flex:0 0 auto;width:var(--opponent-card);height:calc(var(--opponent-card)*2.025);margin-left:calc(var(--opponent-card)*-.58);border-radius:7px;box-shadow:0 4px 7px #0008,inset 0 0 0 3px #392649,inset 0 0 0 4px #caa6d177;transform:rotate(var(--fan-angle));transform-origin:50% 110%}
+.hidden-card::after {font-size:20px;line-height:calc(var(--opponent-card)*1.95)}
+.subhand .card.mini {width:var(--opponent-card);min-width:var(--opponent-card);height:calc(var(--opponent-card)*2.025)}
+.subhand .card {margin-left:calc(var(--opponent-card)*-.48);filter:drop-shadow(0 3px 3px #0007)}
+.subhand.scroll-hand .card {margin:0}
+.seat.left,.seat.right {width:82px;height:calc(var(--opponent-card)*3.6);top:calc(var(--burner-y) + 16px)}
+.seat.left {left:max(8px,env(safe-area-inset-left))}.seat.right {right:max(8px,env(safe-area-inset-right))}
+.seat.left .back,.seat.left .subhand,.seat.right .back,.seat.right .subhand {
+ position:absolute;left:50%;top:50%;width:calc(var(--opponent-card)*3.6);height:calc(var(--opponent-card)*2.025 + 12px);max-width:none;margin:0;padding:6px 4px;min-height:0;overflow-x:auto;overflow-y:hidden;justify-content:center;
+ transform:translate(-50%,-50%) rotate(90deg)
+}
+.seat.right .back,.seat.right .subhand {transform:translate(-50%,-50%) rotate(-90deg)}
+.seat.left .subhand.scroll-hand,.seat.right .subhand.scroll-hand {justify-content:flex-start}
+.seat.left .seat-identity,.seat.right .seat-identity {position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);width:82px;padding:2px 3px;grid-template-columns:21px auto;column-gap:2px}
+.seat.left .seat-identity>.pan-avatar,.seat.right .seat-identity>.pan-avatar {width:21px;height:23px}
+.seat.left .seat-identity>.sub,.seat.right .seat-identity>.sub {font-size:8px}
+/* A carta inteira continua sendo o alvo de corte, incluindo este balão maior. */
+.cut-bubble {width:58px;height:58px;right:-12px;top:-33px}
+.hand {height:calc(var(--card-width)*2.025 + 70px);padding-top:48px}
+/* Cópias visuais não recebem eventos e nunca substituem o estado real. */
+.play-animations {position:fixed;inset:0;z-index:9;overflow:hidden;pointer-events:none}
+.played-card {position:fixed;pointer-events:none;transform-origin:50% 50%;will-change:transform;filter:drop-shadow(0 8px 8px #0007)}
+.flight-front,.flight-back {position:absolute;inset:0;backface-visibility:hidden}
+.played-card .card,.played-card .hidden-card {display:flex;width:100%;min-width:0;height:100%;margin:0;transform:none;aspect-ratio:auto}
+.played-card .card-image {width:100%;height:100%;object-fit:contain}
+.played-card .hidden-card {align-items:center;justify-content:center}.played-card .hidden-card::after{line-height:1}
+#discard.receiving-card>.card {visibility:hidden}
+@media(orientation:landscape) and (max-height:600px){
+ .table{--opponent-card:clamp(26px,7.5vh,33px)}
+ .table>.draw-stack{top:20%;left:max(12px,env(safe-area-inset-left))}
+ .seat.top{top:max(7px,env(safe-area-inset-top))}.seat.top .back,.seat.top .subhand{margin-top:3px;padding:5px 6px}
+ .seat-identity{padding:1px 5px;grid-template-columns:20px auto;grid-template-rows:13px 12px;column-gap:3px}
+ .seat-identity>.pan-avatar{width:20px;height:22px}.seat-identity>.name{font-size:10px;line-height:13px}.seat-identity>.sub{font-size:8px;line-height:12px}
+ .seat.left,.seat.right{top:48%;width:76px}.seat.left .seat-identity,.seat.right .seat-identity{width:76px}
+ .hand{height:calc(var(--card-width)*2.025 + 62px);padding-top:45px}
+}
+@media(prefers-reduced-motion:reduce){.flame{animation:none!important;transform:none!important;filter:saturate(.84) brightness(.86)}}
+
+.hand button:not(:disabled):hover .card {transform:none}

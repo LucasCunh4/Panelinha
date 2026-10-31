@@ -105,14 +105,18 @@ public class OfflineGameTest {
         // Pausa controlada só na fixture: o emulador sem KVM demora mais que a
         // janela humana de 2,8s. Os handlers de carta/corte continuam originais.
         js("window.__holdCutTurn=()=>{CartasTest.getState().unlockAt=Date.now()+120000;document.getElementById('useCardArt').onchange()};document.querySelector('[data-card=\"84000\"]').addEventListener('click',window.__holdCutTurn,{once:true})");
+        js("window.__playedCards=[];new MutationObserver(rs=>rs.forEach(r=>r.addedNodes.forEach(n=>{if(n.classList&&n.classList.contains('played-card'))window.__playedCards.push({id:n.dataset.cardId,actor:n.dataset.actor,x:Number(n.dataset.originX),y:Number(n.dataset.originY)});}))).observe(document.getElementById('playAnimations'),{childList:true})");
         tap("[data-card='84000']");
         waitFor("!CartasTest.getState().players[0].hand.some(c=>c.id===84000)", 60000);
         assertEquals("2", js("CartasTest.getState().penalty"));
+        if ("false".equals(js("matchMedia('(prefers-reduced-motion: reduce)').matches"))) {
+            assertEquals("true", js("window.__playedCards.some(c=>c.id==='84000'&&c.actor==='0'&&c.x>0&&c.y>0)"));
+        }
         // Anunciar antes do corte de 2 para 1 evita a denúncia legítima dos bots.
         tap("#unoBtn");
         waitFor("CartasTest.getState().preUno===true", 60000);
         js("document.getElementById('cutBtn').addEventListener('click',window.__holdCutTurn,{once:true})");
-        tap("#cutBtn");
+        tap("#cutBtn .cut-bubble");
         waitFor("!CartasTest.getState().players[0].hand.some(c=>c.id===84001)", 60000);
         assertEquals("2", js("CartasTest.getState().penalty"));
         assertEquals("1", js("CartasTest.getState().players[0].hand.length"));
@@ -138,6 +142,7 @@ public class OfflineGameTest {
         InstrumentationRegistry.getInstrumentation().waitForIdleSync();
         InstrumentationRegistry.getInstrumentation().getUiAutomation().waitForIdle(300, 5000);
         assertEquals("true", js("document.documentElement.scrollWidth<=innerWidth && document.documentElement.scrollHeight<=innerHeight"));
+        assertEquals("true", js("(()=>{const r=document.getElementById('buyBtn').getBoundingClientRect();return r.right<innerWidth*.25&&r.height>r.width*1.8})()"));
         assertEquals("true", js("(()=>{const bg=document.getElementById('stoveScene').getBoundingClientRect(),f=document.getElementById('burner').getBoundingClientRect();return Math.abs(f.x+f.width/2-(bg.x+bg.width*836/1672))<1&&Math.abs(f.y+f.height/2-(bg.y+bg.height*451/941))<1&&Math.abs(f.width-f.height)<1})()"));
         Bitmap bitmap = InstrumentationRegistry.getInstrumentation().getUiAutomation().takeScreenshot();
         assertNotNull("Captura Android da mesa", bitmap);
@@ -155,7 +160,7 @@ public class OfflineGameTest {
             while ((count = input.read(buffer)) != -1) output.write(buffer, 0, count);
         }
         assertTrue("Captura física PNG", target.length() > 8);
-        String details = new JSONArray("[" + js("JSON.stringify({width:innerWidth,height:innerHeight,dpr:devicePixelRatio,landscape:matchMedia('(orientation:landscape)').matches,table:document.getElementById('table').getBoundingClientRect().toJSON(),hand:document.getElementById('hand').getBoundingClientRect().toJSON()})") + "]").getString(0);
+        String details = new JSONArray("[" + js("JSON.stringify({width:innerWidth,height:innerHeight,dpr:devicePixelRatio,motionReduced:matchMedia('(prefers-reduced-motion: reduce)').matches,landscape:matchMedia('(orientation:landscape)').matches,table:document.getElementById('table').getBoundingClientRect().toJSON(),hand:document.getElementById('hand').getBoundingClientRect().toJSON()})") + "]").getString(0);
         org.json.JSONObject geometry = new org.json.JSONObject(details);
         geometry.put("nativeWidth", web.getWidth()); geometry.put("nativeHeight", web.getHeight());
         try (FileOutputStream output = new FileOutputStream(new File(folder, "mesa-v1-" + orientation + ".json"))) {
