@@ -460,7 +460,7 @@
       }
     }
     const self=$('player0').getBoundingClientRect(),tableRect=$('table').getBoundingClientRect();
-    $('table').style.setProperty('--turn-cue-bottom',`${tableRect.bottom-self.top+8}px`);
+    $('table').style.setProperty('--turn-cue-bottom',`${tableRect.bottom-self.top+(innerWidth>innerHeight&&innerHeight<=600?2:8)}px`);
     fan($('hand'), innerWidth < 360 ? 7 : 9, savedScroll);
     const top=state.discard[state.discard.length-1];
     displayedTop=top?.id ?? null;

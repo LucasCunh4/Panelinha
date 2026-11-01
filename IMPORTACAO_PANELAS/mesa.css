@@ -346,5 +346,12 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 @keyframes mandatory-draw {0%,100%{opacity:.7;filter:brightness(1)}50%{opacity:1;filter:brightness(1.4);box-shadow:0 0 19px #ffc568,inset 0 0 9px #ffe7b0}}
 @media(orientation:portrait){#turnCue {right:16px;bottom:clamp(150px,28vh,240px);max-width:140px;font-size:24px}}
 @media(prefers-reduced-motion:reduce){.hand {transition:none}#buyBtn.mandatory-buy::after {animation:none}}
+/* HUD compacto em telas baixas: nome e avatar não avançam sobre o adversário lateral. */
+@media(orientation:landscape) and (max-height:600px){
+ .seat.self {display:grid;grid-template-columns:22px minmax(0,1fr);grid-template-rows:auto auto;gap:2px 3px;padding:4px 5px}
+ .seat.self>.name {grid-column:1 / -1;grid-row:1;font-size:10px;line-height:1.15;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+ .seat.self>.pan-avatar {grid-column:1;grid-row:2;width:22px;height:22px}
+ .seat.self>.sub {grid-column:2;grid-row:2;font-size:8.5px;line-height:1.1;min-width:0}
+}
 .table[data-direction="-1"] .tail-clockwise.tail-mid,.table[data-direction="1"] .tail-counterclockwise.tail-mid{opacity:.4}
 .table[data-direction="-1"] .tail-clockwise.tail-near,.table[data-direction="1"] .tail-counterclockwise.tail-near{opacity:.7}

@@ -87,7 +87,7 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/horizontal-evidence'
   console.log('PASS corte fora da vez mantém tamanho normal e faca clicável; controles sem mensagens de espera');
   for(const [width,height] of [[568,320],[844,390],[1280,800]]){
    await p.setViewportSize({width,height});await fixture();await p.evaluate(()=>{CartasTest.getState().identity.name='NomeMuitoCompridoSemEspacos123456';document.getElementById('useCardArt').onchange()});
-   const overlap=await p.evaluate(()=>{const a=document.getElementById('player0').getBoundingClientRect(),b=document.getElementById('turnCue').getBoundingClientRect();return a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top});assert.equal(overlap,false);
+   const overlap=await p.evaluate(()=>{const a=document.getElementById('player0').getBoundingClientRect(),b=document.getElementById('turnCue').getBoundingClientRect();const bot=document.querySelector('#player1 .seat-identity').getBoundingClientRect();const hit=(a,b)=>a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;return hit(a,b)||hit(a,bot)||hit(b,bot)});assert.equal(overlap,false);
   }
   await p.setViewportSize({width:844,height:390});await p.evaluate(()=>CartasTest.getState().identity=PanelinhaProfile.current);
   await fixture({hand:[card('num','red',2)]});await p.locator('[data-card="139000"]').tap();assert.ok((await p.locator('#controls').textContent()).includes('Chef Lua'));
