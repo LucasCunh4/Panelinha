@@ -27,3 +27,19 @@ Base: `android/apk-testes`, upload `e1e9edd`, após APK 0.2.25/c4502.
 ## Android
 
 Mantidos `com.lucascunha.panelinha.teste`, origem `https://localhost`, `sensorLandscape`, categoria `game`, imersão permanente e assinatura da geração 2. Nenhum Secret ou chave alterado/criado. Mesmo workflow, alocador crescente e upload `actions/upload-artifact@v7` com `archive: false`, somente APK. Compilação/assinatura e resultados reais do emulador serão registrados após o workflow, sem tratar falhas de infraestrutura como aprovação de testes.
+
+### APK final e download
+
+- **0.2.26 / código 4602**, fonte `7b5111e7c7c53124c3d9b036fe4587aed076362f`, [workflow #26](https://github.com/LucasCunh4/Panelinha/actions/runs/41346698423). Compilação release, compilação da instrumentação e candidato de atualização 4603 aprovados, com assinatura da geração 2.
+- [Baixar diretamente Panelinha-Teste-v0.2.26-c4602.apk](https://github.com/LucasCunh4/Panelinha/actions/runs/41346698423/artifacts/13099792313). Exige sessão no GitHub; retenção até 30/01/2027. Arquivo APK direto, sem extração de ZIP.
+- O arquivo foi baixado e conferido novamente com `apksigner`, `aapt` e `ferramentas/verificar_apk.py`: mesmo applicationId, origem, assinatura v2 e certificado SHA-256 `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`. Verificados release, orientação/categoria e arquivos web exatos. Conferidos 52 PNGs de cartas, seis da mesa, dois recursos de menu, 11 especiais remanescentes, 22 de +4/+6 e **os dois PNGs padronizados RGBA 400×850**. As duas artes antigas estão ausentes do APK.
+- SHA-256 do APK: `6e64ba7a289a467e54473d251f4784aaa5df5cf0ee683de7df80a07c31080ce9`, igual ao digest GitHub. `AndroidManifest.xml` e `classes.dex` na raiz, sem outro `.apk` interno. [Metadados verificados](PADRAO_400X850_APK_0.2.26.json).
+- A inspeção do servidor local do Capacitor 8.6.0 confirmou `Cache-Control: no-cache` em `WebViewLocalServer.java`, além dos novos nomes e caminhos de imagens. Nenhum cache de dados do jogador foi apagado.
+
+### Resultado real do emulador
+
+**O workflow geral falhou na etapa Android.** A instrumentação anunciou 11 testes e iniciou `a_imagesAndThreeBotsOffline`, mas **zero testes concluíram**. O dispositivo ficou `offline` no ADB e a porta TCP 5554 do emulador recusou conexão. Não houve resultado de asserção nem registro de crash/ANR do aplicativo nos logs coletados; não foi encontrado OOM/segfault do host. A causa raiz da interrupção do ambiente não está comprovada, e a compilação não equivale a aprovar a execução no Android.
+
+Permanecem pendentes os 11 casos nativos e a atualização real com conferência de UID/localStorage/SharedPreferences. Nenhum teste foi removido ou desativado; a Release continua bloqueada pela falha, enquanto o APK assinado fica disponível pelo artefato já configurado. [Diagnósticos completos](https://github.com/LucasCunh4/Panelinha/actions/runs/41346698423/artifacts/13099204597); extratos originais em `evidencias-padrao-400x850/android-*`.
+
+Comparação dos APKs reais **0.2.25/c4502 → 0.2.26/c4602** confirmou mesmo pacote, certificado e origem, com código maior. O APK é compatível com instalação por cima, sem desinstalação. O armazenamento e o comportamento de salvamento não foram alterados; a comprovação da retenção por instalação no emulador permanece pendente conforme descrito.

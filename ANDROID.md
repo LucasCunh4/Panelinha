@@ -182,3 +182,11 @@ O menu principal passa por uma identificação compartilhada antes das configura
 A mesa remove os textos de espera, apresenta SUA VEZ!, amplia a mão humana em 6% durante o turno disponível e destaca o monte apenas quando comprar for a única ação de turno válida. Configurações/menus podem rolar para conservar a acessibilidade; a mesa não rola. Em landscape baixo, nomes longos no card humano ficam em até duas linhas, com valor integral no perfil/resultados/título/acessibilidade.
 
 São **11 testes nativos**, com capturas landscape e reverse-landscape e verificação adicional do perfil na atualização. As 14 suítes web e cinco testes de versão passaram. O APK **0.2.25/c4502** foi assinado no workflow existente e verificado independentemente com o certificado da geração 2, pacote e origem preservados. No workflow #25, o emulador ficou offline durante o primeiro teste: zero dos 11 casos concluídos, e atualização real com retenção de dados pendente. Resultados e APK direto em `testes/HORIZONTAL_IDENTIDADE_RESULTADOS.md`.
+
+## Verso e Panela padronizados — 0.2.26
+
+O verso e a Panela usam exclusivamente os novos PNGs RGBA de 400×850 em `assets/padronizadas/`. As duas versões anteriores foram retiradas da produção; `MANIFESTO_ESPECIAIS_V1.json` conserva as outras 11 imagens. `MANIFESTO_PADRAO_400X850.json` registra as duas novas. Build e verificador rejeitam imagens antigas e conferem os novos hashes, dimensões e formato. Seletores e outras artes não foram alterados.
+
+Os componentes continuam com a geometria das numéricas e encaixe proporcional `contain`, sem borda/recorte CSS adicional nas novas imagens. As 52 numéricas integradas têm 420×850 e foram preservadas; a referência numérica 400×850 do ZIP não pertence a esse conjunto. As máscaras das duas novas artes são idênticas entre si, sem alegar igualdade pixel a pixel com todas as numéricas atuais.
+
+Quinze suítes web e cinco testes de versão passaram. O APK **0.2.26/c4602** foi assinado e verificado independentemente com a geração 2, incluindo ausência das imagens antigas e atualização compatível sobre c4502. No workflow #26, o emulador ficou offline durante o primeiro teste: zero dos 11 casos nativos concluídos e retenção real de dados pendente. Download direto, evidências e limitações em `testes/PADRAO_400X850_RESULTADOS.md`.
