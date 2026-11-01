@@ -12,10 +12,6 @@
       "sha256": "df297ea83edb538acff839eb3944fed23788284fbb5c1c5a82bfce3fca83084d"
     },
     {
-      "path": "assets/especiais/carta_panela_de_pressao.png",
-      "sha256": "2aafbd64a4a3fa591e71a09d7f59eccd2fcaa2ac22b894af77819a5d1734d01b"
-    },
-    {
       "path": "assets/especiais/escolher_cor_alfaces.png",
       "sha256": "72a5739301fbe94b2336663ff36f0a0d0c21273a613daa88c1a47ef89a819a49"
     },
@@ -50,10 +46,13 @@
     {
       "path": "assets/especiais/escolher_cor_tomates_overlay_full.png",
       "sha256": "3006a909b92b05893d5e584a130e913d85669f30ffcca5df7bceb6ad80337c36"
-    },
-    {
-      "path": "assets/especiais/verso_todas_as_cartas.png",
-      "sha256": "d100e9ef1f8c252e67a0712b83d6bc8a715338bec838655bd32859e5462ea5a5"
     }
-  ]
+  ],
+  "supersededAssets": {
+    "manifest": "documentacao/MANIFESTO_PADRAO_400X850.json",
+    "paths": [
+      "assets/especiais/carta_panela_de_pressao.png",
+      "assets/especiais/verso_todas_as_cartas.png"
+    ]
+  }
 }

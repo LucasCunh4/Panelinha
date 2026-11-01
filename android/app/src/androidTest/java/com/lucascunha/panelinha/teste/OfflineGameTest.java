@@ -299,9 +299,9 @@ public class OfflineGameTest {
     }
     @Test public void i_officialArtAndIngredientColorPickerOffline() throws Exception {
         startControlled();
-        js("window.__specialCheck=null;(async()=>{try{const files=['verso_todas_as_cartas','carta_panela_de_pressao','carta_escolher_cor_montada_preview','escolher_cor_base',...['tomates','queijos','mirtilos','alfaces'].map(n=>'escolher_cor_'+n+'_overlay_full')];await Promise.all(files.map(async f=>{const im=new Image();im.src='assets/especiais/'+f+'.png';await im.decode();if(im.naturalWidth!==1024||im.naturalHeight!==1536)throw Error(f)}));window.__specialCheck=8}catch(e){window.__specialCheck=String(e)}})()");
+        js("window.__specialCheck=null;(async()=>{try{const files=['carta_escolher_cor_montada_preview','escolher_cor_base',...['tomates','queijos','mirtilos','alfaces'].map(n=>'escolher_cor_'+n+'_overlay_full')];await Promise.all(files.map(async f=>{const im=new Image();im.src='assets/especiais/'+f+'.png';await im.decode();if(im.naturalWidth!==1024||im.naturalHeight!==1536)throw Error(f)}));await Promise.all(['verso_oficial_400x850','panela_de_pressao_400x850'].map(async f=>{const im=new Image();im.src='assets/padronizadas/'+f+'.png';await im.decode();if(im.naturalWidth!==400||im.naturalHeight!==850)throw Error(f)}));window.__specialCheck=8}catch(e){window.__specialCheck=String(e)}})()");
         waitFor("window.__specialCheck===8",60000);
-        assertEquals("true",js("[...document.querySelectorAll('.hidden-card,.deck-back')].every(e=>getComputedStyle(e).backgroundImage.includes('verso_todas_as_cartas.png'))"));
+        assertEquals("true",js("[...document.querySelectorAll('.hidden-card,.deck-back')].every(e=>getComputedStyle(e).backgroundImage.includes('verso_oficial_400x850.png'))"));
         for(String color:new String[]{"red","yellow","blue","green"}){
             startControlled();
             js("(()=>{const s=CartasTest.getState();s.players[0].hand=[{id:89800,type:'wild',color:null},{id:89801,type:'num',color:'blue',num:7}];document.getElementById('useCardArt').onchange()})()");

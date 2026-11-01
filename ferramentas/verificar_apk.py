@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import re
+import struct
 import subprocess
 import sys
 import zipfile
@@ -50,13 +51,21 @@ with zipfile.ZipFile(apk) as archive:
     for entry in menu['assets']:
         assert hashlib.sha256(archive.read(prefix + entry['path'])).hexdigest() == entry['sha256'], entry['path']
     especiais = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_ESPECIAIS_V1.json').read_text())
-    assert len(especiais['assets']) == 13
+    assert len(especiais['assets']) == 11
     for entry in especiais['assets']:
         assert hashlib.sha256(archive.read(prefix + entry['path'])).hexdigest() == entry['sha256'], entry['path']
     penalidades = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_MAIS4_MAIS6.json').read_text())
     assert len(penalidades['assets']) == 22
     for entry in penalidades['assets']:
         assert hashlib.sha256(archive.read(prefix + entry['path'])).hexdigest() == entry['sha256'], entry['path']
+    padrao = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_PADRAO_400X850.json').read_text())
+    assert len(padrao['assets']) == 2
+    for entry in padrao['assets']:
+        data = archive.read(prefix + entry['path'])
+        assert hashlib.sha256(data).hexdigest() == entry['sha256'], entry['path']
+        assert data[:8] == b'\x89PNG\r\n\x1a\n' and struct.unpack('>II', data[16:24]) == (400,850) and data[25] == 6, 'PNG padronizado deve ser RGBA 400x850'
+    for old in especiais['supersededAssets']['paths']:
+        assert prefix + old not in archive.namelist(), f'Arte substituída ainda empacotada: {old}'
     for name in ['perfil.js', 'escolher-cor.js', 'escolher-cor.css', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js']:
         assert archive.read(prefix + name) == (root / 'IMPORTACAO_PANELAS' / name).read_bytes(), f'Jogo alterado no APK: {name}'
     original_html = (root / 'IMPORTACAO_PANELAS/index.html').read_bytes()
@@ -75,7 +84,7 @@ info = {
     'file': apk.name, 'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
     'applicationId': package[1], 'versionCode': int(package[2]), 'versionName': package[3],
     'certificateSha256': match[1].lower(), 'pngsVerified': len(pngs), 'origin': identity['origin'], 'androidCompat': has_compat,
-    'orientation': 'sensorLandscape', 'appCategory': 'game', 'signingGeneration': identity.get('signingGeneration', 1), 'mesaAssetsVerified': len(mesa['asset_files']), 'menuAssetsVerified': len(menu['assets']), 'specialAssetsVerified': len(especiais['assets']), 'penaltyAssetsVerified': len(penalidades['assets']),
+    'orientation': 'sensorLandscape', 'appCategory': 'game', 'signingGeneration': identity.get('signingGeneration', 1), 'mesaAssetsVerified': len(mesa['asset_files']), 'menuAssetsVerified': len(menu['assets']), 'specialAssetsVerified': len(especiais['assets']), 'penaltyAssetsVerified': len(penalidades['assets']), 'standardCardAssetsVerified': len(padrao['assets']),
 }
 apk.with_suffix('.json').write_text(json.dumps(info, indent=2) + '\n')
 print(json.dumps(info, indent=2))

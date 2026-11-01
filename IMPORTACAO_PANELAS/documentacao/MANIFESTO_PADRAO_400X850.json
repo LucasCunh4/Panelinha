@@ -1,0 +1,21 @@
+{
+  "bundle": "Panelinha — verso e Panela padronizados 400x850",
+  "sourceZip": "Panelinha_Verso_Panela_Pressao_400x850.zip",
+  "sourceZipSha256": "c20649fcb124147ef4a611388707daed3f0dbf19927cd56f93e8fc5f79dd446f",
+  "assets": [
+    {
+      "path": "assets/padronizadas/verso_oficial_400x850.png",
+      "sha256": "a18c6bcb0a31880d8363636d096f005a294bd7573723cdea2b77e9165d1edcc5",
+      "width": 400,
+      "height": 850,
+      "alphaSha256": "934a687637936ca627554de0610cefbf764b59b9f325514b6667e2957077a71d"
+    },
+    {
+      "path": "assets/padronizadas/panela_de_pressao_400x850.png",
+      "sha256": "b8522575c491016889a3b33c62cf78af333c6038126f1aacbf23ac8050bfd22b",
+      "width": 400,
+      "height": 850,
+      "alphaSha256": "934a687637936ca627554de0610cefbf764b59b9f325514b6667e2957077a71d"
+    }
+  ]
+}

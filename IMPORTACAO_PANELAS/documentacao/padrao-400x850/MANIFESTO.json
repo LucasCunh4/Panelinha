@@ -1,0 +1,42 @@
+{
+  "pacote": "Panelinha — Verso e Panela de Pressão padronizados",
+  "resolucao_canonica": [
+    400,
+    850
+  ],
+  "referencia": "cartas_panelas_numero_5_final/vermelha_tomates.png",
+  "geometria_alfa": "A máscara de transparência (alfa) é pixel-a-pixel idêntica à carta numérica de referência, incluindo cantos arredondados.",
+  "arquivos": {
+    "verso_oficial_400x850.png": {
+      "size": [
+        400,
+        850
+      ],
+      "mode": "RGBA",
+      "pixel_alpha_matches_reference": true,
+      "original_source_dimensions": [
+        860,
+        1828
+      ],
+      "original_source_filename": "carta_traseira_roxa_com_panelas_brilhantes.png",
+      "sha256": "a18c6bcb0a31880d8363636d096f005a294bd7573723cdea2b77e9165d1edcc5",
+      "bytes": 425430
+    },
+    "panela_de_pressao_400x850.png": {
+      "size": [
+        400,
+        850
+      ],
+      "mode": "RGBA",
+      "pixel_alpha_matches_reference": true,
+      "original_source_dimensions": [
+        860,
+        1828
+      ],
+      "original_source_filename": "carta_especial_panela_de_pressão.png",
+      "sha256": "b8522575c491016889a3b33c62cf78af333c6038126f1aacbf23ac8050bfd22b",
+      "bytes": 517077
+    }
+  },
+  "escopo": "Somente troca de imagem do verso e da Panela de Pressão. Nenhuma mudança de regra ou interação."
+}

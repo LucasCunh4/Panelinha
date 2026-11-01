@@ -185,7 +185,7 @@ const ASSET_FACE={draw2:'mais_2',skip:'bloqueio',reverse:'inverter'};
 function cardAssetPath(c){
   if(c?.type==='wild4')return 'assets/cartas_mais4_mais6/carta_mais4_completa.png';
   if(c?.type==='wild6')return 'assets/cartas_mais4_mais6/carta_mais6_completa.png';
-  if(c?.type==='dist')return 'assets/especiais/carta_panela_de_pressao.png';
+  if(c?.type==='dist')return 'assets/padronizadas/panela_de_pressao_400x850.png';
   if(c?.type==='wild')return 'assets/especiais/carta_escolher_cor_montada_preview.png';
   if(!c||!c.color||!ASSET_COLOR_DIR[c.color])return null;
   const face=c.type==='num'&&Number.isInteger(c.num)&&c.num>=0&&c.num<=9?String(c.num):ASSET_FACE[c.type];
@@ -196,7 +196,7 @@ function cardHTML(c,small=false,selected=false,invalid=false){
   const label=`<small>${c.color?CN[c.color]:''}</small><span class="${c.type==='dist'||c.type==='rotate'?'special-name':''}">${SHORT[c.type]||descriptor(c)}</span><small>${c.type==='num'?'':(c.color?'⇄':'★')}</small>`;
   const path=$('useCardArt')?.checked?cardAssetPath(c):null;
   if(!path)return `<span class="${base}" title="${name}">${label}</span>`;
-  return `<span class="${base} art-card${['dist','wild','wild4','wild6'].includes(c.type)?' official-special':''}" title="${name}" data-asset="${path}"><img class="card-image" src="${path}" alt="${name}" loading="lazy" draggable="false" onerror="this.parentNode.classList.add('asset-unavailable')"><span class="art-fallback">${label}</span></span>`;
+  return `<span class="${base} art-card${c.type==='dist'?' standard-card':['wild','wild4','wild6'].includes(c.type)?' official-special':''}" title="${name}" data-asset="${path}"><img class="card-image" src="${path}" alt="${name}" loading="lazy" draggable="false" onerror="this.parentNode.classList.add('asset-unavailable')"><span class="art-fallback">${label}</span></span>`;
 }
 function buildDeck(o){let a=[];for(const color of COLORS){for(let n=0;n<=9;n++){a.push(make('num',color,n),make('num',color,n));}for(let k=0;k<2;k++){a.push(make('draw2',color),make('skip',color),make('reverse',color));}}for(let k=0;k<4;k++)a.push(make('wild4'),make('wild'));if(o.wild6!==false)for(let k=0;k<2;k++)a.push(make('wild6'));if(o.dist)for(let k=0;k<2;k++)a.push(make('dist'));if(o.rotate)for(let k=0;k<2;k++)a.push(make('rotate'));return shuffle(a);}
 function log(msg){s.log.unshift(`[${new Date().toLocaleTimeString('pt-BR')}] ${msg}`);s.log=s.log.slice(0,70);}

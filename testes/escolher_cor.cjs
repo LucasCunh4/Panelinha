@@ -24,13 +24,13 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/escolher-cor-ev
  try{
   await p.goto(base);await p.locator('#singlePlayerBtn').tap();await p.locator('#profileContinueBtn').tap();await p.locator('#startBtn').tap();
   const manifest=JSON.parse(fs.readFileSync(path.join(__dirname,'../IMPORTACAO_PANELAS/documentacao/MANIFESTO_ESPECIAIS_V1.json')));
-  assert.equal(manifest.assets.length,13);
+  assert.equal(manifest.assets.length,11);
   for(const a of manifest.assets){const r=await p.request.get(new URL(a.path,base).href);assert.equal(r.status(),200);assert.equal(crypto.createHash('sha256').update(await r.body()).digest('hex'),a.sha256)}
   assert.ok(await p.evaluate(async assets=>{await Promise.all(assets.map(async a=>{const im=new Image();im.src=a.path;await im.decode();if(!im.naturalWidth)throw Error(a.path)}));return true},manifest.assets));
-  console.log('PASS 13 artes oficiais: bytes SHA-256, HTTP, decodificação e arquivos completos; 52 frentes anteriores intactas pelo build');
-  await setup('dist');assert.match(await p.locator('[data-card="9000"] .card-image').getAttribute('src'),/carta_panela_de_pressao.png$/);
+  console.log('PASS 11 artes especiais remanescentes: bytes SHA-256, HTTP, decodificação e arquivos completos; 52 frentes anteriores intactas pelo build');
+  await setup('dist');assert.match(await p.locator('[data-card="9000"] .card-image').getAttribute('src'),/panela_de_pressao_400x850.png$/);
   await setup();assert.match(await p.locator('[data-card="9000"] .card-image').getAttribute('src'),/carta_escolher_cor_montada_preview.png$/);
-  const backs=await p.locator('.hidden-card,.deck-back').evaluateAll(es=>es.map(e=>getComputedStyle(e).backgroundImage));assert.ok(backs.length>6&&backs.every(x=>x.includes('verso_todas_as_cartas.png')));
+  const backs=await p.locator('.hidden-card,.deck-back').evaluateAll(es=>es.map(e=>getComputedStyle(e).backgroundImage));assert.ok(backs.length>6&&backs.every(x=>x.includes('verso_oficial_400x850.png')));
   assert.equal(await p.locator('#pile>.deck-back').count(),6);assert.equal(await p.locator('#pile .pan-avatar,#pile .deck-brand').count(),0);
   await p.screenshot({path:path.join(evidence,'mesa-versos.png')});
   console.log('PASS verso oficial em todas as mãos ocultas e seis camadas do monte; Panela de Pressão e Escolher Cor na mão');
@@ -66,7 +66,7 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/escolher-cor-ev
   await open();const beforeTap=await p.evaluate(()=>CartasTest.getState().deck.length);await p.mouse.click(8,8);assert.equal(await p.evaluate(()=>CartasTest.getState().deck.length),beforeTap);assert.ok(await p.locator('.color-picker').isVisible());await p.keyboard.press('Escape');
   console.log('PASS Liquidificador sem escolha, última carta finaliza, Voltar/Escape cancelam e o fundo bloqueia toque na mesa');
   // A animação de compra também usa o verso oficial, não o avatar provisório.
-  await setup();await p.locator('#pile').tap();assert.ok(await p.locator('.drawn-card>.deck-back').count());assert.ok((await p.locator('.drawn-card>.deck-back').evaluateAll(es=>es.map(e=>getComputedStyle(e).backgroundImage))).every(x=>x.includes('verso_todas_as_cartas.png')));await p.waitForFunction(()=>!document.querySelector('.drawn-card'));
+  await setup();await p.locator('#pile').tap();assert.ok(await p.locator('.drawn-card>.deck-back').count());assert.ok((await p.locator('.drawn-card>.deck-back').evaluateAll(es=>es.map(e=>getComputedStyle(e).backgroundImage))).every(x=>x.includes('verso_oficial_400x850.png')));await p.waitForFunction(()=>!document.querySelector('.drawn-card'));
   await p.emulateMedia({reducedMotion:'reduce'});await open();assert.equal(await p.locator('.ingredient-layer').evaluateAll(es=>es.flatMap(e=>e.getAnimations()).length),0);await p.locator('[data-color="green"]').tap();assert.equal(await p.locator('.color-picker').count(),0);assert.equal(await p.evaluate(()=>CartasTest.getState().activeColor),'green');
   await p.context().setOffline(true);await open();await p.locator('[data-color="blue"]').tap();assert.equal(await p.evaluate(()=>CartasTest.getState().activeColor),'blue');await p.context().setOffline(false);
   console.log('PASS compras animadas com verso oficial, preferência por movimento reduzido e escolha offline');

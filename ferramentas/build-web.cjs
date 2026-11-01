@@ -20,7 +20,7 @@ for (const entry of menu.assets) {
   if(crypto.createHash('sha256').update(fs.readFileSync(path.join(source,entry.path))).digest('hex')!==entry.sha256)throw Error(`Recurso do menu divergente: ${entry.path}`);
 }
 const especiais=JSON.parse(fs.readFileSync(path.join(source,'documentacao/MANIFESTO_ESPECIAIS_V1.json')));
-if(especiais.assets.length!==13)throw Error('O pacote oficial deve conter 13 PNGs');
+if(especiais.assets.length!==11)throw Error('O pacote especial remanescente deve conter 11 PNGs');
 for(const entry of especiais.assets){
   if(crypto.createHash('sha256').update(fs.readFileSync(path.join(source,entry.path))).digest('hex')!==entry.sha256)throw Error(`Arte especial divergente: ${entry.path}`);
 }
@@ -28,6 +28,16 @@ const penalidades=JSON.parse(fs.readFileSync(path.join(source,'documentacao/MANI
 if(penalidades.assets.length!==22)throw Error('O pacote +4/+6 deve conter 22 PNGs');
 for(const entry of penalidades.assets){
   if(crypto.createHash('sha256').update(fs.readFileSync(path.join(source,entry.path))).digest('hex')!==entry.sha256)throw Error(`Arte +4/+6 divergente: ${entry.path}`);
+}
+const padrao=JSON.parse(fs.readFileSync(path.join(source,'documentacao/MANIFESTO_PADRAO_400X850.json')));
+if(padrao.assets.length!==2)throw Error('São duas artes padronizadas');
+for(const entry of padrao.assets){
+  if(crypto.createHash('sha256').update(fs.readFileSync(path.join(source,entry.path))).digest('hex')!==entry.sha256)throw Error(`Arte padronizada divergente: ${entry.path}`);
+}
+for(const old of especiais.supersededAssets.paths)if(fs.existsSync(path.join(source,old)))throw Error(`Arte substituída ainda no pacote: ${old}`);
+for(const file of ['index.html','mesa.css','mesa.js','escolher-cor.css','escolher-cor.js']){
+  const code=fs.readFileSync(path.join(source,file),'utf8');
+  for(const old of especiais.supersededAssets.paths)if(code.includes(path.basename(old)))throw Error(`Referência ativa à arte substituída: ${file}`);
 }
 fs.rmSync(output, {recursive:true, force:true});
 fs.mkdirSync(output, {recursive:true});
