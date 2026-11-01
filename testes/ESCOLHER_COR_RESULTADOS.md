@@ -34,7 +34,21 @@ Comparação direta do script do motor com a base: **idêntico byte a byte**, om
 
 Mantido o workflow `APK Android de testes`, os quatro Secrets existentes e o upload `actions/upload-artifact@v7` com `archive: false`, somente o APK. O alocador existente produz código superior a 4002, sem reiniciar o histórico.
 
-Adicionado o nono teste nativo de execução offline: decodificação das artes, verso oficial e quatro cores por toques reais no WebView. Preservados os oito testes anteriores e os testes de atualização por instalação `-r`, UID, localStorage e SharedPreferences. Compilar e assinar não equivale a aprovar a instrumentação; os resultados do CI e a verificação do arquivo assinado serão registrados após a execução.
+Adicionado o nono teste nativo de execução offline: decodificação das artes, verso oficial e quatro cores por toques reais no WebView. Preservados os oito testes anteriores e os testes de atualização por instalação `-r`, UID, localStorage e SharedPreferences.
+
+### Resultado real do GitHub Actions
+
+- [Execução #21](https://github.com/LucasCunh4/Panelinha/actions/runs/41257059591), commit `d9e27a01b3536ac57588c7163f1d4c5c88d50c03`: compilação release, instrumentação e candidato de atualização **aprovadas**, com assinatura da geração 2. Nenhum Secret foi modificado ou exibido.
+- APK entregue **0.2.21 / código 4102**, superior a 4002. O candidato interno usa 4103. O arquivo entregue foi baixado e verificado novamente com `apksigner`, `aapt` e `ferramentas/verificar_apk.py`: assinatura v2, mesmo certificado, pacote, origem, orientação, recursos e código esperados. Conferidos 52 PNGs de cartas, seis da mesa, dois recursos do menu e 13 artes especiais.
+- SHA-256 do APK: `a2d034f67c14e1ff89af52c304674801a859cf01a4b67cb82476be91e15e2d68`, idêntico ao digest do artefato GitHub. O arquivo contém diretamente `AndroidManifest.xml` e `classes.dex`, sem outro `.apk` interno: **não há ZIP externo para extrair**.
+- [Baixar diretamente Panelinha-Teste-v0.2.21-c4102.apk](https://github.com/LucasCunh4/Panelinha/actions/runs/41257059591/artifacts/13063352538). Exige sessão no GitHub; retenção até 30/01/2027. Metadados verificados em [ESCOLHER_COR_APK_0.2.21.json](ESCOLHER_COR_APK_0.2.21.json).
+- **A execução geral ficou vermelha na etapa do emulador.** Foram anunciados nove testes, iniciado `a_imagesAndThreeBotsOffline`, mas **zero testes concluídos**. Depois o ADB informou `device offline`; a porta TCP 5554 do emulador recusou conexão. Não houve resultado de asserção nem registro de `FATAL EXCEPTION`, sinal fatal ou ANR do aplicativo nos logs coletados. Isso caracteriza interrupção do ambiente de execução, cuja causa raiz não está comprovada; não é aprovação dos testes Android nem prova de ausência de defeitos no app.
+- Logs de dispositivo, kernel, memória e netsim examinados. Não encontrado registro de OOM/segfault do processo host. A evidência disponível não permite atribuir o problema a uma causa específica. [Diagnósticos completos](https://github.com/LucasCunh4/Panelinha/actions/runs/41257059591/artifacts/13063577191); extratos originais preservados em `evidencias-escolher-cor/android-*`.
+- Permanecem pendentes a conclusão dos nove testes no Android e as verificações reais de instalação por cima, UID/localStorage/SharedPreferences nesse emulador. Nenhum teste foi removido ou desativado; a Release continua bloqueada pelo teste falho, enquanto o APK assinado é disponibilizado pelo mecanismo já existente.
+
+### Atualização direta
+
+Comparação independente dos APKs reais **0.2.20/c4002 → 0.2.21/c4102** confirmou mesmo applicationId, mesmo certificado de assinatura e mesma configuração de origem, com código estritamente maior. Portanto, o novo APK é compatível com instalação por cima da versão atual da geração 2, sem desinstalação. Não houve mudança no armazenamento do jogo. A preservação dos dados no teste de atualização real permanece pendente pela interrupção do emulador descrita acima.
 
 Identidade exigida: `com.lucascunha.panelinha.teste`, origem `https://localhost`, geração 2 e certificado SHA-256 `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`. Nenhuma chave foi criada ou alterada.
 
