@@ -1,0 +1,20 @@
+{
+  "file": "Panelinha-Teste-v0.2.27-c4702.apk",
+  "sha256": "adcda4717d1084c5dd5e0af916207377c6f74efd3ce682cc330adf778d23fc32",
+  "applicationId": "com.lucascunha.panelinha.teste",
+  "versionCode": 4702,
+  "versionName": "0.2.27",
+  "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+  "pngsVerified": 52,
+  "origin": "https://localhost",
+  "androidCompat": true,
+  "orientation": "sensorLandscape",
+  "appCategory": "game",
+  "signingGeneration": 2,
+  "mesaAssetsVerified": 6,
+  "menuAssetsVerified": 2,
+  "specialAssetsVerified": 11,
+  "penaltyAssetsVerified": 22,
+  "standardCardAssetsVerified": 2,
+  "interactiveBasesVerified": 2
+}

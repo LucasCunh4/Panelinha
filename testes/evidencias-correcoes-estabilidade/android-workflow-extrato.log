@@ -1,0 +1,35 @@
+2026-11-01T21:34:57.7866988Z   "versionCode": 4702,
+2026-11-01T21:34:57.7867584Z   "versionName": "0.2.27",
+2026-11-01T21:34:57.7891227Z   "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+2026-11-01T21:34:57.7901790Z   "interactiveBasesVerified": 2
+2026-11-01T21:34:57.7903198Z OK: APK assinado, identidade fixa e 52 PNGs/jogo originais empacotados.
+2026-11-01T21:35:25.1556930Z   "versionCode": 4703,
+2026-11-01T21:35:25.1557747Z   "versionName": "0.2.27-upgrade-check",
+2026-11-01T21:35:25.1559632Z   "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+2026-11-01T21:35:25.1569484Z   "interactiveBasesVerified": 2
+2026-11-01T21:35:25.1570959Z OK: APK assinado, identidade fixa e 52 PNGs/jogo originais empacotados.
+2026-11-01T21:36:27.7727962Z adb: device offline
+2026-11-01T21:36:27.7737646Z The process '/usr/local/lib/android/sdk/platform-tools/adb' failed with exit code 1
+2026-11-01T21:36:29.7844611Z adb: device offline
+2026-11-01T21:36:29.7850996Z The process '/usr/local/lib/android/sdk/platform-tools/adb' failed with exit code 1
+2026-11-01T21:37:13.6854354Z INSTRUMENTATION_STATUS: class=com.lucascunha.panelinha.teste.OfflineGameTest
+2026-11-01T21:37:13.6856104Z INSTRUMENTATION_STATUS: current=1
+2026-11-01T21:37:13.6859826Z INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+2026-11-01T21:37:13.6861004Z INSTRUMENTATION_STATUS: numtests=11
+2026-11-01T21:37:13.6862107Z INSTRUMENTATION_STATUS: stream=
+2026-11-01T21:37:13.6864490Z INSTRUMENTATION_STATUS: test=a_imagesAndThreeBotsOffline
+2026-11-01T21:37:13.6865709Z INSTRUMENTATION_STATUS_CODE: 1
+2026-11-01T21:37:50.4401828Z adb: error: failed to get feature set: device offline
+2026-11-01T21:37:50.4403270Z adb: error: failed to get feature set: device offline
+2026-11-01T21:37:50.4433659Z adb: error: failed to get feature set: device offline
+2026-11-01T21:37:50.4464242Z adb: error: failed to get feature set: device offline
+2026-11-01T21:37:50.4485121Z adb: error: failed to get feature set: device offline
+2026-11-01T21:37:50.4513802Z adb: error: failed to get feature set: device offline
+2026-11-01T21:37:50.4541659Z adb: device offline
+2026-11-01T21:37:50.4806492Z ##[error]The process '/usr/bin/sh' failed with exit code 1
+2026-11-01T21:37:50.4852064Z error: could not connect to TCP port 5554: Connection refused
+2026-11-01T21:37:50.4857654Z The process '/usr/local/lib/android/sdk/platform-tools/adb' failed with exit code 1
+2026-11-01T21:37:50.5819956Z   archive: false
+2026-11-01T21:37:52.0480994Z Artifact artifact has been successfully uploaded! Final size is 65163846 bytes. Artifact ID is 13101917111
+2026-11-01T21:37:52.9763754Z Artifact metadados-apk-27-1 has been successfully uploaded! Final size is 558 bytes. Artifact ID is 13101942063
+2026-11-01T21:37:54.1942614Z Artifact resultados-android-27-1 has been successfully uploaded! Final size is 669353 bytes. Artifact ID is 13101852322

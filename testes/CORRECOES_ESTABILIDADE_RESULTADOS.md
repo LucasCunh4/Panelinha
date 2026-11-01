@@ -35,4 +35,15 @@
 
 Aplicativo mantém `sensorLandscape`, imersão, pacote `com.lucascunha.panelinha.teste`, origem `https://localhost` e identidade da geração 2. Código nativo de produção, certificado e configuração dos Secrets não foram alterados. Os 11 testes de instrumentação existentes foram preservados e atualizados para conferir as bases reparadas, tipo da Panela, círculo, estabilidade e pilha completa. O teste de toque externo usa a mesa, pois o aviso SUA VEZ não intercepta eventos.
 
-Compilação, certificado do APK real e resultados do emulador serão acrescentados após o workflow. Os resultados web não substituem execução no Android. O aplicativo conserva dados locais gravados; a partida em andamento continua existindo apenas em memória.
+Workflow [#27](https://github.com/LucasCunh4/Panelinha/actions/runs/41352523142), código-fonte `339cabc5deef50a3b239e09e8ebeff12aad4db18`:
+
+- Compilação release, instrumentação e candidato de atualização: **aprovados**. APK principal **0.2.27 / código 4702**; candidato de teste 4703, sem distribuição.
+- APK principal baixado e verificado novamente localmente: assinatura v2, certificado, applicationId, origem offline, sensorLandscape/categoria game, HTML/JS/CSS exatos e todos os assets por SHA-256. Metadados: [CORRECOES_ESTABILIDADE_APK_0.2.27.json](CORRECOES_ESTABILIDADE_APK_0.2.27.json).
+- Certificado SHA-256: `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`, igual a `android-identity.json` e ao APK anterior **0.2.26 / 4602**. Pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`. Código 4702 superior ao anterior e ao candidato 4603. Compatível com atualização direta sobre a geração 2, sem desinstalar.
+- SHA-256 do APK: `adcda4717d1084c5dd5e0af916207377c6f74efd3ce682cc330adf778d23fc32`. Igual ao digest do artefato GitHub. Tamanho 65.163.846 bytes. O arquivo contém diretamente `AndroidManifest.xml`/assets do APK, sem ZIP externo nem APK aninhado.
+- **Emulador: falhou; 0/11 testes concluídos.** Iniciou `a_imagesAndThreeBotsOffline`, perdeu conexão (`emulator-5554 offline`); a porta 5554 recusou conexão. Não houve resultado de assertiva do aplicativo, FATAL EXCEPTION/Fatal signal ou OOM nos logs coletados. O runner tinha cerca de 14 GiB de memória disponível após a queda. A causa final da indisponibilidade AVD/ADB não foi identificada. Essa falha de infraestrutura/execução não aprova nem reprova funcionalmente o aplicativo.
+- **Pendentes:** execução nativa completa em Android, capturas nativas nas duas paisagens e teste real de atualização/preservação de UID, localStorage e SharedPreferences. Não foram removidas ou desativadas verificações. A Release foi pulada pelo próprio fluxo após a falha, mas o upload direto do APK e dos diagnósticos passou.
+
+[Baixar diretamente o APK 0.2.27 / 4702, sem ZIP](https://github.com/LucasCunh4/Panelinha/actions/runs/41352523142/artifacts/13101917111). Requer sessão no GitHub; retenção até 30/01/2027. Metadados e resultados Android ficam em artefatos separados.
+
+Os resultados web não substituem execução no Android. A identidade de atualização foi conferida nos dois APKs reais; a preservação de dados não foi exercitada nesta execução por causa do emulador. O aplicativo conserva o mecanismo de dados locais gravados; a partida em andamento continua existindo apenas em memória.
