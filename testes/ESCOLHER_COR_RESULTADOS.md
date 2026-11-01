@@ -38,7 +38,7 @@ Adicionado o nono teste nativo de execução offline: decodificação das artes,
 
 ### Resultado real do GitHub Actions
 
-- [Execução #21](https://github.com/LucasCunh4/Panelinha/actions/runs/41257059591), commit `d9e27a01b3536ac57588c7163f1d4c5c88d50c03`: compilação release, instrumentação e candidato de atualização **aprovadas**, com assinatura da geração 2. Nenhum Secret foi modificado ou exibido.
+- [Execução #21](https://github.com/LucasCunh4/Panelinha/actions/runs/41257059591), commit `d9e27a01b3536ac57588c7163f1d4c5c88d50c03`: compilação do APK release, do APK de instrumentação e do candidato de atualização **aprovada**, com assinatura da geração 2. Nenhum Secret foi modificado ou exibido.
 - APK entregue **0.2.21 / código 4102**, superior a 4002. O candidato interno usa 4103. O arquivo entregue foi baixado e verificado novamente com `apksigner`, `aapt` e `ferramentas/verificar_apk.py`: assinatura v2, mesmo certificado, pacote, origem, orientação, recursos e código esperados. Conferidos 52 PNGs de cartas, seis da mesa, dois recursos do menu e 13 artes especiais.
 - SHA-256 do APK: `a2d034f67c14e1ff89af52c304674801a859cf01a4b67cb82476be91e15e2d68`, idêntico ao digest do artefato GitHub. O arquivo contém diretamente `AndroidManifest.xml` e `classes.dex`, sem outro `.apk` interno: **não há ZIP externo para extrair**.
 - [Baixar diretamente Panelinha-Teste-v0.2.21-c4102.apk](https://github.com/LucasCunh4/Panelinha/actions/runs/41257059591/artifacts/13063352538). Exige sessão no GitHub; retenção até 30/01/2027. Metadados verificados em [ESCOLHER_COR_APK_0.2.21.json](ESCOLHER_COR_APK_0.2.21.json).
