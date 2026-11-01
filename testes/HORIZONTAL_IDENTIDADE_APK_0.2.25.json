@@ -1,0 +1,61 @@
+{
+  "file": "Panelinha-Teste-v0.2.25-c4502.apk",
+  "sha256": "348f267328ab65b5a6a5b777746fe7375607b14c6c4d870cc728e2bff655fe57",
+  "applicationId": "com.lucascunha.panelinha.teste",
+  "versionCode": 4502,
+  "versionName": "0.2.25",
+  "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+  "pngsVerified": 52,
+  "origin": "https://localhost",
+  "androidCompat": true,
+  "orientation": "sensorLandscape",
+  "appCategory": "game",
+  "signingGeneration": 2,
+  "mesaAssetsVerified": 6,
+  "menuAssetsVerified": 2,
+  "specialAssetsVerified": 13,
+  "penaltyAssetsVerified": 22,
+  "sourceCommit": "eb283a2148355323d3e08d9ef9c763d4252d651d",
+  "workflowRun": 41344535934,
+  "workflowJob": 124962467197,
+  "workflowConclusion": "failure",
+  "artifactId": 13098608821,
+  "directApkUrl": "https://github.com/LucasCunh4/Panelinha/actions/runs/41344535934/artifacts/13098608821",
+  "archive": false,
+  "webSuitesPassed": 14,
+  "versionAllocatorTestsPassed": 5,
+  "androidInstrumentation": {
+    "expected": 11,
+    "completed": 0,
+    "firstStarted": "a_imagesAndThreeBotsOffline",
+    "outcome": "device offline; emulator TCP port 5554 refused connection",
+    "applicationAssertionFailureObserved": false,
+    "rootCauseConfirmed": false,
+    "orientationExecutionVerified": false,
+    "updatePersistenceTestExecuted": false
+  },
+  "binaryUpdateComparison": {
+    "previousVersion": "0.2.22",
+    "previousVersionCode": 4202,
+    "sameApplicationId": true,
+    "sameCertificate": true,
+    "sameOrigin": true,
+    "higherVersionCode": true
+  },
+  "intermediateWorkflows": [
+    {
+      "run": 41343410207,
+      "version": "0.2.23",
+      "code": 4302,
+      "conclusion": "failure",
+      "reason": "device offline durante primeiro teste; zero concluídos"
+    },
+    {
+      "run": 41343926556,
+      "version": "0.2.24",
+      "code": 4402,
+      "conclusion": "cancelled",
+      "reason": "revisão substituída pelo layout corrigido; aguardava sys.boot_completed e não havia iniciado instrumentação"
+    }
+  ]
+}

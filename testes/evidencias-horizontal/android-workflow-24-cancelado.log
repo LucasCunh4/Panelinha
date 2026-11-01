@@ -1,0 +1,11 @@
+2026-11-01T19:54:09.6832182Z   "versionCode": 4402,
+2026-11-01T19:54:09.6832506Z   "versionName": "0.2.24",
+2026-11-01T19:54:26.4772744Z   "versionCode": 4403,
+2026-11-01T19:54:26.4773046Z   "versionName": "0.2.24-upgrade-check",
+2026-11-01T19:55:06.4909219Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-01T20:03:30.4847942Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-01T20:03:32.4920575Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-01T20:03:34.5002229Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-01T20:03:36.5077462Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-01T20:03:38.5134783Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-01T20:03:40.5271394Z ##[error]The operation was canceled.

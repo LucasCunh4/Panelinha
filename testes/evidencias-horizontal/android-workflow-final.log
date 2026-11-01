@@ -1,0 +1,26 @@
+2026-11-01T20:05:40.5644400Z   "versionCode": 4502,
+2026-11-01T20:05:40.5644645Z   "versionName": "0.2.25",
+2026-11-01T20:05:40.5645129Z   "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+2026-11-01T20:05:40.5646389Z   "orientation": "sensorLandscape",
+2026-11-01T20:05:40.5646661Z   "appCategory": "game",
+2026-11-01T20:05:55.9287390Z   "versionCode": 4503,
+2026-11-01T20:05:55.9287577Z   "versionName": "0.2.25-upgrade-check",
+2026-11-01T20:05:55.9287904Z   "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+2026-11-01T20:05:55.9288883Z   "orientation": "sensorLandscape",
+2026-11-01T20:05:55.9289066Z   "appCategory": "game",
+2026-11-01T20:06:50.8932189Z adb: device offline
+2026-11-01T20:07:36.3230988Z INSTRUMENTATION_STATUS: class=com.lucascunha.panelinha.teste.OfflineGameTest
+2026-11-01T20:07:36.3269857Z INSTRUMENTATION_STATUS: current=1
+2026-11-01T20:07:36.3340323Z INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+2026-11-01T20:07:36.3386489Z INSTRUMENTATION_STATUS: numtests=11
+2026-11-01T20:07:36.3419398Z INSTRUMENTATION_STATUS: stream=
+2026-11-01T20:07:36.3449640Z INSTRUMENTATION_STATUS: test=a_imagesAndThreeBotsOffline
+2026-11-01T20:07:36.3469257Z INSTRUMENTATION_STATUS_CODE: 1
+2026-11-01T20:08:17.2446897Z adb: error: failed to get feature set: device offline
+2026-11-01T20:08:17.2464921Z adb: error: failed to get feature set: device offline
+2026-11-01T20:08:17.2483979Z adb: error: failed to get feature set: device offline
+2026-11-01T20:08:17.2501707Z adb: error: failed to get feature set: device offline
+2026-11-01T20:08:17.2518285Z adb: error: failed to get feature set: device offline
+2026-11-01T20:08:17.2535785Z adb: error: failed to get feature set: device offline
+2026-11-01T20:08:17.2556052Z adb: device offline
+2026-11-01T20:08:17.2749306Z error: could not connect to TCP port 5554: Connection refused

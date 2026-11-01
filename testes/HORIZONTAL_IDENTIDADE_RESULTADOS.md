@@ -29,3 +29,25 @@ A versão web mantém fallback funcional em retrato; o APK solicita somente land
 Mantidos certificado da geração 2, applicationId `com.lucascunha.panelinha.teste`, origem `https://localhost`, quatro Secrets e workflow/versionamento existentes. Upload somente do `.apk` com `actions/upload-artifact@v7`, `archive: false`.
 
 Atualizada a instrumentação para ambos os sentidos landscape, navegação via perfil e **11 testes nativos**. O novo caso confere a orientação declarada, identidade, +6 desligada, SUA VEZ e compra obrigatória. O teste de atualização mantém UID/localStorage/SharedPreferences e acrescenta a comparação do perfil, quando registrado pelo teste anterior. Compilação, assinatura e execução real do Android serão relatadas separadamente após o workflow.
+
+### APK final verificado
+
+- **0.2.25 / código 4502**, fonte `eb283a2148355323d3e08d9ef9c763d4252d651d`, [workflow #25](https://github.com/LucasCunh4/Panelinha/actions/runs/41344535934). Compilação release, compilação da instrumentação e candidato interno 4503 aprovados; assinatura da geração 2 conferida no CI.
+- [Baixar diretamente Panelinha-Teste-v0.2.25-c4502.apk](https://github.com/LucasCunh4/Panelinha/actions/runs/41344535934/artifacts/13098608821). Exige sessão no GitHub; retenção até 30/01/2027. Arquivo APK direto, sem ZIP externo para extrair.
+- O arquivo foi baixado e conferido independentemente com `apksigner`, `aapt` e `ferramentas/verificar_apk.py`: pacote permanente, origem `https://localhost`, assinatura v2, certificado SHA-256 `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`, release, min SDK 24/target 36, **`sensorLandscape` e categoria `game`** no manifesto real. O script novo de perfil e os demais arquivos web correspondem exatamente às fontes, incluindo somente a inclusão esperada do bundle de compatibilidade.
+- Conferidos por hash 52 PNGs de cartas, seis da mesa, dois recursos de fonte/menu, 13 artes especiais anteriores e 22 de +4/+6. Nenhuma imagem aprovada alterada.
+- SHA-256 do APK: `348f267328ab65b5a6a5b777746fe7375607b14c6c4d870cc728e2bff655fe57`, idêntico ao digest do artefato GitHub. `AndroidManifest.xml`/`classes.dex` presentes na raiz e nenhum outro `.apk` interno. [Metadados verificados](HORIZONTAL_IDENTIDADE_APK_0.2.25.json).
+
+### Resultado real dos testes Android
+
+**O workflow final ficou vermelho na etapa do emulador.** A instrumentação anunciou 11 testes e iniciou `a_imagesAndThreeBotsOffline`, mas **zero testes concluíram**. Em seguida, o dispositivo ficou `offline` no ADB e a porta TCP 5554 do emulador recusou conexão. Os logs coletados não apresentam resultado de asserção nem crash/ANR do aplicativo; não foi encontrado registro de OOM/segfault do host. A causa raiz da interrupção do ambiente não está comprovada.
+
+Portanto, ficam pendentes a execução real dos 11 testes, incluindo orientação/imersão no dispositivo, os novos fluxos e a instalação de atualização com conferência de UID/localStorage/SharedPreferences/perfil. A orientação foi comprovada no manifesto do APK e os layouts nos testes web; isso não substitui uma execução Android concluída. Nenhum teste foi removido/desativado, e a Release continua bloqueada pela falha. O artefato assinado foi preservado pelo mecanismo existente.
+
+[Diagnósticos completos do workflow final](https://github.com/LucasCunh4/Panelinha/actions/runs/41344535934/artifacts/13098677982); extratos originais em `evidencias-horizontal/android-*`.
+
+Histórico desta atualização, sem reiniciar versões: #23 gerou 0.2.23/c4302 e teve desconexão durante o primeiro teste; #24 compilou 0.2.24/c4402, mas ficou esperando `sys.boot_completed` e foi cancelado explicitamente para liberar a revisão final com o card humano corrigido. Não havia iniciado a instrumentação. #25 mantém todos os testes e contém o layout final e os rótulos acessíveis corretos. Os dois resultados anteriores não foram tratados como aprovação do aplicativo.
+
+### Atualização direta e dados
+
+Comparação independente dos APKs reais **0.2.22/c4202 → 0.2.25/c4502** confirmou mesmo applicationId, mesmo certificado da geração 2, mesma origem e código estritamente maior. O novo APK é compatível com instalação por cima, sem desinstalação; também supera os códigos intermediários desta atualização. Nenhum armazenamento existente foi limpo ou migrado; o perfil acrescenta sua própria chave local. A comprovação real da retenção de dados por instalação no emulador permanece pendente, como descrito acima. A partida em andamento continua sendo apenas em memória, conforme o comportamento anterior.
