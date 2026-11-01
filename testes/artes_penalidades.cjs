@@ -23,7 +23,7 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mais4-mais6-evidence
  },{type,penalty,highest});
  const open=async(type='wild4',penalty=0,highest=0)=>{await setup(type,penalty,highest);await p.locator('[data-card="70000"]').tap();await p.locator('.color-picker').waitFor()};
  try{
-  await p.goto(base);await p.locator('#singlePlayerBtn').tap();await p.locator('#startBtn').tap();
+  await p.goto(base);await p.locator('#singlePlayerBtn').tap();await p.locator('#profileContinueBtn').tap();await p.locator('#startBtn').tap();
   assert.equal(manifest.assets.length,22);
   for(const a of manifest.assets){const r=await p.request.get(new URL(a.path,base).href);assert.equal(r.status(),200);assert.equal(crypto.createHash('sha256').update(await r.body()).digest('hex'),a.sha256)}
   for(const file of ['MANIFESTO_52_PNG.json','MANIFESTO_MESA_V1.json','MANIFESTO_MENU_V1.json','MANIFESTO_ESPECIAIS_V1.json']){

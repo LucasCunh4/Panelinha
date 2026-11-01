@@ -38,3 +38,27 @@ body[data-screen=game] .kitchen-scene{display:none}
 .kitchen-vignette{background:linear-gradient(90deg,#160f2c55,transparent 30% 70%,#160f2c55),linear-gradient(transparent 66%,#130e2366)}
 @media(orientation:landscape) and (max-height:600px){.kitchen-art{opacity:.7}}
 @media(orientation:landscape) and (max-height:600px){.home-screen .hero-button{padding-left:48px;padding-right:28px;font-size:clamp(20px,2.8vw,25px)}.home-screen .hero-icon{left:14px}.home-screen .hero-icon svg{width:26px;height:27px}.home-screen .hero-arrow{right:10px;font-size:26px}}
+
+/* Identificação local, compartilhada pelos dois caminhos do menu principal. */
+.profile-screen {padding-top:70px;padding-bottom:24px}
+.profile-screen .screen-title {margin-bottom:20px}
+.profile-layout {width:min(100%,760px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);align-items:center;gap:20px 32px}
+.profile-identification label {display:block;margin:12px 0 8px;font-size:14px;color:#eed9bd}
+#playerName {width:100%;max-width:320px;min-height:46px;border:1px solid #d7ac7e;border-radius:14px;padding:10px 14px;background:#271a35;color:#fff3d6;font-size:18px}
+.profile-preview {display:flex;flex-direction:column;align-items:center;gap:8px}
+#profilePreviewAvatar .pan-avatar {width:82px;height:82px}
+#profilePreviewName {font:25px PanelinhaDisplay,sans-serif;max-width:100%;overflow-wrap:anywhere;color:#ffe2a0}
+.profile-choices p {font-size:14px;color:#ead7c0;margin-bottom:10px}
+#avatarGallery {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#avatarGallery button {min-height:78px;min-width:44px;padding:5px;border:1px solid #b196b380;border-radius:16px;background:#35213fe6;color:#eedecb;font-size:11px;touch-action:manipulation}
+#avatarGallery button[aria-pressed=true] {border-color:#ffe3a0;box-shadow:0 0 0 2px #e5b86b70;background:#69436c}
+#avatarGallery button:focus-visible,#playerName:focus-visible {outline:3px solid #ffe6ac;outline-offset:3px}
+#avatarGallery .pan-avatar {width:40px;height:40px;margin:0 auto 2px}
+#profileContinueBtn {grid-column:1 / -1;justify-self:center;width:min(100%,310px);min-height:52px}
+@media(orientation:landscape) and (max-height:420px){
+ .profile-screen {padding:54px 24px 12px}.profile-screen .screen-title {font-size:28px;margin-bottom:12px}
+ .profile-layout {gap:10px 24px;max-width:680px}.profile-preview {flex-direction:row;justify-content:center;text-align:left}#profilePreviewAvatar .pan-avatar {width:52px;height:52px}#profilePreviewName {font-size:20px;max-width:170px}
+ #avatarGallery button {min-height:60px;padding:3px}#avatarGallery .pan-avatar {width:32px;height:32px}#profileContinueBtn {min-height:46px;font-size:22px;padding:9px 20px}.profile-identification label {margin-top:8px;font-size:12px}
+}
+@media(orientation:portrait){.profile-layout {grid-template-columns:1fr;max-width:390px}.profile-screen {justify-content:flex-start}.profile-screen .screen-title {font-size:34px}.profile-preview {flex-direction:row;justify-content:center}#profileContinueBtn {grid-column:1}}
+@media(orientation:landscape){#menu .grid,.settings-ghost .grid {grid-template-columns:repeat(2,minmax(0,1fr))}#menu .setting,.settings-ghost .setting {font-size:13px}}

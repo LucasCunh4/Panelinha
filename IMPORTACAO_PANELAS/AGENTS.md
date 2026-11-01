@@ -13,3 +13,4 @@
 - Distinguir claramente **feito / testado / ainda a fazer**. Se houver ambiguidade, registrar e sugerir solução, não inventar regra final silenciosamente.
 
 - Tela inicial e navegação ficam em `menu.css` / `navegacao.js`; reutilize `#menu` e preserve o motor. Telas Criar/Entrar são preparação visual, sem backend/códigos fictícios. Voltar deve confirmar saída de partida ativa e respeitar a hierarquia, inclusive no Android.
+- A identificação em `perfil.js` fica entre Início e Configurações/Multiplayer. Nome/avatar locais usam `panelinha.player.v1`; escape nomes em HTML, preserve os bots e não apague outras chaves. O APK usa `sensorLandscape` e categoria `game`, com imersão permanente. `wild6` é opcional, ativada por padrão, aplicada somente em novas partidas. O brilho de compra usa disponibilidade real de cartas/desafio, e o crescimento da mão não sinaliza corte fora do turno como turno normal.

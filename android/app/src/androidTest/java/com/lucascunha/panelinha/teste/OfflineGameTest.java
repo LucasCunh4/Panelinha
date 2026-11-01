@@ -93,7 +93,7 @@ public class OfflineGameTest {
         } finally { automation.dropShellPermissionIdentity(); }
         assertEquals("\"function\"", js("typeof String.prototype.replaceAll"));
         assertEquals("\"function\"", js("typeof Element.prototype.getAnimations"));
-        tap("#singlePlayerBtn");tap("#startBtn");
+        tap("#singlePlayerBtn");tap("#profileContinueBtn");tap("#startBtn");
         js("window.__pngCheck=null;(async()=>{try{const colors=['vermelho','azul','amarelo','verde'];const faces=[...Array.from({length:10},(_,i)=>String(i)),'mais_2','bloqueio','inverter'];await Promise.all(colors.flatMap(c=>faces.map(async f=>{const im=new Image();im.src='assets/cartas/'+c+'/'+f+'.png';await im.decode();if(im.naturalWidth===0)throw Error('PNG');})));window.__pngCheck=52;}catch(e){window.__pngCheck=String(e);}})()");
         waitFor("window.__pngCheck===52", 120000);
         assertEquals("4", js("CartasTest.getState().players.length"));
@@ -103,7 +103,7 @@ public class OfflineGameTest {
         startControlled();
         js("(()=>{const s=CartasTest.getState();s.players[0].hand=[{id:84000,type:'draw2',color:'red',num:null},{id:84001,type:'draw2',color:'red',num:null},{id:84002,type:'num',color:'blue',num:9}];document.getElementById('useCardArt').onchange()})()");
         // Pausa controlada só na fixture: o emulador sem KVM demora mais que a
-        // janela humana de 2,8s. Os handlers de carta/corte continuam originais.
+        // janela humana de 2,2s. Os handlers de carta/corte continuam originais.
         js("window.__holdCutTurn=()=>{CartasTest.getState().unlockAt=Date.now()+120000;document.getElementById('useCardArt').onchange()};document.querySelector('[data-card=\"84000\"]').addEventListener('click',window.__holdCutTurn,{once:true})");
         js("window.__playedCards=[];new MutationObserver(rs=>rs.forEach(r=>r.addedNodes.forEach(n=>{if(n.classList&&n.classList.contains('played-card'))window.__playedCards.push({id:n.dataset.cardId,actor:n.dataset.actor,x:Number(n.dataset.originX),y:Number(n.dataset.originY)});}))).observe(document.getElementById('playAnimations'),{childList:true})");
         tap("[data-card='84000']");
@@ -134,7 +134,7 @@ public class OfflineGameTest {
         long deadline = SystemClock.uptimeMillis() + 15000;
         while (!oriented.get() && SystemClock.uptimeMillis() < deadline) {
             InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> oriented.set(
-                (web.getWidth() > web.getHeight()) == orientation.equals("landscape")));
+                (web.getWidth() > web.getHeight()) == orientation.contains("landscape")));
             if (!oriented.get()) SystemClock.sleep(100);
         }
         assertTrue("WebView na orientação nativa esperada", oriented.get());
@@ -169,15 +169,16 @@ public class OfflineGameTest {
         }
         assertEquals("true", js("(()=>{const r=document.getElementById('table').getBoundingClientRect();return Math.abs(r.width-innerWidth)<1&&Math.abs(r.height-innerHeight)<1})()"));
     }
-    @Test public void c_portraitAndLandscape() throws Exception {
+    @Test public void c_bothLandscapeOrientations() throws Exception {
         startControlled();
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activity.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE));
         waitFor("innerWidth>innerHeight", 15000);
         captureTable("landscape");
         assertEquals("true", js("document.documentElement.scrollWidth<=innerWidth"));
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activity.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT));
-        waitFor("innerHeight>innerWidth", 15000);
-        captureTable("portrait");
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activity.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE));
+        waitFor("innerWidth>innerHeight", 15000);
+        captureTable("reverse-landscape");
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activity.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE));
         assertEquals("true", js("document.documentElement.scrollWidth<=innerWidth"));
         assertEquals("4", js("CartasTest.getState().players.length"));
     }
@@ -212,8 +213,8 @@ public class OfflineGameTest {
         tap("#tableMenuBtn");tap("#backBtn");tap("#confirmLeaveBtn");waitFor("document.getElementById('menu').getClientRects().length>0",15000);waitBars(false);
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activity.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE));
         waitFor("innerWidth>innerHeight",15000);waitBars(false);
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activity.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT));
-        waitFor("innerHeight>innerWidth",15000);waitBars(false);
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activity.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE));
+        waitFor("innerWidth>innerHeight",15000);waitBars(false);
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activity.getActivity().moveTaskToBack(true));
         android.content.Context target = InstrumentationRegistry.getInstrumentation().getTargetContext();
         android.content.Intent launch = target.getPackageManager().getLaunchIntentForPackage(target.getPackageName());
@@ -261,7 +262,7 @@ public class OfflineGameTest {
         waitFor("PanelinhaNavigation.current==='home'",15000);waitBars(false);
         assertEquals("2",js("document.querySelectorAll('#home button').length"));
         assertEquals("true",js("[...document.fonts].some(f=>f.family==='PanelinhaDisplay'&&f.status==='loaded')"));
-        tap("#multiplayerBtn");tap("#createRoomBtn");waitFor("PanelinhaNavigation.current==='create'",15000);
+        tap("#multiplayerBtn");tap("#profileContinueBtn");tap("#createRoomBtn");waitFor("PanelinhaNavigation.current==='create'",15000);
         systemBack();waitFor("PanelinhaNavigation.current==='multiplayer'",15000);
         tap("#joinRoomBtn");assertEquals("true",js("document.getElementById('roomCode').disabled&&document.getElementById('roomCode').value.length===0"));
         // Somente o emulador/dispositivo de instrumentação: gesto real pela borda.
@@ -277,15 +278,15 @@ public class OfflineGameTest {
         } finally {
             if(previousMode!=2)shell("cmd overlay enable --user 0 com.android.internal.systemui.navbar.threebutton");
         }
-        systemBack();waitFor("PanelinhaNavigation.current==='home'",15000);
-        tap("#singlePlayerBtn");waitFor("PanelinhaNavigation.current==='solo'",15000);tap("#startBtn");
+        systemBack();waitFor("PanelinhaNavigation.current==='profile'",15000);systemBack();waitFor("PanelinhaNavigation.current==='home'",15000);
+        tap("#singlePlayerBtn");tap("#profileContinueBtn");waitFor("PanelinhaNavigation.current==='solo'",15000);tap("#startBtn");
         js("(()=>{const s=CartasTest.getState();s.current=0;s.deadline=0;s.o.timeout=0;s.token++})()");
         assertEquals("4",js("CartasTest.getState().players.length"));
         systemBack();waitFor("!document.getElementById('navDialog').hidden",15000);tap("#cancelLeaveBtn");
         assertEquals("true",js("PanelinhaNavigation.current==='game'&&CartasTest.getState()!==null"));
         tap("#tableMenuBtn");systemBack();waitFor("document.getElementById('tableMenu').classList.contains('hide')",15000);
         systemBack();tap("#confirmLeaveBtn");waitFor("PanelinhaNavigation.current==='solo'&&CartasTest.getState()===null",15000);
-        systemBack();waitFor("PanelinhaNavigation.current==='home'",15000);systemBack();tap("#cancelLeaveBtn");waitBars(false);
+        systemBack();waitFor("PanelinhaNavigation.current==='profile'",15000);systemBack();waitFor("PanelinhaNavigation.current==='home'",15000);systemBack();tap("#cancelLeaveBtn");waitBars(false);
     }
     @Test public void d_writeUpdateSentinels() throws Exception {
         js("localStorage.setItem('panelinha-upgrade-check','preservado-v0.1')");
@@ -331,6 +332,23 @@ public class OfflineGameTest {
             assertEquals(String.valueOf(number+2),js("CartasTest.getState().penalty"));
             assertEquals("true",js("document.querySelector('#discard .discard-top .card-image').src.endsWith('carta_mais"+number+"_completa.png')"));
         }
+    }
+
+    @Test public void k_identityOptionalSixAndLandscape() throws Exception {
+        android.content.pm.ActivityInfo declared = activity.getActivity().getPackageManager().getActivityInfo(activity.getActivity().getComponentName(),0);
+        assertEquals(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE,declared.screenOrientation);
+        waitFor("innerWidth>innerHeight",15000);waitBars(false);
+        tap("#singlePlayerBtn");waitFor("PanelinhaNavigation.current==='profile'",15000);
+        js("document.getElementById('playerName').value='Chef Offline';document.getElementById('playerName').dispatchEvent(new Event('input'))");
+        tap("[data-avatar-choice='concha']");tap("#profileContinueBtn");
+        assertEquals("true",js("document.getElementById('wild6').checked"));tap("#wild6");tap("#startBtn");
+        assertEquals("true",js("(()=>{const s=CartasTest.getState();return s.o.wild6===false&&s.identity.name==='Chef Offline'&&s.identity.avatar==='concha'&&[...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].every(c=>c.type!=='wild6')})()"));
+        assertEquals("true",js("document.getElementById('player0').textContent.includes('Chef Offline')"));
+        js("(()=>{const s=CartasTest.getState();s.token++;s.current=0;s.unlockAt=0;s.penalty=20;s.highest=4;s.lastPenalty=null;s.o.timeout=0;s.drawn=null;s.pendingAction=null;s.players[0].hand=[{id:99980,type:'num',color:'blue',num:1}];document.getElementById('useCardArt').onchange()})()");
+        assertEquals("true",js("document.getElementById('buyBtn').classList.contains('mandatory-buy')&&document.getElementById('hand').classList.contains('human-turn')&&document.getElementById('turnCue').textContent==='SUA VEZ!'"));
+        String profile = new JSONArray("["+js("JSON.stringify(PanelinhaProfile.current)")+"]").getString(0);
+        InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("upgrade-check",Context.MODE_PRIVATE).edit().putString("profile",profile).commit();
+        SystemClock.sleep(7000); // Flush durável antes de instalar por cima na etapa seguinte.
     }
 
 }

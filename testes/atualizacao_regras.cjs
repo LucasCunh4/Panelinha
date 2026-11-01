@@ -7,7 +7,7 @@ const assert=require('node:assert/strict');
  try{
   // Centenas de sorteios verificam só regras; os voos normais são cobertos pelas suítes de mesa.
   await page.emulateMedia({reducedMotion:'reduce'});
-  const epoch=new Date("2030-01-01T12:00:00Z");await page.clock.install({time:epoch});await page.clock.pauseAt(epoch);await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#singlePlayerBtn').click();await page.locator('#startBtn').tap();
+  const epoch=new Date("2030-01-01T12:00:00Z");await page.clock.install({time:epoch});await page.clock.pauseAt(epoch);await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#singlePlayerBtn').click();await page.locator('#profileContinueBtn').click();await page.locator('#startBtn').tap();
   const results=await page.evaluate(()=>{
    const originalRandom=Math.random;let seed=0x50414e4c;
    Math.random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};

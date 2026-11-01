@@ -4,23 +4,25 @@
   const $=id=>document.getElementById(id);
   const routes={
     home:{id:'home',parent:null,hash:'inicio',focus:'singlePlayerBtn'},
-    solo:{id:'menu',parent:'home',hash:'um-jogador',focus:'settingsTitle'},
-    multiplayer:{id:'multiplayer',parent:'home',hash:'multiplayer',focus:'multiplayerTitle'},
+    profile:{id:'profile',parent:'home',hash:'identificacao',focus:'profileTitle'},
+    solo:{id:'menu',parent:'profile',hash:'um-jogador',focus:'settingsTitle'},
+    multiplayer:{id:'multiplayer',parent:'profile',hash:'multiplayer',focus:'multiplayerTitle'},
     create:{id:'createRoom',parent:'multiplayer',hash:'criar-sala',focus:'createTitle'},
     join:{id:'joinRoom',parent:'multiplayer',hash:'entrar-na-sala',focus:'joinTitle'},
     game:{id:'game',parent:'solo',hash:'mesa',focus:'tableMenuBtn'}
   };
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   let current='home',hooks=null,dialogAction=null,previousFocus=null,ghost=null,returningToSettings=false;
-  const entrance=new Set();
+  const entrance=new Set();let profileDestination='solo';
   function animate(node,keyframes,options){
     if(reduced.matches||!node?.animate)return;
     const a=node.animate(keyframes,options);entrance.add(a);
     a.addEventListener('finish',()=>entrance.delete(a),{once:true});a.addEventListener('cancel',()=>entrance.delete(a),{once:true});return a;
   }
   function clearEntrance(){entrance.forEach(a=>a.cancel());entrance.clear();ghost?.remove();ghost=null;}
-  function writeHistory(route,replace=false){history[replace?'replaceState':'pushState']({panelinha:route},'',`#${routes[route].hash}`);}
+  function writeHistory(route,replace=false){history[replace?'replaceState':'pushState']({panelinha:route,profileFor:profileDestination},'',`#${routes[route].hash}`);}
   function show(route,focus=true){
+    if(route==='profile')PanelinhaProfile.open();
     current=route;document.body.dataset.screen=route;
     for(const [name,r] of Object.entries(routes))$(r.id).classList.toggle('hide',name!==route);
     if(route!=='game'){
@@ -84,8 +86,9 @@
     ['player2','player3','player1'].forEach((id,i)=>animate($(id),[{opacity:0},{opacity:1}],{duration:180,delay:35+i*25,easing:'ease-out'}));
     animate(document.querySelector('.hand-panel'),[{opacity:0},{opacity:1}],{duration:200,delay:60,easing:'ease-out'});
   }
-  document.querySelectorAll('[data-route]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.route)));
+  document.querySelectorAll('[data-route]').forEach(b=>b.addEventListener('click',()=>{if(b.id==='singlePlayerBtn'||b.id==='multiplayerBtn'){profileDestination=b.dataset.route;go('profile')}else go(b.dataset.route)}));
   document.querySelectorAll('[data-nav-back]').forEach(b=>b.addEventListener('click',()=>back()));
+  $('profileForm').onsubmit=event=>{event.preventDefault();const profile=PanelinhaProfile.commit();$('mode').querySelector('[value=duo]').textContent=`Duplas (${profile.name} + Bot 2)`;go(profileDestination);};
   $('startBtn').addEventListener('click',captureSettings,true);
   $('cancelLeaveBtn').onclick=hideDialog;
   $('confirmLeaveBtn').onclick=()=>{const action=dialogAction;hideDialog();action?.();};
@@ -103,6 +106,7 @@
   });
   addEventListener('popstate',event=>{
     const target=routes[event.state?.panelinha]?event.state.panelinha:'home';
+    if(target==='profile'&&['solo','multiplayer'].includes(event.state?.profileFor))profileDestination=event.state.profileFor;
     if(current==='game'&&hooks?.getState()){
       // Restaura a âncora da mesa antes de perguntar; cancelar nunca abandona a partida.
       writeHistory('game');back();return;

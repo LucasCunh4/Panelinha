@@ -22,7 +22,7 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/escolher-cor-ev
  },{type,penalty});
  const open=async(type='wild',penalty=0)=>{await setup(type,penalty);await p.locator('[data-card="9000"]').tap();await p.locator('.color-picker').waitFor()};
  try{
-  await p.goto(base);await p.locator('#singlePlayerBtn').tap();await p.locator('#startBtn').tap();
+  await p.goto(base);await p.locator('#singlePlayerBtn').tap();await p.locator('#profileContinueBtn').tap();await p.locator('#startBtn').tap();
   const manifest=JSON.parse(fs.readFileSync(path.join(__dirname,'../IMPORTACAO_PANELAS/documentacao/MANIFESTO_ESPECIAIS_V1.json')));
   assert.equal(manifest.assets.length,13);
   for(const a of manifest.assets){const r=await p.request.get(new URL(a.path,base).href);assert.equal(r.status(),200);assert.equal(crypto.createHash('sha256').update(await r.body()).digest('hex'),a.sha256)}
@@ -71,7 +71,7 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/escolher-cor-ev
   await p.context().setOffline(true);await open();await p.locator('[data-color="blue"]').tap();assert.equal(await p.evaluate(()=>CartasTest.getState().activeColor),'blue');await p.context().setOffline(false);
   console.log('PASS compras animadas com verso oficial, preferência por movimento reduzido e escolha offline');
   // Mouse e teclado em contexto desktop independente; o hover afeta uma só camada.
-  const desktop=await b.newPage({viewport:{width:1280,height:800}});await desktop.goto(base);await desktop.locator('#singlePlayerBtn').click();await desktop.locator('#startBtn').click();
+  const desktop=await b.newPage({viewport:{width:1280,height:800}});await desktop.goto(base);await desktop.locator('#singlePlayerBtn').click();await desktop.locator('#profileContinueBtn').click();await desktop.locator('#startBtn').click();
   await desktop.evaluate(()=>{const s=CartasTest.getState();s.token++;s.current=0;s.unlockAt=0;s.penalty=0;s.drawn=null;s.cutOpen=false;s.o.timeout=0;s.players[0].hand=[{id:9900,type:'wild',color:null},{id:9901,type:'num',color:'blue',num:8}];document.getElementById('useCardArt').onchange()});await desktop.locator('[data-card="9900"]').click();await desktop.locator('[data-color="red"]').hover();
   await desktop.waitForFunction(()=>document.querySelector('[data-ingredient="red"]').classList.contains('ingredient-hover'));assert.equal(await desktop.locator('.ingredient-hover').count(),1);
   const hover=await desktop.locator('[data-ingredient="red"]').evaluate(e=>({transform:getComputedStyle(e).transform,filter:getComputedStyle(e).filter,origin:getComputedStyle(e).transformOrigin}));assert.notEqual(hover.transform,'none');assert.match(hover.filter,/brightness/);

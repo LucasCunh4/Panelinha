@@ -6,7 +6,7 @@ const assert=require('node:assert/strict');
   const page=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.addInitScript(()=>{delete String.prototype.replaceAll;delete Element.prototype.getAnimations;delete Document.prototype.getAnimations;});
-  await page.clock.install();await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8002/');await page.locator('#singlePlayerBtn').click();
+  await page.clock.install();await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8002/');await page.locator('#singlePlayerBtn').click();await page.locator('#profileContinueBtn').click();
   await page.locator('#startBtn').tap();
   assert.equal(await page.locator('.seat .pan-avatar').count(),4);
   await page.evaluate(()=>{document.querySelector('#testPenalty').click();document.querySelector('#buyBtn').click();});

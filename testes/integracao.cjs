@@ -12,7 +12,7 @@ const base = process.env.PANELAS_TEST_URL || 'http://127.0.0.1:8000/';
  const errors=[]; page.on('pageerror', e=>errors.push(e.message));
  try {
   await page.clock.install();
-  await page.goto(base);await page.locator('#singlePlayerBtn').click();
+  await page.goto(base);await page.locator('#singlePlayerBtn').click();await page.locator('#profileContinueBtn').click();
   const manifest=JSON.parse(fs.readFileSync(path.join(root,'documentacao/MANIFESTO_52_PNG.json')));
   assert.equal(manifest.files.length,52);
   for (const f of manifest.files) {

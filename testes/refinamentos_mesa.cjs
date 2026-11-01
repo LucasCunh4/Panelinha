@@ -19,7 +19,7 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
  });
  const finishFlights=()=>page.locator('.played-card').evaluateAll(nodes=>Promise.all(nodes.flatMap(n=>n.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})))));
  try{
-  await page.clock.install();await page.clock.pauseAt(new Date());await page.goto(base);await page.locator('#singlePlayerBtn').click();await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();await fixture();
+  await page.clock.install();await page.clock.pauseAt(new Date());await page.goto(base);await page.locator('#singlePlayerBtn').click();await page.locator('#profileContinueBtn').click();await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();await fixture();
   for(const [width,height] of [[320,568],[390,844],[568,320],[844,390],[1280,800]]){
    await page.setViewportSize({width,height});await fixture();
    const layout=await page.evaluate(()=>{
@@ -55,7 +55,8 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
   assert.ok(await page.evaluate(()=>CartasTest.getState().unlockAt-Date.now()>2000));
   await human.evaluate(el=>{const a=el.getAnimations()[0];a.pause();a.currentTime=180});
   const midway=await human.boundingBox();const mx=midway.x+midway.width/2,my=midway.y+midway.height/2;
-  assert.ok(Math.hypot(mx-origin.x,my-origin.y)>20&&Math.hypot(mx-Number(coordinates.targetX),my-Number(coordinates.targetY))>20);
+  const travel=Math.hypot(Number(coordinates.targetX)-origin.x,Number(coordinates.targetY)-origin.y);
+  assert.ok(travel>40&&Math.hypot(mx-origin.x,my-origin.y)>travel*.2&&Math.hypot(mx-Number(coordinates.targetX),my-Number(coordinates.targetY))>travel*.05,JSON.stringify({mx,my,origin,coordinates}));
   await page.screenshot({path:path.join(evidence,'voo-humano-meio.png')});
   await human.evaluate(el=>el.getAnimations()[0].play());await finishFlights();
   assert.equal(await page.locator('.played-card').count(),0);assert.ok(await page.locator('#discard .discard-top .card').isVisible());

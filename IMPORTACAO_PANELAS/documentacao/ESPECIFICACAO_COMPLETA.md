@@ -29,12 +29,15 @@
 | Bloqueio | 8 | 2 por cor |
 | Inverter | 8 | 2 por cor |
 | +4 | 4 | Incolor |
-| +6 | 2 | Incolor |
+| +6 | 0 ou 2 | Incolor; opcional, **ativada por padrão** |
 | Coringa | 4 | Incolor |
-| **Total obrigatório** | **114** | |
+| **Total sem opcionais** | **112** | +6, Panela e Liquidificador desligados |
+| **Padrão com +6** | **114** | Sem Panela e Liquidificador |
 | Panela de Pressão | +2 | Incolor; host ativa individualmente |
 | Liquidificador | +2 | Incolor; host ativa individualmente |
-| **Com as duas opcionais** | **118** | |
+| **Com as três opcionais** | **118** | 116 se apenas +6 estiver desligada |
+
+A opção `wild6` pertence às configurações da partida. É lida ao iniciar uma nova partida; não altera um baralho em andamento. Desativada, exclui as duas +6 da criação de todas as rodadas e impede sua injeção no laboratório. Ativada (inclusive para configurações antigas sem esse campo), preserva efeitos, desafios e penalidades anteriores. A identidade de cada carta e a reciclagem do descarte permanecem as mesmas.
 
 Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**. Cartas +4, +6, Coringa, Panela de Pressão e Liquidificador **não têm cor impressa**.
 

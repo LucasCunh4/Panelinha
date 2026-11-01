@@ -17,7 +17,7 @@ collect_diagnostics() {
     timeout 10s adb devices -l > "$output/adb-devices.txt" 2>&1 || true
     timeout 10s adb shell dumpsys activity processes > "$output/android-processes.txt" 2>&1 || true
     timeout 10s adb shell dumpsys window > "$output/android-windows.txt" 2>&1 || true
-    for orientation in portrait landscape; do
+    for orientation in landscape reverse-landscape; do
       timeout 10s adb pull "/sdcard/Android/data/$app/files/mesa-v1-$orientation.png" "$output/mesa-v1-$orientation.png" >/dev/null 2>&1 || true
     done
   fi
@@ -88,8 +88,8 @@ if [[ "${PANELINHA_VERIFY_EXISTING_DATA:-0}" = 1 ]]; then
   run_tests UpdatePersistenceTest 1 "$output/update-anterior.txt"
 fi
 ci_test_status=0
-if ! run_tests OfflineGameTest 10 "$output/offline.txt"; then ci_test_status=1; fi
-for orientation in portrait landscape; do
+if ! run_tests OfflineGameTest 11 "$output/offline.txt"; then ci_test_status=1; fi
+for orientation in landscape reverse-landscape; do
   for suffix in .png .json -uiautomation.png; do
     if ! adb pull "/sdcard/Android/data/$app/files/mesa-v1-$orientation$suffix" "$output/mesa-v1-$orientation$suffix"; then ci_test_status=1; fi
   done
@@ -107,4 +107,4 @@ if [[ "$ci_test_status" != 0 ]]; then
   echo 'Uma ou mais verificações Android falharam; consulte os resultados individuais.' >&2
   exit 1
 fi
-echo 'APK offline: 10 testes. Atualização sem desinstalar: 1 teste. UID, localStorage e SharedPreferences preservados.'
+echo 'APK offline: 11 testes. Atualização sem desinstalar: 1 teste. UID, localStorage e SharedPreferences preservados.'

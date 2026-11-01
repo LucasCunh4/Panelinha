@@ -333,5 +333,18 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 /* Cabeça mais luminosa; a cauda dissipa sem iluminar a circunferência inteira. */
 .stove-flow{stroke-width:4.2}.stove-glint{filter:drop-shadow(0 0 8px #fff)}
 .table[data-direction="-1"] .tail-clockwise.tail-long,.table[data-direction="1"] .tail-counterclockwise.tail-long{opacity:.2}
+
+/* A margem reservada permite ampliar o leque inteiro sem invadir as bordas. */
+.hand {width:calc(100% / 1.06);margin-left:auto;margin-right:auto;transform-origin:50% 100%;transform:scale(1);transition:transform 240ms cubic-bezier(.2,.7,.2,1)}
+.hand.human-turn {transform:scale(1.06)}
+.seat.self .name {white-space:normal;overflow-wrap:anywhere;max-width:100%;line-height:1.15}
+#turnCue {position:absolute;z-index:7;top:auto;left:auto;right:max(12px,env(safe-area-inset-right));bottom:var(--turn-cue-bottom,clamp(86px,23vh,136px));transform:none;max-width:calc(17vw - 20px);font:clamp(18px,2.8vw,30px) PanelinhaDisplay,sans-serif;color:#ffe29b;white-space:nowrap;pointer-events:none;text-shadow:0 2px #6d3c35,0 0 10px #efbc6b66}
+#turnCue[hidden] {display:none}
+#turnCue>span {display:block;transform:scale(.82);opacity:.85;transform-origin:50% 50%}
+#buyBtn {position:relative}
+#buyBtn.mandatory-buy::after {content:'';position:absolute;inset:12% -6px;border:2px solid #ffe6a0;border-radius:10px;pointer-events:none;box-shadow:0 0 10px #ffdc7f,inset 0 0 7px #ffd47c99;animation:mandatory-draw 1.15s ease-in-out infinite}
+@keyframes mandatory-draw {0%,100%{opacity:.7;filter:brightness(1)}50%{opacity:1;filter:brightness(1.4);box-shadow:0 0 19px #ffc568,inset 0 0 9px #ffe7b0}}
+@media(orientation:portrait){#turnCue {right:16px;bottom:clamp(150px,28vh,240px);max-width:140px;font-size:24px}}
+@media(prefers-reduced-motion:reduce){.hand {transition:none}#buyBtn.mandatory-buy::after {animation:none}}
 .table[data-direction="-1"] .tail-clockwise.tail-mid,.table[data-direction="1"] .tail-counterclockwise.tail-mid{opacity:.4}
 .table[data-direction="-1"] .tail-clockwise.tail-near,.table[data-direction="1"] .tail-counterclockwise.tail-near{opacity:.7}

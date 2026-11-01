@@ -64,6 +64,15 @@
       <button id="multiplayerBtn" class="hero-button hero-violet" data-route="multiplayer"><span class="hero-icon players-icon" aria-hidden="true"><svg viewBox="0 0 320 210"><use href="#homePot" transform="translate(0 0) scale(.9)"/><use href="#homePot" transform="translate(125 45) scale(.8)"/></svg></span><span>Multiplayer</span><span class="hero-arrow" aria-hidden="true">›</span></button>
     </div>
   </section>
+  <section id="profile" class="front-screen profile-screen hide" aria-labelledby="profileTitle">
+    <button type="button" class="screen-back" data-nav-back aria-label="Voltar à tela inicial">‹ <span>Voltar</span></button>
+    <h1 id="profileTitle" class="screen-title">Seu nome e avatar</h1>
+    <form id="profileForm" class="profile-layout">
+      <div class="profile-identification"><div class="profile-preview"><div id="profilePreviewAvatar"></div><strong id="profilePreviewName"></strong></div><label for="playerName">Como quer aparecer na mesa?</label><input id="playerName" name="nickname" maxlength="32" autocomplete="nickname" enterkeyhint="done" placeholder="Seu nome"></div>
+      <div class="profile-choices"><p>Escolha seu avatar</p><div id="avatarGallery" role="group" aria-label="Avatares temporários"></div></div>
+      <button id="profileContinueBtn" type="submit" class="hero-button hero-gold">Continuar</button>
+    </form>
+  </section>
   <section id="multiplayer" class="front-screen branch-screen hide" aria-labelledby="multiplayerTitle">
     <button class="screen-back" data-nav-back aria-label="Voltar à tela inicial">‹ <span>Voltar</span></button>
     <div class="branch-emblem" aria-hidden="true">✦</div><h1 id="multiplayerTitle" class="screen-title">Multiplayer</h1>
@@ -83,7 +92,7 @@
   <section id="menu" class="panel front-screen hide" aria-labelledby="settingsTitle"><button class="screen-back" data-nav-back aria-label="Voltar à tela inicial">‹ <span>Voltar</span></button><h2 id="settingsTitle">Sua partida</h2><p class="muted">Prepare a mesa para jogar com três bots.</p>
     <div class="grid">
       <div><label class="setting">Formato <select id="mode"><option value="solo">Todos contra todos</option><option value="duo">Duplas (você + Bot 2)</option></select></label><label class="setting">Duração <select id="duration"><option value="points">Partida por pontos</option><option value="single">Rodada única</option></select></label><label class="setting">Pontuação-meta <select id="goal"></select></label><label class="setting">Tempo por turno <select id="timeout"><option value="0">Sem limite</option><option value="15">15 s</option><option value="30">30 s</option><option value="45">45 s</option><option value="60">60 s</option></select></label></div>
-      <div><label class="setting">Compra infinita <input id="infinite" type="checkbox"></label><label class="setting">Cortes + cartas idênticas <input id="cut" type="checkbox" checked></label><label class="setting">Desafiar +4 e +6 <input id="challenge" type="checkbox" checked></label><label class="setting">Panela de Pressão <input id="dist" type="checkbox" checked></label><label class="setting">Liquidificador <input id="rotate" type="checkbox" checked></label></div>
+      <div><label class="setting">Compra infinita <input id="infinite" type="checkbox"></label><label class="setting">Cortes + cartas idênticas <input id="cut" type="checkbox" checked></label><label class="setting"><span id="challengeSettingLabel">Desafiar +4 e +6</span> <input id="challenge" type="checkbox" checked></label><label class="setting"><span>Carta +6 <small id="sixSettingValue">Ativada</small></span><input id="wild6" type="checkbox" checked aria-label="Carta +6"></label><label class="setting">Panela de Pressão <input id="dist" type="checkbox" checked></label><label class="setting">Liquidificador <input id="rotate" type="checkbox" checked></label></div>
     </div>
     <div class="row menu-header"><button class="hero-button hero-gold" id="startBtn">Começar com 3 bots</button></div>
   </section>
@@ -121,9 +130,9 @@
           <div class="penalty-display" id="penaltyDisplay" role="status" aria-live="polite" hidden></div>
           <div class="direction-indicator sr-only" id="directionIndicator"><span id="directionGlyph" aria-hidden="true">↻</span><span id="directionLabel">Horário</span></div>
           <div class="scenter sr-only" id="centerMsg"></div>
-          <div id="turnCue" role="status" aria-live="polite"></div>
         </div>
         <div class="seat right" id="player1"></div>
+        <div id="turnCue" role="status" aria-live="polite" hidden></div>
         <div class="hand-panel">
           <div class="controls" id="controls"></div>
           <div class="hand-heading"><div class="seat self" id="player0"></div><span id="handCount"></span></div>
@@ -137,7 +146,7 @@
         <div class="row between"><h2 id="tableMenuTitle">Sua mesa</h2><button id="closeTableMenu" class="btn alt" aria-label="Fechar opções e voltar à mesa">Fechar ✕</button></div>
         <p class="help">Os bots e o tempo de turno continuam enquanto este menu está aberto.</p>
         <div class="panel"><strong id="roundLabel">Rodada 1</strong><span id="status" class="pill"></span><div class="score" id="score"></div><div class="topline" id="stateText"></div></div>
-    <details class="panel debug"><summary>Laboratório de testes (ferramentas de depuração)</summary><p class="help">Mostre as mãos dos bots ou adicione cartas à sua mão. Cartas injetadas podem ultrapassar a quantidade normal do baralho; isso é proposital para testar efeitos. Com cortes ativados, o balão de faca aparece sobre a carta idêntica; os bots normais respeitam uma pausa de 2,8 segundos.</p><div class="controls"><label class="row"><input id="useCardArt" type="checkbox" checked> Artes PNG (ligar/desligar)</label><label class="row"><input id="reveal" type="checkbox"> Ver mãos dos bots</label><select id="injectType"><option value="num">Número 7</option><option value="draw2">+2</option><option value="wild4">+4</option><option value="wild6">+6</option><option value="wild">Coringa</option><option value="skip">Bloqueio</option><option value="reverse">Inverter</option><option value="dist">Panela de Pressão</option><option value="rotate">Liquidificador</option></select><select id="injectColor"><option value="red">Vermelho</option><option value="blue">Azul</option><option value="green">Verde</option><option value="yellow">Amarelo</option></select><button class="btn alt" id="injectBtn">Dar carta de teste</button><button class="btn alt" id="testPenalty">Simular +20 para você</button><label class="row"><input id="quickBots" type="checkbox"> Bots rápidos</label></div></details>
+    <details class="panel debug"><summary>Laboratório de testes (ferramentas de depuração)</summary><p class="help">Mostre as mãos dos bots ou adicione cartas à sua mão. Cartas injetadas podem ultrapassar a quantidade normal do baralho; isso é proposital para testar efeitos. Com cortes ativados, o balão de faca aparece sobre a carta idêntica; os bots normais respeitam uma janela de 2,2 segundos.</p><p id="labSixStatus" class="help"></p><div class="controls"><label class="row"><input id="useCardArt" type="checkbox" checked> Artes PNG (ligar/desligar)</label><label class="row"><input id="reveal" type="checkbox"> Ver mãos dos bots</label><select id="injectType"><option value="num">Número 7</option><option value="draw2">+2</option><option value="wild4">+4</option><option value="wild6">+6</option><option value="wild">Coringa</option><option value="skip">Bloqueio</option><option value="reverse">Inverter</option><option value="dist">Panela de Pressão</option><option value="rotate">Liquidificador</option></select><select id="injectColor"><option value="red">Vermelho</option><option value="blue">Azul</option><option value="green">Verde</option><option value="yellow">Amarelo</option></select><button class="btn alt" id="injectBtn">Dar carta de teste</button><button class="btn alt" id="testPenalty">Simular +20 para você</button><label class="row"><input id="quickBots" type="checkbox"> Bots rápidos</label></div></details>
     <details class="panel" open><summary>Histórico da partida</summary><div class="history" id="history"></div></details>
         <button id="backBtn" class="btn alt hide">Encerrar e voltar às configurações</button>
       </div>
@@ -146,6 +155,7 @@
 
 </main><div id="modalRoot"></div>
 <div id="navDialog" class="nav-dialog" role="alertdialog" aria-modal="true" aria-labelledby="navDialogTitle" aria-describedby="navDialogText" hidden><div class="nav-dialog-panel"><h2 id="navDialogTitle"></h2><p id="navDialogText"></p><button id="cancelLeaveBtn" class="hero-button hero-gold">Continuar jogando</button><button id="confirmLeaveBtn" class="hero-button hero-violet">Encerrar partida</button></div></div>
+<script src="perfil.js"></script>
 <script src="escolher-cor.js"></script>
 <script src="mesa.js"></script>
 <script src="navegacao.js"></script>
@@ -188,14 +198,16 @@ function cardHTML(c,small=false,selected=false,invalid=false){
   if(!path)return `<span class="${base}" title="${name}">${label}</span>`;
   return `<span class="${base} art-card${['dist','wild','wild4','wild6'].includes(c.type)?' official-special':''}" title="${name}" data-asset="${path}"><img class="card-image" src="${path}" alt="${name}" loading="lazy" draggable="false" onerror="this.parentNode.classList.add('asset-unavailable')"><span class="art-fallback">${label}</span></span>`;
 }
-function buildDeck(o){let a=[];for(const color of COLORS){for(let n=0;n<=9;n++){a.push(make('num',color,n),make('num',color,n));}for(let k=0;k<2;k++){a.push(make('draw2',color),make('skip',color),make('reverse',color));}}for(let k=0;k<4;k++)a.push(make('wild4'),make('wild'));for(let k=0;k<2;k++)a.push(make('wild6'));if(o.dist)for(let k=0;k<2;k++)a.push(make('dist'));if(o.rotate)for(let k=0;k<2;k++)a.push(make('rotate'));return shuffle(a);}
+function buildDeck(o){let a=[];for(const color of COLORS){for(let n=0;n<=9;n++){a.push(make('num',color,n),make('num',color,n));}for(let k=0;k<2;k++){a.push(make('draw2',color),make('skip',color),make('reverse',color));}}for(let k=0;k<4;k++)a.push(make('wild4'),make('wild'));if(o.wild6!==false)for(let k=0;k<2;k++)a.push(make('wild6'));if(o.dist)for(let k=0;k<2;k++)a.push(make('dist'));if(o.rotate)for(let k=0;k<2;k++)a.push(make('rotate'));return shuffle(a);}
 function log(msg){s.log.unshift(`[${new Date().toLocaleTimeString('pt-BR')}] ${msg}`);s.log=s.log.slice(0,70);}
 function updateGoals(){const duo=$('mode').value==='duo';$('goal').innerHTML=(duo?[5,10,15]:[10,20,30,50]).map(v=>`<option value="${v}">${v} pontos</option>`).join('');$('goal').value=duo?'5':'10';$('goal').disabled=$('duration').value==='single';}
+$('wild6').onchange=()=>{$('sixSettingValue').textContent=$('wild6').checked?'Ativada':'Desativada';$('challengeSettingLabel').textContent=$('wild6').checked?'Desafiar +4 e +6':'Desafiar +4';};
 $('mode').onchange=updateGoals;$('duration').onchange=updateGoals;updateGoals();
-function settings(){return {duo:$('mode').value==='duo',single:$('duration').value==='single',goal:Number($('goal').value),timeout:Number($('timeout').value),infinite:$('infinite').checked,cut:$('cut').checked,challenge:$('challenge').checked,dist:$('dist').checked,rotate:$('rotate').checked};}
-function names(i){return i===0?'Você':'Bot '+i;}
+function settings(){return {duo:$('mode').value==='duo',single:$('duration').value==='single',goal:Number($('goal').value),timeout:Number($('timeout').value),infinite:$('infinite').checked,cut:$('cut').checked,challenge:$('challenge').checked,wild6:$('wild6').checked,dist:$('dist').checked,rotate:$('rotate').checked};}
+function names(i){return i===0?(s?.identity?.name||PanelinhaProfile.current.name):'Bot '+i;}
+function safeName(i){return PanelinhaProfile.escape(names(i));}
 function clearJobs(){if(botTimer)clearTimeout(botTimer);if(cutTimer)clearTimeout(cutTimer);botTimer=null;cutTimer=null;}
-function startMatch(){clearJobs();let o=settings();s={o,players:[0,1,2,3].map(i=>({id:i,hand:[],score:0})),teams:[0,0],deck:[],discard:[],activeColor:null,direction:1,current:0,penalty:0,highest:0,lastPenalty:null,finisher:null,round:0,phase:'playing',drawn:null,cutOpen:false,unlockAt:0,lastActor:null,lastDistribution:null,preUno:false,unoWindow:null,log:[],message:'',deadline:0,pendingAction:null,token:0,reveal:false,summary:[],pastWinners:[],modal:null};$('menu').classList.add('hide');$('game').classList.remove('hide');$('backBtn').classList.remove('hide');PanelasMesa.closeMenu();$('reveal').checked=false;newRound();PanelinhaNavigation.enterGame();}
+function startMatch(){clearJobs();let o=settings();s={o,identity:PanelinhaProfile.current,players:[0,1,2,3].map(i=>({id:i,hand:[],score:0})),teams:[0,0],deck:[],discard:[],activeColor:null,direction:1,current:0,penalty:0,highest:0,lastPenalty:null,finisher:null,round:0,phase:'playing',drawn:null,cutOpen:false,unlockAt:0,lastActor:null,lastDistribution:null,preUno:false,unoWindow:null,log:[],message:'',deadline:0,pendingAction:null,token:0,reveal:false,summary:[],pastWinners:[],modal:null};$('menu').classList.add('hide');$('game').classList.remove('hide');$('backBtn').classList.remove('hide');PanelasMesa.closeMenu();$('reveal').checked=false;newRound();PanelinhaNavigation.enterGame();}
 function top(){return s.discard[s.discard.length-1];}
 function nextActive(from,steps=1){let i=from;for(let st=0;st<steps;st++){let tries=0;do{i=(i+4+s.direction)%4;tries++;}while(s.players[i].hand.length===0&&tries<4);}return i;}
 function refill(){if(s.deck.length||s.discard.length<=1)return;let t=s.discard.pop();s.deck=shuffle(s.discard);s.discard=[t];log('Monte reabastecido com os descartes.');}
@@ -331,11 +343,11 @@ function challenge(){if(!canChallenge(0)||!canActNow())return;clearJobs();closeU
 if(s.lastPenalty.illegal){drawMany(offender,total);log(`Desafio CORRETO: ${names(offender)} recebeu +${total}. Você mantém o turno.`);s.penalty=0;s.highest=0;s.lastPenalty=null;startTurn();}
 else{drawMany(0,total+2);log(`Desafio INCORRETO: você recebeu +${total+2} e perdeu a vez.`);s.penalty=0;s.highest=0;s.lastPenalty=null;if(s.finisher!==null){finishRound();return;}s.current=nextActive(0);startTurn();}}
 function canChallenge(id){return s.phase==='playing'&&s.o.challenge&&s.penalty>0&&s.current===id&&s.lastPenalty&&s.lastPenalty.challengeable&&(['wild4','wild6'].includes(s.lastPenalty.type));}
-function buyHuman(){if(!s||s.phase!=='playing'||s.current!==0||s.drawn!==null||!canActNow())return;clearJobs();closeUnoOnAction();if(s.penalty){finishPenaltyDraw(0);return;}let got=null,n=0;do{got=drawCard(0);if(!got)break;n++;}while(s.o.infinite&&!canPlay(got)&&n<200);log(`Você comprou ${n} carta(s).`);if(got&&canPlay(got)){s.drawn=got.id;s.message='Você pode jogar a carta comprada ou guardá-la e passar.';render();}
+function buyHuman(){if(!s||s.phase!=='playing'||s.current!==0||s.drawn!==null||!canActNow())return;clearJobs();closeUnoOnAction();if(s.penalty){finishPenaltyDraw(0);return;}let got=null,n=0;do{got=drawCard(0);if(!got)break;n++;}while(s.o.infinite&&!canPlay(got)&&n<200);log(`${names(0)} comprou ${n} carta(s).`);if(got&&canPlay(got)){s.drawn=got.id;s.message='Você pode jogar a carta comprada ou guardá-la e passar.';render();}
 else{s.message='Nenhuma carta válida comprada. Turno encerrado.';s.current=nextActive(0);startTurn();}}
-function keepPass(){if(s.phase!=='playing'||s.current!==0||s.drawn===null||!canActNow())return;clearJobs();log('Você guardou a carta comprada e passou.');s.drawn=null;s.current=nextActive(0);startTurn();}
-function callUno(){if(s.phase!=='playing')return;if(s.players[0].hand.length>=2){s.preUno=true;s.message='Última carta anunciada preventivamente; agora descarte para ficar com uma.';log('Você anunciou sua última carta preventivamente.');}
-else if(s.players[0].hand.length===1&&s.unoWindow&&s.unoWindow.id===0){s.unoWindow=null;log('Você anunciou última carta antes de ser denunciado.');}render();}
+function keepPass(){if(s.phase!=='playing'||s.current!==0||s.drawn===null||!canActNow())return;clearJobs();log(`${names(0)} guardou a carta comprada e passou.`);s.drawn=null;s.current=nextActive(0);startTurn();}
+function callUno(){if(s.phase!=='playing')return;if(s.players[0].hand.length>=2){s.preUno=true;s.message='Última carta anunciada preventivamente; agora descarte para ficar com uma.';log(`${names(0)} anunciou a última carta preventivamente.`);}
+else if(s.players[0].hand.length===1&&s.unoWindow&&s.unoWindow.id===0){s.unoWindow=null;log(`${names(0)} anunciou última carta antes de ser denunciado.`);}render();}
 function reportUno(by=0){if(!s||!s.unoWindow||s.phase!=='playing')return;let id=s.unoWindow.id;if(id===by)return;s.unoWindow=null;let got=drawMany(id,2);log(`${names(by)} denunciou ${names(id)} por esquecer ÚLTIMA CARTA (+${got}).`);render();}
 function handPoints(p){return p.hand.reduce((a,c)=>a+VALUE[c.type],0);}
 function specialCount(p){return p.hand.filter(c=>SPECIAL.has(c.type)).length;}
@@ -344,9 +356,9 @@ function numberCount(p){return p.hand.filter(c=>c.type==='num').length;}
 function rankPlayers(){let others=s.players.filter(p=>p.id!==s.finisher);others.sort((a,b)=>handPoints(a)-handPoints(b)||specialCount(a)-specialCount(b)||effectCount(a)-effectCount(b)||numberCount(a)-numberCount(b)||a.id-b.id);return [s.players[s.finisher],...others];}
 function finishRound(){clearJobs();s.token++;s.phase='roundOver';s.unoWindow=null;const ranks=rankPlayers();s.summary=ranks.map((p,i)=>({id:p.id,place:i+1,remaining:p.hand.length,cost:handPoints(p)}));
 s.pastWinners.push(s.finisher);
-if(s.o.duo){let team=s.finisher%2;s.teams[team]++;log(`Rodada encerrada: equipe ${team===0?'Você + Bot 2':'Bot 1 + Bot 3'} ganhou 1 ponto.`);}
+if(s.o.duo){let team=s.finisher%2;s.teams[team]++;log(`Rodada encerrada: equipe ${team===0?names(0)+' + Bot 2':'Bot 1 + Bot 3'} ganhou 1 ponto.`);}
 else{ranks.forEach((p,i)=>p.score+=3-i);log(`Classificação: ${ranks.map((p,i)=>`${i+1}º ${names(p.id)} (${handPoints(p)} pontos na mão)`).join('; ')}.`);}
-let victor=null;if(s.o.duo){const reached=s.teams.map((v,i)=>({v,i})).filter(x=>x.v>=s.o.goal);if(reached.length)victor=reached.sort((a,b)=>b.v-a.v)[0].i===0?'Equipe Você + Bot 2':'Equipe Bot 1 + Bot 3';}
+let victor=null;if(s.o.duo){const reached=s.teams.map((v,i)=>({v,i})).filter(x=>x.v>=s.o.goal);if(reached.length)victor=reached.sort((a,b)=>b.v-a.v)[0].i===0?'Equipe '+names(0)+' + Bot 2':'Equipe Bot 1 + Bot 3';}
 else{const reached=s.players.filter(p=>p.score>=s.o.goal);if(reached.length){let ordered=[...reached].sort((a,b)=>b.score-a.score||victories(b.id)-victories(a.id));if(ordered.length>1&&ordered[0].score===ordered[1].score&&victories(ordered[0].id)===victories(ordered[1].id)){log('Empate em pontos e vitórias: rodada extra de desempate.');}else victor=names(ordered[0].id);}}
 if(s.o.single||victor){s.phase='gameOver';s.winner=victor;}
 const summary=s.summary.map(x=>`${x.place}º ${names(x.id)} — ${x.cost} pts nas cartas, ${x.remaining} cartas`).join(' | ');
@@ -400,11 +412,11 @@ function showColors(){
     cancel(){if(s!==state||s.pendingAction!==action)return;s.pendingAction=null;render();queueBots();}
   });
 }
-function finishControlHTML(){let ranks=s.summary.map(x=>`<div class="notice"><strong>${x.place}º — ${names(x.id)}</strong> · ${x.cost} pontos nas cartas restantes (${x.remaining} cartas)</div>`).join('');return `<div class="banner">${s.phase==='gameOver'?(s.winner?`🏆 ${s.winner} venceu a partida!`:'🏆 Rodada única concluída!'):'Rodada concluída.'}</div>${ranks}<div class="controls">${s.phase==='roundOver'?'<button id="nextRound" class="btn good">Próxima rodada</button>':'<button id="newMatch" class="btn good">Nova partida</button>'}<button id="backLobby" class="btn alt">Voltar às configurações</button></div>`;}
+function finishControlHTML(){let ranks=s.summary.map(x=>`<div class="notice"><strong>${x.place}º — ${safeName(x.id)}</strong> · ${x.cost} pontos nas cartas restantes (${x.remaining} cartas)</div>`).join('');return `<div class="banner">${s.phase==='gameOver'?(s.winner?`🏆 ${PanelinhaProfile.escape(s.winner)} venceu a partida!`:'🏆 Rodada única concluída!'):'Rodada concluída.'}</div>${ranks}<div class="controls">${s.phase==='roundOver'?'<button id="nextRound" class="btn good">Próxima rodada</button>':'<button id="newMatch" class="btn good">Nova partida</button>'}<button id="backLobby" class="btn alt">Voltar às configurações</button></div>`;}
 function render(){if(!s)return;PanelasMesa.beforeRender(s);$('roundLabel').textContent=`Rodada ${s.round} · ${s.o.duo?'Duplas':'Individual'}`;$('status').textContent=s.phase==='playing'?`Vez de ${names(s.current)}`:s.phase==='roundOver'?'Fim da rodada':'Fim da partida';
-$('score').innerHTML=s.o.duo?`<span>Você + Bot 2: ${s.teams[0]}</span><span>Bot 1 + Bot 3: ${s.teams[1]}</span>`:s.players.map(p=>`<span>${names(p.id)}: ${p.score}</span>`).join('');
+$('score').innerHTML=s.o.duo?`<span>${safeName(0)} + Bot 2: ${s.teams[0]}</span><span>Bot 1 + Bot 3: ${s.teams[1]}</span>`:s.players.map(p=>`<span>${safeName(p.id)}: ${p.score}</span>`).join('');
 $('stateText').textContent=s.phase==='playing'?`Sentido: ${s.direction===-1?'horário':'anti-horário'} · Cor: ${CN[s.activeColor]} · Monte: ${s.deck.length} · ${s.penalty?'PENALIDADE OBRIGATÓRIA +'+s.penalty:'Sem penalidade'}${s.o.timeout&&s.deadline?' · Tempo: '+Math.max(0,Math.ceil((s.deadline-Date.now())/1000))+'s':''}`:s.message;
-for(let i=0;i<4;i++){const p=s.players[i],active=s.current===i&&s.phase==='playing';const show=s.reveal||(s.o.duo&&i===2);let node=$('player'+i);node.classList.toggle('active',active);node.innerHTML=`<div class="name">${names(i)} ${active?'⏳':''}${s.o.duo?' <span class="tag">'+(i%2?'B':'A')+'</span>':''}</div><div class="sub">${p.hand.length} cartas${i===0?'':' · bot'}</div>${i!==0?(show?'<div class="subhand">'+p.hand.map(c=>cardHTML(c,true)).join('')+'</div>':'<div class="back">'+'▰ '.repeat(Math.min(6,p.hand.length))+'</div>'):''}`;}
+for(let i=0;i<4;i++){const p=s.players[i],active=s.current===i&&s.phase==='playing';const show=s.reveal||(s.o.duo&&i===2);let node=$('player'+i);node.classList.toggle('active',active);node.innerHTML=`<div class="name">${safeName(i)} ${active?'⏳':''}${s.o.duo?' <span class="tag">'+(i%2?'B':'A')+'</span>':''}</div><div class="sub">${p.hand.length} cartas${i===0?'':' · bot'}</div>${i!==0?(show?'<div class="subhand">'+p.hand.map(c=>cardHTML(c,true)).join('')+'</div>':'<div class="back">'+'▰ '.repeat(Math.min(6,p.hand.length))+'</div>'):''}`;}
 $('pile').innerHTML=`<div class="card" style="background:#283f68;color:#b9d1ff;border:2px solid #718cbb"><small>MONTE</small><span>⬚</span><small>${s.deck.length}</small></div>`;$('discard').innerHTML=PanelasMesa.discardHTML(s.discard,cardHTML,s);$('centerMsg').innerHTML=`Cor: <strong>${CN[s.activeColor]}</strong><div>${s.penalty?'⚠️ OBRIGATÓRIO +'+s.penalty:'Carta central'}</div>`;
 $('handCount').textContent=s.players[0].hand.length+' cartas';
 const cards=[...s.players[0].hand].sort((a,b)=>(COLORS.indexOf(a.color)+1||9)-(COLORS.indexOf(b.color)+1||9)||a.type.localeCompare(b.type)||(a.num??0)-(b.num??0));
@@ -425,8 +437,8 @@ if(s.phase!=='playing'){
   const canCall=s.players[0].hand.length===2||(s.players[0].hand.length===1&&s.unoWindow?.id===0);
   const canReport=s.unoWindow&&s.unoWindow.id!==0;
   const penaltyBanner=mine&&s.penalty?`<div class="penalty-alert">⚠️ ${penaltyText()}</div>`:'';
-  const actionHint=mine&&locked?`<span class="pill">Próxima jogada liberada em ${Math.max(0,((s.unlockAt-Date.now())/1000)).toFixed(1)}s · cortes abertos</span>`:'';
-  $('controls').innerHTML=`${penaltyBanner}${actionHint}${mine&&s.drawn!==null?'<button id="passBtn" class="btn alt">Guardar e passar</button>':''}${mine&&canChallenge(0)?`<button id="challengeBtn" class="btn warn" ${locked?'disabled':''}>Desafiar +4/+6</button>`:''}${canCall?`<button id="unoBtn" class="btn good" ${s.preUno?'disabled':''}>ÚLTIMA CARTA!</button>`:''}${canReport?'<button id="reportBtn" class="btn warn">Denunciar última carta</button>':''}`;
+
+  $('controls').innerHTML=`${penaltyBanner}${mine&&s.drawn!==null?'<button id="passBtn" class="btn alt">Guardar e passar</button>':''}${mine&&canChallenge(0)?`<button id="challengeBtn" class="btn warn" ${locked?'disabled':''}>Desafiar +4${s.o.wild6===false?'':'/+6'}</button>`:''}${canCall?`<button id="unoBtn" class="btn good" ${s.preUno?'disabled':''}>ÚLTIMA CARTA!</button>`:''}${canReport?'<button id="reportBtn" class="btn warn">Denunciar última carta</button>':''}`;
   $('buyBtn').disabled=!mine||s.drawn!==null||locked||!!s.pendingAction;
   $('buyBtn').setAttribute('aria-label',s.penalty?'Comprar penalidade de '+s.penalty+' cartas':'Comprar carta');
   $('buyBtn').onclick=buyHuman;
@@ -435,13 +447,16 @@ if(s.phase!=='playing'){
   $('unoBtn')?.addEventListener('click',callUno);
   $('reportBtn')?.addEventListener('click',()=>reportUno(0));
 }
-$('message').textContent=s.message||'Toque em uma carta para jogá-la. Se tiver carta idêntica, a faca aparece na carta idêntica imediatamente após o descarte.';$('history').innerHTML=s.log.slice(0,40).map(x=>`<div>${x.replaceAll('<','&lt;').replaceAll('>','&gt;')}</div>`).join('');
+$('message').textContent=/^(Aguarde a abertura|Fora do seu turno, toque na carta com o balão)/.test(s.message)?'':s.message||'';$('history').innerHTML=s.log.slice(0,40).map(x=>`<div>${x.replaceAll('<','&lt;').replaceAll('>','&gt;')}</div>`).join('');
 if(s.phase!=='playing')$('buyBtn').disabled=true;
-PanelasMesa.render(s,handScroll);
+const mustBuy=s.phase==='playing'&&s.current===0&&canActNow()&&!s.pendingAction&&s.drawn===null&&!s.players[0].hand.some(canPlay)&&!canChallenge(0);
+const sixOption=$('injectType').querySelector('[value=wild6]');sixOption.disabled=s.o.wild6===false;if(sixOption.disabled&&$('injectType').value==='wild6')$('injectType').value='wild4';
+$('labSixStatus').textContent='Carta +6 nesta partida: '+(s.o.wild6===false?'desativada':'ativada')+'. A opção é aplicada ao começar uma nova partida.';
+PanelasMesa.render(s,handScroll,{mustBuy});
 $('cutBtn')?.scrollIntoView({block:'nearest',inline:'nearest'});}
 function backToMenu(){clearJobs();s=null;$('menu').classList.remove('hide');$('game').classList.add('hide');$('backBtn').classList.add('hide');$('modalRoot').innerHTML='';PanelasMesa.reset();PanelinhaNavigation.returnToSettings();}
 $('useCardArt').onchange=()=>{if(s)render();};$('startBtn').onclick=startMatch;$('backBtn').onclick=()=>PanelinhaNavigation.requestLeave();$('reveal').onchange=()=>{if(s){s.reveal=$('reveal').checked;render();}};
-$('injectBtn').onclick=()=>{if(!s||s.phase!=='playing')return;let type=$('injectType').value,color=$('injectColor').value;s.players[0].hand.push(make(type,(['num','draw2','skip','reverse'].includes(type)?color:null),type==='num'?7:null));log(`Teste: carta ${TYPES[type]} adicionada à sua mão.`);render();};
+$('injectBtn').onclick=()=>{if(!s||s.phase!=='playing')return;let type=$('injectType').value,color=$('injectColor').value;if(type==='wild6'&&s.o.wild6===false)return;s.players[0].hand.push(make(type,(['num','draw2','skip','reverse'].includes(type)?color:null),type==='num'?7:null));log(`Teste: carta ${TYPES[type]} adicionada à sua mão.`);render();};
 $('testPenalty').onclick=()=>{if(!s||s.phase!=='playing'||s.finisher!==null)return;clearJobs();s.current=0;s.penalty=20;s.highest=2;s.lastPenalty=null;s.drawn=null;s.cutOpen=false;s.unlockAt=0;s.deadline=s.o.timeout?Date.now()+s.o.timeout*1000:0;s.token++;log('Teste: penalidade acumulada +20 direcionada a você.');render();};
 // Atualiza cronômetro sem recriar toda a interface. Estouro: compra automática e turno perdido.
 ticker=setInterval(()=>{if(!s||s.phase!=='playing')return;PanelasMesa.updateClock(s,Date.now());if(s.cutOpen&&Date.now()>=s.unlockAt){s.cutOpen=false;render();}if(s.current===0&&s.unlockAt&&Date.now()>=s.unlockAt){s.unlockAt=0;render();}

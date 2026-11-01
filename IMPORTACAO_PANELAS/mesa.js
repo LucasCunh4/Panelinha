@@ -5,6 +5,7 @@
   const colorNames = { red:'Vermelho', blue:'Azul', yellow:'Amarelo', green:'Verde' };
   const avatarColors = ['#c6a1fa', '#f0a783', '#91d7c5', '#9dbef5'];
   let previous = null;
+  let cueOwner=null,cueRound=null,wasHumanTurn=false,cueAnimation=null;
   let snapshot = null, pendingPlay = null;
   let displayedTop = null;
   const flights = new Set();
@@ -171,15 +172,21 @@
     $('discard').classList.toggle('receiving-card',playing.has(Number($('discard').querySelector('.discard-top')?.dataset.visualKey)));
     document.querySelectorAll('[data-card],[data-hand-card]').forEach(node=>node.classList.toggle('drawing-card',drawingIds.has(Number(node.dataset.card||node.dataset.handCard))));
   }
-  function handPoint(actor,id) {
+  function handPoint(actor,id,target=false) {
     const seat=$(`player${actor}`),area=actor===0?$('hand'):(seat.querySelector('.subhand,.back')||seat);
     let node=actor===0?area.querySelector(`[data-card="${id}"]`):area.querySelector(`[data-hand-card="${id}"]`);
     node=node||area.lastElementChild||area;
     const angle=(area===node?0:rotation(area))+rotation(node);
     if(actor===0)node=node.querySelector('.card')||node;
     const r=node.getBoundingClientRect(),clip=area.getBoundingClientRect();
+    const matrix=actor===0?getComputedStyle(area).transform.match(/^matrix\(([^)]+)\)$/):null;
+    const values=matrix?matrix[1].split(',').map(Number):[1,0];
+    const actualScale=Math.hypot(values[0],values[1])||1;
+    const scale=target&&actor===0?Number(area.dataset.turnScale)||1:actualScale;
+    const adjust=scale/actualScale,anchorX=clip.x+clip.width/2,anchorY=clip.bottom;
+    const centerX=anchorX+(r.x+r.width/2-anchorX)*adjust,centerY=anchorY+(r.y+r.height/2-anchorY)*adjust;
     const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
-    return {x:clamp(r.x+r.width/2,Math.max(0,clip.left),Math.min(innerWidth,clip.right)),y:clamp(r.y+r.height/2,Math.max(0,clip.top),Math.min(innerHeight,clip.bottom)),width:node.offsetWidth||r.width,height:node.offsetHeight||r.height,angle,node};
+    return {x:clamp(centerX,Math.max(0,clip.left),Math.min(innerWidth,clip.right)),y:clamp(centerY,Math.max(0,clip.top),Math.min(innerHeight,clip.bottom)),width:(node.offsetWidth||r.width)*scale,height:(node.offsetHeight||r.height)*scale,angle,node};
   }
   function recordDraw(state,actor,card) {
     if(!snapshot||snapshot.state!==state||snapshot.round!==state.round||reducedMotion.matches)return;
@@ -195,7 +202,7 @@
     events.forEach((event,i)=>{
       const delay=elapsed;elapsed+=intervals[i]*factor;
       const duration=Math.max(240,420-count*1.6);
-      const end=handPoint(event.actor,event.id),present=state.players[event.actor].hand.some(c=>c.id===event.id);
+      const end=handPoint(event.actor,event.id,true),present=state.players[event.actor].hand.some(c=>c.id===event.id);
       if(!end.width||!end.height)return;
       const face=event.actor===0||state.reveal||(state.o.duo&&event.actor===2);
       const sprite=document.createElement('div');sprite.className='drawn-card flying-card';
@@ -376,10 +383,20 @@
     else if (!event.shiftKey && document.activeElement === last) {event.preventDefault();first.focus();}
   });
 
-  function render(state, savedScroll) {
+  function render(state, savedScroll, {mustBuy=false}={}) {
     nativeTable(true);
     if(handOwner!==state||handRound!==state.round){cancelHandTimers();expandedColor=null;handPinned=false;handLayout=null;handOwner=state;handRound=state.round;}
     document.body.classList.add('playing');
+    const humanTurn=state.phase==='playing'&&state.current===0&&Date.now()>=state.unlockAt;
+    $('hand').dataset.turnScale=humanTurn?'1.06':'1';
+    $('hand').classList.toggle('human-turn',humanTurn);
+    $('buyBtn').classList.toggle('mandatory-buy',mustBuy);
+    $('buyBtn').setAttribute('data-mandatory',String(mustBuy));
+    const cue=$('turnCue'),newTurn=cueOwner!==state||cueRound!==state.round||!wasHumanTurn;
+    cue.hidden=!humanTurn;
+    if(humanTurn&&newTurn){cueAnimation?.cancel();cue.innerHTML='<span>SUA VEZ!</span>';if(!reducedMotion.matches)cueAnimation=cue.firstElementChild.animate([{opacity:0,transform:'translateY(6px) scale(.82)'},{offset:.15,opacity:1,transform:'scale(1.08)'},{offset:.65,opacity:1,transform:'scale(1)'},{opacity:.85,transform:'scale(.82)'}],{duration:1400,easing:'ease-out',fill:'forwards'});}
+    if(!humanTurn){cueAnimation?.cancel();cueAnimation=null;}
+    cueOwner=state;cueRound=state.round;wasHumanTurn=humanTurn;
     const center = document.querySelector('.center');
     $('table').dataset.activeColor = state.activeColor || '';
     $('table').dataset.phase = state.phase;
@@ -391,7 +408,6 @@
     $('table').dataset.penalty=String(state.penalty);
     $('table').setAttribute('aria-label', `Mesa de jogo · ${state.activeColor ? colorNames[state.activeColor] : 'sem cor ativa'}`);
     layout();
-    $('turnCue').textContent = state.phase === 'playing' ? `Vez de ${state.current === 0 ? 'Você' : 'Bot ' + state.current}` : 'Rodada concluída';
     center.dataset.activeColor = state.activeColor;
     $('burner').setAttribute('aria-label', `Boca do fogão · cor ativa: ${colorNames[state.activeColor] || 'nenhuma'}`);
     const penalty = $('penaltyDisplay');
@@ -421,7 +437,7 @@
     for (const player of state.players) {
       const seat = $(`player${player.id}`);
       if (player.id === 0) {
-        if (!seat.querySelector('.pan-avatar')) seat.insertAdjacentHTML('afterbegin',panAvatar(player.id));
+        if (!seat.querySelector('.pan-avatar')) seat.insertAdjacentHTML('afterbegin',PanelinhaProfile.avatarHTML(state.identity?.avatar));
       } else if (!seat.querySelector('.seat-identity')) {
         const identity=document.createElement('div');identity.className='seat-identity';
         identity.innerHTML=panAvatar(player.id);
@@ -430,7 +446,7 @@
         seat.prepend(identity);
       }
       if(player.id===2)fitTopIdentity();
-      seat.setAttribute('aria-label', `${player.id === 0 ? 'Você' : `Bot ${player.id}`}, ${player.hand.length} cartas${state.current === player.id && state.phase === 'playing' ? ', na vez' : ''}`);
+      seat.setAttribute('aria-label', `${player.id === 0 ? state.identity?.name||PanelinhaProfile.current.name : `Bot ${player.id}`}, ${player.hand.length} cartas${state.current === player.id && state.phase === 'playing' ? ', na vez' : ''}`);
       const back = seat.querySelector('.back');
       if (back) {
         back.setAttribute('aria-hidden', 'true');
@@ -443,6 +459,8 @@
         fan(subhand,Infinity);
       }
     }
+    const self=$('player0').getBoundingClientRect(),tableRect=$('table').getBoundingClientRect();
+    $('table').style.setProperty('--turn-cue-bottom',`${tableRect.bottom-self.top+8}px`);
     fan($('hand'), innerWidth < 360 ? 7 : 9, savedScroll);
     const top=state.discard[state.discard.length-1];
     displayedTop=top?.id ?? null;
@@ -460,5 +478,5 @@
     document.querySelectorAll('.subhand,.back').forEach(hand => fan(hand,Infinity));
   });
   nativeTable(false);
-  window.PanelasMesa = { render, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
+  window.PanelasMesa = { render, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {cueAnimation?.cancel();cueAnimation=null;cueOwner=null;cueRound=null;wasHumanTurn=false;$('turnCue').hidden=true;$('hand').classList.remove('human-turn');$('hand').dataset.turnScale='1';$('buyBtn').classList.remove('mandatory-buy');clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
 })();

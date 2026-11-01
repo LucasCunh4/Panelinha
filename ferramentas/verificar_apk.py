@@ -30,7 +30,8 @@ assert "application-label:'Panelinha Teste'" in metadata, 'Nome do app incorreto
 assert "sdkVersion:'24'" in metadata and "targetSdkVersion:'36'" in metadata
 assert 'application-debuggable' not in metadata, 'Distribuir somente APK release'
 xml = subprocess.check_output([str(aapt), 'dump', 'xmltree', str(apk), 'AndroidManifest.xml'], text=True)
-assert re.search(r'android:screenOrientation.*=\(type 0x10\)0xa\b', xml), 'Orientação fullSensor ausente'
+assert re.search(r'android:screenOrientation.*=\(type 0x10\)0x6\b', xml), 'Orientação sensorLandscape ausente'
+assert re.search(r'android:appCategory.*=\(type 0x10\)0x0\b', xml), 'Categoria game ausente: necessária para respeitar orientação em telas grandes Android 16'
 if os.environ.get('PANELINHA_VERSION_CODE'):
     assert package[2] == os.environ['PANELINHA_VERSION_CODE'], 'versionCode divergente'
 if os.environ.get('PANELINHA_VERSION_NAME'):
@@ -56,7 +57,7 @@ with zipfile.ZipFile(apk) as archive:
     assert len(penalidades['assets']) == 22
     for entry in penalidades['assets']:
         assert hashlib.sha256(archive.read(prefix + entry['path'])).hexdigest() == entry['sha256'], entry['path']
-    for name in ['escolher-cor.js', 'escolher-cor.css', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js']:
+    for name in ['perfil.js', 'escolher-cor.js', 'escolher-cor.css', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js']:
         assert archive.read(prefix + name) == (root / 'IMPORTACAO_PANELAS' / name).read_bytes(), f'Jogo alterado no APK: {name}'
     original_html = (root / 'IMPORTACAO_PANELAS/index.html').read_bytes()
     has_compat = prefix + 'android-compat.js' in archive.namelist()
@@ -74,7 +75,7 @@ info = {
     'file': apk.name, 'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
     'applicationId': package[1], 'versionCode': int(package[2]), 'versionName': package[3],
     'certificateSha256': match[1].lower(), 'pngsVerified': len(pngs), 'origin': identity['origin'], 'androidCompat': has_compat,
-    'signingGeneration': identity.get('signingGeneration', 1), 'mesaAssetsVerified': len(mesa['asset_files']), 'menuAssetsVerified': len(menu['assets']), 'specialAssetsVerified': len(especiais['assets']), 'penaltyAssetsVerified': len(penalidades['assets']),
+    'orientation': 'sensorLandscape', 'appCategory': 'game', 'signingGeneration': identity.get('signingGeneration', 1), 'mesaAssetsVerified': len(mesa['asset_files']), 'menuAssetsVerified': len(menu['assets']), 'specialAssetsVerified': len(especiais['assets']), 'penaltyAssetsVerified': len(penalidades['assets']),
 }
 apk.with_suffix('.json').write_text(json.dumps(info, indent=2) + '\n')
 print(json.dumps(info, indent=2))

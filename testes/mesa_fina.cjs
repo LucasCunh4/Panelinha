@@ -11,7 +11,7 @@ const output=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mesa-fina-evidenc
  });
  const finish=async()=>{await page.locator('.flying-card,.block-effect').evaluateAll(nodes=>nodes.forEach(n=>n.getAnimations().forEach(a=>a.finish())));await page.waitForFunction(()=>!document.querySelector('.flying-card,.block-effect'));};
  try{
-  await page.clock.install();await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#singlePlayerBtn').click();await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();
+  await page.clock.install();await page.goto(process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/');await page.locator('#singlePlayerBtn').click();await page.locator('#profileContinueBtn').click();await page.locator('#mode').selectOption('duo');await page.locator('#startBtn').tap();
   for(const [width,height] of [[320,568],[390,844],[412,915],[568,320],[844,390],[1280,800]]){
    await page.setViewportSize({width,height});await fixture();
    await page.locator('#hand>button,.subhand>.card,.back>.hidden-card').evaluateAll(nodes=>Promise.all(nodes.flatMap(n=>n.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})))));
