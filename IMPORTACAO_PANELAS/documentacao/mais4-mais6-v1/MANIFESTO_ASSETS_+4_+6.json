@@ -1,0 +1,39 @@
+{
+  "pacote": "Panelinha_Artes_+4_+6_Somente",
+  "descricao": "Apenas os assets novos das cartas +4 e +6",
+  "pasta_principal": "cartas_mais4_mais6",
+  "carta_mais4": {
+    "completa": "cartas_mais4_mais6/carta_mais4_completa.png",
+    "base": "cartas_mais4_mais6/carta_mais4_base_sem_ingredientes.png",
+    "preview": "cartas_mais4_mais6/carta_mais4_montada_camadas_preview.png",
+    "overlays": {
+      "tomates": "cartas_mais4_mais6/carta_mais4_tomates_overlay_full.png",
+      "queijos": "cartas_mais4_mais6/carta_mais4_queijos_overlay_full.png",
+      "mirtilos": "cartas_mais4_mais6/carta_mais4_mirtilos_overlay_full.png",
+      "alfaces": "cartas_mais4_mais6/carta_mais4_alfaces_overlay_full.png"
+    },
+    "sprites": {
+      "tomates": "cartas_mais4_mais6/carta_mais4_tomates_sprite.png",
+      "queijos": "cartas_mais4_mais6/carta_mais4_queijos_sprite.png",
+      "mirtilos": "cartas_mais4_mais6/carta_mais4_mirtilos_sprite.png",
+      "alfaces": "cartas_mais4_mais6/carta_mais4_alfaces_sprite.png"
+    }
+  },
+  "carta_mais6": {
+    "completa": "cartas_mais4_mais6/carta_mais6_completa.png",
+    "base": "cartas_mais4_mais6/carta_mais6_base_sem_ingredientes.png",
+    "preview": "cartas_mais4_mais6/carta_mais6_montada_camadas_preview.png",
+    "overlays": {
+      "tomates": "cartas_mais4_mais6/carta_mais6_tomates_overlay_full.png",
+      "queijos": "cartas_mais4_mais6/carta_mais6_queijos_overlay_full.png",
+      "mirtilos": "cartas_mais4_mais6/carta_mais6_mirtilos_overlay_full.png",
+      "alfaces": "cartas_mais4_mais6/carta_mais6_alfaces_overlay_full.png"
+    },
+    "sprites": {
+      "tomates": "cartas_mais4_mais6/carta_mais6_tomates_sprite.png",
+      "queijos": "cartas_mais4_mais6/carta_mais6_queijos_sprite.png",
+      "mirtilos": "cartas_mais4_mais6/carta_mais6_mirtilos_sprite.png",
+      "alfaces": "cartas_mais4_mais6/carta_mais6_alfaces_sprite.png"
+    }
+  }
+}

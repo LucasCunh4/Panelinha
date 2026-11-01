@@ -314,4 +314,23 @@ public class OfflineGameTest {
         }
     }
 
+    @Test public void j_penaltyCardArtAndColorPickerOffline() throws Exception {
+        startControlled();
+        js("window.__penaltyCheck=null;(async()=>{try{const files=[4,6].flatMap(n=>['completa','base_sem_ingredientes',...['tomates','queijos','mirtilos','alfaces'].map(s=>s+'_overlay_full')].map(s=>'carta_mais'+n+'_'+s));await Promise.all(files.map(async f=>{const im=new Image();im.src='assets/cartas_mais4_mais6/'+f+'.png';await im.decode();if(im.naturalWidth!==1024||im.naturalHeight!==1536)throw Error(f)}));window.__penaltyCheck=12}catch(e){window.__penaltyCheck=String(e)}})()");
+        waitFor("window.__penaltyCheck===12",60000);
+        for(int number:new int[]{4,6})for(String color:new String[]{"red","yellow","blue","green"}){
+            startControlled();
+            js("(()=>{const s=CartasTest.getState();s.players[0].hand=[{id:89900,type:'wild"+number+"',color:null},{id:89901,type:'num',color:'blue',num:7}];s.penalty=2;s.highest=2;document.getElementById('useCardArt').onchange()})()");
+            assertEquals("true",js("document.querySelector('[data-card=\"89900\"] .card-image').src.endsWith('carta_mais"+number+"_completa.png')"));
+            tap("[data-card='89900']");waitFor("!!document.querySelector('.color-picker')",15000);
+            assertEquals("true",js("document.querySelector('.color-picker-base').src.endsWith('carta_mais"+number+"_base_sem_ingredientes.png')"));
+            assertEquals("4",js("document.querySelectorAll('.ingredient-layer img').length"));
+            assertEquals("true",js("[...document.querySelectorAll('[data-color]')].every(e=>{const r=e.getBoundingClientRect();return r.width>=44&&r.height>=44})"));
+            tap("[data-color='"+color+"']");waitFor("!document.querySelector('.color-picker')",15000);
+            assertEquals(org.json.JSONObject.quote(color),js("CartasTest.getState().activeColor"));
+            assertEquals(String.valueOf(number+2),js("CartasTest.getState().penalty"));
+            assertEquals("true",js("document.querySelector('#discard .discard-top .card-image').src.endsWith('carta_mais"+number+"_completa.png')"));
+        }
+    }
+
 }

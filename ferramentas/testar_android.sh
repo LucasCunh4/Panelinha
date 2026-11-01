@@ -88,7 +88,7 @@ if [[ "${PANELINHA_VERIFY_EXISTING_DATA:-0}" = 1 ]]; then
   run_tests UpdatePersistenceTest 1 "$output/update-anterior.txt"
 fi
 ci_test_status=0
-if ! run_tests OfflineGameTest 9 "$output/offline.txt"; then ci_test_status=1; fi
+if ! run_tests OfflineGameTest 10 "$output/offline.txt"; then ci_test_status=1; fi
 for orientation in portrait landscape; do
   for suffix in .png .json -uiautomation.png; do
     if ! adb pull "/sdcard/Android/data/$app/files/mesa-v1-$orientation$suffix" "$output/mesa-v1-$orientation$suffix"; then ci_test_status=1; fi
@@ -107,4 +107,4 @@ if [[ "$ci_test_status" != 0 ]]; then
   echo 'Uma ou mais verificações Android falharam; consulte os resultados individuais.' >&2
   exit 1
 fi
-echo 'APK offline: 9 testes. Atualização sem desinstalar: 1 teste. UID, localStorage e SharedPreferences preservados.'
+echo 'APK offline: 10 testes. Atualização sem desinstalar: 1 teste. UID, localStorage e SharedPreferences preservados.'

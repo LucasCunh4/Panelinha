@@ -1,0 +1,236 @@
+{
+  "bundle": "Panelinha — +4 e +6 oficiais v1",
+  "sourceZip": "Panelinha_Artes_+4_+6_Somente.zip",
+  "sourceZipSha256": "5c6e69c0f3c204ad4ff272f697816f813aae6ab666f4a6cdbc395b2143dab5a0",
+  "hitRegionSource": "Bounds do canal alfa dos overlays oficiais, sem alterar os arquivos. O manifesto fornecido mapeia arquivos, mas não contém coordenadas de toque.",
+  "assets": [
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais4_alfaces_overlay_full.png",
+      "sha256": "1fc4653854a2b7302dadee13e82ef170550a559119cfb55d45587737d952b433"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais4_alfaces_sprite.png",
+      "sha256": "7276e6237ac30636759772085e2091331a64509f900510558eaa38386e31205f"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais4_base_sem_ingredientes.png",
+      "sha256": "d66f3f2c78d44d2dbedf083dd2dc1ddfe240f7ed3b3722283aa864bd040b1fde"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais4_completa.png",
+      "sha256": "6d47fb517e5ea8b5f30e02b1cbe54ad57cf824b0897ab30b88d4d72ea4248029"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais4_mirtilos_overlay_full.png",
+      "sha256": "ebca0c21913d5d51420b0ab77fbb82fe76345d2705afe41fdaad4236fa5ac617"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais4_mirtilos_sprite.png",
+      "sha256": "78ffd49b53424cc9d2ca916a35e18042c0645a14d5e250d3fa02d9ed54c2df23"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais4_montada_camadas_preview.png",
+      "sha256": "8d87c815e4907854006bd33064bab6e6afb5e1c358bb94c2998eba1f0f96a2b9"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais4_queijos_overlay_full.png",
+      "sha256": "9c604fe1bebd9b6b3edf662a08c4601a9ae823e123e698443421ca2d96b7dbb2"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais4_queijos_sprite.png",
+      "sha256": "adbe4b455d13edca719d959bacebd01f8e15d9fc85409d4e58eb74733e0be8ea"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais4_tomates_overlay_full.png",
+      "sha256": "4ab101ed94e86e94493569bcf2c58922e78cbed456f1631b1e8b965a89fe25c1"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais4_tomates_sprite.png",
+      "sha256": "471edbfaeeb20f8baae1aff44cd3c16dc86cdb5154a68935f1f395069abb2e6a"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais6_alfaces_overlay_full.png",
+      "sha256": "07872eb2ededf351211f55e2eb941a84fec3a32a055a1059ca3332029150b498"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais6_alfaces_sprite.png",
+      "sha256": "4031e0d0b113f333178db615f028947db2a993be769b4c971127b8bec82351ee"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais6_base_sem_ingredientes.png",
+      "sha256": "22f5208590d2d1e181b86d3c9253e6a6c34ee3b934bea2c5274fa32b2658a3d9"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais6_completa.png",
+      "sha256": "77fb82fd4673f40ef9008c8155964e245febc6bfa6ca9290b05bdb48b561216b"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais6_mirtilos_overlay_full.png",
+      "sha256": "51b5d4373d3d5a4e640913881f8ac7e3987649aa8f6df673e0c4de0613011aa3"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais6_mirtilos_sprite.png",
+      "sha256": "4fd2757c0ba34c3a09602f567b767c35e5bc410b5ec88c790fa3de881051af6d"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais6_montada_camadas_preview.png",
+      "sha256": "66489b24eb988eb0a652fd4b39c5d570558f4a2ced3cbb7812297ca951496ed1"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais6_queijos_overlay_full.png",
+      "sha256": "38bc5bd67db102c4f82df5e6b978961beaa8b8b79092d742203a8be75e6320a1"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais6_queijos_sprite.png",
+      "sha256": "75e4b428e9e2d3c0eba05296475061c79cae7a251d8392de90847467dc3a89a4"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais6_tomates_overlay_full.png",
+      "sha256": "559a26fbe3b0add748eed08550e0b19a273e2a0444d590717396c07d9b0a93ed"
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais6_tomates_sprite.png",
+      "sha256": "4437c5432abfcc2bfc2957208ecfe4610b58a5cc2476fe48e2e7c8f3b6ec446f"
+    }
+  ],
+  "layouts": {
+    "wild4": {
+      "base": "assets/cartas_mais4_mais6/carta_mais4_base_sem_ingredientes.png",
+      "canvas": [
+        1024,
+        1536
+      ],
+      "layers": {
+        "tomates": {
+          "path": "assets/cartas_mais4_mais6/carta_mais4_tomates_overlay_full.png",
+          "alphaBoundsPx": [
+            142,
+            277,
+            443,
+            574
+          ],
+          "hitRegion": {
+            "x": 0.138671875,
+            "y": 0.18033854166666666,
+            "width": 0.2939453125,
+            "height": 0.193359375
+          }
+        },
+        "queijos": {
+          "path": "assets/cartas_mais4_mais6/carta_mais4_queijos_overlay_full.png",
+          "alphaBoundsPx": [
+            545,
+            262,
+            912,
+            574
+          ],
+          "hitRegion": {
+            "x": 0.5322265625,
+            "y": 0.17057291666666666,
+            "width": 0.3583984375,
+            "height": 0.203125
+          }
+        },
+        "mirtilos": {
+          "path": "assets/cartas_mais4_mais6/carta_mais4_mirtilos_overlay_full.png",
+          "alphaBoundsPx": [
+            68,
+            635,
+            432,
+            901
+          ],
+          "hitRegion": {
+            "x": 0.06640625,
+            "y": 0.4134114583333333,
+            "width": 0.35546875,
+            "height": 0.17317708333333334
+          }
+        },
+        "alfaces": {
+          "path": "assets/cartas_mais4_mais6/carta_mais4_alfaces_overlay_full.png",
+          "alphaBoundsPx": [
+            647,
+            635,
+            936,
+            895
+          ],
+          "hitRegion": {
+            "x": 0.6318359375,
+            "y": 0.4134114583333333,
+            "width": 0.2822265625,
+            "height": 0.16927083333333334
+          }
+        }
+      }
+    },
+    "wild6": {
+      "base": "assets/cartas_mais4_mais6/carta_mais6_base_sem_ingredientes.png",
+      "canvas": [
+        1024,
+        1536
+      ],
+      "layers": {
+        "tomates": {
+          "path": "assets/cartas_mais4_mais6/carta_mais6_tomates_overlay_full.png",
+          "alphaBoundsPx": [
+            133,
+            263,
+            436,
+            557
+          ],
+          "hitRegion": {
+            "x": 0.1298828125,
+            "y": 0.17122395833333334,
+            "width": 0.2958984375,
+            "height": 0.19140625
+          }
+        },
+        "queijos": {
+          "path": "assets/cartas_mais4_mais6/carta_mais6_queijos_overlay_full.png",
+          "alphaBoundsPx": [
+            535,
+            244,
+            906,
+            568
+          ],
+          "hitRegion": {
+            "x": 0.5224609375,
+            "y": 0.15885416666666666,
+            "width": 0.3623046875,
+            "height": 0.2109375
+          }
+        },
+        "mirtilos": {
+          "path": "assets/cartas_mais4_mais6/carta_mais6_mirtilos_overlay_full.png",
+          "alphaBoundsPx": [
+            71,
+            630,
+            410,
+            897
+          ],
+          "hitRegion": {
+            "x": 0.0693359375,
+            "y": 0.41015625,
+            "width": 0.3310546875,
+            "height": 0.173828125
+          }
+        },
+        "alfaces": {
+          "path": "assets/cartas_mais4_mais6/carta_mais6_alfaces_overlay_full.png",
+          "alphaBoundsPx": [
+            626,
+            635,
+            915,
+            889
+          ],
+          "hitRegion": {
+            "x": 0.611328125,
+            "y": 0.4134114583333333,
+            "width": 0.2822265625,
+            "height": 0.16536458333333334
+          }
+        }
+      }
+    }
+  }
+}
