@@ -41,7 +41,8 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/refinamentos-ev
    });
    for(const [key,value] of Object.entries(geometry))assert.ok(value,`${key} ${width}x${height}: ${JSON.stringify(geometry)}`);
    await page.locator('#hand>button').last().scrollIntoViewIfNeeded();
-   assert.ok(await page.locator('#hand>button').last().evaluate(el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.bottom<=innerHeight;}),`carta fora da tela ${width}x${height}`);
+   const lastCard=await page.locator('#hand>button').last().evaluate(el=>{const r=el.getBoundingClientRect(),hand=document.getElementById('hand');return {inside:r.left>=0&&r.right<=innerWidth&&r.bottom<=innerHeight,rect:r.toJSON(),padding:getComputedStyle(hand).paddingBottom,scrollTop:hand.scrollTop,scale:getComputedStyle(hand).transform}});
+   assert.ok(lastCard.inside,`carta fora da tela ${width}x${height}: ${JSON.stringify(lastCard)}`);
    await page.screenshot({path:path.join(evidence,`${width}x${height}-duplas.png`)});
   }
   console.log('PASS 10 tamanhos: sem rolagem da mesa; fundo e chama co-registrados; descarte no queimador; compra/menu alcançáveis; mãos dentro da tela');

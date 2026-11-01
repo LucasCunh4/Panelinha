@@ -6,6 +6,7 @@ const path=require('node:path');
 const crypto=require('node:crypto');
 const root=path.join(__dirname,'../IMPORTACAO_PANELAS');
 const manifest=JSON.parse(fs.readFileSync(path.join(root,'documentacao/MANIFESTO_MAIS4_MAIS6.json')));
+const repaired=JSON.parse(fs.readFileSync(path.join(root,'documentacao/MANIFESTO_INTERACAO_V2.json')));
 const base=process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/';
 const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mais4-mais6-evidence';
 (async()=>{
@@ -32,7 +33,7 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mais4-mais6-evidence
   assert.ok(await p.evaluate(async assets=>{await Promise.all(assets.map(async a=>{const im=new Image();im.src=a.path;await im.decode();if(!im.naturalWidth)throw Error(a.path)}));return true},manifest.assets));
   console.log('PASS 22 PNGs novos por SHA-256/HTTP/decodificação; todas as artes anteriores preservadas');
   for(const type of ['wild4','wild6']){
-   await open(type);const layout=manifest.layouts[type],n=type.slice(-1);
+   await open(type);const layout=repaired.layouts[type],n=type.slice(-1);
    assert.equal(await p.locator('.color-picker-base').getAttribute('src'),layout.base);
    assert.match(await p.locator('[data-card="70000"] .card-image').getAttribute('src'),new RegExp(`carta_mais${n}_completa.png$`));
    for(const [name,l] of Object.entries(layout.layers)){
@@ -58,7 +59,7 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mais4-mais6-evidence
     await p.locator('#cancelColor').tap();
    }
   }
-  console.log('PASS bases/camadas específicas; montagem alinhada ao preview (tolerância alfa <=1/255 por canal); 12 layouts, alvos >=44px e frente completa na mão');
+  console.log('PASS bases reparadas/camadas da Coringa; montagem histórica preservada (alfa <=1/255); 12 layouts, alvos >=44px e frente completa na mão');
   await p.setViewportSize({width:390,height:844});
   for(const type of ['wild4','wild6'])for(const [penalty,highest] of [[0,0],[2,2],[12,4],...(type==='wild6'?[[20,6]]:[])])for(const color of ['red','yellow','blue','green']){
    await open(type,penalty,highest);const before=await p.evaluate(()=>{const s=CartasTest.getState();return [...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort().join()});

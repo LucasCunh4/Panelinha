@@ -1,0 +1,3 @@
+PASS dois PNGs oficiais por SHA-256/HTTP, 400x850 RGBA, alfas idênticos e cantos transparentes; demais artes intactas, antigas removidas
+PASS 12 layouts individual/duplas, panorama e fallback retrato: caixa da Panela igual à numérica, contain sem borda/recorte CSS, verso em todas as mãos e seis camadas do monte
+PASS Panela no descarte/voo, compra com verso novo e parceiro aberto offline; sem exceções JS

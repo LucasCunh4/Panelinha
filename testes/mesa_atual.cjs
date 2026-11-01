@@ -17,16 +17,16 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
     const r=e=>e.getBoundingClientRect(),base=document.querySelector('#hand .card'),w=base.offsetWidth,h=base.offsetHeight;
     const same=[...document.querySelectorAll('#pile>.card,#pile>.pile-layer,#discard .card')].every(c=>Math.abs(c.offsetWidth-w)<=1&&Math.abs(c.offsetHeight-h)<=1);
     const centers=[1,3].map(i=>{const nodes=[...document.querySelectorAll(`#player${i} .seat-identity,#player${i} .hidden-card,#player${i} .subhand>.card`)].map(r);return Math.abs((Math.min(...nodes.map(t=>t.top))+Math.max(...nodes.map(t=>t.bottom)))/2-innerHeight/2)});
-    return {same,w,centers,layers:document.querySelectorAll('#pile>.deck-back').length,counter:document.querySelectorAll('#pile .deck-count').length,count:document.querySelector('#pile .deck-count').textContent,cardTotal:CartasTest.getState().players.reduce((s,p)=>s+p.hand.length,0)+CartasTest.getState().deck.length+CartasTest.getState().discard.length};
+    return {same,w,centers,layers:document.querySelectorAll('#pile>.deck-back').length,counter:document.querySelectorAll('#pile .deck-count').length,count:CartasTest.getState().deck.length,cardTotal:CartasTest.getState().players.reduce((s,p)=>s+p.hand.length,0)+CartasTest.getState().deck.length+CartasTest.getState().discard.length};
    });
-   assert.ok(metrics.same&&metrics.centers.every(x=>x<10),`${width}x${height}/${n}: ${JSON.stringify(metrics)}`);assert.equal(metrics.layers,6);assert.equal(metrics.counter,1);assert.equal(metrics.count,'80');assert.equal(metrics.cardTotal,n*4+81);
+   assert.ok(metrics.same&&metrics.centers.every(x=>x<10),`${width}x${height}/${n}: ${JSON.stringify(metrics)}`);assert.equal(metrics.layers,6);assert.equal(metrics.counter,0);assert.equal(metrics.count,80);assert.equal(metrics.cardTotal,n*4+81);
    await page.evaluate(()=>{const s=CartasTest.getState();s.o.timeout=15;s.deadline=Date.now()+5000;document.getElementById('useCardArt').onchange()});
    await page.locator('#turnClock').evaluate(el=>Promise.all(el.getAnimations().map(a=>a.finished)));
    assert.equal(await page.locator('#turnClock').textContent(),'5');
    assert.ok(await page.locator('#turnClock').evaluate(el=>{const t=el.getBoundingClientRect(),p=document.getElementById('buyBtn').getBoundingClientRect();return el.parentNode.id==='table'&&t.left>innerWidth/2&&Math.abs(t.y+t.height/2-(p.y+p.height/2))<1&&Math.abs(t.right+p.left-innerWidth)<1}));
    if(n===7)await page.screenshot({path:path.join(out,`${width}x${height}.png`)});
   }
-  console.log('PASS 18 layouts: base humana/monte/descarte preservada, seis camadas/um contador, laterais centralizadas incluindo avatar e cronômetro grande à direita');
+  console.log('PASS 18 layouts: base humana/monte/descarte preservada, seis camadas sem contador visível, laterais centralizadas incluindo avatar e cronômetro grande à direita');
   await page.setViewportSize({width:390,height:844});
   for(const direction of [1,-1]){
    await fixture(7,direction);

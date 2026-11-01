@@ -58,6 +58,10 @@ with zipfile.ZipFile(apk) as archive:
     assert len(penalidades['assets']) == 22
     for entry in penalidades['assets']:
         assert hashlib.sha256(archive.read(prefix + entry['path'])).hexdigest() == entry['sha256'], entry['path']
+    interacao = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_INTERACAO_V2.json').read_text())
+    assert len(interacao['assets']) == 2
+    for entry in interacao['assets']:
+        assert hashlib.sha256(archive.read(prefix + entry['path'])).hexdigest() == entry['sha256'], entry['path']
     padrao = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_PADRAO_400X850.json').read_text())
     assert len(padrao['assets']) == 2
     for entry in padrao['assets']:
@@ -84,7 +88,7 @@ info = {
     'file': apk.name, 'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
     'applicationId': package[1], 'versionCode': int(package[2]), 'versionName': package[3],
     'certificateSha256': match[1].lower(), 'pngsVerified': len(pngs), 'origin': identity['origin'], 'androidCompat': has_compat,
-    'orientation': 'sensorLandscape', 'appCategory': 'game', 'signingGeneration': identity.get('signingGeneration', 1), 'mesaAssetsVerified': len(mesa['asset_files']), 'menuAssetsVerified': len(menu['assets']), 'specialAssetsVerified': len(especiais['assets']), 'penaltyAssetsVerified': len(penalidades['assets']), 'standardCardAssetsVerified': len(padrao['assets']),
+    'orientation': 'sensorLandscape', 'appCategory': 'game', 'signingGeneration': identity.get('signingGeneration', 1), 'mesaAssetsVerified': len(mesa['asset_files']), 'menuAssetsVerified': len(menu['assets']), 'specialAssetsVerified': len(especiais['assets']), 'penaltyAssetsVerified': len(penalidades['assets']), 'standardCardAssetsVerified': len(padrao['assets']), 'interactiveBasesVerified': len(interacao['assets']),
 }
 apk.with_suffix('.json').write_text(json.dumps(info, indent=2) + '\n')
 print(json.dumps(info, indent=2))

@@ -1,0 +1,82 @@
+[
+  {
+    "penalty": 0,
+    "pending": {
+      "logicalType": "dist",
+      "pending": {
+        "id": 0,
+        "ids": [
+          81000
+        ],
+        "isCut": false
+      },
+      "displayType": "wild",
+      "title": "Escolher cor"
+    },
+    "after": {
+      "top": "dist",
+      "counts": [
+        3,
+        5,
+        6,
+        6
+      ],
+      "distribution": {
+        "counts": "Você: 3 · Bot 1: 5 · Bot 2: 6 · Bot 3: 6",
+        "penaltyAdded": 0,
+        "active": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "actor": 0,
+        "actorLimit": 5,
+        "actorReduction": 2,
+        "actorReceived": 3,
+        "total": 20
+      },
+      "penalty": 0
+    }
+  },
+  {
+    "penalty": 20,
+    "pending": {
+      "logicalType": "dist",
+      "pending": {
+        "id": 0,
+        "ids": [
+          81000
+        ],
+        "isCut": false
+      },
+      "displayType": "wild",
+      "title": "Escolher cor"
+    },
+    "after": {
+      "top": "dist",
+      "counts": [
+        3,
+        11,
+        13,
+        13
+      ],
+      "distribution": {
+        "counts": "Você: 3 · Bot 1: 11 · Bot 2: 13 · Bot 3: 13",
+        "penaltyAdded": 20,
+        "active": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "actor": 0,
+        "actorLimit": 5,
+        "actorReduction": 2,
+        "actorReceived": 3,
+        "total": 40
+      },
+      "penalty": 0
+    }
+  }
+]

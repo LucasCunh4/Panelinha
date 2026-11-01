@@ -37,9 +37,9 @@ const output=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mesa-fina-evidenc
   const orbit=await page.locator('.stove-glint').evaluate(el=>{
    const a=el.getAnimations()[0];a.pause();a.currentTime=1000;const first=parseFloat(getComputedStyle(el).strokeDashoffset);a.currentTime=1500;const second=parseFloat(getComputedStyle(el).strokeDashoffset);
    const bg=document.getElementById('stoveScene').getBoundingClientRect(),svg=document.getElementById('stoveDirection').getBoundingClientRect(),box=el.getBBox();
-   return {first,second,forever:a.effect.getTiming().iterations===Infinity,aligned:Math.abs(svg.x-bg.x)<1&&Math.abs(svg.y-bg.y)<1&&Math.abs(svg.width-bg.width)<1&&Math.abs(svg.height-bg.height)<1,box:{x:box.x,y:box.y,width:box.width,height:box.height}};
+   return {first,second,forever:a.effect.getTiming().iterations===Infinity,aligned:Math.abs(svg.width-svg.height)<.01&&Math.abs(svg.x+svg.width/2-(bg.x+bg.width*836/1672))<1&&Math.abs(svg.y+svg.height/2-(bg.y+bg.height*451/941))<1,box:{x:box.x,y:box.y,width:box.width,height:box.height}};
   });
-  assert.ok(orbit.forever&&orbit.aligned&&orbit.second>orbit.first&&orbit.box.x===630&&orbit.box.y===245&&orbit.box.width===412);
+  assert.ok(orbit.forever&&orbit.aligned&&orbit.second>orbit.first&&orbit.box.x===39&&orbit.box.y===39&&orbit.box.width===412);
   await page.evaluate(()=>{CartasTest.getState().direction=-1;document.getElementById('useCardArt').onchange()});
   const reverse=await page.locator('.stove-glint').evaluate(el=>{const a=el.getAnimations()[0],before=parseFloat(getComputedStyle(el).strokeDashoffset);a.currentTime+=500;return {before,after:parseFloat(getComputedStyle(el).strokeDashoffset),direction:a.effect.getTiming().direction};});
   assert.equal(reverse.direction,'normal');assert.ok(Math.abs(reverse.before-orbit.second)<1&&reverse.after<reverse.before,JSON.stringify(reverse));

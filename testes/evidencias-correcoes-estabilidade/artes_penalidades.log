@@ -1,0 +1,5 @@
+PASS 22 PNGs novos por SHA-256/HTTP/decodificação; todas as artes anteriores preservadas
+PASS bases reparadas/camadas da Coringa; montagem histórica preservada (alfa <=1/255); 12 layouts, alvos >=44px e frente completa na mão
+PASS 28 escolhas por toque: quatro cores, penalidades +2/+4/+6 acumuladas, conservação, destaque e envio único; frente oficial no descarte e no voo
+PASS +4 proibido sobre +6, última carta sem seletor, escolha offline e movimento reduzido nas duas cartas
+PASS hover nas oito regiões das duas cartas, clique e feedback; sem erros JS ou solicitações externas

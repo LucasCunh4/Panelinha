@@ -1,5 +1,7 @@
 # Panelinha Teste — Android
 
+Atualização atual: [correções de interface e estabilidade](testes/CORRECOES_ESTABILIDADE_RESULTADOS.md). Preserva geração 2, `sensorLandscape`, imersão, dados locais e o workflow existente. Inclui novas verificações da Panela, mãos persistentes e duas bases interativas reparadas de +4/+6, sem alterar as frentes aprovadas.
+
 > Assinatura ativa: **geração 2**, autorizada em 30/10/2026 após perda da chave
 > anterior. Identidade pública e certificado aposentado em `android-identity.json`.
 > v0.2.0/código 2000 inicia a nova família; 2001 é reservado ao teste de atualização.

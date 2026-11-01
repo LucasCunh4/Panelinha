@@ -1,0 +1,101 @@
+{
+  "description": "Bases interativas reparadas: sem ingredientes embutidos, usando os quatro PNGs originais da Coringa. Frentes completas oficiais +4/+6 preservadas.",
+  "canvas": {
+    "width": 1024,
+    "height": 1536
+  },
+  "assets": [
+    {
+      "path": "assets/interacao_v2/mais4_base_limpa.png",
+      "sha256": "37593912c1f988a4d99f2efb0596f8a25877f4efce723154b74d5ae8bd544b22"
+    },
+    {
+      "path": "assets/interacao_v2/mais6_base_limpa.png",
+      "sha256": "ba4016a9267b4fa3df781132327756764029c3ee09899de197f11dee6ddb45f7"
+    }
+  ],
+  "layouts": {
+    "wild4": {
+      "base": "assets/interacao_v2/mais4_base_limpa.png",
+      "layers": {
+        "tomates": {
+          "path": "assets/especiais/escolher_cor_tomates_overlay_full.png",
+          "hitRegion": {
+            "x": 0.05371,
+            "y": 0.15625,
+            "width": 0.37598,
+            "height": 0.24089
+          }
+        },
+        "queijos": {
+          "path": "assets/especiais/escolher_cor_queijos_overlay_full.png",
+          "hitRegion": {
+            "x": 0.56152,
+            "y": 0.15951,
+            "width": 0.39844,
+            "height": 0.23763
+          }
+        },
+        "mirtilos": {
+          "path": "assets/especiais/escolher_cor_mirtilos_overlay_full.png",
+          "hitRegion": {
+            "x": 0.04492,
+            "y": 0.39062,
+            "width": 0.40039,
+            "height": 0.22917
+          }
+        },
+        "alfaces": {
+          "path": "assets/especiais/escolher_cor_alfaces_overlay_full.png",
+          "hitRegion": {
+            "x": 0.55273,
+            "y": 0.39062,
+            "width": 0.41992,
+            "height": 0.22917
+          }
+        }
+      }
+    },
+    "wild6": {
+      "base": "assets/interacao_v2/mais6_base_limpa.png",
+      "layers": {
+        "tomates": {
+          "path": "assets/especiais/escolher_cor_tomates_overlay_full.png",
+          "hitRegion": {
+            "x": 0.05371,
+            "y": 0.15625,
+            "width": 0.37598,
+            "height": 0.24089
+          }
+        },
+        "queijos": {
+          "path": "assets/especiais/escolher_cor_queijos_overlay_full.png",
+          "hitRegion": {
+            "x": 0.56152,
+            "y": 0.15951,
+            "width": 0.39844,
+            "height": 0.23763
+          }
+        },
+        "mirtilos": {
+          "path": "assets/especiais/escolher_cor_mirtilos_overlay_full.png",
+          "hitRegion": {
+            "x": 0.04492,
+            "y": 0.39062,
+            "width": 0.40039,
+            "height": 0.22917
+          }
+        },
+        "alfaces": {
+          "path": "assets/especiais/escolher_cor_alfaces_overlay_full.png",
+          "hitRegion": {
+            "x": 0.55273,
+            "y": 0.39062,
+            "width": 0.41992,
+            "height": 0.22917
+          }
+        }
+      }
+    }
+  }
+}

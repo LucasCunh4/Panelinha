@@ -9,28 +9,23 @@
     ['mirtilos','blue','Azul — mirtilos',.04492,.39062,.40039,.22917],
     ['alfaces','green','Verde — alfaces',.55273,.39062,.41992,.22917]
   ];
-  // Manifesto +4/+6: overlays no canvas integral. Alvos/origens seguem o alfa de cada ingrediente.
-  const penaltyVariants={
-    wild4:{number:4,bounds:[[142,277,443,574],[545,262,912,574],[68,635,432,901],[647,635,936,895]]},
-    wild6:{number:6,bounds:[[133,263,436,557],[535,244,906,568],[71,630,410,897],[626,635,915,889]]}
-  };
+  // A mesma geometria e os mesmos PNGs da Coringa nas três cartas interativas.
+  // Só as bases mudam; as bases reparadas não contêm alimentos duplicados.
+  const penaltyBases={wild4:'assets/interacao_v2/mais4_base_limpa.png',wild6:'assets/interacao_v2/mais6_base_limpa.png'};
   let closeCurrent=null;
   function open(root,{cardType,choose,cancel}){
-    const variant=penaltyVariants[cardType];
-    const base=variant?`assets/cartas_mais4_mais6/carta_mais${variant.number}_base_sem_ingredientes.png`:`${assets}escolher_cor_base.png`;
-    const layers=ingredients.map((entry,i)=>{
-      if(!variant)return entry;
-      const [x,y,right,bottom]=variant.bounds[i];
-      return [...entry.slice(0,3),x/1024,y/1536,(right-x)/1024,(bottom-y)/1536];
-    });
-    const imageFor=name=>variant?`assets/cartas_mais4_mais6/carta_mais${variant.number}_${name}_overlay_full.png`:`${assets}escolher_cor_${name}_overlay_full.png`;
+    const type=['wild','wild4','wild6','dist'].includes(cardType)?cardType:'wild';
+    const base=penaltyBases[type]||`${assets}escolher_cor_base.png`;
+    const title=type==='dist'?'Panela de Pressão':type==='wild4'?'+4 — Escolher cor':type==='wild6'?'+6 — Escolher cor':'Escolher cor';
+    const hint=type==='dist'?'Escolha a cor para redistribuir as mãos':'Toque em um ingrediente';
+    const imageFor=name=>`${assets}escolher_cor_${name}_overlay_full.png`;
     closeCurrent?.();
     const previous=document.activeElement;
-    const overlay=document.createElement('div');overlay.className='modal-wrap color-picker';overlay.dataset.cardType=variant?cardType:'wild';
+    const overlay=document.createElement('div');overlay.className='modal-wrap color-picker';overlay.dataset.cardType=type;
     overlay.innerHTML=`<section class="color-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="colorPickerTitle" aria-describedby="colorPickerHint">
-      <h2 id="colorPickerTitle">Escolher cor</h2><p id="colorPickerHint">Toque em um ingrediente</p>
+      <h2 id="colorPickerTitle">${title}</h2><p id="colorPickerHint">${hint}</p>
       <div class="color-picker-card"><img class="color-picker-base" src="${base}" alt="" draggable="false">
-      ${layers.map(([name,color,label,x,y,w,h])=>`<div class="ingredient-layer" data-ingredient="${color}" style="--origin-x:${(x+w/2)*100}%;--origin-y:${(y+h/2)*100}%"><img src="${imageFor(name)}" alt="" draggable="false"></div><button type="button" class="colorbtn ingredient-hit" data-color="${color}" aria-label="${label}" style="left:${x*100}%;top:${y*100}%;width:${w*100}%;height:${h*100}%"></button>`).join('')}
+      ${ingredients.map(([name,color,label,x,y,w,h])=>`<div class="ingredient-layer" data-ingredient="${color}" style="--origin-x:${(x+w/2)*100}%;--origin-y:${(y+h/2)*100}%"><img src="${imageFor(name)}" alt="" draggable="false"></div><button type="button" class="colorbtn ingredient-hit" data-color="${color}" aria-label="${label}" style="left:${x*100}%;top:${y*100}%;width:${w*100}%;height:${h*100}%"></button>`).join('')}
       </div><button type="button" class="btn alt" id="cancelColor">Cancelar</button>
       <span class="sr-only" role="status" aria-live="polite"></span>
     </section>`;

@@ -29,6 +29,11 @@ if(penalidades.assets.length!==22)throw Error('O pacote +4/+6 deve conter 22 PNG
 for(const entry of penalidades.assets){
   if(crypto.createHash('sha256').update(fs.readFileSync(path.join(source,entry.path))).digest('hex')!==entry.sha256)throw Error(`Arte +4/+6 divergente: ${entry.path}`);
 }
+const interacao=JSON.parse(fs.readFileSync(path.join(source,'documentacao/MANIFESTO_INTERACAO_V2.json')));
+if(interacao.assets.length!==2)throw Error('São duas bases interativas reparadas');
+for(const entry of interacao.assets){
+  if(crypto.createHash('sha256').update(fs.readFileSync(path.join(source,entry.path))).digest('hex')!==entry.sha256)throw Error(`Base interativa divergente: ${entry.path}`);
+}
 const padrao=JSON.parse(fs.readFileSync(path.join(source,'documentacao/MANIFESTO_PADRAO_400X850.json')));
 if(padrao.assets.length!==2)throw Error('São duas artes padronizadas');
 for(const entry of padrao.assets){

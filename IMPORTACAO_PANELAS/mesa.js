@@ -5,7 +5,7 @@
   const colorNames = { red:'Vermelho', blue:'Azul', yellow:'Amarelo', green:'Verde' };
   const avatarColors = ['#c6a1fa', '#f0a783', '#91d7c5', '#9dbef5'];
   let previous = null;
-  let cueOwner=null,cueRound=null,wasHumanTurn=false,cueAnimation=null;
+  let cueOwner=null,cueRound=null,wasHumanTurn=false,cueAnimation=null,cueLayoutFrame=null;
   let snapshot = null, pendingPlay = null;
   let displayedTop = null;
   const flights = new Set();
@@ -36,6 +36,46 @@
       '<path d="M25 11V4h22v7m-26 0h30" fill="#392443" stroke="#d5baee" stroke-width="2"/>'
     ][id];
     return `<span class="pan-avatar" style="--avatar-color:${avatarColors[id]}" aria-hidden="true"><svg viewBox="0 0 72 58" fill="none"><path d="M15 24H5v10h12m40-10h10v10H55" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><path d="M16 23h40l-3 24q-17 10-34 0z" fill="currentColor" stroke="#201326" stroke-width="2"/><path d="M23 28v15" stroke="#fff" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/><path d="M13 23q23-18 46 0z" fill="currentColor" stroke="#201326" stroke-width="2"/><path d="M31 13h10" stroke="#f5e4ff" stroke-width="4" stroke-linecap="round"/>${accessory}</svg></span>`;
+  }
+
+  // Elementos persistentes por assento/cartas: turnos não recriam mãos.
+  const seatRecords=new WeakMap(),opponentLayouts=new WeakMap();
+  function attr(node,name,value){if(node.getAttribute(name)!==String(value))node.setAttribute(name,String(value));}
+  function renderSeat(state,id,name,format){
+    const seat=$(`player${id}`),player=state.players[id];let record=seatRecords.get(seat);
+    if(!record||record.owner!==state){
+      seat.textContent='';
+      const identity=id===0?seat:document.createElement('div');if(id!==0){identity.className='seat-identity';seat.append(identity);}
+      const avatar=document.createElement('div');avatar.innerHTML=id===0?PanelinhaProfile.avatarHTML(state.identity?.avatar):panAvatar(id);identity.append(avatar.firstElementChild);
+      const label=document.createElement('div');label.className='name';const text=document.createTextNode('');label.append(text);
+      const team=document.createElement('span');team.className='tag';label.append(team);identity.append(label);
+      const count=document.createElement('div');count.className='sub';identity.append(count);
+      const area=id===0?null:document.createElement('div');if(area)seat.append(area);
+      record={owner:state,text,label,team,count,area,cards:new Map()};seatRecords.set(seat,record);
+    }
+    if(record.text.parentNode!==record.label||record.team.parentNode!==record.label){record.label.textContent='';record.label.append(record.text,record.team);}
+    const active=state.phase==='playing'&&state.current===id;seat.classList.toggle('active',active);
+    const label=name+(active?' ⏳':'')+(state.o.duo?' ':'');if(record.text.data!==label)record.text.data=label;
+    attr(record.label,'title',name);record.team.hidden=!state.o.duo;
+    const team=id%2?'B':'A';if(record.team.textContent!==team)record.team.textContent=team;
+    const count=`${player.hand.length} cartas${id===0?'':' · bot'}`;if(record.count.textContent!==count)record.count.textContent=count;
+    if(!record.area)return;
+    const show=state.reveal||(state.o.duo&&id===2),area=record.area;
+    let changed=false;
+    area.classList.toggle('subhand',!!show);area.classList.toggle('back',!show);
+    if(!show)attr(area,'aria-hidden','true');else if(area.hasAttribute('aria-hidden'))area.removeAttribute('aria-hidden');
+    const ids=new Set(player.hand.map(c=>c.id));
+    for(const [key,node] of record.cards)if(!ids.has(key)){node.remove();record.cards.delete(key);changed=true;}
+    player.hand.forEach((card,i)=>{
+      const view=show?format(card,true):'back';let node=record.cards.get(card.id);
+      if(!node||node._cardView!==view){
+        const holder=document.createElement('div');holder.innerHTML=show?view:'<span class="hidden-card"></span>';
+        changed=true;const next=holder.firstElementChild;next.dataset.handCard=String(card.id);next._cardView=view;
+        if(node)node.replaceWith(next);node=next;record.cards.set(card.id,node);
+      }
+      if(area.children[i]!==node){area.insertBefore(node,area.children[i]||null);changed=true;}
+    });
+    if(changed)opponentLayouts.delete(area);
   }
 
   // Organização visual: os botões permanecem filhos do mesmo leque e conservam IDs.
@@ -100,6 +140,7 @@
     handLayout={count:n,overflow,compact,color:expandedColor};
     hand.setAttribute('aria-label',compact?'Suas cartas em um leque contínuo. Toque uma cor para expandir e depois escolha a carta. Deslize a mão se necessário.':'Suas cartas');
     if(instant){hand.getBoundingClientRect();requestAnimationFrame(()=>hand.classList.remove('layout-instant'));}
+    followTurnCue(!instant);
   }
   function openHandGroup(color,pinned,focusId=null){
     cancelHandTimers();expandedColor=color;handPinned=pinned;layoutHand(undefined,false,focusId);
@@ -141,6 +182,8 @@
     const sidePortrait=innerHeight>innerWidth&&container.closest('.seat.left,.seat.right');
     const style=getComputedStyle(container),room=container.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
     const width=parseFloat(getComputedStyle(cards[0]).width);
+    const layoutKey=`${room}:${width}:${!!sidePortrait}:${cards.map(c=>c.dataset.handCard).join(',')}`;
+    if(opponentLayouts.get(container)===layoutKey)return;opponentLayouts.set(container,layoutKey);
     const step=n<2?width:Math.min(width*.60,Math.max(0,(room-width-(sidePortrait?12:Math.max(22,width*.7)))/(n-1)));
     cards.forEach((card,i)=>{
       const position=n<2?0:(i/(n-1)-.5)*2;
@@ -431,37 +474,24 @@
     }
     previous = { state, round:state.round, direction:state.direction };
 
-    $('pile').innerHTML = Array.from({length:5},(_,i)=>`<span class="pile-layer deck-back" aria-hidden="true" style="--depth:${5-i}"></span>`).join('')+`<div class="card deck-back"><span class="deck-count">${state.deck.length}</span></div>`;
-    $('pile').setAttribute('aria-label', `Monte de compra: ${state.deck.length} cartas`);
+    if(!$('pile').children.length)$('pile').innerHTML = Array.from({length:5},(_,i)=>`<span class="pile-layer deck-back" aria-hidden="true" style="--depth:${5-i}"></span>`).join('')+'<div class="card deck-back"></div>';
+    attr($('pile'),'aria-label','Monte de compra');
     document.querySelector('.draw-stack .stack-label').textContent = state.penalty ? `COMPRAR +${state.penalty}` : 'COMPRAR';
     for (const player of state.players) {
       const seat = $(`player${player.id}`);
-      if (player.id === 0) {
-        if (!seat.querySelector('.pan-avatar')) seat.insertAdjacentHTML('afterbegin',PanelinhaProfile.avatarHTML(state.identity?.avatar));
-      } else if (!seat.querySelector('.seat-identity')) {
-        const identity=document.createElement('div');identity.className='seat-identity';
-        identity.innerHTML=panAvatar(player.id);
-        const name=seat.querySelector('.name'),sub=seat.querySelector('.sub');
-        if(name)identity.append(name);if(sub)identity.append(sub);
-        seat.prepend(identity);
-      }
       if(player.id===2)fitTopIdentity();
-      seat.setAttribute('aria-label', `${player.id === 0 ? state.identity?.name||PanelinhaProfile.current.name : `Bot ${player.id}`}, ${player.hand.length} cartas${state.current === player.id && state.phase === 'playing' ? ', na vez' : ''}`);
+      attr(seat,'aria-label', `${player.id === 0 ? state.identity?.name||PanelinhaProfile.current.name : `Bot ${player.id}`}, ${player.hand.length} cartas${state.current === player.id && state.phase === 'playing' ? ', na vez' : ''}`);
       const back = seat.querySelector('.back');
       if (back) {
-        back.setAttribute('aria-hidden', 'true');
-        back.innerHTML = player.hand.map(card=>`<span class="hidden-card" data-hand-card="${card.id}"></span>`).join('');
         fan(back,Infinity);
       }
       const subhand = seat.querySelector('.subhand');
       if (subhand) {
-        [...subhand.children].forEach((node,i)=>node.dataset.handCard=String(player.hand[i].id));
         fan(subhand,Infinity);
       }
     }
-    const self=$('player0').getBoundingClientRect(),tableRect=$('table').getBoundingClientRect();
-    $('table').style.setProperty('--turn-cue-bottom',`${tableRect.bottom-self.top+(innerWidth>innerHeight&&innerHeight<=600?2:8)}px`);
     fan($('hand'), innerWidth < 360 ? 7 : 9, savedScroll);
+    positionTurnCue();
     const top=state.discard[state.discard.length-1];
     displayedTop=top?.id ?? null;
     const play=pendingPlay;pendingPlay=null;
@@ -471,12 +501,26 @@
     if(play&&play.id===displayedTop)animatePlay(play,ends.get(play.id)||0);
     maskCards();updateClock(state);
   }
+  function followTurnCue(animated){
+    cancelAnimationFrame(cueLayoutFrame);const until=performance.now()+(animated&&!reducedMotion.matches?260:0);
+    const step=()=>{positionTurnCue();if(!$('turnCue').hidden&&performance.now()<until)cueLayoutFrame=requestAnimationFrame(step);};step();
+  }
+  function positionTurnCue(){
+    const cue=$('turnCue');if(cue.hidden)return;
+    const hand=$('hand'),r=hand.getBoundingClientRect(),table=$('table').getBoundingClientRect();
+    const cards=[...hand.querySelectorAll('.card')];if(!cards.length){cue.hidden=true;return;}
+    const match=getComputedStyle(hand).transform.match(/^matrix\(([^)]+)\)$/),scale=match?Math.hypot(...match[1].split(',').slice(0,2).map(Number)):1;
+    const target=Number(hand.dataset.turnScale)||1;
+    const top=Math.min(...cards.map(c=>{const b=c.getBoundingClientRect();return r.bottom-(r.bottom-b.top)*target/(scale||1)}));
+    cue.style.left=`${r.x+r.width/2-table.x}px`;cue.style.top=`${top-table.y-cue.offsetHeight-3}px`;
+  }
   addEventListener('resize', () => {
     clearFlights();
     layout();
     fan($('hand'), innerWidth < 360 ? 7 : 9);
     document.querySelectorAll('.subhand,.back').forEach(hand => fan(hand,Infinity));
+    positionTurnCue();
   });
   nativeTable(false);
-  window.PanelasMesa = { render, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {cueAnimation?.cancel();cueAnimation=null;cueOwner=null;cueRound=null;wasHumanTurn=false;$('turnCue').hidden=true;$('hand').classList.remove('human-turn');$('hand').dataset.turnScale='1';$('buyBtn').classList.remove('mandatory-buy');clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
+  window.PanelasMesa = { render, renderSeat, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {cancelAnimationFrame(cueLayoutFrame);cueAnimation?.cancel();cueAnimation=null;cueOwner=null;cueRound=null;wasHumanTurn=false;$('turnCue').hidden=true;$('hand').classList.remove('human-turn');$('hand').dataset.turnScale='1';$('buyBtn').classList.remove('mandatory-buy');clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
 })();

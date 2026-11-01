@@ -43,7 +43,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 #discard,#pile{position:relative;isolation:isolate;display:flex;justify-content:center;align-items:center;width:var(--card-width);height:calc(var(--card-width) * 2.025)}
 #discard::before,#discard::after,#pile::before{content:'';position:absolute;inset:0;z-index:-1;border:1px solid #dcc0a4;border-radius:8px;background:#4d3354;box-shadow:0 3px 5px #0006}#discard::before{transform:translate(-5px,2px) rotate(-10deg)}#discard::after{transform:translate(4px,3px) rotate(9deg)}#pile::before{transform:translate(-4px,3px)}
 #discard .card,#pile .card{width:var(--card-width);min-width:var(--card-width);height:calc(var(--card-width) * 2.025);font-size:18px}#discard .card{transform:rotate(-3deg)}
-.deck-back{display:flex;justify-content:center;align-items:center;flex-direction:column;color:#fff1db}.deck-back .pan-avatar{margin:0;width:32px}.deck-brand{font-size:7px;letter-spacing:.1em}.deck-count{position:absolute;bottom:5px;font-size:10px;background:#24142e;border-radius:15px;padding:2px 7px}
+.deck-back{display:flex;justify-content:center;align-items:center;flex-direction:column;color:#fff1db}.deck-back .pan-avatar{margin:0;width:32px}.deck-brand{font-size:7px;letter-spacing:.1em}
 .stack-label{display:block;position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:.1em;color:#fff1dd;text-shadow:0 1px 4px #000;white-space:nowrap;pointer-events:none}.draw-stack .stack-label{transform:translateX(-50%) rotate(7deg)}
 .penalty-display{position:absolute;left:0;top:calc(var(--card-width) * -1.55);transform:translateX(-50%);z-index:3;pointer-events:none;color:#fff1dc;background:#402033e8;border:1px solid #f5a6a6;border-radius:12px;padding:4px 12px;font-size:clamp(27px,5vh,42px);font-weight:900;text-shadow:0 2px #b9314b}
 .direction-indicator{position:absolute;left:calc(var(--card-width) * 1.15);top:0;transform:translateY(-50%);display:flex;align-items:center;flex-direction:column;gap:3px;white-space:nowrap;color:#fff0d6;font-size:9px;text-shadow:0 1px 4px #000;pointer-events:none}
@@ -170,7 +170,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 #buyBtn {min-width:44px;min-height:44px;display:flex;justify-content:center;align-items:center}
 #pile {width:var(--pile-width);height:calc(var(--pile-width)*2.025)}
 #pile .card {width:var(--pile-width);min-width:var(--pile-width);height:calc(var(--pile-width)*2.025)}
-#pile .pan-avatar {width:24px}#pile .deck-brand{font-size:5px}#pile .deck-count{font-size:10px;bottom:4px}
+#pile .pan-avatar {width:24px}#pile .deck-brand{font-size:5px}
 #discard {width:var(--discard-width);height:calc(var(--discard-width)*2.025)}
 #discard::before,#discard::after {display:none}
 .discard-layer {position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
@@ -251,7 +251,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 #pile .pile-layer {position:absolute;inset:0;transform:translate(calc(var(--depth)*-1px),calc(var(--depth)*1.5px));z-index:calc(6 - var(--depth));pointer-events:none}
 #pile>.card {position:relative;z-index:6}
 #pile .pan-avatar {width:calc(var(--card-width)*.5)}
-#pile .deck-brand {font-size:7px}#pile .deck-count {font-size:12px}
+#pile .deck-brand {font-size:7px}
 .card .special-name {font-size:clamp(7px,calc(var(--card-width)*.12),11px);line-height:1.25;white-space:normal;overflow-wrap:anywhere;text-align:center}
 /* Inclui nome/avatar na caixa centralizada, em vez de pendurá-los fora dela. */
 .seat.left,.seat.right {--side-fan:calc(var(--card-width)*3);--identity-height:36px;top:50%;height:calc(var(--side-fan) + var(--identity-height) + 4px);padding:0;width:calc(var(--card-width)*2.025 + 24px)}
@@ -353,5 +353,36 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
  .seat.self>.pan-avatar {grid-column:1;grid-row:2;width:22px;height:22px}
  .seat.self>.sub {grid-column:2;grid-row:2;font-size:8.5px;line-height:1.1;min-width:0}
 }
+
+/* O leque superior tem eixo próprio; o nome fica fora de sua caixa de alinhamento. */
+.seat.top {display:block;left:50%;width:min(42vw,360px);padding:0;transform:translateX(-50%)}
+.seat.top .back,.seat.top .subhand {width:100%;max-width:none;margin:0;flex:none}
+.seat.top .seat-identity {position:absolute;right:calc(100% + 8px);left:auto;top:50%;transform:translateY(-50%);width:clamp(82px,11vw,116px);min-width:0;max-width:116px;padding:4px 5px;grid-template-columns:18px minmax(0,1fr);gap:1px 3px}
+.seat.top .seat-identity>.pan-avatar {width:18px;height:20px}
+.seat.top .seat-identity>.name {font-size:9.5px;line-height:1.15;margin:0}
+.seat.top .seat-identity>.sub {font-size:8px;line-height:1.15;margin:0}
+.seat.top .seat-identity.long-name {width:min(116px,calc((100vw - min(42vw,360px))/2 - 16px));max-width:116px}
+.seat.top .seat-identity.long-name>.name {font-size:9px;line-height:1.15}
+.back>.hidden-card,.subhand>.card {transition:margin-left 180ms ease,transform 180ms ease}
+
+/* Espaço para o aviso acima das cartas mesmo nas telas horizontais mais baixas. */
+@media(orientation:landscape) and (max-height:420px){.table {--card-width:clamp(38px,12.3vh,54px)}.hand {padding-bottom:12px}}
+#turnCue {right:auto;bottom:auto;line-height:1;max-width:calc(100% - 40px);transform:translateX(-50%);font-size:clamp(17px,2.8vw,28px)}
+
+/* SVG quadrado e círculos reais, no mesmo plano e centro nativo das chamas. */
+.stove-direction {inset:auto;left:836px;top:451px;width:490px;height:490px;transform:translate(-50%,-50%);aspect-ratio:1 / 1}
+.stove-flow {stroke-width:5;fill:none}
+
+/* O filtro considera a silhueta de TODAS as seis camadas, sem pintar sobre a arte. */
+#buyBtn.mandatory-buy::after {display:none}
+#buyBtn.mandatory-buy #pile {animation:whole-pile-glow 1.15s ease-in-out infinite}
+@keyframes whole-pile-glow {0%,100%{filter:drop-shadow(0 0 1px #fff2b0) drop-shadow(0 0 5px #ffc366)}50%{filter:drop-shadow(0 0 2px #fff6ce) drop-shadow(0 0 12px #ffc366)}}
+
+@media(hover:hover){
+ .hand>button:not(:disabled):hover,.hand.grouped-hand.scroll-hand>button:not(:disabled):hover {transform:translateY(var(--fan-lift)) rotate(var(--fan-angle))}
+ .hand>button>.card {transition:transform 160ms ease,filter 160ms ease}
+ .hand>button:hover>.card,.hand>button:not(:disabled):hover>.card {transform:translateY(-7px);filter:drop-shadow(0 2px 5px #ffe1a07a)}
+}
+@media(prefers-reduced-motion:reduce){#buyBtn.mandatory-buy #pile {animation:none;filter:drop-shadow(0 0 2px #fff2b0) drop-shadow(0 0 8px #ffc366)}.back>.hidden-card,.subhand>.card {transition:none}}
 .table[data-direction="-1"] .tail-clockwise.tail-mid,.table[data-direction="1"] .tail-counterclockwise.tail-mid{opacity:.4}
 .table[data-direction="-1"] .tail-clockwise.tail-near,.table[data-direction="1"] .tail-counterclockwise.tail-near{opacity:.7}

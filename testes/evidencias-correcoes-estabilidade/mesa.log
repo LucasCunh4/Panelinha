@@ -1,0 +1,9 @@
+PASS 6 PNGs oficiais por SHA-256/HTTP; quatro participantes; parceiro visível e adversários ocultos
+PASS 10 tamanhos: sem rolagem da mesa; fundo e chama co-registrados; descarte no queimador; compra/menu alcançáveis; mãos dentro da tela
+PASS quatro chamas por estado, crossfade e ausência de chama sem cor ativa
+PASS menu sobreposto, foco/ESC, laboratório e retorno à mesa; Inverter por toque e movimento reduzido
+PASS compra por toque no monte, guardar/passagem e pagamento integral de +20
+PASS sequência por toque: +2, anúncio de última carta e corte da segunda cópia, em retrato/paisagem
+PASS faca na carta elegível, toque no balão e pausa de corte preservada em retrato/paisagem
+PASS classificação e controles de fim de rodada; retorno às opções e novo início individual
+PASS mãos grandes alcançáveis, individual sem vazamento de cartas e apresentação sem mutação do estado

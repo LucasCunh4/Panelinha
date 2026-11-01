@@ -92,7 +92,7 @@
   <section id="menu" class="panel front-screen hide" aria-labelledby="settingsTitle"><button class="screen-back" data-nav-back aria-label="Voltar à identificação">‹ <span>Voltar</span></button><h2 id="settingsTitle">Sua partida</h2><p class="muted">Prepare a mesa para jogar com três bots.</p>
     <div class="grid">
       <div><label class="setting">Formato <select id="mode"><option value="solo">Todos contra todos</option><option value="duo">Duplas (você + Bot 2)</option></select></label><label class="setting">Duração <select id="duration"><option value="points">Partida por pontos</option><option value="single">Rodada única</option></select></label><label class="setting">Pontuação-meta <select id="goal"></select></label><label class="setting">Tempo por turno <select id="timeout"><option value="0">Sem limite</option><option value="15">15 s</option><option value="30">30 s</option><option value="45">45 s</option><option value="60">60 s</option></select></label></div>
-      <div><label class="setting">Compra infinita <input id="infinite" type="checkbox"></label><label class="setting">Cortes + cartas idênticas <input id="cut" type="checkbox" checked></label><label class="setting"><span id="challengeSettingLabel">Desafiar +4 e +6</span> <input id="challenge" type="checkbox" checked></label><label class="setting"><span>Carta +6 <small id="sixSettingValue">Ativada</small></span><input id="wild6" type="checkbox" checked aria-label="Carta +6"></label><label class="setting">Panela de Pressão <input id="dist" type="checkbox" checked></label><label class="setting">Liquidificador <input id="rotate" type="checkbox" checked></label></div>
+      <div><label class="setting">Compra infinita <input id="infinite" type="checkbox"></label><label class="setting">Cortes + cartas idênticas <input id="cut" type="checkbox" checked></label><label class="setting"><span id="challengeSettingLabel">Desafiar +4 e +6</span> <input id="challenge" type="checkbox" checked></label><label class="setting">+6 <input id="wild6" type="checkbox" checked aria-label="+6"></label><label class="setting">Panela de Pressão <input id="dist" type="checkbox" checked></label><label class="setting">Liquidificador <input id="rotate" type="checkbox" checked></label></div>
     </div>
     <div class="row menu-header"><button class="hero-button hero-gold" id="startBtn">Começar com 3 bots</button></div>
   </section>
@@ -107,15 +107,14 @@
             <img class="flame flame-green" src="assets/mesa/chama_verde.png" alt="">
             <img class="flame flame-yellow" src="assets/mesa/chama_amarela.png" alt="">
           </div>
-          <svg id="stoveDirection" class="stove-direction" viewBox="0 0 1672 941" aria-hidden="true">
-            <defs><circle id="stoveOrbit" pathLength="1000" cx="836" cy="451" r="206"/></defs>
-            <use href="#stoveOrbit" class="stove-flow stove-glint"/>
-            <use href="#stoveOrbit" class="stove-flow stove-tail tail-clockwise tail-long"/>
-            <use href="#stoveOrbit" class="stove-flow stove-tail tail-clockwise tail-mid"/>
-            <use href="#stoveOrbit" class="stove-flow stove-tail tail-counterclockwise tail-long"/>
-            <use href="#stoveOrbit" class="stove-flow stove-tail tail-counterclockwise tail-mid"/>
-            <use href="#stoveOrbit" class="stove-flow stove-tail tail-clockwise tail-near"/>
-            <use href="#stoveOrbit" class="stove-flow stove-tail tail-counterclockwise tail-near"/>
+          <svg id="stoveDirection" class="stove-direction" viewBox="0 0 490 490" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <circle id="stoveOrbit" cx="245" cy="245" r="206" pathLength="1000" class="stove-flow stove-glint"/>
+            <circle cx="245" cy="245" r="206" pathLength="1000" class="stove-flow stove-tail tail-clockwise tail-long"/>
+            <circle cx="245" cy="245" r="206" pathLength="1000" class="stove-flow stove-tail tail-clockwise tail-mid"/>
+            <circle cx="245" cy="245" r="206" pathLength="1000" class="stove-flow stove-tail tail-counterclockwise tail-long"/>
+            <circle cx="245" cy="245" r="206" pathLength="1000" class="stove-flow stove-tail tail-counterclockwise tail-mid"/>
+            <circle cx="245" cy="245" r="206" pathLength="1000" class="stove-flow stove-tail tail-clockwise tail-near"/>
+            <circle cx="245" cy="245" r="206" pathLength="1000" class="stove-flow stove-tail tail-counterclockwise tail-near"/>
           </svg>
         </div>
         <div class="seat top" id="player2"></div>
@@ -196,12 +195,12 @@ function cardHTML(c,small=false,selected=false,invalid=false){
   const label=`<small>${c.color?CN[c.color]:''}</small><span class="${c.type==='dist'||c.type==='rotate'?'special-name':''}">${SHORT[c.type]||descriptor(c)}</span><small>${c.type==='num'?'':(c.color?'⇄':'★')}</small>`;
   const path=$('useCardArt')?.checked?cardAssetPath(c):null;
   if(!path)return `<span class="${base}" title="${name}">${label}</span>`;
-  return `<span class="${base} art-card${c.type==='dist'?' standard-card':['wild','wild4','wild6'].includes(c.type)?' official-special':''}" title="${name}" data-asset="${path}"><img class="card-image" src="${path}" alt="${name}" loading="lazy" draggable="false" onerror="this.parentNode.classList.add('asset-unavailable')"><span class="art-fallback">${label}</span></span>`;
+  return `<span class="${base} art-card${c.type==='dist'?' standard-card':['wild','wild4','wild6'].includes(c.type)?' official-special':''}" title="${name}" data-card-type="${c.type}" data-asset="${path}"><img class="card-image" src="${path}" alt="${name}" loading="lazy" draggable="false" onerror="this.parentNode.classList.add('asset-unavailable')"><span class="art-fallback">${label}</span></span>`;
 }
 function buildDeck(o){let a=[];for(const color of COLORS){for(let n=0;n<=9;n++){a.push(make('num',color,n),make('num',color,n));}for(let k=0;k<2;k++){a.push(make('draw2',color),make('skip',color),make('reverse',color));}}for(let k=0;k<4;k++)a.push(make('wild4'),make('wild'));if(o.wild6!==false)for(let k=0;k<2;k++)a.push(make('wild6'));if(o.dist)for(let k=0;k<2;k++)a.push(make('dist'));if(o.rotate)for(let k=0;k<2;k++)a.push(make('rotate'));return shuffle(a);}
 function log(msg){s.log.unshift(`[${new Date().toLocaleTimeString('pt-BR')}] ${msg}`);s.log=s.log.slice(0,70);}
 function updateGoals(){const duo=$('mode').value==='duo';$('goal').innerHTML=(duo?[5,10,15]:[10,20,30,50]).map(v=>`<option value="${v}">${v} pontos</option>`).join('');$('goal').value=duo?'5':'10';$('goal').disabled=$('duration').value==='single';}
-$('wild6').onchange=()=>{$('sixSettingValue').textContent=$('wild6').checked?'Ativada':'Desativada';$('challengeSettingLabel').textContent=$('wild6').checked?'Desafiar +4 e +6':'Desafiar +4';};
+$('wild6').onchange=()=>{$('challengeSettingLabel').textContent=$('wild6').checked?'Desafiar +4 e +6':'Desafiar +4';};
 $('mode').onchange=updateGoals;$('duration').onchange=updateGoals;updateGoals();
 function settings(){return {duo:$('mode').value==='duo',single:$('duration').value==='single',goal:Number($('goal').value),timeout:Number($('timeout').value),infinite:$('infinite').checked,cut:$('cut').checked,challenge:$('challenge').checked,wild6:$('wild6').checked,dist:$('dist').checked,rotate:$('rotate').checked};}
 function names(i){return i===0?(s?.identity?.name||PanelinhaProfile.current.name):'Bot '+i;}
@@ -301,8 +300,22 @@ function chooseCards(id,ids){
   }
   const c=s.players[id].hand.find(x=>x.id===ids[0]);
   const ending=s.players[id].hand.length===1;
-  if(isWild(c)&&c.type!=='rotate'&&!ending){s.pendingAction={id,ids,isCut};clearJobs();showColors();return;}
+  if(['wild','wild4','wild6','dist'].includes(c.type)&&!ending){s.pendingAction={id,ids:[...ids],isCut,cardType:c.type,cardId:c.id};clearJobs();showColors();return;}
   applyPlay(id,ids,isCut,s.activeColor);
+}
+// Efeito próprio da Panela: o seletor de cor nunca decide qual efeito executar.
+function resolvePressurePlay(actor,repeatedOwnCut){
+  const extra=s.penalty;s.penalty=0;s.highest=0;s.lastPenalty=null;
+  if(!repeatedOwnCut)redistribute(extra,[s.finisher].filter(x=>x!==null),actor);
+}
+function commitColorChoice(state,action,color){
+  if(s!==state||s.pendingAction!==action||!COLORS.includes(color))return false;
+  const card=s.players[action.id].hand.find(c=>c.id===action.cardId);
+  if(!card||card.type!==action.cardType){
+    s.pendingAction=null;$('modalRoot').innerHTML='';
+    log('Escolha cancelada: a identidade da carta pendente mudou.');render();queueBots();return false;
+  }
+  return applyPlay(action.id,action.ids,action.isCut,color);
 }
 function applyPlay(id,ids,isCut,color){
   // Guarda de segurança também para bots/modal: nenhuma jogada atravessa uma penalidade.
@@ -320,14 +333,13 @@ function applyPlay(id,ids,isCut,color){
   if(p.hand.length===1){const announced=(id===0?s.preUno:Math.random()<.75);if(announced){log(`${names(id)} anunciou ÚLTIMA CARTA.`);}else{s.unoWindow={id};log(`${names(id)} ficou com 1 carta sem anunciar!`);}}
   s.preUno=false;
   if(p.hand.length===0&&s.finisher===null){s.finisher=id;log(`${names(id)} terminou suas cartas!`);}
-  if(power(c)){
+  if(c.type==='dist'){
+    resolvePressurePlay(id,repeatedOwnCut);
+  }else if(power(c)){
     if(!repeatedOwnCut){s.penalty+=power(c);s.highest=power(c);}
     if(!repeatedOwnCut)s.lastPenalty={id,type:c.type,illegal,challengeable:p.hand.length>0};
     else if(s.lastPenalty)s.lastPenalty.challengeable=p.hand.length>0;
     log(`Penalidade acumulada: +${s.penalty}${repeatedOwnCut?' (segunda cópia, sem novo efeito)':''}.`);
-  }else if(c.type==='dist'){
-    const extra=s.penalty;s.penalty=0;s.highest=0;s.lastPenalty=null;
-    if(!repeatedOwnCut)redistribute(extra,[s.finisher].filter(x=>x!==null),id);
   }else if(c.type==='rotate'){
     if(!repeatedOwnCut&&!(s.o.duo&&s.finisher!==null))rotateHands([s.finisher].filter(x=>x!==null));
   }else{s.lastPenalty=null;}
@@ -408,7 +420,7 @@ function showColors(){
   const state=s,action=s.pendingAction;
   PanelinhaColorPicker.open($('modalRoot'),{
     cardType:state.players[action.id].hand.find(c=>c.id===action.ids[0])?.type,
-    choose(color){if(s===state&&s.pendingAction===action)applyPlay(action.id,action.ids,action.isCut,color);},
+    choose(color){commitColorChoice(state,action,color);},
     cancel(){if(s!==state||s.pendingAction!==action)return;s.pendingAction=null;render();queueBots();}
   });
 }
@@ -416,8 +428,8 @@ function finishControlHTML(){let ranks=s.summary.map(x=>`<div class="notice"><st
 function render(){if(!s)return;PanelasMesa.beforeRender(s);$('roundLabel').textContent=`Rodada ${s.round} · ${s.o.duo?'Duplas':'Individual'}`;$('status').textContent=s.phase==='playing'?`Vez de ${names(s.current)}`:s.phase==='roundOver'?'Fim da rodada':'Fim da partida';
 $('score').innerHTML=s.o.duo?`<span>${safeName(0)} + Bot 2: ${s.teams[0]}</span><span>Bot 1 + Bot 3: ${s.teams[1]}</span>`:s.players.map(p=>`<span>${safeName(p.id)}: ${p.score}</span>`).join('');
 $('stateText').textContent=s.phase==='playing'?`Sentido: ${s.direction===-1?'horário':'anti-horário'} · Cor: ${CN[s.activeColor]} · Monte: ${s.deck.length} · ${s.penalty?'PENALIDADE OBRIGATÓRIA +'+s.penalty:'Sem penalidade'}${s.o.timeout&&s.deadline?' · Tempo: '+Math.max(0,Math.ceil((s.deadline-Date.now())/1000))+'s':''}`:s.message;
-for(let i=0;i<4;i++){const p=s.players[i],active=s.current===i&&s.phase==='playing';const show=s.reveal||(s.o.duo&&i===2);let node=$('player'+i);node.classList.toggle('active',active);node.innerHTML=`<div class="name" title="${safeName(i)}">${safeName(i)} ${active?'⏳':''}${s.o.duo?' <span class="tag">'+(i%2?'B':'A')+'</span>':''}</div><div class="sub">${p.hand.length} cartas${i===0?'':' · bot'}</div>${i!==0?(show?'<div class="subhand">'+p.hand.map(c=>cardHTML(c,true)).join('')+'</div>':'<div class="back">'+'▰ '.repeat(Math.min(6,p.hand.length))+'</div>'):''}`;}
-$('pile').innerHTML=`<div class="card" style="background:#283f68;color:#b9d1ff;border:2px solid #718cbb"><small>MONTE</small><span>⬚</span><small>${s.deck.length}</small></div>`;$('discard').innerHTML=PanelasMesa.discardHTML(s.discard,cardHTML,s);$('centerMsg').innerHTML=`Cor: <strong>${CN[s.activeColor]}</strong><div>${s.penalty?'⚠️ OBRIGATÓRIO +'+s.penalty:'Carta central'}</div>`;
+for(let i=0;i<4;i++)PanelasMesa.renderSeat(s,i,names(i),cardHTML);
+$('discard').innerHTML=PanelasMesa.discardHTML(s.discard,cardHTML,s);$('centerMsg').innerHTML=`Cor: <strong>${CN[s.activeColor]}</strong><div>${s.penalty?'⚠️ OBRIGATÓRIO +'+s.penalty:'Carta central'}</div>`;
 $('handCount').textContent=s.players[0].hand.length+' cartas';
 const cards=[...s.players[0].hand].sort((a,b)=>(COLORS.indexOf(a.color)+1||9)-(COLORS.indexOf(b.color)+1||9)||a.type.localeCompare(b.type)||(a.num??0)-(b.num??0));
 const locked=s.phase==='playing'&&s.current===0&&!canActNow();

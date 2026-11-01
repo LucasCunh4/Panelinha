@@ -1,0 +1,6 @@
+PASS Panela: 35 jogadas pelo seletor tipado; mãos pequenas/20/40/80/120+, redução sorteada 1–3, mínimo, equilíbrio, +2/+6/+20/+40 e conservação de todos os IDs
+PASS Coringa não redistribui; troca de tipo durante seleção é recusada; Panela como última carta exclui quem bateu e mantém os demais com cartas
+PASS mãos sem mutações em ações alheias; compra/remoção preservam cartas não afetadas; revelar reconfigura o leque; seis camadas persistentes sem contador
+PASS 35 layouts horizontais: superior centrado independente do nome, card contido e SUA VEZ acima da mão sem invadir descarte
+PASS círculo concêntrico sem elipse nos dois sentidos; brilho da compra aplicado às seis camadas, removido quando há resposta legal
+PASS hover levanta só a carta, sem mover vizinhas ou jogar, no leque normal e no grupo compacto expandido; sem erros JS

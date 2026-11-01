@@ -226,6 +226,7 @@ public class OfflineGameTest {
         js("(()=>{const s=CartasTest.getState();Object.assign(s,{phase:'playing',current:0,penalty:20,highest:6,finisher:null,unlockAt:0,cutOpen:false,pendingAction:null,activeColor:'blue',deadline:0,token:s.token+1});s.o.duo=false;s.o.timeout=0;s.players.forEach((p,a)=>p.hand=Array.from({length:10},(_,i)=>({id:87000+a*100+i,type:'num',color:'green',num:7})));s.players[0].hand.push({id:87900,type:'dist',color:null});s.discard=[{id:87901,type:'num',color:'blue',num:2}];s.deck=Array.from({length:60},(_,i)=>({id:88000+i,type:'num',color:'red',num:1}));window.originalIds=[...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort().join();document.getElementById('useCardArt').onchange()})()");
         tap("[data-card='87900']");
         if (js("!!document.querySelector('#hand[data-expanded-color=wild]')&&!CartasTest.getState().pendingAction").equals("true")) tap("[data-card='87900']");
+        assertEquals("true",js("CartasTest.getState().pendingAction.cardType==='dist'&&document.querySelector('.color-picker').dataset.cardType==='dist'"));
         js("document.querySelector('[data-color=blue]').addEventListener('click',()=>CartasTest.getState().token++,{once:true})");
         tap("[data-color='blue']");
         assertEquals("true",js("(()=>{const s=CartasTest.getState();return s.players.every(p=>p.hand.length>=1)&&s.players[0].hand.length>=7&&s.players[0].hand.length<=9&&Math.max(...s.players.slice(1).map(p=>p.hand.length))-Math.min(...s.players.slice(1).map(p=>p.hand.length))<=2&&s.players.flatMap(p=>p.hand).length===60&&s.penalty===0&&[...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort().join()===window.originalIds})()"));
@@ -245,7 +246,7 @@ public class OfflineGameTest {
         assertEquals("40",js("CartasTest.getState().players[0].hand.length"));
         assertEquals("blue",js("document.getElementById('hand').dataset.expandedColor"));
         SystemClock.sleep(350);
-        tap("#turnCue");
+        tap("#table"); // Toque real fora da mão; o aviso é apenas visual e não intercepta eventos.
         assertEquals("true",js("!document.getElementById('hand').dataset.expandedColor"));
         tap("[data-card='980039']");SystemClock.sleep(350);tap("[data-card='980039']");
         assertEquals("39",js("CartasTest.getState().players[0].hand.length"));
@@ -307,6 +308,7 @@ public class OfflineGameTest {
             js("(()=>{const s=CartasTest.getState();s.players[0].hand=[{id:89800,type:'wild',color:null},{id:89801,type:'num',color:'blue',num:7}];document.getElementById('useCardArt').onchange()})()");
             tap("[data-card='89800']");waitFor("!!document.querySelector('.color-picker')",15000);
             assertEquals("4",js("document.querySelectorAll('.ingredient-layer img').length"));
+            assertEquals("true",js("[...document.querySelectorAll('.ingredient-layer img')].every(im=>im.src.includes('/especiais/escolher_cor_')&&im.src.endsWith('_overlay_full.png'))"));
             assertEquals("true",js("[...document.querySelectorAll('[data-color]')].every(e=>{const r=e.getBoundingClientRect();return r.width>=44&&r.height>=44})"));
             tap("[data-color='"+color+"']");
             waitFor("!document.querySelector('.color-picker')",15000);
@@ -317,15 +319,16 @@ public class OfflineGameTest {
 
     @Test public void j_penaltyCardArtAndColorPickerOffline() throws Exception {
         startControlled();
-        js("window.__penaltyCheck=null;(async()=>{try{const files=[4,6].flatMap(n=>['completa','base_sem_ingredientes',...['tomates','queijos','mirtilos','alfaces'].map(s=>s+'_overlay_full')].map(s=>'carta_mais'+n+'_'+s));await Promise.all(files.map(async f=>{const im=new Image();im.src='assets/cartas_mais4_mais6/'+f+'.png';await im.decode();if(im.naturalWidth!==1024||im.naturalHeight!==1536)throw Error(f)}));window.__penaltyCheck=12}catch(e){window.__penaltyCheck=String(e)}})()");
-        waitFor("window.__penaltyCheck===12",60000);
+        js("window.__penaltyCheck=null;(async()=>{try{const files=[4,6].flatMap(n=>['completa','base_sem_ingredientes',...['tomates','queijos','mirtilos','alfaces'].map(s=>s+'_overlay_full')].map(s=>'carta_mais'+n+'_'+s));await Promise.all(files.map(async f=>{const im=new Image();im.src='assets/cartas_mais4_mais6/'+f+'.png';await im.decode();if(im.naturalWidth!==1024||im.naturalHeight!==1536)throw Error(f)}));await Promise.all([4,6].map(async n=>{const im=new Image();im.src='assets/interacao_v2/mais'+n+'_base_limpa.png';await im.decode();if(im.naturalWidth!==1024||im.naturalHeight!==1536)throw Error('base limpa '+n)}));window.__penaltyCheck=14}catch(e){window.__penaltyCheck=String(e)}})()");
+        waitFor("window.__penaltyCheck===14",60000);
         for(int number:new int[]{4,6})for(String color:new String[]{"red","yellow","blue","green"}){
             startControlled();
             js("(()=>{const s=CartasTest.getState();s.players[0].hand=[{id:89900,type:'wild"+number+"',color:null},{id:89901,type:'num',color:'blue',num:7}];s.penalty=2;s.highest=2;document.getElementById('useCardArt').onchange()})()");
             assertEquals("true",js("document.querySelector('[data-card=\"89900\"] .card-image').src.endsWith('carta_mais"+number+"_completa.png')"));
             tap("[data-card='89900']");waitFor("!!document.querySelector('.color-picker')",15000);
-            assertEquals("true",js("document.querySelector('.color-picker-base').src.endsWith('carta_mais"+number+"_base_sem_ingredientes.png')"));
+            assertEquals("true",js("document.querySelector('.color-picker-base').src.endsWith('mais"+number+"_base_limpa.png')"));
             assertEquals("4",js("document.querySelectorAll('.ingredient-layer img').length"));
+            assertEquals("true",js("[...document.querySelectorAll('.ingredient-layer img')].every(im=>im.src.includes('/especiais/escolher_cor_')&&im.src.endsWith('_overlay_full.png'))"));
             assertEquals("true",js("[...document.querySelectorAll('[data-color]')].every(e=>{const r=e.getBoundingClientRect();return r.width>=44&&r.height>=44})"));
             tap("[data-color='"+color+"']");waitFor("!document.querySelector('.color-picker')",15000);
             assertEquals(org.json.JSONObject.quote(color),js("CartasTest.getState().activeColor"));
@@ -346,6 +349,10 @@ public class OfflineGameTest {
         assertEquals("true",js("document.getElementById('player0').textContent.includes('Chef Offline')"));
         js("(()=>{const s=CartasTest.getState();s.token++;s.current=0;s.unlockAt=0;s.penalty=20;s.highest=4;s.lastPenalty=null;s.o.timeout=0;s.drawn=null;s.pendingAction=null;s.players[0].hand=[{id:99980,type:'num',color:'blue',num:1}];document.getElementById('useCardArt').onchange()})()");
         assertEquals("true",js("document.getElementById('buyBtn').classList.contains('mandatory-buy')&&document.getElementById('hand').classList.contains('human-turn')&&document.getElementById('turnCue').textContent==='SUA VEZ!'"));
+        assertEquals("true",js("document.querySelectorAll('#pile>.deck-back').length===6&&!document.querySelector('#pile .deck-count')&&document.getElementById('pile').getAnimations().some(a=>a.animationName==='whole-pile-glow')"));
+        js("window.__stableBotCards=[...document.querySelectorAll('#player1 [data-hand-card]')];CartasTest.getState().current=2;document.getElementById('useCardArt').onchange()");
+        assertEquals("true",js("window.__stableBotCards.every((n,i)=>document.querySelectorAll('#player1 [data-hand-card]')[i]===n)"));
+        assertEquals("true",js("(()=>{const svg=document.getElementById('stoveDirection').getBoundingClientRect(),b=document.getElementById('burner').getBoundingClientRect();return Math.abs(svg.width-svg.height)<.1&&Math.abs(svg.x+svg.width/2-b.x-b.width/2)<.1&&Math.abs(svg.y+svg.height/2-b.y-b.height/2)<.1})()"));
         String profile = new JSONArray("["+js("JSON.stringify(PanelinhaProfile.current)")+"]").getString(0);
         InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("upgrade-check",Context.MODE_PRIVATE).edit().putString("profile",profile).commit();
         SystemClock.sleep(7000); // Flush durável antes de instalar por cima na etapa seguinte.
