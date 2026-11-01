@@ -26,7 +26,7 @@
   const stopDirectionAnimation = () => $('directionGlyph').getAnimations().forEach(animation => animation.cancel());
   reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) {stopDirectionAnimation();clearFlights();} });
 
-  // Avatar provisório de panela sem rosto, reutilizado no verso das cartas.
+  // Avatar provisório de panela sem rosto, independente das artes oficiais das cartas.
   function panAvatar(id = 0) {
     const accessory = [
       '<path d="M24 12l-4-7 9 3 7-6 6 6 9-3-4 7" fill="#ffdb86" stroke="#62442e" stroke-width="2"/>',
@@ -201,7 +201,7 @@
       const sprite=document.createElement('div');sprite.className='drawn-card flying-card';
       Object.assign(sprite.dataset,{actor:String(event.actor),cardId:String(event.id),sequence:String(i),delay:String(delay),duration:String(duration)});
       Object.assign(sprite.style,{left:`${event.x-event.width/2}px`,top:`${event.y-event.height/2}px`,width:`${event.width}px`,height:`${event.height}px`});
-      const back=document.createElement('span');back.className='card deck-back';back.innerHTML=panAvatar();sprite.append(back);
+      const back=document.createElement('span');back.className='card deck-back';sprite.append(back);
       if(face&&present){const card=end.node.matches('.card')?end.node:end.node.querySelector('.card');if(card){const front=document.createElement('div');front.className='flight-front';front.append(card.cloneNode(true));sprite.append(front);front.animate([{opacity:0},{offset:.4,opacity:0},{opacity:1}],{duration,delay,fill:'both'});}}
       $('playAnimations').append(sprite);if(present)drawingIds.add(event.id);
       const dx=end.x-event.x,dy=end.y-event.y,sx=end.width/event.width,sy=end.height/event.height;
@@ -415,7 +415,7 @@
     }
     previous = { state, round:state.round, direction:state.direction };
 
-    $('pile').innerHTML = Array.from({length:5},(_,i)=>`<span class="pile-layer deck-back" aria-hidden="true" style="--depth:${5-i}"></span>`).join('')+`<div class="card deck-back">${panAvatar()}<span class="deck-brand">PANELAS</span><span class="deck-count">${state.deck.length}</span></div>`;
+    $('pile').innerHTML = Array.from({length:5},(_,i)=>`<span class="pile-layer deck-back" aria-hidden="true" style="--depth:${5-i}"></span>`).join('')+`<div class="card deck-back"><span class="deck-count">${state.deck.length}</span></div>`;
     $('pile').setAttribute('aria-label', `Monte de compra: ${state.deck.length} cartas`);
     document.querySelector('.draw-stack .stack-label').textContent = state.penalty ? `COMPRAR +${state.penalty}` : 'COMPRAR';
     for (const player of state.players) {

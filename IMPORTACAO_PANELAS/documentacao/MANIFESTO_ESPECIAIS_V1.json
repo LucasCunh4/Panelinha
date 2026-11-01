@@ -1,0 +1,59 @@
+{
+  "bundle": "Panelinha — artes especiais oficiais v1",
+  "sourceZip": "Panelinha_escolher_cor_assets.zip",
+  "sourceZipSha256": "6466f51844b100a6e3c4369e429b470e6c69a0d835c31a02526de8ca199aefaf",
+  "assets": [
+    {
+      "path": "assets/especiais/carta_escolher_cor_integrada_referencia.png",
+      "sha256": "9f7372f6b36198cbb2990020869e98a2f2bb6850ac057bfa263dc2993a9acf2a"
+    },
+    {
+      "path": "assets/especiais/carta_escolher_cor_montada_preview.png",
+      "sha256": "df297ea83edb538acff839eb3944fed23788284fbb5c1c5a82bfce3fca83084d"
+    },
+    {
+      "path": "assets/especiais/carta_panela_de_pressao.png",
+      "sha256": "2aafbd64a4a3fa591e71a09d7f59eccd2fcaa2ac22b894af77819a5d1734d01b"
+    },
+    {
+      "path": "assets/especiais/escolher_cor_alfaces.png",
+      "sha256": "72a5739301fbe94b2336663ff36f0a0d0c21273a613daa88c1a47ef89a819a49"
+    },
+    {
+      "path": "assets/especiais/escolher_cor_alfaces_overlay_full.png",
+      "sha256": "6f575b7c8b4658c12d2b3cf01fed6ee63d6d4af54ba6733c5816fda70d937ebe"
+    },
+    {
+      "path": "assets/especiais/escolher_cor_base.png",
+      "sha256": "0e5a5ce274e1e7cdcb6ffac41cca2d5681b3574e2d225b253611c3c3fec34583"
+    },
+    {
+      "path": "assets/especiais/escolher_cor_mirtilos.png",
+      "sha256": "4603791c176c3c6b4f210cfd32f080d4b5e0fd77dbef67242694fe4e75a471de"
+    },
+    {
+      "path": "assets/especiais/escolher_cor_mirtilos_overlay_full.png",
+      "sha256": "e888f48a9b40fa9fe71d31f49675d91f73372a3d46ed773ed789762172b4415f"
+    },
+    {
+      "path": "assets/especiais/escolher_cor_queijos.png",
+      "sha256": "cd21a76ba4937388506ed2ba1dcb0835ba88e84367561c7b26f362ed7113a629"
+    },
+    {
+      "path": "assets/especiais/escolher_cor_queijos_overlay_full.png",
+      "sha256": "30adc435ee945542ed91c92b4e5569c3af7a4c5df83cc719faf22a52c4d555fb"
+    },
+    {
+      "path": "assets/especiais/escolher_cor_tomates.png",
+      "sha256": "7c0bd052a36c1fcb88f0fb5d8239c9e12211b62efc11aa58765cfd1fcc8da910"
+    },
+    {
+      "path": "assets/especiais/escolher_cor_tomates_overlay_full.png",
+      "sha256": "3006a909b92b05893d5e584a130e913d85669f30ffcca5df7bceb6ad80337c36"
+    },
+    {
+      "path": "assets/especiais/verso_todas_as_cartas.png",
+      "sha256": "d100e9ef1f8c252e67a0712b83d6bc8a715338bec838655bd32859e5462ea5a5"
+    }
+  ]
+}

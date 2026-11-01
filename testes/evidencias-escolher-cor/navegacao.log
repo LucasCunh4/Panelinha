@@ -1,0 +1,6 @@
+PASS tela inicial em seis tamanhos, só dois botões, título com fonte local carregada, decoração separada da mesa e alvos de toque livres
+PASS Multiplayer → Criar/Entrar → retornos web/nativo, sem sala/código fictício, autenticação ou socket
+PASS Um jogador reutiliza configurações e conserva escolhas; partida com três bots e transição sem atrasar/modificar deadline
+PASS card superior com nomes curtos/longos, palavras contínuas e contagem 118, ao lado do leque elevado em retrato/paisagem
+PASS órbita circular no queimador, atrás das cartas, sem textos; Inverter muda sentido sem salto de fase
+PASS Voltar web/nativo respeita camadas, confirmação/cancelamento sem perda, retorno à configuração/início e movimento reduzido; sem rede externa/erros JS

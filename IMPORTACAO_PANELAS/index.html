@@ -31,6 +31,7 @@
 </style>
 <link rel="stylesheet" href="mesa.css">
 <link rel="stylesheet" href="menu.css">
+<link rel="stylesheet" href="escolher-cor.css">
 </head>
 <body>
 <main class="container app-container">
@@ -145,6 +146,7 @@
 
 </main><div id="modalRoot"></div>
 <div id="navDialog" class="nav-dialog" role="alertdialog" aria-modal="true" aria-labelledby="navDialogTitle" aria-describedby="navDialogText" hidden><div class="nav-dialog-panel"><h2 id="navDialogTitle"></h2><p id="navDialogText"></p><button id="cancelLeaveBtn" class="hero-button hero-gold">Continuar jogando</button><button id="confirmLeaveBtn" class="hero-button hero-violet">Encerrar partida</button></div></div>
+<script src="escolher-cor.js"></script>
 <script src="mesa.js"></script>
 <script src="navegacao.js"></script>
 <script>
@@ -171,6 +173,8 @@ function power(c){return c.type==='draw2'?2:c.type==='wild4'?4:c.type==='wild6'?
 const ASSET_COLOR_DIR={red:'vermelho',blue:'azul',green:'verde',yellow:'amarelo'};
 const ASSET_FACE={draw2:'mais_2',skip:'bloqueio',reverse:'inverter'};
 function cardAssetPath(c){
+  if(c?.type==='dist')return 'assets/especiais/carta_panela_de_pressao.png';
+  if(c?.type==='wild')return 'assets/especiais/carta_escolher_cor_montada_preview.png';
   if(!c||!c.color||!ASSET_COLOR_DIR[c.color])return null;
   const face=c.type==='num'&&Number.isInteger(c.num)&&c.num>=0&&c.num<=9?String(c.num):ASSET_FACE[c.type];
   return face===undefined?null:`assets/cartas/${ASSET_COLOR_DIR[c.color]}/${face}.png`;
@@ -180,7 +184,7 @@ function cardHTML(c,small=false,selected=false,invalid=false){
   const label=`<small>${c.color?CN[c.color]:''}</small><span class="${c.type==='dist'||c.type==='rotate'?'special-name':''}">${SHORT[c.type]||descriptor(c)}</span><small>${c.type==='num'?'':(c.color?'⇄':'★')}</small>`;
   const path=$('useCardArt')?.checked?cardAssetPath(c):null;
   if(!path)return `<span class="${base}" title="${name}">${label}</span>`;
-  return `<span class="${base} art-card" title="${name}" data-asset="${path}"><img class="card-image" src="${path}" alt="${name}" loading="lazy" draggable="false" onerror="this.parentNode.classList.add('asset-unavailable')"><span class="art-fallback">${label}</span></span>`;
+  return `<span class="${base} art-card${c.type==='dist'||c.type==='wild'?' official-special':''}" title="${name}" data-asset="${path}"><img class="card-image" src="${path}" alt="${name}" loading="lazy" draggable="false" onerror="this.parentNode.classList.add('asset-unavailable')"><span class="art-fallback">${label}</span></span>`;
 }
 function buildDeck(o){let a=[];for(const color of COLORS){for(let n=0;n<=9;n++){a.push(make('num',color,n),make('num',color,n));}for(let k=0;k<2;k++){a.push(make('draw2',color),make('skip',color),make('reverse',color));}}for(let k=0;k<4;k++)a.push(make('wild4'),make('wild'));for(let k=0;k<2;k++)a.push(make('wild6'));if(o.dist)for(let k=0;k<2;k++)a.push(make('dist'));if(o.rotate)for(let k=0;k<2;k++)a.push(make('rotate'));return shuffle(a);}
 function log(msg){s.log.unshift(`[${new Date().toLocaleTimeString('pt-BR')}] ${msg}`);s.log=s.log.slice(0,70);}
@@ -386,7 +390,13 @@ function cutHuman(){
   chooseCards(0,[c.id]); // Uma carta por clique, inclusive no corte.
 }
 
-function showColors(){let root=$('modalRoot');root.innerHTML=`<div class="modal-wrap"><div class="modal"><h2>Escolher a próxima cor</h2><p class="muted">Após jogar essa carta, qual será a cor ativa?</p><div class="row" style="justify-content:center;margin:20px 0">${COLORS.map(x=>`<button class="colorbtn ${x}" data-color="${x}" aria-label="${CN[x]}"></button>`).join('')}</div><button class="btn alt" id="cancelColor">Cancelar</button></div></div>`;root.querySelectorAll('[data-color]').forEach(b=>b.onclick=()=>{let data=s.pendingAction;root.innerHTML='';if(data)applyPlay(data.id,data.ids,data.isCut,b.dataset.color);});$('cancelColor').onclick=()=>{s.pendingAction=null;root.innerHTML='';render();queueBots();};}
+function showColors(){
+  const state=s,action=s.pendingAction;
+  PanelinhaColorPicker.open($('modalRoot'),{
+    choose(color){if(s===state&&s.pendingAction===action)applyPlay(action.id,action.ids,action.isCut,color);},
+    cancel(){if(s!==state||s.pendingAction!==action)return;s.pendingAction=null;render();queueBots();}
+  });
+}
 function finishControlHTML(){let ranks=s.summary.map(x=>`<div class="notice"><strong>${x.place}º — ${names(x.id)}</strong> · ${x.cost} pontos nas cartas restantes (${x.remaining} cartas)</div>`).join('');return `<div class="banner">${s.phase==='gameOver'?(s.winner?`🏆 ${s.winner} venceu a partida!`:'🏆 Rodada única concluída!'):'Rodada concluída.'}</div>${ranks}<div class="controls">${s.phase==='roundOver'?'<button id="nextRound" class="btn good">Próxima rodada</button>':'<button id="newMatch" class="btn good">Nova partida</button>'}<button id="backLobby" class="btn alt">Voltar às configurações</button></div>`;}
 function render(){if(!s)return;PanelasMesa.beforeRender(s);$('roundLabel').textContent=`Rodada ${s.round} · ${s.o.duo?'Duplas':'Individual'}`;$('status').textContent=s.phase==='playing'?`Vez de ${names(s.current)}`:s.phase==='roundOver'?'Fim da rodada':'Fim da partida';
 $('score').innerHTML=s.o.duo?`<span>Você + Bot 2: ${s.teams[0]}</span><span>Bot 1 + Bot 3: ${s.teams[1]}</span>`:s.players.map(p=>`<span>${names(p.id)}: ${p.score}</span>`).join('');

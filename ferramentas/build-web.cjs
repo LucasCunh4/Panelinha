@@ -19,9 +19,14 @@ const menu=JSON.parse(fs.readFileSync(path.join(source,'documentacao/MANIFESTO_M
 for (const entry of menu.assets) {
   if(crypto.createHash('sha256').update(fs.readFileSync(path.join(source,entry.path))).digest('hex')!==entry.sha256)throw Error(`Recurso do menu divergente: ${entry.path}`);
 }
+const especiais=JSON.parse(fs.readFileSync(path.join(source,'documentacao/MANIFESTO_ESPECIAIS_V1.json')));
+if(especiais.assets.length!==13)throw Error('O pacote oficial deve conter 13 PNGs');
+for(const entry of especiais.assets){
+  if(crypto.createHash('sha256').update(fs.readFileSync(path.join(source,entry.path))).digest('hex')!==entry.sha256)throw Error(`Arte especial divergente: ${entry.path}`);
+}
 fs.rmSync(output, {recursive:true, force:true});
 fs.mkdirSync(output, {recursive:true});
-for (const name of ['index.html', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js', 'assets']) fs.cpSync(path.join(source, name), path.join(output, name), {recursive:true});
+for (const name of ['index.html', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js', 'escolher-cor.js', 'escolher-cor.css', 'assets']) fs.cpSync(path.join(source, name), path.join(output, name), {recursive:true});
 require('esbuild').buildSync({
   entryPoints:[path.join(__dirname, 'android-compat.js')],
   outfile:path.join(output, 'android-compat.js'),

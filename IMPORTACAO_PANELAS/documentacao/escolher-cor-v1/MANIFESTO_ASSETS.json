@@ -1,0 +1,86 @@
+{
+  "project": "Panelinha",
+  "bundle": "Artes especiais e escolha de cor — v1",
+  "cardSize": {
+    "width": 1024,
+    "height": 1536
+  },
+  "assets": {
+    "back": "verso_todas_as_cartas.png",
+    "pressurePot": "carta_panela_de_pressao.png",
+    "chooseColorStaticReference": "carta_escolher_cor_integrada_referencia.png",
+    "chooseColorBase": "escolher_cor_base.png",
+    "chooseColorFlatPreview": "carta_escolher_cor_montada_preview.png"
+  },
+  "ingredientLayers": {
+    "tomates": {
+      "color": "vermelho",
+      "originalPng": "escolher_cor_tomates.png",
+      "prePositionedFullCanvasPng": "escolher_cor_tomates_overlay_full.png",
+      "placementOnCard": {
+        "x": 0.03906,
+        "y": 0.15299,
+        "width": 0.41016,
+        "height": 0.27344
+      },
+      "suggestedHitRegion": {
+        "x": 0.05371,
+        "y": 0.15625,
+        "width": 0.37598,
+        "height": 0.24089
+      }
+    },
+    "queijos": {
+      "color": "amarelo",
+      "originalPng": "escolher_cor_queijos.png",
+      "prePositionedFullCanvasPng": "escolher_cor_queijos_overlay_full.png",
+      "placementOnCard": {
+        "x": 0.54297,
+        "y": 0.14974,
+        "width": 0.41992,
+        "height": 0.27995
+      },
+      "suggestedHitRegion": {
+        "x": 0.56152,
+        "y": 0.15951,
+        "width": 0.39844,
+        "height": 0.23763
+      }
+    },
+    "mirtilos": {
+      "color": "azul",
+      "originalPng": "escolher_cor_mirtilos.png",
+      "prePositionedFullCanvasPng": "escolher_cor_mirtilos_overlay_full.png",
+      "placementOnCard": {
+        "x": 0.0332,
+        "y": 0.38086,
+        "width": 0.40527,
+        "height": 0.27018
+      },
+      "suggestedHitRegion": {
+        "x": 0.04492,
+        "y": 0.39062,
+        "width": 0.40039,
+        "height": 0.22917
+      }
+    },
+    "alfaces": {
+      "color": "verde",
+      "originalPng": "escolher_cor_alfaces.png",
+      "prePositionedFullCanvasPng": "escolher_cor_alfaces_overlay_full.png",
+      "placementOnCard": {
+        "x": 0.55371,
+        "y": 0.37109,
+        "width": 0.4043,
+        "height": 0.26953
+      },
+      "suggestedHitRegion": {
+        "x": 0.55273,
+        "y": 0.39062,
+        "width": 0.41992,
+        "height": 0.22917
+      }
+    }
+  },
+  "guidance": "In interactive picker, use base and full-canvas transparent overlay layers, with separate accessible hit areas and animations; use flat preview only for normal small card display. Hit areas are starter coordinates; validate on actual screens."
+}

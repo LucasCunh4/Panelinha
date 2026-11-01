@@ -296,4 +296,22 @@ public class OfflineGameTest {
         // O roteiro também verifica um reinício a frio ANTES de instalar outro APK.
         SystemClock.sleep(7000);
     }
+    @Test public void i_officialArtAndIngredientColorPickerOffline() throws Exception {
+        startControlled();
+        js("window.__specialCheck=null;(async()=>{try{const files=['verso_todas_as_cartas','carta_panela_de_pressao','carta_escolher_cor_montada_preview','escolher_cor_base',...['tomates','queijos','mirtilos','alfaces'].map(n=>'escolher_cor_'+n+'_overlay_full')];await Promise.all(files.map(async f=>{const im=new Image();im.src='assets/especiais/'+f+'.png';await im.decode();if(im.naturalWidth!==1024||im.naturalHeight!==1536)throw Error(f)}));window.__specialCheck=8}catch(e){window.__specialCheck=String(e)}})()");
+        waitFor("window.__specialCheck===8",60000);
+        assertEquals("true",js("[...document.querySelectorAll('.hidden-card,.deck-back')].every(e=>getComputedStyle(e).backgroundImage.includes('verso_todas_as_cartas.png'))"));
+        for(String color:new String[]{"red","yellow","blue","green"}){
+            startControlled();
+            js("(()=>{const s=CartasTest.getState();s.players[0].hand=[{id:89800,type:'wild',color:null},{id:89801,type:'num',color:'blue',num:7}];document.getElementById('useCardArt').onchange()})()");
+            tap("[data-card='89800']");waitFor("!!document.querySelector('.color-picker')",15000);
+            assertEquals("4",js("document.querySelectorAll('.ingredient-layer img').length"));
+            assertEquals("true",js("[...document.querySelectorAll('[data-color]')].every(e=>{const r=e.getBoundingClientRect();return r.width>=44&&r.height>=44})"));
+            tap("[data-color='"+color+"']");
+            waitFor("!document.querySelector('.color-picker')",15000);
+            assertEquals(org.json.JSONObject.quote(color),js("CartasTest.getState().activeColor"));
+            assertEquals("true",js("CartasTest.getState().pendingAction===null&&CartasTest.getState().discard.filter(c=>c.id===89800).length===1"));
+        }
+    }
+
 }
