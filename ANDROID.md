@@ -164,3 +164,11 @@ O histórico usa fragmentos da mesma origem e não altera localStorage/SharedPre
 A transição de até 240 ms usa apenas apresentação/opacidade, sem retardar o motor, o deadline ou desativar controles. O card superior passa a ter largura/altura naturais e quebra de nomes longos. O indicador luminoso percorre um círculo centrado em (836,451), raio 206 no plano nativo do fogão, atrás das cartas. A direção continua derivada do motor (+1 anti-horário, -1 horário).
 
 Há **8 testes** de `OfflineGameTest`, incluindo navegação inicial, Back do sistema e swipe pela borda em navegação gestual no dispositivo exclusivo de teste; o teste de atualização/persistência continua exigido. O APK real também verifica os dois novos scripts/estilos e os recursos da fonte, além das 52 cartas, seis PNGs da mesa e identidade de assinatura. Resultados atuais em `testes/INICIO_MENU_RESULTADOS.md`.
+
+## Artes especiais após 0.2.21 e +4/+6 em 0.2.22
+
+As artes oficiais do verso, Panela de Pressão e Escolher Cor ficam em `assets/especiais/`, com 13 PNGs verificados pelo `MANIFESTO_ESPECIAIS_V1.json`. As novas frentes completas, bases, overlays e sprites de +4/+6 ficam em `assets/cartas_mais4_mais6/`, com 22 PNGs conferidos pelo `MANIFESTO_MAIS4_MAIS6.json`. Build e verificador do APK exigem esses recursos e preservam os manifestos anteriores.
+
+`escolher-cor.js`/`.css` compartilham uma única interação: a carta pendente seleciona a base, os quatro overlays alinhados e suas áreas/origens de animação. Cor/efeitos continuam registrados imediatamente pelo motor; a confirmação visual de 200 ms não cria temporizador de regras. Liquidificador continua sem escolha de cor. Nenhuma arte anterior ou regra foi modificada nesta integração de +4/+6.
+
+São agora **10 testes** em `OfflineGameTest`: os nove anteriores e o caso de +4/+6 com toques e penalidade acumulada. O teste de atualização/persistência continua obrigatório. A compilação/assinatura do APK **0.2.22/c4202** passou, e o arquivo foi verificado independentemente com o certificado da geração 2. No workflow #22, o emulador ficou offline durante o primeiro teste, sem concluir os dez casos; a instrumentação e retenção real de dados permanecem pendentes. Resultados, evidências e download direto em `testes/ARTES_MAIS4_MAIS6_RESULTADOS.md`.

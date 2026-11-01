@@ -1,0 +1,8 @@
+PASS 30 layouts: leque único contínuo/centrado, 15/20/30/40/60/100 cartas, superior ao lado e mais alto; bots menores e parceiro legível
+PASS toque expande somente a cor, primeiro toque não joga; demais cores compactas conectadas; toque externo recolhe
+PASS troca de grupo, carta inválida não joga e descarte parte da carta real no leque expandido
+PASS cor única com 40/100 cartas: sobreposição adaptada e acesso às primeiras/intermediárias/últimas por rolagem apenas da mão
+PASS compra automática +20 com grupo aberto: prazo real, cartas individuais, grupo preservado e conservação de IDs
+PASS compra +20 individual e corte direto na faca em mão compacta sem bloquear a janela de 2,2s
+PASS centro sem rótulos redundantes, rastro circular 220/1000 e animação derivada da direção do motor
+PASS mouse com intenção de 180ms, clique fixa sem jogar, ausência de recolhimento sensível e clique externo fecha; sem exceções JS

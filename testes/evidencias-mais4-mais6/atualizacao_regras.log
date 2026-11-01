@@ -1,0 +1,41 @@
+PASS Panela de Pressão 20 cartas: conservação, redução do autor, mínimo 1 e equilíbrio
+PASS Panela de Pressão 40 cartas: conservação, redução do autor, mínimo 1 e equilíbrio
+PASS Panela de Pressão 80 cartas: conservação, redução do autor, mínimo 1 e equilíbrio
+PASS Panela de Pressão 118 cartas: conservação, redução do autor, mínimo 1 e equilíbrio
+PASS Panela de Pressão resolve +2 com redução e equilíbrio
+PASS Panela de Pressão resolve +6 com redução e equilíbrio
+PASS Panela de Pressão resolve +12 com redução e equilíbrio
+PASS Panela de Pressão resolve +20 com redução e equilíbrio
+PASS Panela de Pressão resolve +40 com redução e equilíbrio
+PASS Panela de Pressão resolve +80 com redução e equilíbrio
+PASS Última Panela de Pressão vence pelo descarte e redistribui só restantes (individual, +0)
+PASS Última Panela de Pressão vence pelo descarte e redistribui só restantes (individual, +20)
+PASS Última Panela de Pressão vence pelo descarte e redistribui só restantes (duplas, +0)
+PASS Última Panela de Pressão vence pelo descarte e redistribui só restantes (duplas, +20)
+PASS Autor com teto 1 recebe exatamente 1 (+0)
+PASS Autor com teto 1 recebe exatamente 1 (+20)
+PASS Autor com teto 1 recebe exatamente 1 (+40)
+PASS Panela de Pressão inicial reserva uma carta para cada participante
+PASS Panela de Pressão recicla descarte e conserva mínimo mesmo com monte curto
+PASS Panela de Pressão exclui finalizador anterior e mantém o resultado
+PASS Único destinatário não pode absorver excedente além do limite
+PASS Reduções possíveis após descartar com 1 cartas, conservando e balanceando
+PASS Reduções possíveis após descartar com 2 cartas, conservando e balanceando
+PASS Reduções possíveis após descartar com 3 cartas, conservando e balanceando
+PASS Reduções possíveis após descartar com 4 cartas, conservando e balanceando
+PASS Reduções possíveis após descartar com 7 cartas, conservando e balanceando
+PASS Reduções possíveis após descartar com 20 cartas, conservando e balanceando
+PASS Reduções possíveis após descartar com 40 cartas, conservando e balanceando
+PASS Reduções possíveis após descartar com 80 cartas, conservando e balanceando
+PASS Redução exige outro destinatário; mão mínima pode permanecer com 1
+PASS Última Panela durante penalidade preserva finalizador anterior e exclui ambos os vazios
+PASS Liquidificador preserva red, direção 1 e não abre modal
+PASS Liquidificador preserva blue, direção 1 e não abre modal
+PASS Liquidificador preserva green, direção 1 e não abre modal
+PASS Liquidificador preserva yellow, direção 1 e não abre modal
+PASS Liquidificador preserva red, direção -1 e não abre modal
+PASS Liquidificador preserva blue, direção -1 e não abre modal
+PASS Liquidificador preserva green, direção -1 e não abre modal
+PASS Liquidificador preserva yellow, direção -1 e não abre modal
+PASS corte disponível até 2199 ms, recusado em 2200 ms; cópia própria não duplica efeito
+PASS 40 cenários novos de regras sem exceções JS

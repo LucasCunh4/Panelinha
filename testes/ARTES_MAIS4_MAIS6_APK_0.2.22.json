@@ -1,0 +1,42 @@
+{
+  "file": "Panelinha-Teste-v0.2.22-c4202.apk",
+  "sha256": "b70dc84513af4857b124973163dcdde393e70f8e5a46e71b59da7263da16e90d",
+  "applicationId": "com.lucascunha.panelinha.teste",
+  "versionCode": 4202,
+  "versionName": "0.2.22",
+  "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+  "pngsVerified": 52,
+  "origin": "https://localhost",
+  "androidCompat": true,
+  "signingGeneration": 2,
+  "mesaAssetsVerified": 6,
+  "menuAssetsVerified": 2,
+  "specialAssetsVerified": 13,
+  "penaltyAssetsVerified": 22,
+  "sourceCommit": "8fc6f06c9fdcbb1bd9838f2d1549d07128fe42b6",
+  "workflowRun": 41258767793,
+  "workflowJob": 124707485233,
+  "workflowConclusion": "failure",
+  "artifactId": 13064820656,
+  "directApkUrl": "https://github.com/LucasCunh4/Panelinha/actions/runs/41258767793/artifacts/13064820656",
+  "archive": false,
+  "webSuitesPassed": 13,
+  "versionAllocatorTestsPassed": 5,
+  "androidInstrumentation": {
+    "expected": 10,
+    "completed": 0,
+    "firstStarted": "a_imagesAndThreeBotsOffline",
+    "outcome": "device offline; emulator TCP port 5554 refused connection",
+    "applicationAssertionFailureObserved": false,
+    "rootCauseConfirmed": false,
+    "updatePersistenceTestExecuted": false
+  },
+  "binaryUpdateComparison": {
+    "previousVersion": "0.2.21",
+    "previousVersionCode": 4102,
+    "sameApplicationId": true,
+    "sameCertificate": true,
+    "sameOrigin": true,
+    "higherVersionCode": true
+  }
+}
