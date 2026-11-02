@@ -1,6 +1,6 @@
 # Panelinha Teste — Android
 
-Atualização atual: [ajustes de mesa, interações e opções](testes/AJUSTES_OPCOES_RESULTADOS.md). Panela sem escolha de cor, rastro elíptico, halo simétrico e opções temáticas. Preserva geração 2, `sensorLandscape`, imersão, dados locais, todas as artes e o workflow existente.
+Atualização atual: [seletores expansíveis, halo externo e órbita](testes/SELETORES_HALO_RESULTADOS.md). Popovers próprios, halo com vão externo e órbita deslocada 4px CSS. Preserva geração 2, `sensorLandscape`, imersão, dados locais, todas as regras/artes e o workflow existente.
 
 > Assinatura ativa: **geração 2**, autorizada em 30/10/2026 após perda da chave
 > anterior. Identidade pública e certificado aposentado em `android-identity.json`.

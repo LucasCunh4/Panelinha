@@ -46,7 +46,7 @@ for(const file of ['index.html','mesa.css','mesa.js','escolher-cor.css','escolhe
 }
 fs.rmSync(output, {recursive:true, force:true});
 fs.mkdirSync(output, {recursive:true});
-for (const name of ['index.html', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js', 'perfil.js', 'escolher-cor.js', 'escolher-cor.css', 'assets']) fs.cpSync(path.join(source, name), path.join(output, name), {recursive:true});
+for (const name of ['index.html', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js', 'seletores.js', 'seletores.css', 'perfil.js', 'escolher-cor.js', 'escolher-cor.css', 'assets']) fs.cpSync(path.join(source, name), path.join(output, name), {recursive:true});
 require('esbuild').buildSync({
   entryPoints:[path.join(__dirname, 'android-compat.js')],
   outfile:path.join(output, 'android-compat.js'),

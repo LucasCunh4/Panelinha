@@ -211,21 +211,23 @@
     if(!aura){
       button.insertAdjacentHTML('afterbegin',`<svg id="pileAura" class="pile-aura" aria-hidden="true" focusable="false">
         <defs><filter id="pileAuraFilter" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-          <feMorphology in="SourceAlpha" operator="dilate" radius="2" result="spread"/>
-          <feComposite in="spread" in2="SourceAlpha" operator="out" result="outline"/>
+          <feMorphology in="SourceAlpha" operator="dilate" radius="5" result="clearance"/>
+          <feMorphology in="SourceAlpha" operator="dilate" radius="7" result="spread"/>
+          <feComposite in="spread" in2="clearance" operator="out" result="outline"/>
           <feGaussianBlur in="outline" stdDeviation="4" result="halo"/>
           <feFlood flood-color="#ffc66e" flood-opacity=".95" result="gold"/>
           <feComposite in="gold" in2="halo" operator="in" result="glow"/>
           <feFlood flood-color="#fff1b7" result="light"/>
           <feComposite in="light" in2="outline" operator="in" result="edge"/>
-          <feMerge><feMergeNode in="glow"/><feMergeNode in="edge"/></feMerge>
+          <feMerge result="lit"><feMergeNode in="glow"/><feMergeNode in="edge"/></feMerge>
+          <feComposite in="lit" in2="clearance" operator="out"/>
         </filter></defs><g filter="url(#pileAuraFilter)">${Array.from({length:6},(_,depth)=>`<image href="assets/padronizadas/verso_oficial_400x850.png" x="${5-depth}" y="${depth*1.5}" preserveAspectRatio="xMidYMid meet"/>`).join('')}</g></svg>`);
       aura=$('pileAura');pileAuraSize='';
     }
     const box=pile.getBoundingClientRect(),parent=button.getBoundingClientRect();
     const left=box.left-parent.left-button.clientLeft,top=box.top-parent.top-button.clientTop;
     const key=`${width}:${height}:${left}:${top}`;if(key===pileAuraSize)return;pileAuraSize=key;
-    const pad=18,w=width+5,h=height+7.5;
+    const pad=26,w=width+5,h=height+7.5;
     aura.setAttribute('viewBox',`${-pad} ${-pad} ${w+pad*2} ${h+pad*2}`);
     aura.style.cssText=`left:${left-5-pad}px;top:${top-pad}px;width:${w+pad*2}px;height:${h+pad*2}px`;
     const filter=$('pileAuraFilter');
@@ -431,6 +433,8 @@
     const scale = Math.max(width / 1672, height / 941);
     const x = (width - 1672 * scale) / 2, y = (height - 941 * scale) / 2;
     table.style.setProperty('--scene-scale', scale);
+    // Deslocamento em pixels CSS, compensando a escala uniforme do cenário.
+    table.style.setProperty('--orbit-left', `${836-4/scale}px`);
     table.style.setProperty('--scene-x', `${x}px`);
     table.style.setProperty('--scene-y', `${y}px`);
     table.style.setProperty('--burner-y', `${y + 451 * scale}px`);

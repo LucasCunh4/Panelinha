@@ -32,6 +32,7 @@
 <link rel="stylesheet" href="mesa.css">
 <link rel="stylesheet" href="menu.css">
 <link rel="stylesheet" href="escolher-cor.css">
+<link rel="stylesheet" href="seletores.css">
 </head>
 <body>
 <main class="container app-container">
@@ -145,7 +146,7 @@
         <div class="row between"><h2 id="tableMenuTitle">Sua mesa</h2><button id="closeTableMenu" class="btn alt" aria-label="Fechar opções e voltar à mesa">Fechar ✕</button></div>
         <p class="help">Os bots e o tempo de turno continuam enquanto este menu está aberto.</p>
         <div class="panel"><strong id="roundLabel">Rodada 1</strong><span id="status" class="pill"></span><div class="score" id="score"></div><div class="topline" id="stateText"></div></div>
-    <details class="panel debug"><summary>Laboratório de testes (ferramentas de depuração)</summary><p class="help">Mostre as mãos dos bots ou adicione cartas à sua mão. Cartas injetadas podem ultrapassar a quantidade normal do baralho; isso é proposital para testar efeitos. Com cortes ativados, o balão de faca aparece sobre a carta idêntica; os bots normais respeitam uma janela de 2,2 segundos.</p><p id="labSixStatus" class="help"></p><div class="controls"><label class="row"><input id="useCardArt" type="checkbox" checked> Artes PNG (ligar/desligar)</label><label class="row"><input id="reveal" type="checkbox"> Ver mãos dos bots</label><select id="injectType"><option value="num">Número 7</option><option value="draw2">+2</option><option value="wild4">+4</option><option value="wild6">+6</option><option value="wild">Coringa</option><option value="skip">Bloqueio</option><option value="reverse">Inverter</option><option value="dist">Panela de Pressão</option><option value="rotate">Liquidificador</option></select><select id="injectColor"><option value="red">Vermelho</option><option value="blue">Azul</option><option value="green">Verde</option><option value="yellow">Amarelo</option></select><button class="btn alt" id="injectBtn">Dar carta de teste</button><button class="btn alt" id="testPenalty">Simular +20 para você</button><label class="row"><input id="quickBots" type="checkbox"> Bots rápidos</label></div></details>
+    <details class="panel debug"><summary>Laboratório de testes (ferramentas de depuração)</summary><p class="help">Mostre as mãos dos bots ou adicione cartas à sua mão. Cartas injetadas podem ultrapassar a quantidade normal do baralho; isso é proposital para testar efeitos. Com cortes ativados, o balão de faca aparece sobre a carta idêntica; os bots normais respeitam uma janela de 2,2 segundos.</p><p id="labSixStatus" class="help"></p><div class="controls"><label class="row"><input id="useCardArt" type="checkbox" checked> Artes PNG (ligar/desligar)</label><label class="row"><input id="reveal" type="checkbox"> Ver mãos dos bots</label><select id="injectType" aria-label="Carta de teste"><option value="num">Número 7</option><option value="draw2">+2</option><option value="wild4">+4</option><option value="wild6">+6</option><option value="wild">Coringa</option><option value="skip">Bloqueio</option><option value="reverse">Inverter</option><option value="dist">Panela de Pressão</option><option value="rotate">Liquidificador</option></select><select id="injectColor" aria-label="Cor da carta de teste"><option value="red">Vermelho</option><option value="blue">Azul</option><option value="green">Verde</option><option value="yellow">Amarelo</option></select><button class="btn alt" id="injectBtn">Dar carta de teste</button><button class="btn alt" id="testPenalty">Simular +20 para você</button><label class="row"><input id="quickBots" type="checkbox"> Bots rápidos</label></div></details>
     <details class="panel" open><summary>Histórico da partida</summary><div class="history" id="history"></div></details>
         <button id="backBtn" class="btn alt hide">Encerrar e voltar às configurações</button>
       </div>
@@ -481,5 +482,6 @@ PanelinhaNavigation.attach({getState:()=>s,leaveMatch:backToMenu});
 window.CartasTest={getState:()=>s,createDeck:o=>buildDeck(o),newRound:()=>s&&newRound(),describe:description,assetFor:cardAssetPath};
 })();
 </script>
+<script src="seletores.js"></script>
 </body>
 </html>

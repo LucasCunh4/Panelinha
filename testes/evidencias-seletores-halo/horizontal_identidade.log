@@ -1,0 +1,7 @@
+PASS dois fluxos via identificação, seis avatares locais, prévia, nomes seguros, bots independentes, persistência/reabertura e hierarquia Voltar
+PASS 200 baralhos on/off, duas ou zero +6, total 118/116, 20 distribuições sem +6, snapshot da configuração e laboratório sem injeção indevida
+PASS desafios procedentes/improcedentes de +4 com +6 desligado e +6 ativado, sem alteração dos valores ou destinos
+PASS 13 condições de compra obrigatória, sem brilho indevido com carta/desafio/turno bloqueado; compra por toque remove efeito imediatamente e conserva cartas
+PASS 42 layouts/mãos 7–100: crescimento 6%, retorno suave, centralização, leque contínuo, sem rolagem da mesa ou repetição do aviso a cada render
+PASS corte fora da vez mantém tamanho normal e faca clicável; controles sem mensagens de espera
+PASS nome nos resultados, movimento reduzido e opções offline; sem erros JS ou dependência de rede externa

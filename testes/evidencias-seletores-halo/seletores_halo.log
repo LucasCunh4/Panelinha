@@ -1,0 +1,4 @@
+PASS popovers locais nos quatro seletores: valores/callbacks, estado selecionado, meta dinâmica/desabilitada, 24 layouts, altura 240px, toque fora e Voltar web/nativo
+PASS laboratório usa o mesmo componente, injeta a carta correta e Voltar fecha a lista antes do laboratório
+PASS órbita -4px CSS em três escalas sem mover chama/descarte; 15 condições reais de compra; halo sem sobreposição e vão externo simétrico medido nos pixels: 5.25/5.25/5.25/5
+PASS mouse, hover, teclado Home/End/setas/Enter/Espaço/Tab/Escape, opção selecionada, movimento reduzido e escolha offline; sem erros JS

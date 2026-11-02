@@ -108,7 +108,7 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/correcoes-evidence';
     const animation=circle.getAnimations().find(a=>a.effect.getTiming().iterations===Infinity);animation.pause();animation.currentTime=1000;const first=parseFloat(getComputedStyle(circle).strokeDashoffset);animation.currentTime=1500;
     return {rx:Math.hypot(rx.x-center.x,rx.y-center.y),ry:Math.hypot(ry.x-center.x,ry.y-center.y),dx:center.x-burner.x-burner.width/2,dy:center.y-burner.y-burner.height/2,first,second:parseFloat(getComputedStyle(circle).strokeDashoffset),dash:getComputedStyle(circle).strokeDasharray};
    });
-   assert.ok(Math.abs(geometry.rx/geometry.ry-220/194)<.001&&Math.abs(geometry.dx)<.1&&Math.abs(geometry.dy)<.1,JSON.stringify(geometry));
+   assert.ok(Math.abs(geometry.rx/geometry.ry-220/194)<.001&&Math.abs(geometry.dx+4)<.1&&Math.abs(geometry.dy)<.1,JSON.stringify(geometry));
    assert.ok(direction===1?geometry.second>geometry.first:geometry.second<geometry.first);assert.match(geometry.dash,/32.*968/);
   }
   await page.setViewportSize({width:844,height:390});await fixture(3,12);

@@ -31,7 +31,7 @@ public class OfflineGameTest {
     WebView web;
     @Before public void ready() throws Exception {
         web = activity.getActivity().getBridge().getWebView();
-        waitFor("typeof CartasTest === 'object' && !!document.getElementById('startBtn')", 120000);
+        waitFor("typeof CartasTest === 'object' && typeof PanelinhaSelects === 'object' && !!document.getElementById('startBtn')", 120000);
     }
     String js(String code) throws Exception {
         AtomicReference<String> result = new AtomicReference<>();
@@ -344,6 +344,11 @@ public class OfflineGameTest {
         tap("#singlePlayerBtn");waitFor("PanelinhaNavigation.current==='profile'",15000);
         js("document.getElementById('playerName').value='Chef Offline';document.getElementById('playerName').dispatchEvent(new Event('input'))");
         tap("[data-avatar-choice='concha']");tap("#profileContinueBtn");
+        tap("[data-select-for='timeout']");
+        assertEquals("true",js("PanelinhaSelects.isOpen&&document.querySelector('#panelinhaSelectList[role=listbox]')!==null&&document.getElementById('timeout').getAttribute('aria-hidden')==='true'"));
+        tap("#panelinhaSelectList [data-value='15']");assertEquals("\"15\"",js("document.getElementById('timeout').value"));
+        tap("[data-select-for='timeout']");systemBack();waitFor("!PanelinhaSelects.isOpen&&PanelinhaNavigation.current==='solo'",15000);
+        js("document.getElementById('timeout').value='0';document.getElementById('timeout').dispatchEvent(new Event('change',{bubbles:true}))");
         assertEquals("true",js("document.getElementById('wild6').checked"));tap("#wild6");tap("#startBtn");
         assertEquals("true",js("(()=>{const s=CartasTest.getState();return s.o.wild6===false&&s.identity.name==='Chef Offline'&&s.identity.avatar==='concha'&&[...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].every(c=>c.type!=='wild6')})()"));
         assertEquals("true",js("document.getElementById('player0').textContent.includes('Chef Offline')"));
@@ -352,7 +357,7 @@ public class OfflineGameTest {
         assertEquals("true",js("document.querySelectorAll('#pile>.deck-back').length===6&&!document.querySelector('#pile .deck-count')&&document.getElementById('pileAura').getAnimations().some(a=>a.animationName==='pile-aura-pulse')&&document.querySelectorAll('#pileAura image').length===6"));
         js("window.__stableBotCards=[...document.querySelectorAll('#player1 [data-hand-card]')];CartasTest.getState().current=2;document.getElementById('useCardArt').onchange()");
         assertEquals("true",js("window.__stableBotCards.every((n,i)=>document.querySelectorAll('#player1 [data-hand-card]')[i]===n)"));
-        assertEquals("true",js("(()=>{const svg=document.getElementById('stoveDirection').getBoundingClientRect(),b=document.getElementById('burner').getBoundingClientRect();const e=document.getElementById('stoveOrbit');return e.tagName==='ellipse'&&+e.getAttribute('rx')===220&&+e.getAttribute('ry')===194&&Math.abs(svg.width-svg.height)<.1&&Math.abs(svg.x+svg.width/2-b.x-b.width/2)<.1&&Math.abs(svg.y+svg.height/2-b.y-b.height/2)<.1})()"));
+        assertEquals("true",js("(()=>{const svg=document.getElementById('stoveDirection').getBoundingClientRect(),b=document.getElementById('burner').getBoundingClientRect();const e=document.getElementById('stoveOrbit');return e.tagName==='ellipse'&&+e.getAttribute('rx')===220&&+e.getAttribute('ry')===194&&Math.abs(svg.width-svg.height)<.1&&Math.abs(svg.x+svg.width/2-b.x-b.width/2+4)<.1&&Math.abs(svg.y+svg.height/2-b.y-b.height/2)<.1})()"));
         String profile = new JSONArray("["+js("JSON.stringify(PanelinhaProfile.current)")+"]").getString(0);
         InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("upgrade-check",Context.MODE_PRIVATE).edit().putString("profile",profile).commit();
         SystemClock.sleep(7000); // Flush durável antes de instalar por cima na etapa seguinte.

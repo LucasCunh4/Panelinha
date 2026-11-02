@@ -27,7 +27,7 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/ajustes-opcoes-evide
   for(const [width,height] of [[568,320],[667,375],[844,390],[915,412],[1280,800],[390,844]]){
    await p.setViewportSize({width,height});assert.equal(await p.locator('#menu fieldset').count(),2);assert.equal(await p.locator('#menu label.setting').count(),10);
    for(const id of ['mode','duration','goal','timeout','infinite','cut','challenge','wild6','dist','rotate']){
-    const control=p.locator('#'+id),label=control.locator('..');await label.scrollIntoViewIfNeeded();
+    const model=p.locator('#'+id),control=['mode','duration','goal','timeout'].includes(id)?p.locator(`[data-select-for="${id}"]`):model,label=control.locator('xpath=ancestor::label[1]');await label.scrollIntoViewIfNeeded();
     const hit=await control.evaluate(e=>{const r=e.getBoundingClientRect(),label=e.closest('label').getBoundingClientRect(),menu=document.getElementById('menu').getBoundingClientRect();return e.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))&&r.left>=menu.left&&r.right<=menu.right&&label.height>=44});assert.ok(hit,`${id} inacessível ${width}x${height}`);
     if(await control.getAttribute('type')==='checkbox'){const checked=await control.isChecked();await label.tap();assert.equal(await control.isChecked(),!checked);await label.tap();assert.equal(await control.isChecked(),checked);}
    }
@@ -69,7 +69,7 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/ajustes-opcoes-evide
     const orbit=document.getElementById('stoveOrbit'),m=orbit.getScreenCTM(),point=(x,y)=>new DOMPoint(x,y).matrixTransform(m),c=point(245,245),x=point(465,245),y=point(245,439),burner=document.getElementById('burner').getBoundingClientRect();
     return {gap:Math.min(...cards.map(r=>r.left))-identity.right,center:Math.abs((Math.min(...cards.map(r=>r.left))+Math.max(...cards.map(r=>r.right)))/2-innerWidth/2),margins:[lo.x-a.left,a.right-lo.right,lo.y-a.top,a.bottom-lo.bottom],images:svg.querySelectorAll('image').length,glowPointer:getComputedStyle(svg).pointerEvents,tag:orbit.tagName,ratio:Math.hypot(x.x-c.x,x.y-c.y)/Math.hypot(y.x-c.x,y.y-c.y),dx:c.x-burner.x-burner.width/2,dy:c.y-burner.y-burner.height/2};
    });
-   assert.ok(shape.gap>=10&&shape.gap<=15&&shape.center<1.5,JSON.stringify({width,height,n,shape}));assert.ok(shape.margins.every(x=>Math.abs(x-18)<.1),JSON.stringify({width,height,n,shape}));assert.equal(shape.images,6);assert.equal(shape.glowPointer,'none');assert.equal(shape.tag,'ellipse');assert.ok(Math.abs(shape.ratio-220/194)<.001&&Math.abs(shape.dx)<.1&&Math.abs(shape.dy)<.1);
+   assert.ok(shape.gap>=10&&shape.gap<=15&&shape.center<1.5,JSON.stringify({width,height,n,shape}));assert.ok(shape.margins.every(x=>Math.abs(x-26)<.1),JSON.stringify({width,height,n,shape}));assert.equal(shape.images,6);assert.equal(shape.glowPointer,'none');assert.equal(shape.tag,'ellipse');assert.ok(Math.abs(shape.ratio-220/194)<.001&&Math.abs(shape.dx+4)<.1&&Math.abs(shape.dy)<.1);
    if(n===7){await p.locator('.stove-glint').evaluate(e=>{const a=e.getAnimations().find(a=>a.effect.getTiming().iterations===Infinity);a.pause();a.currentTime=1400});await p.screenshot({path:path.join(out,`mesa-normal-${width}x${height}.png`)});}
   }
   for(const [penalty,highest,response,expected] of [[0,0,'num',true],[2,2,'num',true],[4,4,'num',true],[6,6,'num',true],[20,6,'num',true],[2,2,'draw2',false],[4,4,'wild4',false],[6,6,'wild6',false],[20,6,'dist',false]]){
@@ -77,7 +77,7 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/ajustes-opcoes-evide
    assert.equal(await p.locator('#buyBtn').getAttribute('data-mandatory'),String(expected));assert.equal(await p.locator('#pileAura').evaluate(e=>e.getAnimations().some(a=>a.animationName==='pile-aura-pulse')),expected);
    if(expected&&penalty===20)await p.screenshot({path:path.join(out,'monte-obrigatorio.png')});
   }
-  console.log('PASS elipse 220×194 concêntrica; card junto ao leque centrado; halo com 18px simétricos nas quatro bordas, seis silhuetas e reforço apenas sem resposta legal');
+  console.log('PASS elipse 220×194 concêntrica; card junto ao leque centrado; halo com 26px simétricos nas quatro bordas, seis silhuetas e reforço apenas sem resposta legal');
   const desktop=await b.newPage({viewport:{width:1280,height:800}});
   await desktop.clock.install();await desktop.clock.pauseAt(new Date());await desktop.goto(base);await desktop.locator('#singlePlayerBtn').click();await desktop.locator('#profileContinueBtn').click();
   await desktop.locator('#wild6').focus();await desktop.keyboard.press('Space');assert.equal(await desktop.locator('#wild6').isChecked(),false);await desktop.keyboard.press('Space');assert.equal(await desktop.locator('#wild6').isChecked(),true);await desktop.locator('#startBtn').click();

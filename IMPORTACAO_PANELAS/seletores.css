@@ -1,0 +1,25 @@
+/* O select conserva o modelo original, mas nunca apresenta o menu nativo. */
+.select-native-model {position:absolute!important;width:1px!important;height:1px!important;min-width:0!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;clip:rect(0,0,0,0);clip-path:inset(50%);opacity:0;overflow:hidden;pointer-events:none}
+.panelinha-select {position:relative;display:inline-flex;vertical-align:middle;min-width:82px;max-width:100%}
+.settings-block .panelinha-select {display:flex;width:100%;min-width:0;margin-top:4px}
+.select-trigger {display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-width:0;min-height:44px;padding:8px 10px;border:1px solid #c49a7399;border-radius:9px;background:linear-gradient(#49304f,#34233f);color:#fff0d6;box-shadow:inset 0 1px #ffe4ac17;font:13px/1.3 system-ui,sans-serif;text-align:left;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.settings-block .select-trigger {font-size:12px;padding:8px 6px;gap:6px}
+.select-value {flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.select-chevron {flex:none;color:#e7bc85;font-size:20px;line-height:1;transition:transform 130ms ease}
+.select-trigger[aria-expanded=true] {border-color:#f0ca90;box-shadow:0 0 0 2px #d6a76c33}
+.select-trigger[aria-expanded=true] .select-chevron {transform:rotate(180deg)}
+.select-trigger:focus-visible {outline:2px solid #fff0c3;outline-offset:3px}
+.select-trigger:active {background:#654066}
+.select-trigger:disabled {cursor:default}
+.panelinha-select-layer {position:fixed;inset:0;z-index:130;pointer-events:none;padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+.panelinha-select-list {position:absolute;pointer-events:auto;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;box-sizing:border-box;margin:0;padding:6px;border:1px solid #d6ae76;border-radius:15px;background:linear-gradient(145deg,#45274f,#281732);color:#fff0d4;box-shadow:inset 0 1px #ffe4ae26,0 12px 32px #130b2480;font:14px/1.35 system-ui,sans-serif;scrollbar-width:thin;scrollbar-color:#b88a87 #301c3c;transform-origin:50% 0}
+.panelinha-select-list[hidden] {display:none}
+.panelinha-select-option {display:flex;align-items:center;gap:9px;min-height:44px;width:100%;padding:10px;border:0;border-radius:9px;background:transparent;color:inherit;font:inherit;text-align:left;white-space:normal;overflow-wrap:anywhere;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background 110ms ease,color 110ms ease}
+.select-option-check {width:18px;flex:none;visibility:hidden;color:#ffe09f;font-weight:900}
+.panelinha-select-option[aria-selected=true] {color:#ffe0a0;background:#b17a4a29}
+.panelinha-select-option[aria-selected=true] .select-option-check {visibility:visible}
+.panelinha-select-option.is-active {background:#ab739657;box-shadow:inset 0 0 0 1px #d9ae794a}
+.panelinha-select-option:active {background:#ac785c80;color:#fff5dc}
+.panelinha-select-option:disabled {cursor:default;opacity:.4}
+@media(hover:hover){.panelinha-select-option:not(:disabled):hover {background:#ab739657;color:#ffe6b4}.select-trigger:not(:disabled):hover {border-color:#dbb585}}
+@media(prefers-reduced-motion:reduce){.select-chevron,.panelinha-select-option {transition:none}}

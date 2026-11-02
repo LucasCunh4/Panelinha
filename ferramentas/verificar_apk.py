@@ -70,7 +70,7 @@ with zipfile.ZipFile(apk) as archive:
         assert data[:8] == b'\x89PNG\r\n\x1a\n' and struct.unpack('>II', data[16:24]) == (400,850) and data[25] == 6, 'PNG padronizado deve ser RGBA 400x850'
     for old in especiais['supersededAssets']['paths']:
         assert prefix + old not in archive.namelist(), f'Arte substituída ainda empacotada: {old}'
-    for name in ['perfil.js', 'escolher-cor.js', 'escolher-cor.css', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js']:
+    for name in ['seletores.js', 'seletores.css', 'perfil.js', 'escolher-cor.js', 'escolher-cor.css', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js']:
         assert archive.read(prefix + name) == (root / 'IMPORTACAO_PANELAS' / name).read_bytes(), f'Jogo alterado no APK: {name}'
     original_html = (root / 'IMPORTACAO_PANELAS/index.html').read_bytes()
     has_compat = prefix + 'android-compat.js' in archive.namelist()
