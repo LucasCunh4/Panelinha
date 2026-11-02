@@ -1,164 +1,227 @@
 {
-  "bundle": "Panelinha — +4 e +6 oficiais v1",
-  "sourceZip": "Panelinha_Artes_+4_+6_Somente.zip",
-  "sourceZipSha256": "5c6e69c0f3c204ad4ff272f697816f813aae6ab666f4a6cdbc395b2143dab5a0",
-  "hitRegionSource": "Bounds do canal alfa dos overlays oficiais, sem alterar os arquivos. O manifesto fornecido mapeia arquivos, mas não contém coordenadas de toque.",
+  "bundle": "Panelinha — +4/+6 oficiais padronizadas 400x850",
+  "sourceZip": "Panelinha_Mais4_Mais6_Padronizadas_400x850.zip",
+  "sourceZipSha256": "ea182afdca1b0175e21d8fd580a54b02f0725a7e54535e05f399bb2b748d0f9c",
+  "canvas": [
+    400,
+    850
+  ],
   "assets": [
     {
       "path": "assets/cartas_mais4_mais6/carta_mais4_alfaces_overlay_full.png",
-      "sha256": "1fc4653854a2b7302dadee13e82ef170550a559119cfb55d45587737d952b433"
+      "sha256": "d6aa2dd01ce2c3740c297cd79cb90c0f7ab922efa7ae36c6c28bbdf32a38b7e9",
+      "width": 400,
+      "height": 850
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais4_alfaces_sprite.png",
-      "sha256": "7276e6237ac30636759772085e2091331a64509f900510558eaa38386e31205f"
+      "sha256": "0eb0599ea96e007555cc009b51a74bf9359d39e33d025b3d2ceacf759796d642",
+      "width": 108,
+      "height": 145
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais4_base_sem_ingredientes.png",
-      "sha256": "d66f3f2c78d44d2dbedf083dd2dc1ddfe240f7ed3b3722283aa864bd040b1fde"
+      "sha256": "b1260d22335e6f97b8d48ae81e214df3ff3265ddda5f1df374f1a4e763265386",
+      "width": 400,
+      "height": 850
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais4_completa.png",
-      "sha256": "6d47fb517e5ea8b5f30e02b1cbe54ad57cf824b0897ab30b88d4d72ea4248029"
+      "sha256": "bdfa6d7daff41f76596b917bac21d7e4a8789b36ae76bad606173fc51b41e8bb",
+      "width": 400,
+      "height": 850
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais4_mirtilos_overlay_full.png",
-      "sha256": "ebca0c21913d5d51420b0ab77fbb82fe76345d2705afe41fdaad4236fa5ac617"
+      "sha256": "9bce3cf9b5e03f56aa743996423f1e251de30b326ba42ef13f1935847d2d1607",
+      "width": 400,
+      "height": 850
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais4_mirtilos_sprite.png",
-      "sha256": "78ffd49b53424cc9d2ca916a35e18042c0645a14d5e250d3fa02d9ed54c2df23"
+      "sha256": "34b3e47d2f7145b2a4296bc6217af525d044d2f4ea84137d539a6868666699c4",
+      "width": 134,
+      "height": 148
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais4_montada_camadas_preview.png",
-      "sha256": "8d87c815e4907854006bd33064bab6e6afb5e1c358bb94c2998eba1f0f96a2b9"
+      "sha256": "ae663b836a9a8e8e2c615c8b8eb18fd7fbd90f5ceaa5630f159dfe00e76bfa44",
+      "width": 400,
+      "height": 850
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais4_montagem_interativa_teste.png",
+      "sha256": "8773a375e488de63cdf8367372954dd434ffdb44c753d14c68610c7a6139aa5a",
+      "width": 400,
+      "height": 850
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais4_queijos_overlay_full.png",
-      "sha256": "9c604fe1bebd9b6b3edf662a08c4601a9ae823e123e698443421ca2d96b7dbb2"
+      "sha256": "340b13840cc92bc83b04968aa0dc555fe57d11a620b04a559eff3e81abe42198",
+      "width": 400,
+      "height": 850
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais4_queijos_sprite.png",
-      "sha256": "adbe4b455d13edca719d959bacebd01f8e15d9fc85409d4e58eb74733e0be8ea"
+      "sha256": "565a88ad8a677b1a9e07be1d1a08cd61b467e60f488420c054a3d02931f9ee45",
+      "width": 135,
+      "height": 171
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais4_tomates_overlay_full.png",
-      "sha256": "4ab101ed94e86e94493569bcf2c58922e78cbed456f1631b1e8b965a89fe25c1"
+      "sha256": "2bcecd65c40527bf322de31ea075f5367edb6db90224a053e4aae88fc1495dd2",
+      "width": 400,
+      "height": 850
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais4_tomates_sprite.png",
-      "sha256": "471edbfaeeb20f8baae1aff44cd3c16dc86cdb5154a68935f1f395069abb2e6a"
+      "sha256": "22d9f1b4303c05c1dbb3b6449029fa81898ff93dfe59318b5bbec1c082d9e1ec",
+      "width": 113,
+      "height": 163
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais6_alfaces_overlay_full.png",
-      "sha256": "07872eb2ededf351211f55e2eb941a84fec3a32a055a1059ca3332029150b498"
+      "sha256": "7b0a95875a69e27c1d6fb4f4ab29d2f6b344cb337326a1f6973720c7039824e0",
+      "width": 400,
+      "height": 850
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais6_alfaces_sprite.png",
-      "sha256": "4031e0d0b113f333178db615f028947db2a993be769b4c971127b8bec82351ee"
+      "sha256": "e1b931c150a2baf697076a0dad3a8dae394a452dbe5f12f1671daee992e9921c",
+      "width": 108,
+      "height": 141
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais6_base_sem_ingredientes.png",
-      "sha256": "22f5208590d2d1e181b86d3c9253e6a6c34ee3b934bea2c5274fa32b2658a3d9"
+      "sha256": "c2b12c460c3a0d537554eaa461131ef38142b3de4c213ca4003cf59a093dbc3c",
+      "width": 400,
+      "height": 850
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais6_completa.png",
-      "sha256": "77fb82fd4673f40ef9008c8155964e245febc6bfa6ca9290b05bdb48b561216b"
+      "sha256": "5a8245f25abe8616fa61014570806ee239c0d1baa69a7fa4bd82adb386b77ad5",
+      "width": 400,
+      "height": 850
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais6_mirtilos_overlay_full.png",
-      "sha256": "51b5d4373d3d5a4e640913881f8ac7e3987649aa8f6df673e0c4de0613011aa3"
+      "sha256": "1803739489164caade2279e5f5b44e13c36e6b5736e6f40167137cf140b4eebf",
+      "width": 400,
+      "height": 850
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais6_mirtilos_sprite.png",
-      "sha256": "4fd2757c0ba34c3a09602f567b767c35e5bc410b5ec88c790fa3de881051af6d"
+      "sha256": "4ccca9485b9b542103f48ba44a1442d27ea9f03d8f8eb0605f72c82eabc3c3e5",
+      "width": 125,
+      "height": 148
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais6_montada_camadas_preview.png",
-      "sha256": "66489b24eb988eb0a652fd4b39c5d570558f4a2ced3cbb7812297ca951496ed1"
+      "sha256": "c50eb2246c57b617a38147182d813c9c538143d6ba1e7c260437b097354f9e23",
+      "width": 400,
+      "height": 850
+    },
+    {
+      "path": "assets/cartas_mais4_mais6/carta_mais6_montagem_interativa_teste.png",
+      "sha256": "7b4eb61d8d674ce4e986d60654be2b3a4da48aca3da5676bee41aae7e496091e",
+      "width": 400,
+      "height": 850
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais6_queijos_overlay_full.png",
-      "sha256": "38bc5bd67db102c4f82df5e6b978961beaa8b8b79092d742203a8be75e6320a1"
+      "sha256": "123e513fd38c265ab836d2ac932e2030868506eb26662bd3000797df355deb7a",
+      "width": 400,
+      "height": 850
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais6_queijos_sprite.png",
-      "sha256": "75e4b428e9e2d3c0eba05296475061c79cae7a251d8392de90847467dc3a89a4"
+      "sha256": "441259a6a9984f30952adf9ff151d1cae74ad61cb3f5b3e4a4e29a0d690b0cb3",
+      "width": 136,
+      "height": 177
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais6_tomates_overlay_full.png",
-      "sha256": "559a26fbe3b0add748eed08550e0b19a273e2a0444d590717396c07d9b0a93ed"
+      "sha256": "916f5e68b9421d17170cf46e203e66f7e214ef4e11c9860badf64342b94b519e",
+      "width": 400,
+      "height": 850
     },
     {
       "path": "assets/cartas_mais4_mais6/carta_mais6_tomates_sprite.png",
-      "sha256": "4437c5432abfcc2bfc2957208ecfe4610b58a5cc2476fe48e2e7c8f3b6ec446f"
+      "sha256": "046c2ed0194f96a293d93b990089a18246ac005613077123435c7d0032f6401e",
+      "width": 113,
+      "height": 161
     }
   ],
   "layouts": {
     "wild4": {
       "base": "assets/cartas_mais4_mais6/carta_mais4_base_sem_ingredientes.png",
       "canvas": [
-        1024,
-        1536
+        400,
+        850
       ],
       "layers": {
         "tomates": {
           "path": "assets/cartas_mais4_mais6/carta_mais4_tomates_overlay_full.png",
-          "alphaBoundsPx": [
-            142,
-            277,
-            443,
-            574
-          ],
+          "sprite": "assets/cartas_mais4_mais6/carta_mais4_tomates_sprite.png",
+          "spriteRectPx": {
+            "x": 69,
+            "y": 167,
+            "width": 113,
+            "height": 163
+          },
           "hitRegion": {
-            "x": 0.138671875,
-            "y": 0.18033854166666666,
-            "width": 0.2939453125,
-            "height": 0.193359375
+            "x": 0.1725,
+            "y": 0.19647058823529412,
+            "width": 0.2825,
+            "height": 0.19176470588235295
           }
         },
         "queijos": {
           "path": "assets/cartas_mais4_mais6/carta_mais4_queijos_overlay_full.png",
-          "alphaBoundsPx": [
-            545,
-            262,
-            912,
-            574
-          ],
+          "sprite": "assets/cartas_mais4_mais6/carta_mais4_queijos_sprite.png",
+          "spriteRectPx": {
+            "x": 206,
+            "y": 159,
+            "width": 135,
+            "height": 171
+          },
           "hitRegion": {
-            "x": 0.5322265625,
-            "y": 0.17057291666666666,
-            "width": 0.3583984375,
-            "height": 0.203125
+            "x": 0.515,
+            "y": 0.18705882352941178,
+            "width": 0.3375,
+            "height": 0.2011764705882353
           }
         },
         "mirtilos": {
           "path": "assets/cartas_mais4_mais6/carta_mais4_mirtilos_overlay_full.png",
-          "alphaBoundsPx": [
-            68,
-            635,
-            432,
-            901
-          ],
+          "sprite": "assets/cartas_mais4_mais6/carta_mais4_mirtilos_sprite.png",
+          "spriteRectPx": {
+            "x": 44,
+            "y": 351,
+            "width": 134,
+            "height": 148
+          },
           "hitRegion": {
-            "x": 0.06640625,
-            "y": 0.4134114583333333,
-            "width": 0.35546875,
-            "height": 0.17317708333333334
+            "x": 0.11,
+            "y": 0.41294117647058826,
+            "width": 0.335,
+            "height": 0.17411764705882352
           }
         },
         "alfaces": {
           "path": "assets/cartas_mais4_mais6/carta_mais4_alfaces_overlay_full.png",
-          "alphaBoundsPx": [
-            647,
-            635,
-            936,
-            895
-          ],
+          "sprite": "assets/cartas_mais4_mais6/carta_mais4_alfaces_sprite.png",
+          "spriteRectPx": {
+            "x": 241,
+            "y": 351,
+            "width": 108,
+            "height": 145
+          },
           "hitRegion": {
-            "x": 0.6318359375,
-            "y": 0.4134114583333333,
-            "width": 0.2822265625,
-            "height": 0.16927083333333334
+            "x": 0.6025,
+            "y": 0.41294117647058826,
+            "width": 0.27,
+            "height": 0.17058823529411765
           }
         }
       }
@@ -166,68 +229,72 @@
     "wild6": {
       "base": "assets/cartas_mais4_mais6/carta_mais6_base_sem_ingredientes.png",
       "canvas": [
-        1024,
-        1536
+        400,
+        850
       ],
       "layers": {
         "tomates": {
           "path": "assets/cartas_mais4_mais6/carta_mais6_tomates_overlay_full.png",
-          "alphaBoundsPx": [
-            133,
-            263,
-            436,
-            557
-          ],
+          "sprite": "assets/cartas_mais4_mais6/carta_mais6_tomates_sprite.png",
+          "spriteRectPx": {
+            "x": 66,
+            "y": 160,
+            "width": 113,
+            "height": 161
+          },
           "hitRegion": {
-            "x": 0.1298828125,
-            "y": 0.17122395833333334,
-            "width": 0.2958984375,
-            "height": 0.19140625
+            "x": 0.165,
+            "y": 0.18823529411764706,
+            "width": 0.2825,
+            "height": 0.18941176470588236
           }
         },
         "queijos": {
           "path": "assets/cartas_mais4_mais6/carta_mais6_queijos_overlay_full.png",
-          "alphaBoundsPx": [
-            535,
-            244,
-            906,
-            568
-          ],
+          "sprite": "assets/cartas_mais4_mais6/carta_mais6_queijos_sprite.png",
+          "spriteRectPx": {
+            "x": 203,
+            "y": 150,
+            "width": 136,
+            "height": 177
+          },
           "hitRegion": {
-            "x": 0.5224609375,
-            "y": 0.15885416666666666,
-            "width": 0.3623046875,
-            "height": 0.2109375
+            "x": 0.5075,
+            "y": 0.17647058823529413,
+            "width": 0.34,
+            "height": 0.20823529411764705
           }
         },
         "mirtilos": {
           "path": "assets/cartas_mais4_mais6/carta_mais6_mirtilos_overlay_full.png",
-          "alphaBoundsPx": [
-            71,
-            630,
-            410,
-            897
-          ],
+          "sprite": "assets/cartas_mais4_mais6/carta_mais6_mirtilos_sprite.png",
+          "spriteRectPx": {
+            "x": 45,
+            "y": 349,
+            "width": 125,
+            "height": 148
+          },
           "hitRegion": {
-            "x": 0.0693359375,
-            "y": 0.41015625,
-            "width": 0.3310546875,
-            "height": 0.173828125
+            "x": 0.1125,
+            "y": 0.41058823529411764,
+            "width": 0.3125,
+            "height": 0.17411764705882352
           }
         },
         "alfaces": {
           "path": "assets/cartas_mais4_mais6/carta_mais6_alfaces_overlay_full.png",
-          "alphaBoundsPx": [
-            626,
-            635,
-            915,
-            889
-          ],
+          "sprite": "assets/cartas_mais4_mais6/carta_mais6_alfaces_sprite.png",
+          "spriteRectPx": {
+            "x": 234,
+            "y": 351,
+            "width": 108,
+            "height": 141
+          },
           "hitRegion": {
-            "x": 0.611328125,
-            "y": 0.4134114583333333,
-            "width": 0.2822265625,
-            "height": 0.16536458333333334
+            "x": 0.585,
+            "y": 0.41294117647058826,
+            "width": 0.27,
+            "height": 0.16588235294117648
           }
         }
       }

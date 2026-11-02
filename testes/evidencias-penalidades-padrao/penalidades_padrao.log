@@ -1,0 +1,3 @@
+PASS frentes/bases 400x850, máscara alfa idêntica ao verso padronizado, incluindo todos os cantos
+PASS 12 layouts: mesmas caixas numéricas, contain sem borda, seletor 400x850, ingredientes únicos da Coringa sem deformação, coordenadas oficiais e alvos >=44px
+PASS compra real, frente na mão/voo/descarte e escolhas offline nas duas cartas; sem erros JavaScript

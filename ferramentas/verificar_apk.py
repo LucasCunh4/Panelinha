@@ -55,9 +55,11 @@ with zipfile.ZipFile(apk) as archive:
     for entry in especiais['assets']:
         assert hashlib.sha256(archive.read(prefix + entry['path'])).hexdigest() == entry['sha256'], entry['path']
     penalidades = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_MAIS4_MAIS6.json').read_text())
-    assert len(penalidades['assets']) == 22
+    assert len(penalidades['assets']) == 24
     for entry in penalidades['assets']:
-        assert hashlib.sha256(archive.read(prefix + entry['path'])).hexdigest() == entry['sha256'], entry['path']
+        data = archive.read(prefix + entry['path'])
+        assert hashlib.sha256(data).hexdigest() == entry['sha256'], entry['path']
+        assert data[:8] == b'\x89PNG\r\n\x1a\n' and struct.unpack('>II', data[16:24]) == (entry['width'],entry['height']) and data[25] == 6, 'PNG +4/+6 deve ter dimensões do manifesto e RGBA'
     interacao = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_INTERACAO_V2.json').read_text())
     assert len(interacao['assets']) == 2
     for entry in interacao['assets']:

@@ -1,0 +1,8 @@
+PASS monte vertical na lateral esquerda, mãos sobre a mesa sem painéis e orientação coerente nas laterais
+PASS encurtamento radial das pontas, intensidade menor e duas oscilações contínuas suaves por CSS
+PASS carta humana parte da posição real da mão, voa em arco e pousa; motor/pausa continuam independentes
+PASS três bots: origem em cada assento, verso nas mãos ocultas e somente a carta jogada revelada no trajeto
+PASS individual: mão superior fechada, orientada a 180 graus, com verso até a carta sair da mão
+PASS rotação encerra somente o efeito visual e conserva o estado/descartes
+PASS foco/toque não desloca a mesa, inclusive no fallback sem overflow:clip
+PASS movimento reduzido: chama estática e jogadas imediatas visíveis, sem exceções JS

@@ -25,9 +25,11 @@ for(const entry of especiais.assets){
   if(crypto.createHash('sha256').update(fs.readFileSync(path.join(source,entry.path))).digest('hex')!==entry.sha256)throw Error(`Arte especial divergente: ${entry.path}`);
 }
 const penalidades=JSON.parse(fs.readFileSync(path.join(source,'documentacao/MANIFESTO_MAIS4_MAIS6.json')));
-if(penalidades.assets.length!==22)throw Error('O pacote +4/+6 deve conter 22 PNGs');
+if(penalidades.assets.length!==24)throw Error('O pacote +4/+6 padronizado deve conter 24 PNGs');
 for(const entry of penalidades.assets){
-  if(crypto.createHash('sha256').update(fs.readFileSync(path.join(source,entry.path))).digest('hex')!==entry.sha256)throw Error(`Arte +4/+6 divergente: ${entry.path}`);
+  const bytes=fs.readFileSync(path.join(source,entry.path));
+  if(crypto.createHash('sha256').update(bytes).digest('hex')!==entry.sha256)throw Error(`Arte +4/+6 divergente: ${entry.path}`);
+  if(bytes.readUInt32BE(16)!==entry.width||bytes.readUInt32BE(20)!==entry.height||bytes[25]!==6)throw Error(`Dimensões/RGBA +4/+6 divergentes: ${entry.path}`);
 }
 const interacao=JSON.parse(fs.readFileSync(path.join(source,'documentacao/MANIFESTO_INTERACAO_V2.json')));
 if(interacao.assets.length!==2)throw Error('São duas bases interativas reparadas');

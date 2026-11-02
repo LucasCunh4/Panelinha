@@ -1,0 +1,102 @@
+[
+  {
+    "suite": "ajustes_opcoes",
+    "exit": 0,
+    "seconds": 42.1
+  },
+  {
+    "suite": "android-compat",
+    "exit": 0,
+    "seconds": 4.9
+  },
+  {
+    "suite": "artes_penalidades",
+    "exit": 0,
+    "seconds": 49.0
+  },
+  {
+    "suite": "atualizacao_mesa",
+    "exit": 0,
+    "seconds": 51.0
+  },
+  {
+    "suite": "atualizacao_regras",
+    "exit": 0,
+    "seconds": 36.5
+  },
+  {
+    "suite": "correcoes_estabilidade",
+    "exit": 0,
+    "seconds": 39.9
+  },
+  {
+    "suite": "escolher_cor",
+    "exit": 0,
+    "seconds": 35.7
+  },
+  {
+    "suite": "horizontal_identidade",
+    "exit": 0,
+    "seconds": 33.6
+  },
+  {
+    "suite": "integracao",
+    "exit": 0,
+    "seconds": 14.2
+  },
+  {
+    "suite": "leque_continuo",
+    "exit": 0,
+    "seconds": 40.5
+  },
+  {
+    "suite": "mesa",
+    "exit": 0,
+    "seconds": 24.8
+  },
+  {
+    "suite": "mesa_atual",
+    "exit": 0,
+    "seconds": 38.4
+  },
+  {
+    "suite": "mesa_fina",
+    "exit": 0,
+    "seconds": 14.8
+  },
+  {
+    "suite": "navegacao",
+    "exit": 0,
+    "seconds": 17.1
+  },
+  {
+    "suite": "padrao_400x850",
+    "exit": 0,
+    "seconds": 8.4
+  },
+  {
+    "suite": "penalidades_padrao",
+    "exit": 0,
+    "seconds": 19.5
+  },
+  {
+    "suite": "preparacao_menu",
+    "exit": 0,
+    "seconds": 3.2
+  },
+  {
+    "suite": "rastro_halo",
+    "exit": 0,
+    "seconds": 29.1
+  },
+  {
+    "suite": "refinamentos_mesa",
+    "exit": 0,
+    "seconds": 14.5
+  },
+  {
+    "suite": "seletores_halo",
+    "exit": 0,
+    "seconds": 26.1
+  }
+]

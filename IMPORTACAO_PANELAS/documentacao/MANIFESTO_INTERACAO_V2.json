@@ -1,8 +1,8 @@
 {
-  "description": "Bases interativas reparadas: sem ingredientes embutidos, usando os quatro PNGs originais da Coringa. Frentes completas oficiais +4/+6 preservadas.",
+  "description": "Bases limpas já aprovadas e ingredientes originais da Coringa. Recomposição interativa 400x850 nas coordenadas do pacote oficial, sem retocar PNGs ou duplicar alimentos.",
   "canvas": {
-    "width": 1024,
-    "height": 1536
+    "width": 400,
+    "height": 850
   },
   "assets": [
     {
@@ -16,86 +16,195 @@
   ],
   "layouts": {
     "wild4": {
-      "base": "assets/interacao_v2/mais4_base_limpa.png",
+      "base": "assets/cartas_mais4_mais6/carta_mais4_base_sem_ingredientes.png",
       "layers": {
         "tomates": {
           "path": "assets/especiais/escolher_cor_tomates_overlay_full.png",
           "hitRegion": {
-            "x": 0.05371,
-            "y": 0.15625,
-            "width": 0.37598,
-            "height": 0.24089
+            "x": 0.1725,
+            "y": 0.19647058823529412,
+            "width": 0.2825,
+            "height": 0.19176470588235295
+          },
+          "spriteRectPx": {
+            "x": 69,
+            "y": 167,
+            "width": 113,
+            "height": 163
+          },
+          "sourceBoundsPx": {
+            "x": 55,
+            "y": 244,
+            "width": 383,
+            "height": 408
           }
         },
         "queijos": {
           "path": "assets/especiais/escolher_cor_queijos_overlay_full.png",
           "hitRegion": {
-            "x": 0.56152,
-            "y": 0.15951,
-            "width": 0.39844,
-            "height": 0.23763
+            "x": 0.515,
+            "y": 0.18705882352941178,
+            "width": 0.3375,
+            "height": 0.2011764705882353
+          },
+          "spriteRectPx": {
+            "x": 206,
+            "y": 159,
+            "width": 135,
+            "height": 171
+          },
+          "sourceBoundsPx": {
+            "x": 568,
+            "y": 235,
+            "width": 393,
+            "height": 417
           }
         },
         "mirtilos": {
           "path": "assets/especiais/escolher_cor_mirtilos_overlay_full.png",
           "hitRegion": {
-            "x": 0.04492,
-            "y": 0.39062,
-            "width": 0.40039,
-            "height": 0.22917
+            "x": 0.11,
+            "y": 0.41294117647058826,
+            "width": 0.335,
+            "height": 0.17411764705882352
+          },
+          "spriteRectPx": {
+            "x": 44,
+            "y": 351,
+            "width": 134,
+            "height": 148
+          },
+          "sourceBoundsPx": {
+            "x": 34,
+            "y": 596,
+            "width": 398,
+            "height": 396
           }
         },
         "alfaces": {
           "path": "assets/especiais/escolher_cor_alfaces_overlay_full.png",
           "hitRegion": {
-            "x": 0.55273,
-            "y": 0.39062,
-            "width": 0.41992,
-            "height": 0.22917
+            "x": 0.6025,
+            "y": 0.41294117647058826,
+            "width": 0.27,
+            "height": 0.17058823529411765
+          },
+          "spriteRectPx": {
+            "x": 241,
+            "y": 351,
+            "width": 108,
+            "height": 145
+          },
+          "sourceBoundsPx": {
+            "x": 576,
+            "y": 581,
+            "width": 397,
+            "height": 396
           }
         }
-      }
+      },
+      "cleanBase": "assets/interacao_v2/mais4_base_limpa.png"
     },
     "wild6": {
-      "base": "assets/interacao_v2/mais6_base_limpa.png",
+      "base": "assets/cartas_mais4_mais6/carta_mais6_base_sem_ingredientes.png",
       "layers": {
         "tomates": {
           "path": "assets/especiais/escolher_cor_tomates_overlay_full.png",
           "hitRegion": {
-            "x": 0.05371,
-            "y": 0.15625,
-            "width": 0.37598,
-            "height": 0.24089
+            "x": 0.165,
+            "y": 0.18823529411764706,
+            "width": 0.2825,
+            "height": 0.18941176470588236
+          },
+          "spriteRectPx": {
+            "x": 66,
+            "y": 160,
+            "width": 113,
+            "height": 161
+          },
+          "sourceBoundsPx": {
+            "x": 55,
+            "y": 244,
+            "width": 383,
+            "height": 408
           }
         },
         "queijos": {
           "path": "assets/especiais/escolher_cor_queijos_overlay_full.png",
           "hitRegion": {
-            "x": 0.56152,
-            "y": 0.15951,
-            "width": 0.39844,
-            "height": 0.23763
+            "x": 0.5075,
+            "y": 0.17647058823529413,
+            "width": 0.34,
+            "height": 0.20823529411764705
+          },
+          "spriteRectPx": {
+            "x": 203,
+            "y": 150,
+            "width": 136,
+            "height": 177
+          },
+          "sourceBoundsPx": {
+            "x": 568,
+            "y": 235,
+            "width": 393,
+            "height": 417
           }
         },
         "mirtilos": {
           "path": "assets/especiais/escolher_cor_mirtilos_overlay_full.png",
           "hitRegion": {
-            "x": 0.04492,
-            "y": 0.39062,
-            "width": 0.40039,
-            "height": 0.22917
+            "x": 0.1125,
+            "y": 0.41058823529411764,
+            "width": 0.3125,
+            "height": 0.17411764705882352
+          },
+          "spriteRectPx": {
+            "x": 45,
+            "y": 349,
+            "width": 125,
+            "height": 148
+          },
+          "sourceBoundsPx": {
+            "x": 34,
+            "y": 596,
+            "width": 398,
+            "height": 396
           }
         },
         "alfaces": {
           "path": "assets/especiais/escolher_cor_alfaces_overlay_full.png",
           "hitRegion": {
-            "x": 0.55273,
-            "y": 0.39062,
-            "width": 0.41992,
-            "height": 0.22917
+            "x": 0.585,
+            "y": 0.41294117647058826,
+            "width": 0.27,
+            "height": 0.16588235294117648
+          },
+          "spriteRectPx": {
+            "x": 234,
+            "y": 351,
+            "width": 108,
+            "height": 141
+          },
+          "sourceBoundsPx": {
+            "x": 576,
+            "y": 581,
+            "width": 397,
+            "height": 396
           }
         }
-      }
+      },
+      "cleanBase": "assets/interacao_v2/mais6_base_limpa.png"
     }
-  }
+  },
+  "basePlacementPx": {
+    "x": 26,
+    "y": 29,
+    "width": 348,
+    "height": 792
+  },
+  "baseClipRadiusPx": {
+    "x": 40,
+    "y": 44
+  },
+  "layersFit": "contain; preserva proporção dos ingredientes da Coringa dentro dos retângulos do manifesto"
 }

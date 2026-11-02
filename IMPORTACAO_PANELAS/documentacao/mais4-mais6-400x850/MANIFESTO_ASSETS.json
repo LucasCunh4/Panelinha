@@ -1,0 +1,400 @@
+{
+  "title": "Panelinha +4 / +6: dimensoes e camadas oficiais padronizadas",
+  "canvas_px": {
+    "width": 400,
+    "height": 850
+  },
+  "reference": "cartas numericas originais do Panelinha (400 x 850 px)",
+  "layout": {
+    "interior_rect_px": {
+      "x": 26,
+      "y": 29,
+      "width": 348,
+      "height": 792
+    },
+    "outer_alpha_mask_identical_to_numeric": true,
+    "outer_white_border_matching_numeric": true
+  },
+  "cards": {
+    "mais4": {
+      "label": "+4",
+      "full": "cartas_mais4_mais6/carta_mais4_completa.png",
+      "base": "cartas_mais4_mais6/carta_mais4_base_sem_ingredientes.png",
+      "preview": "cartas_mais4_mais6/carta_mais4_montada_camadas_preview.png",
+      "ingredients": {
+        "tomates": {
+          "color": "vermelho",
+          "overlay_full": "cartas_mais4_mais6/carta_mais4_tomates_overlay_full.png",
+          "sprite": "cartas_mais4_mais6/carta_mais4_tomates_sprite.png",
+          "sprite_rect_px": {
+            "x": 69,
+            "y": 167,
+            "width": 113,
+            "height": 163
+          },
+          "sprite_rect_percent": {
+            "x": 17.25,
+            "y": 19.6471,
+            "width": 28.25,
+            "height": 19.1765
+          },
+          "note": "Sprite encaixa exatamente no retangulo acima em relacao ao canvas de 400x850. Hover e zoom somente no sprite com transform-origin:center center."
+        },
+        "queijos": {
+          "color": "amarelo",
+          "overlay_full": "cartas_mais4_mais6/carta_mais4_queijos_overlay_full.png",
+          "sprite": "cartas_mais4_mais6/carta_mais4_queijos_sprite.png",
+          "sprite_rect_px": {
+            "x": 206,
+            "y": 159,
+            "width": 135,
+            "height": 171
+          },
+          "sprite_rect_percent": {
+            "x": 51.5,
+            "y": 18.7059,
+            "width": 33.75,
+            "height": 20.1176
+          },
+          "note": "Sprite encaixa exatamente no retangulo acima em relacao ao canvas de 400x850. Hover e zoom somente no sprite com transform-origin:center center."
+        },
+        "mirtilos": {
+          "color": "azul",
+          "overlay_full": "cartas_mais4_mais6/carta_mais4_mirtilos_overlay_full.png",
+          "sprite": "cartas_mais4_mais6/carta_mais4_mirtilos_sprite.png",
+          "sprite_rect_px": {
+            "x": 44,
+            "y": 351,
+            "width": 134,
+            "height": 148
+          },
+          "sprite_rect_percent": {
+            "x": 11.0,
+            "y": 41.2941,
+            "width": 33.5,
+            "height": 17.4118
+          },
+          "note": "Sprite encaixa exatamente no retangulo acima em relacao ao canvas de 400x850. Hover e zoom somente no sprite com transform-origin:center center."
+        },
+        "alfaces": {
+          "color": "verde",
+          "overlay_full": "cartas_mais4_mais6/carta_mais4_alfaces_overlay_full.png",
+          "sprite": "cartas_mais4_mais6/carta_mais4_alfaces_sprite.png",
+          "sprite_rect_px": {
+            "x": 241,
+            "y": 351,
+            "width": 108,
+            "height": 145
+          },
+          "sprite_rect_percent": {
+            "x": 60.25,
+            "y": 41.2941,
+            "width": 27.0,
+            "height": 17.0588
+          },
+          "note": "Sprite encaixa exatamente no retangulo acima em relacao ao canvas de 400x850. Hover e zoom somente no sprite com transform-origin:center center."
+        }
+      },
+      "composition_test": "cartas_mais4_mais6/carta_mais4_montagem_interativa_teste.png"
+    },
+    "mais6": {
+      "label": "+6",
+      "full": "cartas_mais4_mais6/carta_mais6_completa.png",
+      "base": "cartas_mais4_mais6/carta_mais6_base_sem_ingredientes.png",
+      "preview": "cartas_mais4_mais6/carta_mais6_montada_camadas_preview.png",
+      "ingredients": {
+        "tomates": {
+          "color": "vermelho",
+          "overlay_full": "cartas_mais4_mais6/carta_mais6_tomates_overlay_full.png",
+          "sprite": "cartas_mais4_mais6/carta_mais6_tomates_sprite.png",
+          "sprite_rect_px": {
+            "x": 66,
+            "y": 160,
+            "width": 113,
+            "height": 161
+          },
+          "sprite_rect_percent": {
+            "x": 16.5,
+            "y": 18.8235,
+            "width": 28.25,
+            "height": 18.9412
+          },
+          "note": "Sprite encaixa exatamente no retangulo acima em relacao ao canvas de 400x850. Hover e zoom somente no sprite com transform-origin:center center."
+        },
+        "queijos": {
+          "color": "amarelo",
+          "overlay_full": "cartas_mais4_mais6/carta_mais6_queijos_overlay_full.png",
+          "sprite": "cartas_mais4_mais6/carta_mais6_queijos_sprite.png",
+          "sprite_rect_px": {
+            "x": 203,
+            "y": 150,
+            "width": 136,
+            "height": 177
+          },
+          "sprite_rect_percent": {
+            "x": 50.75,
+            "y": 17.6471,
+            "width": 34.0,
+            "height": 20.8235
+          },
+          "note": "Sprite encaixa exatamente no retangulo acima em relacao ao canvas de 400x850. Hover e zoom somente no sprite com transform-origin:center center."
+        },
+        "mirtilos": {
+          "color": "azul",
+          "overlay_full": "cartas_mais4_mais6/carta_mais6_mirtilos_overlay_full.png",
+          "sprite": "cartas_mais4_mais6/carta_mais6_mirtilos_sprite.png",
+          "sprite_rect_px": {
+            "x": 45,
+            "y": 349,
+            "width": 125,
+            "height": 148
+          },
+          "sprite_rect_percent": {
+            "x": 11.25,
+            "y": 41.0588,
+            "width": 31.25,
+            "height": 17.4118
+          },
+          "note": "Sprite encaixa exatamente no retangulo acima em relacao ao canvas de 400x850. Hover e zoom somente no sprite com transform-origin:center center."
+        },
+        "alfaces": {
+          "color": "verde",
+          "overlay_full": "cartas_mais4_mais6/carta_mais6_alfaces_overlay_full.png",
+          "sprite": "cartas_mais4_mais6/carta_mais6_alfaces_sprite.png",
+          "sprite_rect_px": {
+            "x": 234,
+            "y": 351,
+            "width": 108,
+            "height": 141
+          },
+          "sprite_rect_percent": {
+            "x": 58.5,
+            "y": 41.2941,
+            "width": 27.0,
+            "height": 16.5882
+          },
+          "note": "Sprite encaixa exatamente no retangulo acima em relacao ao canvas de 400x850. Hover e zoom somente no sprite com transform-origin:center center."
+        }
+      },
+      "composition_test": "cartas_mais4_mais6/carta_mais6_montagem_interativa_teste.png"
+    }
+  },
+  "files": [
+    {
+      "file": "cartas_mais4_mais6/carta_mais4_alfaces_overlay_full.png",
+      "size_px": [
+        400,
+        850
+      ],
+      "bytes": 28555,
+      "sha256": "d6aa2dd01ce2c3740c297cd79cb90c0f7ab922efa7ae36c6c28bbdf32a38b7e9"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais4_alfaces_sprite.png",
+      "size_px": [
+        108,
+        145
+      ],
+      "bytes": 25185,
+      "sha256": "0eb0599ea96e007555cc009b51a74bf9359d39e33d025b3d2ceacf759796d642"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais4_base_sem_ingredientes.png",
+      "size_px": [
+        400,
+        850
+      ],
+      "bytes": 428222,
+      "sha256": "b1260d22335e6f97b8d48ae81e214df3ff3265ddda5f1df374f1a4e763265386"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais4_completa.png",
+      "size_px": [
+        400,
+        850
+      ],
+      "bytes": 467938,
+      "sha256": "bdfa6d7daff41f76596b917bac21d7e4a8789b36ae76bad606173fc51b41e8bb"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais4_mirtilos_overlay_full.png",
+      "size_px": [
+        400,
+        850
+      ],
+      "bytes": 36023,
+      "sha256": "9bce3cf9b5e03f56aa743996423f1e251de30b326ba42ef13f1935847d2d1607"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais4_mirtilos_sprite.png",
+      "size_px": [
+        134,
+        148
+      ],
+      "bytes": 32311,
+      "sha256": "34b3e47d2f7145b2a4296bc6217af525d044d2f4ea84137d539a6868666699c4"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais4_montada_camadas_preview.png",
+      "size_px": [
+        400,
+        850
+      ],
+      "bytes": 470171,
+      "sha256": "ae663b836a9a8e8e2c615c8b8eb18fd7fbd90f5ceaa5630f159dfe00e76bfa44"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais4_montagem_interativa_teste.png",
+      "size_px": [
+        400,
+        850
+      ],
+      "bytes": 470415,
+      "sha256": "8773a375e488de63cdf8367372954dd434ffdb44c753d14c68610c7a6139aa5a"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais4_queijos_overlay_full.png",
+      "size_px": [
+        400,
+        850
+      ],
+      "bytes": 38312,
+      "sha256": "340b13840cc92bc83b04968aa0dc555fe57d11a620b04a559eff3e81abe42198"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais4_queijos_sprite.png",
+      "size_px": [
+        135,
+        171
+      ],
+      "bytes": 34456,
+      "sha256": "565a88ad8a677b1a9e07be1d1a08cd61b467e60f488420c054a3d02931f9ee45"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais4_tomates_overlay_full.png",
+      "size_px": [
+        400,
+        850
+      ],
+      "bytes": 31859,
+      "sha256": "2bcecd65c40527bf322de31ea075f5367edb6db90224a053e4aae88fc1495dd2"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais4_tomates_sprite.png",
+      "size_px": [
+        113,
+        163
+      ],
+      "bytes": 28465,
+      "sha256": "22d9f1b4303c05c1dbb3b6449029fa81898ff93dfe59318b5bbec1c082d9e1ec"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais6_alfaces_overlay_full.png",
+      "size_px": [
+        400,
+        850
+      ],
+      "bytes": 28828,
+      "sha256": "7b0a95875a69e27c1d6fb4f4ab29d2f6b344cb337326a1f6973720c7039824e0"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais6_alfaces_sprite.png",
+      "size_px": [
+        108,
+        141
+      ],
+      "bytes": 25461,
+      "sha256": "e1b931c150a2baf697076a0dad3a8dae394a452dbe5f12f1671daee992e9921c"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais6_base_sem_ingredientes.png",
+      "size_px": [
+        400,
+        850
+      ],
+      "bytes": 473588,
+      "sha256": "c2b12c460c3a0d537554eaa461131ef38142b3de4c213ca4003cf59a093dbc3c"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais6_completa.png",
+      "size_px": [
+        400,
+        850
+      ],
+      "bytes": 513972,
+      "sha256": "5a8245f25abe8616fa61014570806ee239c0d1baa69a7fa4bd82adb386b77ad5"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais6_mirtilos_overlay_full.png",
+      "size_px": [
+        400,
+        850
+      ],
+      "bytes": 34686,
+      "sha256": "1803739489164caade2279e5f5b44e13c36e6b5736e6f40167137cf140b4eebf"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais6_mirtilos_sprite.png",
+      "size_px": [
+        125,
+        148
+      ],
+      "bytes": 31111,
+      "sha256": "4ccca9485b9b542103f48ba44a1442d27ea9f03d8f8eb0605f72c82eabc3c3e5"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais6_montada_camadas_preview.png",
+      "size_px": [
+        400,
+        850
+      ],
+      "bytes": 515450,
+      "sha256": "c50eb2246c57b617a38147182d813c9c538143d6ba1e7c260437b097354f9e23"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais6_montagem_interativa_teste.png",
+      "size_px": [
+        400,
+        850
+      ],
+      "bytes": 515742,
+      "sha256": "7b4eb61d8d674ce4e986d60654be2b3a4da48aca3da5676bee41aae7e496091e"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais6_queijos_overlay_full.png",
+      "size_px": [
+        400,
+        850
+      ],
+      "bytes": 40529,
+      "sha256": "123e513fd38c265ab836d2ac932e2030868506eb26662bd3000797df355deb7a"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais6_queijos_sprite.png",
+      "size_px": [
+        136,
+        177
+      ],
+      "bytes": 36605,
+      "sha256": "441259a6a9984f30952adf9ff151d1cae74ad61cb3f5b3e4a4e29a0d690b0cb3"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais6_tomates_overlay_full.png",
+      "size_px": [
+        400,
+        850
+      ],
+      "bytes": 31402,
+      "sha256": "916f5e68b9421d17170cf46e203e66f7e214ef4e11c9860badf64342b94b519e"
+    },
+    {
+      "file": "cartas_mais4_mais6/carta_mais6_tomates_sprite.png",
+      "size_px": [
+        113,
+        161
+      ],
+      "bytes": 28078,
+      "sha256": "046c2ed0194f96a293d93b990089a18246ac005613077123435c7d0032f6401e"
+    }
+  ]
+}

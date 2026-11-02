@@ -1,6 +1,6 @@
 # Panelinha Teste — Android
 
-Atualização atual: [correção do halo real e do rastro inferior](testes/RASTRO_HALO_RESULTADOS.md). Remove o brilho legado que confundia compra permitida com obrigatória, mede as seis cartas/sombras e acrescenta 2px CSS só na metade inferior da órbita. Preserva geração 2, `sensorLandscape`, imersão, dados locais, todas as regras/artes e o workflow existente.
+Atualização atual: [+4/+6 padronizadas 400×850](testes/PENALIDADES_PADRAO_RESULTADOS.md). Frentes oficiais, seletor recomposto com ingredientes da Coringa preservados e verificações de assets atualizadas. Preserva geração 2, `sensorLandscape`, imersão, dados locais, demais regras/artes e workflow existente.
 
 > Assinatura ativa: **geração 2**, autorizada em 30/10/2026 após perda da chave
 > anterior. Identidade pública e certificado aposentado em `android-identity.json`.
