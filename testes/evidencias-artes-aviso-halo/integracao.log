@@ -1,0 +1,27 @@
+PASS 52/52 PNGs: SHA-256, HTTP 200 e decodificação no Chromium móvel
+PASS início individual com 1 humano + 3 bots
+PASS duplas: parceiro oposto com mão visível
+PASS baralho 114/118, dois zeros por cor 
+PASS penalidade +20 bloqueia carta comum e cobra total 
+PASS acúmulo +2→+4→+6 = 12 e cor ignorada 
+PASS +6 não permite resposta +2; +2 aceita outra cor 
+PASS Panela de Pressão incorpora +20, respeita limite e encerra punição 
+PASS Liquidificador transfere mãos na direção e é bloqueado contra +N 
+PASS corte próprio de +2 em dois cliques aplica efeito uma vez 
+PASS corte externo redireciona turno e soma +2 
+PASS cortes desligados não exibem comando 
+PASS desafio procedente 
+PASS desafio improcedente 
+PASS denúncia de última carta dá +2 
+PASS compra voluntária pode ser guardada 
+PASS finalização +2 resolve punição antes da classificação 
+PASS pontuação personalizada e classificação da rodada 
+PASS corte próprio de Bloqueio não repete o salto 
+PASS bot resolve +2 final antes de encerrar rodada
+PASS bot executa turno automaticamente
+PASS laboratório: revelar bots e desligar PNGs
+PASS cronômetro cobra +20 integral
+PASS fallback textual quando PNG falha
+PASS jogo visível em paisagem e desktop (sem teste em aparelho físico)
+PASS sem exceções JavaScript
+Regras: 16/16 passaram

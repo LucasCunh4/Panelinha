@@ -25,14 +25,15 @@ for(const entry of especiais.assets){
   if(crypto.createHash('sha256').update(fs.readFileSync(path.join(source,entry.path))).digest('hex')!==entry.sha256)throw Error(`Arte especial divergente: ${entry.path}`);
 }
 const penalidades=JSON.parse(fs.readFileSync(path.join(source,'documentacao/MANIFESTO_MAIS4_MAIS6.json')));
-if(penalidades.assets.length!==24)throw Error('O pacote +4/+6 padronizado deve conter 24 PNGs');
+if(penalidades.assets.length!==22)throw Error('O pacote +4/+6 padronizado deve conter 22 PNGs');
 for(const entry of penalidades.assets){
   const bytes=fs.readFileSync(path.join(source,entry.path));
   if(crypto.createHash('sha256').update(bytes).digest('hex')!==entry.sha256)throw Error(`Arte +4/+6 divergente: ${entry.path}`);
   if(bytes.readUInt32BE(16)!==entry.width||bytes.readUInt32BE(20)!==entry.height||bytes[25]!==6)throw Error(`Dimensões/RGBA +4/+6 divergentes: ${entry.path}`);
 }
+for(const old of penalidades.supersededAssets.paths)if(fs.existsSync(path.join(source,old)))throw Error(`Arte +4/+6 antiga ainda presente: ${old}`);
 const interacao=JSON.parse(fs.readFileSync(path.join(source,'documentacao/MANIFESTO_INTERACAO_V2.json')));
-if(interacao.assets.length!==2)throw Error('São duas bases interativas reparadas');
+if(interacao.assets.length!==2)throw Error('São duas bases interativas novas');
 for(const entry of interacao.assets){
   if(crypto.createHash('sha256').update(fs.readFileSync(path.join(source,entry.path))).digest('hex')!==entry.sha256)throw Error(`Base interativa divergente: ${entry.path}`);
 }
@@ -44,11 +45,11 @@ for(const entry of padrao.assets){
 for(const old of especiais.supersededAssets.paths)if(fs.existsSync(path.join(source,old)))throw Error(`Arte substituída ainda no pacote: ${old}`);
 for(const file of ['index.html','mesa.css','mesa.js','escolher-cor.css','escolher-cor.js']){
   const code=fs.readFileSync(path.join(source,file),'utf8');
-  for(const old of especiais.supersededAssets.paths)if(code.includes(path.basename(old)))throw Error(`Referência ativa à arte substituída: ${file}`);
+  for(const old of [...especiais.supersededAssets.paths,...penalidades.supersededAssets.paths])if(code.includes(path.basename(old)))throw Error(`Referência ativa à arte substituída: ${file}`);
 }
 fs.rmSync(output, {recursive:true, force:true});
 fs.mkdirSync(output, {recursive:true});
-for (const name of ['index.html', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js', 'seletores.js', 'seletores.css', 'perfil.js', 'escolher-cor.js', 'escolher-cor.css', 'assets']) fs.cpSync(path.join(source, name), path.join(output, name), {recursive:true});
+for (const name of ['anuncios.js', 'anuncios.css', 'index.html', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js', 'seletores.js', 'seletores.css', 'perfil.js', 'escolher-cor.js', 'escolher-cor.css', 'assets']) fs.cpSync(path.join(source, name), path.join(output, name), {recursive:true});
 require('esbuild').buildSync({
   entryPoints:[path.join(__dirname, 'android-compat.js')],
   outfile:path.join(output, 'android-compat.js'),

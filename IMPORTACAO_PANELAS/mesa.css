@@ -393,5 +393,5 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 #pile {z-index:1}
 .pile-aura {display:none;position:absolute;pointer-events:none;overflow:visible;z-index:0;opacity:0}
 #buyBtn.mandatory-buy .pile-aura {display:block;opacity:1;animation:pile-aura-pulse 1.1s ease-in-out infinite}
-@keyframes pile-aura-pulse {0%,100%{opacity:.7}50%{opacity:1}}
+@keyframes pile-aura-pulse {0%,100%{opacity:.55}50%{opacity:1}}
 @media(prefers-reduced-motion:reduce){#buyBtn.mandatory-buy .pile-aura {animation:none;opacity:1}}

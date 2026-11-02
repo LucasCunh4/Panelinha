@@ -1,0 +1,5 @@
+.last-card-notice {position:fixed;z-index:90;top:max(10px,env(safe-area-inset-top));left:50%;margin-left:calc(min(360px,64vw) / -2);width:min(360px,64vw);box-sizing:border-box;display:flex;flex-direction:column;gap:3px;padding:11px 17px;border:1px solid #f4cd79;border-radius:15px;background:linear-gradient(125deg,#40204fee,#22102cf5);box-shadow:0 4px 17px #17081c99,inset 0 0 0 2px #b77f3a33;color:#fff0d5;text-align:center;pointer-events:none;user-select:none}
+.last-card-notice[hidden] {display:none}
+.last-card-notice strong {font:26px/1.05 PanelinhaDisplay,system-ui,sans-serif;color:#ffe19a;text-shadow:0 2px #603744}
+.last-card-notice>span {font:14px/1.3 system-ui,sans-serif;overflow-wrap:anywhere}
+@media(orientation:landscape) and (max-height:360px){.last-card-notice {top:max(6px,env(safe-area-inset-top));padding:8px 13px;gap:2px}.last-card-notice strong {font-size:22px}.last-card-notice>span {font-size:12px}}

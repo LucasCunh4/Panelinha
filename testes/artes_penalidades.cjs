@@ -25,20 +25,20 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mais4-mais6-evidence
  const open=async(type='wild4',penalty=0,highest=0)=>{await setup(type,penalty,highest);await p.locator('[data-card="70000"]').tap();await p.locator('.color-picker').waitFor()};
  try{
   await p.goto(base);await p.locator('#singlePlayerBtn').tap();await p.locator('#profileContinueBtn').tap();await p.locator('#startBtn').tap();
-  assert.equal(manifest.assets.length,24);
+  assert.equal(manifest.assets.length,22);
   for(const a of manifest.assets){const r=await p.request.get(new URL(a.path,base).href);assert.equal(r.status(),200);assert.equal(crypto.createHash('sha256').update(await r.body()).digest('hex'),a.sha256)}
   for(const file of ['MANIFESTO_52_PNG.json','MANIFESTO_MESA_V1.json','MANIFESTO_MENU_V1.json','MANIFESTO_ESPECIAIS_V1.json']){
    const m=JSON.parse(fs.readFileSync(path.join(root,'documentacao',file)));for(const a of m.files||m.asset_files||m.assets)assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,a.path))).digest('hex'),a.sha256);
   }
   assert.ok(await p.evaluate(async assets=>{await Promise.all(assets.map(async a=>{const im=new Image();im.src=a.path;await im.decode();if(!im.naturalWidth)throw Error(a.path)}));return true},manifest.assets));
-  console.log('PASS 24 PNGs padronizados por SHA-256/HTTP/decodificação; todas as artes anteriores preservadas');
+  console.log('PASS 22 PNGs novos por SHA-256/HTTP/decodificação; todas as artes anteriores preservadas');
   for(const type of ['wild4','wild6']){
    await open(type);const layout=repaired.layouts[type],n=type.slice(-1);
    assert.equal(await p.locator('.color-picker-base').getAttribute('src'),layout.base);
    assert.match(await p.locator('[data-card="70000"] .card-image').getAttribute('src'),new RegExp(`carta_mais${n}_completa.png$`));
    for(const [name,l] of Object.entries(layout.layers)){
     const color={tomates:'red',queijos:'yellow',mirtilos:'blue',alfaces:'green'}[name];
-    assert.equal(await p.locator(`[data-ingredient="${color}"] image`).getAttribute('href'),l.path);
+    assert.equal(await p.locator(`[data-ingredient="${color}"] img`).getAttribute('src'),l.path);
     const measured=await p.locator(`[data-color="${color}"]`).evaluate(e=>{const c=e.parentElement.getBoundingClientRect(),r=e.getBoundingClientRect();return [(r.x-c.x)/c.width,(r.y-c.y)/c.height,r.width/c.width,r.height/c.height]});
     [l.hitRegion.x,l.hitRegion.y,l.hitRegion.width,l.hitRegion.height].forEach((expected,i)=>assert.ok(Math.abs(expected-measured[i])<.001));
    }
@@ -54,12 +54,12 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mais4-mais6-evidence
    for(const [width,height] of [[320,568],[390,844],[412,915],[568,320],[844,390],[1280,800]]){
     await p.setViewportSize({width,height});await open(type);
     assert.ok(await p.locator('[data-color]').evaluateAll(es=>es.every(e=>{const r=e.getBoundingClientRect();return r.width>=44&&r.height>=44&&e===document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)})));
-    await p.evaluate(async()=>{await Promise.all([...document.querySelectorAll('.ingredient-layer image')].map(async node=>{const im=new Image();im.src=node.getAttribute('href');await im.decode()}))});
+    await p.evaluate(async()=>{await Promise.all([...document.querySelectorAll('.ingredient-layer img')].map(async node=>{const im=new Image();im.src=node.getAttribute('src');await im.decode()}))});
     if(width===390||width===568)await p.screenshot({path:path.join(out,`${type}-${width}x${height}.png`)});
     await p.locator('#cancelColor').tap();
    }
   }
-  console.log('PASS bases reparadas/camadas da Coringa; montagem de teste fornecida 400x850 conferida (alfa <=1/255); 12 layouts, alvos >=44px e frente completa na mão');
+  console.log('PASS bases e camadas das novas ilustrações; montagem de teste fornecida 400x850 conferida (alfa <=1/255); 12 layouts, alvos >=44px e frente completa na mão');
   await p.setViewportSize({width:390,height:844});
   for(const type of ['wild4','wild6'])for(const [penalty,highest] of [[0,0],[2,2],[12,4],...(type==='wild6'?[[20,6]]:[])])for(const color of ['red','yellow','blue','green']){
    await open(type,penalty,highest);const before=await p.evaluate(()=>{const s=CartasTest.getState();return [...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort().join()});
@@ -89,6 +89,10 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mais4-mais6-evidence
    }
    await d.screenshot({path:path.join(out,`${cardType}-hover.png`)});await d.locator('[data-color="green"]').click();assert.equal(await d.evaluate(()=>window.__chosenColor),'green');await d.locator('.color-picker').waitFor({state:'hidden'});
   }
-  await d.close();assert.deepEqual(errors,[]);assert.deepEqual(external,[]);console.log('PASS hover nas oito regiões das duas cartas, clique e feedback; sem erros JS ou solicitações externas');
+  for(const cardType of ['wild4','wild6'])for(const color of ['red','yellow','blue']){
+   await d.evaluate(cardType=>PanelinhaColorPicker.open(document.getElementById('modalRoot'),{cardType,choose(c){window.__chosenColor=c},cancel(){}}),cardType);
+   await d.locator(`[data-color="${color}"]`).hover();assert.equal(await d.locator('.ingredient-hover').count(),1);await d.locator(`[data-color="${color}"]`).click();assert.equal(await d.evaluate(()=>window.__chosenColor),color);await d.locator('.color-picker').waitFor({state:'hidden'});
+  }
+  await d.close();assert.deepEqual(errors,[]);assert.deepEqual(external,[]);console.log('PASS hover nas oito regiões e escolha das quatro cores por mouse nas duas cartas, clique e feedback; sem erros JS ou solicitações externas');
  }finally{await b.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

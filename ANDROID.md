@@ -1,6 +1,6 @@
 # Panelinha Teste — Android
 
-Atualização atual: [+4/+6 padronizadas 400×850](testes/PENALIDADES_PADRAO_RESULTADOS.md). Frentes oficiais, seletor recomposto com ingredientes da Coringa preservados e verificações de assets atualizadas. Preserva geração 2, `sensorLandscape`, imersão, dados locais, demais regras/artes e workflow existente.
+Atualização atual: [novas +4/+6, aviso global e halo reforçado](testes/ARTES_AVISO_HALO_RESULTADOS.md). Artes e overlays do pacote novo, anúncios reais deduplicados e luz mais forte com geometria/condição preservadas. Mantém geração 2, landscape, imersão, offline, regras e workflow; instrumentação ampliada para 12 testes offline + 1 de atualização.
 
 > Assinatura ativa: **geração 2**, autorizada em 30/10/2026 após perda da chave
 > anterior. Identidade pública e certificado aposentado em `android-identity.json`.

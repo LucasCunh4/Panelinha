@@ -9,108 +9,96 @@
     ['mirtilos','blue','Azul — mirtilos',.04492,.39062,.40039,.22917],
     ['alfaces','green','Verde — alfaces',.55273,.39062,.41992,.22917]
   ];
-  // Recomposição do pacote 400x850, mantendo os PNGs limpos e alimentos da Coringa.
-  // O interior 26,29 / 348x792 é a transformação oficial do canvas anterior.
+  // Bases e overlays NOVOS alinhados ao mesmo canvas 400x850.
   const penaltyLayouts={
     "wild4": {
       "base": "assets/cartas_mais4_mais6/carta_mais4_base_sem_ingredientes.png",
-      "cleanBase": "assets/interacao_v2/mais4_base_limpa.png",
-      "rects": {
-        "tomates": [
-          69,
-          167,
-          113,
-          163
-        ],
-        "queijos": [
-          206,
-          159,
-          135,
-          171
-        ],
-        "mirtilos": [
-          44,
-          351,
-          134,
-          148
-        ],
-        "alfaces": [
-          241,
-          351,
-          108,
-          145
-        ]
+      "layers": {
+        "tomates": {
+          "path": "assets/cartas_mais4_mais6/carta_mais4_tomates_overlay_full.png",
+          "rect": [
+            54,
+            203,
+            116,
+            115
+          ]
+        },
+        "queijos": {
+          "path": "assets/cartas_mais4_mais6/carta_mais4_queijos_overlay_full.png",
+          "rect": [
+            202,
+            206,
+            151,
+            92
+          ]
+        },
+        "mirtilos": {
+          "path": "assets/cartas_mais4_mais6/carta_mais4_mirtilos_overlay_full.png",
+          "rect": [
+            33,
+            413,
+            100,
+            78
+          ]
+        },
+        "alfaces": {
+          "path": "assets/cartas_mais4_mais6/carta_mais4_alfaces_overlay_full.png",
+          "rect": [
+            268,
+            413,
+            111,
+            96
+          ]
+        }
       }
     },
     "wild6": {
       "base": "assets/cartas_mais4_mais6/carta_mais6_base_sem_ingredientes.png",
-      "cleanBase": "assets/interacao_v2/mais6_base_limpa.png",
-      "rects": {
-        "tomates": [
-          66,
-          160,
-          113,
-          161
-        ],
-        "queijos": [
-          203,
-          150,
-          136,
-          177
-        ],
-        "mirtilos": [
-          45,
-          349,
-          125,
-          148
-        ],
-        "alfaces": [
-          234,
-          351,
-          108,
-          141
-        ]
+      "layers": {
+        "tomates": {
+          "path": "assets/cartas_mais4_mais6/carta_mais6_tomates_overlay_full.png",
+          "rect": [
+            51,
+            176,
+            123,
+            119
+          ]
+        },
+        "queijos": {
+          "path": "assets/cartas_mais4_mais6/carta_mais6_queijos_overlay_full.png",
+          "rect": [
+            199,
+            180,
+            155,
+            108
+          ]
+        },
+        "mirtilos": {
+          "path": "assets/cartas_mais4_mais6/carta_mais6_mirtilos_overlay_full.png",
+          "rect": [
+            30,
+            370,
+            108,
+            99
+          ]
+        },
+        "alfaces": {
+          "path": "assets/cartas_mais4_mais6/carta_mais6_alfaces_overlay_full.png",
+          "rect": [
+            260,
+            368,
+            123,
+            117
+          ]
+        }
       }
     }
   };
-  const sourceBounds={
-    "tomates": [
-      55,
-      244,
-      383,
-      408
-    ],
-    "queijos": [
-      568,
-      235,
-      393,
-      417
-    ],
-    "mirtilos": [
-      34,
-      596,
-      398,
-      396
-    ],
-    "alfaces": [
-      576,
-      581,
-      397,
-      396
-    ]
-  };
-  function cleanBackground(layout,type){
-    if(!layout)return '';
-    return `<svg class="color-picker-clean" viewBox="0 0 400 850" aria-hidden="true" focusable="false"><defs><clipPath id="clean-${type}"><rect x="26" y="29" width="348" height="792" rx="40" ry="44"/></clipPath></defs><image href="${layout.cleanBase}" x="26" y="29" width="348" height="792" preserveAspectRatio="none" clip-path="url(#clean-${type})"/></svg>`;
-  }
   function ingredientHTML(layout,[name,color,label,x,y,w,h]){
-    const path=`${assets}escolher_cor_${name}_overlay_full.png`;
-    if(layout){const r=layout.rects[name];[x,y,w,h]=[r[0]/400,r[1]/850,r[2]/400,r[3]/850];}
-    // Uma única instância do alimento. O viewBox recorta só transparência;
-    // meet mantém o desenho da Coringa proporcional dentro do retângulo novo.
-    const art=layout?`<svg class="ingredient-art" viewBox="${sourceBounds[name].join(' ')}" preserveAspectRatio="xMidYMid meet" style="left:${x*100}%;top:${y*100}%;width:${w*100}%;height:${h*100}%" aria-hidden="true" focusable="false"><image href="${path}" width="1024" height="1536"/></svg>`:`<img src="${path}" alt="" draggable="false">`;
-    const hit=layout?`left:${(x+w/2)*100}%;top:${(y+h/2)*100}%;width:max(44px,${w*100}%);height:max(44px,${h*100}%);transform:translate(-50%,-50%)`:`left:${x*100}%;top:${y*100}%;width:${w*100}%;height:${h*100}%`;
-    return `<div class="ingredient-layer" data-ingredient="${color}" style="--origin-x:${(x+w/2)*100}%;--origin-y:${(y+h/2)*100}%">${art}</div><button type="button" class="colorbtn ingredient-hit" data-color="${color}" aria-label="${label}" style="${hit}"></button>`;
+    const data=layout?.layers[name],path=data?.path||`${assets}escolher_cor_${name}_overlay_full.png`;
+    if(data){const r=data.rect;[x,y,w,h]=[r[0]/400,r[1]/850,r[2]/400,r[3]/850];}
+    const hit=layout?`left:clamp(22px,${(x+w/2)*100}%,calc(100% - 22px));top:clamp(22px,${(y+h/2)*100}%,calc(100% - 22px));width:max(44px,${w*100}%);height:max(44px,${h*100}%);transform:translate(-50%,-50%)`:`left:${x*100}%;top:${y*100}%;width:${w*100}%;height:${h*100}%`;
+    return `<div class="ingredient-layer" data-ingredient="${color}" style="--origin-x:${(x+w/2)*100}%;--origin-y:${(y+h/2)*100}%"><img src="${path}" alt="" draggable="false"></div><button type="button" class="colorbtn ingredient-hit" data-color="${color}" aria-label="${label}" style="${hit}"></button>`;
   }
   let closeCurrent=null;
   function open(root,{cardType,choose,cancel}){
@@ -122,11 +110,11 @@
     const hint='Toque em um ingrediente';
     closeCurrent?.();
     const previous=document.activeElement;
-    const overlay=document.createElement('div');overlay.className='modal-wrap color-picker';overlay.dataset.cardType=type;
+    const overlay=document.createElement('div');overlay.className='modal-wrap color-picker';overlay.dataset.cardType=type;overlay.classList.toggle('penalty-picker',!!layout);
     overlay.innerHTML=`<section class="color-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="colorPickerTitle" aria-describedby="colorPickerHint">
       <h2 id="colorPickerTitle">${title}</h2><p id="colorPickerHint">${hint}</p>
       <div class="color-picker-card"><img class="color-picker-base" src="${base}" alt="" draggable="false">
-      ${cleanBackground(layout,type)}${ingredients.map(ingredient=>ingredientHTML(layout,ingredient)).join('')}
+      ${ingredients.map(ingredient=>ingredientHTML(layout,ingredient)).join('')}
       </div><button type="button" class="btn alt" id="cancelColor">Cancelar</button>
       <span class="sr-only" role="status" aria-live="polite"></span>
     </section>`;

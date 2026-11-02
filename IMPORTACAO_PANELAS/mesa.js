@@ -218,9 +218,10 @@
           <feMorphology in="silhouette" operator="dilate" radius="7" result="spread"/>
           <feComposite in="spread" in2="clearance" operator="out" result="outline"/>
           <feGaussianBlur in="outline" stdDeviation="4" result="halo"/>
-          <feFlood flood-color="#ffc66e" flood-opacity=".95" result="gold"/>
-          <feComposite in="gold" in2="halo" operator="in" result="glow"/>
-          <feFlood flood-color="#fff1b7" result="light"/>
+          <feComponentTransfer in="halo" result="haloStrong"><feFuncA type="linear" slope="2"/></feComponentTransfer>
+          <feFlood flood-color="#ffd987" flood-opacity="1" result="gold"/>
+          <feComposite in="gold" in2="haloStrong" operator="in" result="glow"/>
+          <feFlood flood-color="#fff9db" result="light"/>
           <feComposite in="light" in2="outline" operator="in" result="edge"/>
           <feMerge result="lit"><feMergeNode in="glow"/><feMergeNode in="edge"/></feMerge>
           <feComposite in="lit" in2="clearance" operator="out"/>

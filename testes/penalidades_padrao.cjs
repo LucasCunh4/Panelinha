@@ -37,20 +37,20 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/penalty-400x850-evid
     const card=document.querySelector('.color-picker-card').getBoundingClientRect(),dialog=document.querySelector('.color-picker-dialog').getBoundingClientRect();
     const controlsInside=[...document.querySelectorAll('.color-picker h2,.color-picker p,.color-picker-card,#cancelColor')].every(e=>{const r=e.getBoundingClientRect();return r.left>=0&&r.top>=0&&r.right<=innerWidth+.1&&r.bottom<=innerHeight+.1});
     return {ratio:card.width/card.height,inside:controlsInside&&dialog.left>=0&&dialog.top>=0&&dialog.right<=innerWidth+.1&&dialog.bottom<=innerHeight+.1,completeUnder:document.querySelector('.color-picker-base').src.includes('_completa.png'),layers:[...document.querySelectorAll('.ingredient-layer')].map(layer=>{
-     const svg=layer.querySelector('svg'),image=svg.querySelector('image'),r=svg.getBoundingClientRect(),matrix=image.getScreenCTM(),hit=document.querySelector(`[data-color="${layer.dataset.ingredient}"]`),hr=hit.getBoundingClientRect();
-     return {color:layer.dataset.ingredient,images:layer.querySelectorAll('image,img').length,path:image.getAttribute('href'),viewBox:svg.getAttribute('viewBox'),x:(r.x-card.x)/card.width,y:(r.y-card.y)/card.height,width:r.width/card.width,height:r.height/card.height,proportional:Math.abs(matrix.a-matrix.d)<.00001,opacity:getComputedStyle(image).opacity,hit:document.elementFromPoint(hr.x+hr.width/2,hr.y+hr.height/2)===hit,target:[hr.width,hr.height]};
+     const image=layer.querySelector('img'),r=image.getBoundingClientRect(),hit=document.querySelector(`[data-color="${layer.dataset.ingredient}"]`),hr=hit.getBoundingClientRect();
+     return {color:layer.dataset.ingredient,images:layer.querySelectorAll('image,img').length,path:image.getAttribute('src'),x:(r.x-card.x)/card.width,y:(r.y-card.y)/card.height,width:r.width/card.width,height:r.height/card.height,proportional:getComputedStyle(image).objectFit==='contain',opacity:getComputedStyle(image).opacity,hit:document.elementFromPoint(hr.x+hr.width/2,hr.y+hr.height/2)===hit,target:[hr.width,hr.height]};
     })};
    });assert.ok(Math.abs(geometry.ratio-400/850)<.001&&geometry.inside&&!geometry.completeUnder,JSON.stringify({width,height,geometry}));
    for(const [name,l] of Object.entries(composition.layouts[type].layers)){
     const layer=geometry.layers.find(l=>l.color==={tomates:'red',queijos:'yellow',mirtilos:'blue',alfaces:'green'}[name]);
-    assert.equal(layer.images,1);assert.equal(layer.path,l.path);assert.equal(layer.viewBox,Object.values(l.sourceBoundsPx).join(' '));assert.ok(layer.proportional&&layer.hit&&layer.target.every(n=>n>=44));assert.equal(layer.opacity,'1');
-    for(const key of ['x','y','width','height'])assert.ok(Math.abs(layer[key]-l.hitRegion[key])<.001,JSON.stringify({name,key,layer}));
+    assert.equal(layer.images,1);assert.equal(layer.path,l.path);assert.ok(layer.proportional&&layer.hit&&layer.target.every(n=>n>=44));assert.equal(layer.opacity,'1');
+    assert.ok(Math.abs(layer.x)<.001&&Math.abs(layer.y)<.001&&Math.abs(layer.width-1)<.001&&Math.abs(layer.height-1)<.001,JSON.stringify(layer));
    }
-   assert.equal(await p.locator('.color-picker-clean image').getAttribute('href'),composition.layouts[type].cleanBase);
+   assert.equal(await p.locator('.color-picker-clean,.ingredient-art').count(),0);assert.equal(await p.locator('.color-picker-base').getAttribute('src'),composition.layouts[type].base);
    if(width===844||width===568&&height===320)await p.screenshot({path:path.join(out,`${type}-${width}x${height}-seletor.png`)});
    await p.locator('#cancelColor').tap();
   }
-  console.log('PASS 12 layouts: mesmas caixas numéricas, contain sem borda, seletor 400x850, ingredientes únicos da Coringa sem deformação, coordenadas oficiais e alvos >=44px');
+  console.log('PASS 12 layouts: mesmas caixas numéricas, contain sem borda, seletor 400x850, ingredientes únicos das novas artes sem deformação, coordenadas oficiais e alvos >=44px');
   await p.setViewportSize({width:844,height:390});
   for(const type of ['wild4','wild6']){
    await setup(type);await p.evaluate(type=>{const s=CartasTest.getState();s.players[0].hand.pop();s.deck[s.deck.length-1]={id:950000,type,color:null};document.getElementById('useCardArt').onchange()},type);
