@@ -1,0 +1,36 @@
+2026-11-02T15:58:23.1100948Z   "versionCode": 5102,
+2026-11-02T15:58:23.1101481Z   "versionName": "0.2.31",
+2026-11-02T15:58:23.1102459Z   "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+2026-11-02T15:58:46.5293433Z   "versionCode": 5103,
+2026-11-02T15:58:46.5293757Z   "versionName": "0.2.31-upgrade-check",
+2026-11-02T15:58:46.5294595Z   "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+2026-11-02T15:59:49.2179226Z adb: device offline
+2026-11-02T15:59:51.2281665Z adb: device offline
+2026-11-02T16:00:32.1347076Z INSTRUMENTATION_STATUS: class=com.lucascunha.panelinha.teste.OfflineGameTest
+2026-11-02T16:00:32.1348090Z INSTRUMENTATION_STATUS: current=1
+2026-11-02T16:00:32.1348884Z INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+2026-11-02T16:00:32.1349576Z INSTRUMENTATION_STATUS: numtests=11
+2026-11-02T16:00:32.1350185Z INSTRUMENTATION_STATUS: stream=
+2026-11-02T16:00:32.1351600Z INSTRUMENTATION_STATUS: test=a_imagesAndThreeBotsOffline
+2026-11-02T16:00:32.1352265Z INSTRUMENTATION_STATUS_CODE: 1
+2026-11-02T16:01:31.6849730Z adb: error: failed to get feature set: device offline
+2026-11-02T16:01:31.6886981Z adb: error: failed to get feature set: device offline
+2026-11-02T16:01:31.6913501Z adb: error: failed to get feature set: device offline
+2026-11-02T16:01:31.6938591Z adb: error: failed to get feature set: device offline
+2026-11-02T16:01:31.6958693Z adb: error: failed to get feature set: device offline
+2026-11-02T16:01:31.6981539Z adb: error: failed to get feature set: device offline
+2026-11-02T16:01:31.7001711Z adb: device offline
+2026-11-02T16:01:31.7195173Z ##[error]The process '/usr/bin/sh' failed with exit code 1
+2026-11-02T16:01:31.7232191Z error: could not connect to TCP port 5554: Connection refused
+2026-11-02T16:01:33.4770040Z SHA256 digest of uploaded artifact is 439cea206843c1715d22a8e1374b10fdef834c5c2fe2692e48bfb2b0e37abd8a
+2026-11-02T16:01:33.4771310Z Finalizing artifact upload
+2026-11-02T16:01:34.1101399Z Artifact Panelinha-Teste-v0.2.31-c5102.apk successfully finalized. Artifact ID 13157458708
+2026-11-02T16:01:34.1102417Z Artifact artifact has been successfully uploaded! Final size is 65172287 bytes. Artifact ID is 13157458708
+2026-11-02T16:01:34.7768303Z SHA256 digest of uploaded artifact is 34d8b51ebee2ae322cdda1cc74e6c5da802fdd5394be394e3a2204ccb29f36af
+2026-11-02T16:01:34.7769287Z Finalizing artifact upload
+2026-11-02T16:01:35.3295312Z Artifact metadados-apk-31-1 successfully finalized. Artifact ID 13157793387
+2026-11-02T16:01:35.3296608Z Artifact metadados-apk-31-1 has been successfully uploaded! Final size is 559 bytes. Artifact ID is 13157793387
+2026-11-02T16:01:36.2817735Z SHA256 digest of uploaded artifact is a4bdcbe9de46b71019c78b41109b6c9e4dca1cad2a97ec9dfe4d3fb01b933ccb
+2026-11-02T16:01:36.2818511Z Finalizing artifact upload
+2026-11-02T16:01:36.8428306Z Artifact resultados-android-31-1 successfully finalized. Artifact ID 13157773337
+2026-11-02T16:01:36.8429493Z Artifact resultados-android-31-1 has been successfully uploaded! Final size is 629274 bytes. Artifact ID is 13157773337
