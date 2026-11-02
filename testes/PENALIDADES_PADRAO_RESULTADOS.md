@@ -26,4 +26,19 @@ O preview geral fornecido tem pequenas diferenças de reamostragem em relação 
 
 ## Android
 
-Preservados applicationId `com.lucascunha.panelinha.teste`, origem `https://localhost`, certificado da geração 2 e workflow/Secrets existentes. Nenhuma chave gerada. A sequência de versionamento será a mesma, com código superior ao APK 0.2.31 / 5102 e ao candidato reservado 5103. A verificação será feita no APK real antes da entrega. Testes web não substituem execução nativa; qualquer falha de infraestrutura será explicitada.
+Preservados applicationId `com.lucascunha.panelinha.teste`, origem `https://localhost`, certificado da geração 2 e workflow/Secrets existentes. Nenhuma chave gerada. Execução [**#32**](https://github.com/LucasCunh4/Panelinha/actions/runs/41481763088), fonte `fa448e72d4fa045bd4c4e7f0062bcc3a044973d6`:
+
+- **Compilação/assinatura aprovadas:** APK **0.2.32 / código 5202**. Candidato 5203 reservado ao teste de atualização, não distribuído. Workflow e verificações preservados.
+- APK baixado e verificado novamente com `ferramentas/verificar_apk.py`: assinatura v2, certificado fixo, pacote, origem, landscape/categoria game, todos os 52 PNGs e demais assets anteriores, 24 novos PNGs de penalidades por SHA-256/dimensões/RGBA e cópia exata do código web desta revisão. [Metadados verificados](PENALIDADES_PADRAO_APK_0.2.32.json).
+- Certificado SHA-256 **`3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`**, igual a `android-identity.json` e ao APK anterior real **0.2.31 / 5102**. Mesmo applicationId `com.lucascunha.panelinha.teste` e origem `https://localhost`; código 5202 também supera o candidato anterior 5103. [Comparação dos APKs reais](evidencias-penalidades-padrao/comparacao-identidade-apks.json). Identidade compatível com atualização direta, sem desinstalar.
+- SHA-256 do APK **`2a85d367a881b645e09db1c5ef05de0cb4d75918fdbc4e6edd7db80e52405dc5`**, igual ao digest do GitHub; **52.372.865 bytes**. Metadados locais iguais aos do CI. Confirmado APK com `AndroidManifest.xml`/assets na raiz, sem ZIP externo ou APK aninhado.
+
+**Android nativo: execução interrompida, não aprovada.** A imagem do SDK foi instalada e o AVD iniciou. A instrumentação começou `a_imagesAndThreeBotsOffline` às 16:32:43 UTC; o logcat registra `MainActivity` criada/retomada/exibida. O AVD perdeu a conexão: `adb devices` passou a listar `emulator-5554 offline`; diagnósticos por ADB falharam e a tentativa de encerramento encontrou a porta 5554 recusada. O primeiro teste possui apenas status de início (`INSTRUMENTATION_STATUS_CODE: 1`), sem resultado. **0/11 testes offline concluídos; teste adicional de atualização não executado.**
+
+É uma interrupção do ambiente/ADB, sem asserção funcional reprovada registrada. A causa raiz da queda do AVD não foi determinada pelos arquivos disponíveis: logcat sem `FATAL EXCEPTION`/`Fatal signal` do aplicativo; kernel do host sem OOM/segfault, memória disponível aproximadamente 14GiB. Isso não comprova aprovação do aplicativo no Android. Permanecem pendentes instrumentação completa, interações/capturas nativas nas duas paisagens e instalação por cima com preservação real de UID/localStorage/SharedPreferences. Nenhum teste removido ou desativado. [Trechos da execução](evidencias-penalidades-padrao/github-android-diagnostico.txt); demais diagnósticos completos no artefato `resultados-android-32-1`.
+
+O workflow terminou com falha nos testes; Release corretamente pulada. APK já assinado/verificado, metadados e diagnósticos foram disponibilizados separadamente pelo mecanismo existente.
+
+[**Baixar APK 0.2.32 / 5202 diretamente, sem ZIP**](https://github.com/LucasCunh4/Panelinha/actions/runs/41481763088/artifacts/13160063954). Requer login no GitHub; retenção até 31/01/2027.
+
+A compatibilidade de atualização foi conferida pela identidade/versão dos dois APKs reais. A atualização e a preservação efetiva de dados continuam sem execução nativa nesta rodada. O mecanismo de dados locais não foi alterado; a partida em andamento continua apenas em memória.

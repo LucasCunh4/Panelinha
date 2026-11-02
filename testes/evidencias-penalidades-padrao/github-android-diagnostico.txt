@@ -1,0 +1,26 @@
+2026-11-02T16:30:51.0665043Z   "versionCode": 5202,
+2026-11-02T16:30:51.0665444Z   "versionName": "0.2.32",
+2026-11-02T16:30:51.0666292Z   "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+2026-11-02T16:30:51.0684461Z   "penaltyAssetsVerified": 24,
+2026-11-02T16:31:14.5130691Z   "versionCode": 5203,
+2026-11-02T16:31:14.5131650Z   "versionName": "0.2.32-upgrade-check",
+2026-11-02T16:31:14.5132551Z   "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+2026-11-02T16:31:14.5136688Z   "penaltyAssetsVerified": 24,
+2026-11-02T16:32:06.5649654Z adb: device offline
+2026-11-02T16:32:08.5742978Z adb: device offline
+2026-11-02T16:32:43.9737932Z INSTRUMENTATION_STATUS: class=com.lucascunha.panelinha.teste.OfflineGameTest
+2026-11-02T16:32:43.9739279Z INSTRUMENTATION_STATUS: current=1
+2026-11-02T16:32:43.9740212Z INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+2026-11-02T16:32:43.9741382Z INSTRUMENTATION_STATUS: numtests=11
+2026-11-02T16:32:43.9745582Z INSTRUMENTATION_STATUS: stream=
+2026-11-02T16:32:43.9747644Z INSTRUMENTATION_STATUS: test=a_imagesAndThreeBotsOffline
+2026-11-02T16:32:43.9748455Z INSTRUMENTATION_STATUS_CODE: 1
+2026-11-02T16:33:22.0431634Z adb: error: failed to get feature set: device offline
+2026-11-02T16:33:22.0460103Z adb: error: failed to get feature set: device offline
+2026-11-02T16:33:22.0488033Z adb: error: failed to get feature set: device offline
+2026-11-02T16:33:22.0519507Z adb: error: failed to get feature set: device offline
+2026-11-02T16:33:22.0544841Z adb: error: failed to get feature set: device offline
+2026-11-02T16:33:22.0567766Z adb: error: failed to get feature set: device offline
+2026-11-02T16:33:22.0596717Z adb: device offline
+2026-11-02T16:33:22.0831359Z ##[error]The process '/usr/bin/sh' failed with exit code 1
+2026-11-02T16:33:22.0859651Z error: could not connect to TCP port 5554: Connection refused
