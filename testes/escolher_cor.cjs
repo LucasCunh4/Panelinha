@@ -47,8 +47,8 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/escolher-cor-ev
   }
   console.log('PASS 6 tamanhos retrato/paisagem/desktop, base 2:3 e quatro alvos dentro da carta com pelo menos 44px');
   await p.setViewportSize({width:390,height:844});
-  for(const type of ['wild','wild4','wild6','dist'])for(const color of ['red','yellow','blue','green']){
-   await open(type,type==='dist'?12:0);
+  for(const type of ['wild','wild4','wild6'])for(const color of ['red','yellow','blue','green']){
+   await open(type);
    const before=await p.evaluate(()=>{const s=CartasTest.getState();return [s.deck.length+s.discard.length+s.players.reduce((n,p)=>n+p.hand.length,0),s.token]});
    assert.equal(await p.locator('.ingredient-layer').evaluateAll(es=>es.filter(e=>e.getAnimations().some(a=>a.effect.getTiming().iterations===Infinity)).length),4);
    await p.locator(`[data-color="${color}"]`).tap();
@@ -58,7 +58,13 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/escolher-cor-ev
    await p.locator(`[data-color="${color}"]`).dispatchEvent('click');assert.equal(await p.evaluate(()=>CartasTest.getState().discard.length),2);
    await p.locator('.color-picker').waitFor({state:'hidden'});assert.equal(await p.locator('.color-picker').count(),0);
   }
-  console.log('PASS 16 escolhas por toque: quatro cores em Coringa, +4, +6 e Panela (+12); efeitos imediatos, destaque, conservação e envio único');
+  console.log('PASS 12 escolhas por toque: quatro cores em Coringa, +4 e +6; efeitos imediatos, destaque, conservação e envio único');
+  for(const penalty of [0,12]){
+   await setup('dist',penalty);const before=await p.evaluate(()=>{const s=CartasTest.getState();return [...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort().join()});
+   await p.locator('[data-card="9000"]').tap();assert.equal(await p.locator('.color-picker').count(),0);
+   assert.ok(await p.evaluate(before=>{const s=CartasTest.getState();return s.lastDistribution&&s.activeColor==='red'&&!s.pendingAction&&s.penalty===0&&[...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort().join()===before},before));
+  }
+  console.log('PASS Panela resolve diretamente com/sem +12, conserva cor/IDs e nunca abre seletor');
   // Nem Liquidificador, nem uma última carta criam seleção nova.
   await setup('rotate');await p.locator('[data-card="9000"]').tap();assert.equal(await p.locator('.color-picker').count(),0);assert.equal(await p.evaluate(()=>CartasTest.getState().activeColor),'red');
   await setup();await p.evaluate(()=>{CartasTest.getState().players[0].hand.length=1;document.getElementById('useCardArt').onchange()});await p.locator('[data-card="9000"]').tap();assert.equal(await p.locator('.color-picker').count(),0);assert.equal(await p.evaluate(()=>CartasTest.getState().finisher),0);

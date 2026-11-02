@@ -191,6 +191,46 @@
       card.style.setProperty('--fan-angle',`${position*(sidePortrait?3:8)}deg`);
       card.style.setProperty('--fan-lift',`${position*position*3}px`);
     });
+    // O nome se aproxima da borda das cartas, sem participar do eixo do leque.
+    const top=container.closest('.seat.top');
+    if(top){
+      const originY=parseFloat(getComputedStyle(cards[0]).transformOrigin.split(' ')[1]);
+      const angle=n>1?8*Math.PI/180:0;
+      const spread=Math.sin(angle)*originY+(Math.cos(angle)-1)*width/2;
+      top.style.setProperty('--top-fan-half',`${(width+step*(n-1))/2+spread}px`);
+    }
+  }
+
+  // Máscara da silhueta real: seis versos, com expansão/halo isotrópicos para fora.
+  // A geometria usa pixels CSS, inclusive os deslocamentos reais das camadas.
+  let pileAuraSize='';
+  function layoutPileAura(){
+    const pile=$('pile'),button=$('buyBtn'),width=pile.getBoundingClientRect().width,height=pile.getBoundingClientRect().height;
+    if(!width||!height)return;
+    let aura=$('pileAura');
+    if(!aura){
+      button.insertAdjacentHTML('afterbegin',`<svg id="pileAura" class="pile-aura" aria-hidden="true" focusable="false">
+        <defs><filter id="pileAuraFilter" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+          <feMorphology in="SourceAlpha" operator="dilate" radius="2" result="spread"/>
+          <feComposite in="spread" in2="SourceAlpha" operator="out" result="outline"/>
+          <feGaussianBlur in="outline" stdDeviation="4" result="halo"/>
+          <feFlood flood-color="#ffc66e" flood-opacity=".95" result="gold"/>
+          <feComposite in="gold" in2="halo" operator="in" result="glow"/>
+          <feFlood flood-color="#fff1b7" result="light"/>
+          <feComposite in="light" in2="outline" operator="in" result="edge"/>
+          <feMerge><feMergeNode in="glow"/><feMergeNode in="edge"/></feMerge>
+        </filter></defs><g filter="url(#pileAuraFilter)">${Array.from({length:6},(_,depth)=>`<image href="assets/padronizadas/verso_oficial_400x850.png" x="${5-depth}" y="${depth*1.5}" preserveAspectRatio="xMidYMid meet"/>`).join('')}</g></svg>`);
+      aura=$('pileAura');pileAuraSize='';
+    }
+    const box=pile.getBoundingClientRect(),parent=button.getBoundingClientRect();
+    const left=box.left-parent.left-button.clientLeft,top=box.top-parent.top-button.clientTop;
+    const key=`${width}:${height}:${left}:${top}`;if(key===pileAuraSize)return;pileAuraSize=key;
+    const pad=18,w=width+5,h=height+7.5;
+    aura.setAttribute('viewBox',`${-pad} ${-pad} ${w+pad*2} ${h+pad*2}`);
+    aura.style.cssText=`left:${left-5-pad}px;top:${top-pad}px;width:${w+pad*2}px;height:${h+pad*2}px`;
+    const filter=$('pileAuraFilter');
+    for(const [name,value] of Object.entries({x:-pad,y:-pad,width:w+pad*2,height:h+pad*2}))filter.setAttribute(name,value);
+    aura.querySelectorAll('image').forEach(image=>{image.setAttribute('width',width);image.setAttribute('height',height);});
   }
 
   function discardPose(id) {
@@ -476,6 +516,7 @@
 
     if(!$('pile').children.length)$('pile').innerHTML = Array.from({length:5},(_,i)=>`<span class="pile-layer deck-back" aria-hidden="true" style="--depth:${5-i}"></span>`).join('')+'<div class="card deck-back"></div>';
     attr($('pile'),'aria-label','Monte de compra');
+    layoutPileAura();
     document.querySelector('.draw-stack .stack-label').textContent = state.penalty ? `COMPRAR +${state.penalty}` : 'COMPRAR';
     for (const player of state.players) {
       const seat = $(`player${player.id}`);
@@ -519,6 +560,7 @@
     layout();
     fan($('hand'), innerWidth < 360 ? 7 : 9);
     document.querySelectorAll('.subhand,.back').forEach(hand => fan(hand,Infinity));
+    layoutPileAura();
     positionTurnCue();
   });
   nativeTable(false);

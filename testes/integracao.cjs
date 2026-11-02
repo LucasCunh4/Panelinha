@@ -39,6 +39,7 @@ const base = process.env.PANELAS_TEST_URL || 'http://127.0.0.1:8000/';
    const c=(type='num',color='red',num=7)=>({id:uid++,type,color,num});
    const render=()=>document.querySelector('#useCardArt').onchange();
    const fixture=()=>{
+    document.getElementById('modalRoot').innerHTML='';
     const s=CartasTest.getState();
     Object.assign(s,{current:0,direction:1,phase:'playing',penalty:0,highest:0,lastPenalty:null,finisher:null,drawn:null,cutOpen:false,unlockAt:0,lastActor:null,preUno:false,unoWindow:null,pendingAction:null,deadline:0,activeColor:'red',token:s.token+1,discard:[c()],deck:Array.from({length:80},()=>c('num','blue',2)),summary:[],pastWinners:[],teams:[0,0]});
     Object.assign(s.o,{duo:false,single:true,timeout:0,cut:true,challenge:true,dist:true,rotate:true,infinite:false});
@@ -71,7 +72,7 @@ const base = process.env.PANELAS_TEST_URL || 'http://127.0.0.1:8000/';
     ok(document.querySelector(`[data-card="${card.id}"]`).disabled,'+2 contra +6');s.highest=2;render();ok(!document.querySelector(`[data-card="${card.id}"]`).disabled,'cor indevida');
    });
    test('Panela de Pressão incorpora +20, respeita limite e encerra punição',()=>{
-    const s=fixture();const card=c('dist',null);s.players[0].hand.push(card);s.penalty=20;s.highest=2;play(card);clickColor('red');
+    const s=fixture();const card=c('dist',null);s.players[0].hand.push(card);s.penalty=20;s.highest=2;play(card);ok(!s.pendingAction&&!document.querySelector('.color-picker'),'Panela abriu seletor');
     const sizes=s.players.map(p=>p.hand.length);ok(sizes[0]<=2&&sizes.every(n=>n>=1),'limites da Panela de Pressão');
     ok(sizes.reduce((a,b)=>a+b)===28&&s.penalty===0&&s.lastDistribution.penaltyAdded===20,'pool/punição');
    });

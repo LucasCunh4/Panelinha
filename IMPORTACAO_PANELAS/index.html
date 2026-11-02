@@ -90,9 +90,9 @@
     <p id="joinNotice" class="coming-soon">Em breve você poderá entrar na cozinha dos seus amigos.<br>O multiplayer estará disponível em uma próxima atualização.</p>
   </section>
   <section id="menu" class="panel front-screen hide" aria-labelledby="settingsTitle"><button class="screen-back" data-nav-back aria-label="Voltar à identificação">‹ <span>Voltar</span></button><h2 id="settingsTitle">Sua partida</h2><p class="muted">Prepare a mesa para jogar com três bots.</p>
-    <div class="grid">
-      <div><label class="setting">Formato <select id="mode"><option value="solo">Todos contra todos</option><option value="duo">Duplas (você + Bot 2)</option></select></label><label class="setting">Duração <select id="duration"><option value="points">Partida por pontos</option><option value="single">Rodada única</option></select></label><label class="setting">Pontuação-meta <select id="goal"></select></label><label class="setting">Tempo por turno <select id="timeout"><option value="0">Sem limite</option><option value="15">15 s</option><option value="30">30 s</option><option value="45">45 s</option><option value="60">60 s</option></select></label></div>
-      <div><label class="setting">Compra infinita <input id="infinite" type="checkbox"></label><label class="setting">Cortes + cartas idênticas <input id="cut" type="checkbox" checked></label><label class="setting"><span id="challengeSettingLabel">Desafiar +4 e +6</span> <input id="challenge" type="checkbox" checked></label><label class="setting">+6 <input id="wild6" type="checkbox" checked aria-label="+6"></label><label class="setting">Panela de Pressão <input id="dist" type="checkbox" checked></label><label class="setting">Liquidificador <input id="rotate" type="checkbox" checked></label></div>
+    <div class="grid settings-grid">
+      <fieldset class="settings-block match-settings"><legend><span aria-hidden="true">♨</span> Receita da partida</legend><div class="settings-choices"><label class="setting">Formato <select id="mode"><option value="solo">Individual</option><option value="duo">Duplas</option></select></label><label class="setting">Duração <select id="duration"><option value="points">Por pontos</option><option value="single">Rodada única</option></select></label><label class="setting">Pontuação-meta <select id="goal"></select></label><label class="setting">Tempo por turno <select id="timeout"><option value="0">Sem limite</option><option value="15">15 s</option><option value="30">30 s</option><option value="45">45 s</option><option value="60">60 s</option></select></label></div></fieldset>
+      <fieldset class="settings-block rule-settings"><legend><span aria-hidden="true">✦</span> Temperos do jogo</legend><div class="settings-toggles"><label class="setting">Compra infinita <input id="infinite" type="checkbox"></label><label class="setting">Cortes + cartas idênticas <input id="cut" type="checkbox" checked></label><label class="setting"><span id="challengeSettingLabel">Desafiar +4 e +6</span> <input id="challenge" type="checkbox" checked></label><label class="setting">+6 <input id="wild6" type="checkbox" checked aria-label="+6"></label><label class="setting">Panela de Pressão <input id="dist" type="checkbox" checked></label><label class="setting">Liquidificador <input id="rotate" type="checkbox" checked></label></div></fieldset>
     </div>
     <div class="row menu-header"><button class="hero-button hero-gold" id="startBtn">Começar com 3 bots</button></div>
   </section>
@@ -108,13 +108,13 @@
             <img class="flame flame-yellow" src="assets/mesa/chama_amarela.png" alt="">
           </div>
           <svg id="stoveDirection" class="stove-direction" viewBox="0 0 490 490" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-            <circle id="stoveOrbit" cx="245" cy="245" r="206" pathLength="1000" class="stove-flow stove-glint"/>
-            <circle cx="245" cy="245" r="206" pathLength="1000" class="stove-flow stove-tail tail-clockwise tail-long"/>
-            <circle cx="245" cy="245" r="206" pathLength="1000" class="stove-flow stove-tail tail-clockwise tail-mid"/>
-            <circle cx="245" cy="245" r="206" pathLength="1000" class="stove-flow stove-tail tail-counterclockwise tail-long"/>
-            <circle cx="245" cy="245" r="206" pathLength="1000" class="stove-flow stove-tail tail-counterclockwise tail-mid"/>
-            <circle cx="245" cy="245" r="206" pathLength="1000" class="stove-flow stove-tail tail-clockwise tail-near"/>
-            <circle cx="245" cy="245" r="206" pathLength="1000" class="stove-flow stove-tail tail-counterclockwise tail-near"/>
+            <ellipse id="stoveOrbit" cx="245" cy="245" rx="220" ry="194" pathLength="1000" class="stove-flow stove-glint"/>
+            <ellipse cx="245" cy="245" rx="220" ry="194" pathLength="1000" class="stove-flow stove-tail tail-clockwise tail-long"/>
+            <ellipse cx="245" cy="245" rx="220" ry="194" pathLength="1000" class="stove-flow stove-tail tail-clockwise tail-mid"/>
+            <ellipse cx="245" cy="245" rx="220" ry="194" pathLength="1000" class="stove-flow stove-tail tail-counterclockwise tail-long"/>
+            <ellipse cx="245" cy="245" rx="220" ry="194" pathLength="1000" class="stove-flow stove-tail tail-counterclockwise tail-mid"/>
+            <ellipse cx="245" cy="245" rx="220" ry="194" pathLength="1000" class="stove-flow stove-tail tail-clockwise tail-near"/>
+            <ellipse cx="245" cy="245" rx="220" ry="194" pathLength="1000" class="stove-flow stove-tail tail-counterclockwise tail-near"/>
           </svg>
         </div>
         <div class="seat top" id="player2"></div>
@@ -165,7 +165,8 @@ const COLORS=['red','blue','green','yellow'];
 const CN={red:'Vermelho',blue:'Azul',green:'Verde',yellow:'Amarelo'};
 const TYPES={num:'Número',draw2:'+2',wild4:'+4',wild6:'+6',skip:'Bloqueio',reverse:'Inverter',wild:'Coringa',dist:'Panela de Pressão',rotate:'Liquidificador'};
 const SHORT={skip:'BLOQ',reverse:'INV',wild:'COR',dist:'PANELA DE PRESSÃO',rotate:'LIQUIDIFICADOR'};
-const WILD=new Set(['wild','wild4','wild6','dist','rotate']);
+const COLORLESS=new Set(['wild','wild4','wild6','dist','rotate']);
+const COLOR_CHOOSERS=new Set(['wild','wild4','wild6']);
 const SPECIAL=new Set(['draw2','wild4','wild6','wild','dist','rotate']);
 const VALUE={num:2,draw2:4,skip:4,reverse:4,wild4:6,wild6:8,wild:10,dist:10,rotate:10};
 const CUT_PAUSE_MS=2200; // tempo mínimo antes de o próximo jogador agir; corte aparece imediatamente
@@ -175,7 +176,7 @@ function make(type,color=null,num=null){return {id:++uid,type,color,num};}
 function shuffle(a){for(let i=a.length-1;i>0;i--){let j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
 function descriptor(c){if(!c)return '—';return c.type==='num'?String(c.num):TYPES[c.type];}
 function description(c){return descriptor(c)+(c.color?' '+CN[c.color]:'');}
-function isWild(c){return WILD.has(c.type)}
+function isColorless(c){return COLORLESS.has(c.type)}
 function equals(a,b){return a&&b&&a.type===b.type&&(a.type==='num'?a.num===b.num&&a.color===b.color:(!a.color||a.color===b.color));}
 function power(c){return c.type==='draw2'?2:c.type==='wild4'?4:c.type==='wild6'?6:0;}
 // Mantém os nomes de arquivo EXATOS do ZIP oficial de prévia (inclusive mais_2.png).
@@ -282,7 +283,7 @@ function canDistribute(c){
   // A última carta normal pode encerrar; seu autor não recebe cartas.
   return s.players.some(p=>p.id!==author.id&&p.hand.length>0)||(!s.penalty&&after<=1);
 }
-function canPlay(c){if(c.type==='dist'&&!canDistribute(c))return false;if(s.penalty){return (power(c)>0&&power(c)>=s.highest)||c.type==='dist';}let t=top();if(isWild(c))return true;return c.color===s.activeColor||(!isWild(t)&&c.type===t.type&&(c.type==='num'?c.num===t.num:true));}
+function canPlay(c){if(c.type==='dist'&&!canDistribute(c))return false;if(s.penalty){return (power(c)>0&&power(c)>=s.highest)||c.type==='dist';}let t=top();if(isColorless(c))return true;return c.color===s.activeColor||(!isColorless(t)&&c.type===t.type&&(c.type==='num'?c.num===t.num:true));}
 function checkCards(id,ids,isCut){
   if(!s||s.phase!=='playing'||ids.length!==1)return false;
   const c=s.players[id].hand.find(q=>q.id===ids[0]);
@@ -300,7 +301,7 @@ function chooseCards(id,ids){
   }
   const c=s.players[id].hand.find(x=>x.id===ids[0]);
   const ending=s.players[id].hand.length===1;
-  if(['wild','wild4','wild6','dist'].includes(c.type)&&!ending){s.pendingAction={id,ids:[...ids],isCut,cardType:c.type,cardId:c.id};clearJobs();showColors();return;}
+  if(COLOR_CHOOSERS.has(c.type)&&!ending){s.pendingAction={id,ids:[...ids],isCut,cardType:c.type,cardId:c.id};clearJobs();showColors();return;}
   applyPlay(id,ids,isCut,s.activeColor);
 }
 // Efeito próprio da Panela: o seletor de cor nunca decide qual efeito executar.
@@ -311,7 +312,7 @@ function resolvePressurePlay(actor,repeatedOwnCut){
 function commitColorChoice(state,action,color){
   if(s!==state||s.pendingAction!==action||!COLORS.includes(color))return false;
   const card=s.players[action.id].hand.find(c=>c.id===action.cardId);
-  if(!card||card.type!==action.cardType){
+  if(!card||card.type!==action.cardType||!COLOR_CHOOSERS.has(card.type)){
     s.pendingAction=null;$('modalRoot').innerHTML='';
     log('Escolha cancelada: a identidade da carta pendente mudou.');render();queueBots();return false;
   }
@@ -327,9 +328,9 @@ function applyPlay(id,ids,isCut,color){
   const illegal=(c.type==='wild4'||c.type==='wild6')&&p.hand.some(q=>q.id!==c.id&&q.type!=='wild4'&&q.type!=='wild6'&&canPlay(q));
   closeUnoOnAction();
   p.hand=p.hand.filter(q=>q.id!==c.id);
-  s.discard.push(c);if(c.type!=='rotate')s.activeColor=c.color||color||s.activeColor;
+  s.discard.push(c);if(c.type!=='rotate'&&c.type!=='dist')s.activeColor=c.color||color||s.activeColor;
   s.drawn=null;s.pendingAction=null;s.lastActor=id;s.lastDistribution=null;
-  log(`${names(id)} ${isCut?'CORTOU com':'jogou'} ${description(c)}${!c.color&&p.hand.length?' (cor: '+CN[s.activeColor]+')':''}.`);
+  log(`${names(id)} ${isCut?'CORTOU com':'jogou'} ${description(c)}${COLOR_CHOOSERS.has(c.type)&&p.hand.length?' (cor: '+CN[s.activeColor]+')':''}.`);
   if(p.hand.length===1){const announced=(id===0?s.preUno:Math.random()<.75);if(announced){log(`${names(id)} anunciou ÚLTIMA CARTA.`);}else{s.unoWindow={id};log(`${names(id)} ficou com 1 carta sem anunciar!`);}}
   s.preUno=false;
   if(p.hand.length===0&&s.finisher===null){s.finisher=id;log(`${names(id)} terminou suas cartas!`);}
@@ -383,7 +384,7 @@ function queueBots(){
   if(s.current!==0&&s.cutOpen&&s.finisher===null){
     cutTimer=setTimeout(()=>{
       if(!s||s.token!==token||s.phase!=='playing'||s.pendingAction||Date.now()>=s.unlockAt)return;
-      if(Math.random()<.22){const candidates=s.players.filter(p=>p.id!==s.current&&p.id!==0).flatMap(p=>p.hand.filter(c=>equals(c,top())&&canPlay(c)).map(c=>({id:p.id,card:c})));if(candidates.length){const cut=pick(candidates);applyPlay(cut.id,[cut.card.id],true,cut.card.color||pick(COLORS));}}
+      if(Math.random()<.22){const candidates=s.players.filter(p=>p.id!==s.current&&p.id!==0).flatMap(p=>p.hand.filter(c=>equals(c,top())&&canPlay(c)).map(c=>({id:p.id,card:c})));if(candidates.length){const cut=pick(candidates);applyPlay(cut.id,[cut.card.id],true,cut.card.color||(COLOR_CHOOSERS.has(cut.card.type)?pick(COLORS):s.activeColor));}}
     },Math.min(700,Math.max(0,s.unlockAt-Date.now()-1)));
   }
   if(s.current!==0){
@@ -398,13 +399,14 @@ function queueBots(){
 function botTurn(){if(!s||s.phase!=='playing'||s.current===0||s.pendingAction)return;if(!canActNow()){queueBots();return;}let id=s.current;
 const p=s.players[id];let choices=p.hand.filter(canPlay);let chosen=null;
 if(s.penalty){let defending=choices.filter(c=>power(c));let distributed=choices.find(c=>c.type==='dist');if(distributed&&(!defending.length||s.penalty>=8))chosen=distributed;else if(defending.length)chosen=defending.sort((a,b)=>power(a)-power(b))[0];else chosen=distributed||null;}
-else if(choices.length){let numeric=choices.filter(c=>c.type==='num');let colored=choices.filter(c=>!isWild(c)&&c.type!=='num');let regularWild=choices.filter(c=>c.type==='wild');let specials=choices.filter(c=>isWild(c)&&c.type!=='wild');chosen=pick(numeric.length?numeric:colored.length?colored:regularWild.length?regularWild:specials);}
-if(chosen){let color=chosen.color||bestColor(p.hand.filter(c=>c.id!==chosen.id));applyPlay(id,[chosen.id],false,color);return;}
+else if(choices.length){let numeric=choices.filter(c=>c.type==='num');let colored=choices.filter(c=>!isColorless(c)&&c.type!=='num');let regularWild=choices.filter(c=>c.type==='wild');let specials=choices.filter(c=>isColorless(c)&&c.type!=='wild');chosen=pick(numeric.length?numeric:colored.length?colored:regularWild.length?regularWild:specials);}
+if(chosen){let color=colorForPlay(chosen,p.hand.filter(c=>c.id!==chosen.id));applyPlay(id,[chosen.id],false,color);return;}
 if(s.penalty){finishPenaltyDraw(id);return;}
 let drawn=null,n=0;do{drawn=drawCard(id);if(!drawn)break;n++;}while(s.o.infinite&&!canPlay(drawn)&&n<200);log(`${names(id)} comprou ${n} carta(s).`);
 if(drawn&&canPlay(drawn)){// Bots use a bought special only when they have no other ordinary play.
-let normal=p.hand.some(c=>c.id!==drawn.id&&c.type==='num'&&canPlay(c));if(!normal){applyPlay(id,[drawn.id],false,drawn.color||bestColor(p.hand.filter(c=>c.id!==drawn.id)));return;}}
+let normal=p.hand.some(c=>c.id!==drawn.id&&c.type==='num'&&canPlay(c));if(!normal){applyPlay(id,[drawn.id],false,colorForPlay(drawn,p.hand.filter(c=>c.id!==drawn.id)));return;}}
 s.current=nextActive(id);startTurn();}
+function colorForPlay(card,hand){return card.color||(COLOR_CHOOSERS.has(card.type)?bestColor(hand):s.activeColor);}
 function bestColor(cards){let counts=COLORS.map(color=>({color,n:cards.filter(c=>c.color===color).length})).sort((a,b)=>b.n-a.n);return counts[0].n?counts[0].color:pick(COLORS);}
 function clickHandCard(cardId){
   if(!s||s.phase!=='playing')return;

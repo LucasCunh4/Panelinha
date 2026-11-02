@@ -58,6 +58,7 @@ const assert=require('node:assert/strict');
     try{Math.random=()=>{if(index>=1){const i=index--;return i===114?89.25/(i+1):.999999}return .999999};CartasTest.newRound();}
     finally{Math.random=seededRandom;}
     check(s.discard.at(-1).type==='dist'&&s.lastDistribution.actor===null,'abertura não controlada');
+    check(!s.pendingAction&&!document.querySelector('.color-picker'),'Panela inicial abriu seletor');
     check(s.players.every(p=>p.hand.length>=1)&&s.finisher===null&&s.phase==='playing','abertura gerou zero/vitória');
     check([...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].length===118&&new Set([...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id)).size===118,'baralho inicial');
    });

@@ -1,0 +1,4 @@
+PASS opções temáticas: seis telas, dez controles acessíveis por toque/teclado nativo; mesmas configurações aplicadas ao iniciar
+PASS Panela sem chamar seletor: normal, +2/+6/+20/+40, duplas, última carta, corte, compra e três bots; cor/IDs preservados e componente recusa dist
+PASS elipse 220×194 concêntrica; card junto ao leque centrado; halo com 18px simétricos nas quatro bordas, seis silhuetas e reforço apenas sem resposta legal
+PASS hover real no leque normal, compacto fechado e expandido: elevação suave, retorno, vizinhos imóveis e nenhuma jogada; toggle acessível por Espaço

@@ -14,10 +14,12 @@
   const penaltyBases={wild4:'assets/interacao_v2/mais4_base_limpa.png',wild6:'assets/interacao_v2/mais6_base_limpa.png'};
   let closeCurrent=null;
   function open(root,{cardType,choose,cancel}){
-    const type=['wild','wild4','wild6','dist'].includes(cardType)?cardType:'wild';
+    // Recusa explícita: especiais sem escolha jamais usam este componente.
+    if(!['wild','wild4','wild6'].includes(cardType))return false;
+    const type=cardType;
     const base=penaltyBases[type]||`${assets}escolher_cor_base.png`;
-    const title=type==='dist'?'Panela de Pressão':type==='wild4'?'+4 — Escolher cor':type==='wild6'?'+6 — Escolher cor':'Escolher cor';
-    const hint=type==='dist'?'Escolha a cor para redistribuir as mãos':'Toque em um ingrediente';
+    const title=type==='wild4'?'+4 — Escolher cor':type==='wild6'?'+6 — Escolher cor':'Escolher cor';
+    const hint='Toque em um ingrediente';
     const imageFor=name=>`${assets}escolher_cor_${name}_overlay_full.png`;
     closeCurrent?.();
     const previous=document.activeElement;

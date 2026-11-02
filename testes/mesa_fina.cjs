@@ -39,11 +39,11 @@ const output=process.env.PANELAS_SCREENSHOTS||'/workspace/work/mesa-fina-evidenc
    const bg=document.getElementById('stoveScene').getBoundingClientRect(),svg=document.getElementById('stoveDirection').getBoundingClientRect(),box=el.getBBox();
    return {first,second,forever:a.effect.getTiming().iterations===Infinity,aligned:Math.abs(svg.width-svg.height)<.01&&Math.abs(svg.x+svg.width/2-(bg.x+bg.width*836/1672))<1&&Math.abs(svg.y+svg.height/2-(bg.y+bg.height*451/941))<1,box:{x:box.x,y:box.y,width:box.width,height:box.height}};
   });
-  assert.ok(orbit.forever&&orbit.aligned&&orbit.second>orbit.first&&orbit.box.x===39&&orbit.box.y===39&&orbit.box.width===412);
+  assert.ok(orbit.forever&&orbit.aligned&&orbit.second>orbit.first&&orbit.box.x===25&&orbit.box.y===51&&orbit.box.width===440&&orbit.box.height===388);
   await page.evaluate(()=>{CartasTest.getState().direction=-1;document.getElementById('useCardArt').onchange()});
   const reverse=await page.locator('.stove-glint').evaluate(el=>{const a=el.getAnimations()[0],before=parseFloat(getComputedStyle(el).strokeDashoffset);a.currentTime+=500;return {before,after:parseFloat(getComputedStyle(el).strokeDashoffset),direction:a.effect.getTiming().direction};});
   assert.equal(reverse.direction,'normal');assert.ok(Math.abs(reverse.before-orbit.second)<1&&reverse.after<reverse.before,JSON.stringify(reverse));
-  console.log('PASS brilho circular no plano do queimador, giro nos dois sentidos e inversão sem salto de fase');
+  console.log('PASS brilho elíptico no plano do queimador, giro nos dois sentidos e inversão sem salto de fase');
   const opacity=async color=>{
    await page.evaluate(color=>{const s=CartasTest.getState();s.activeColor=color;document.getElementById('useCardArt').onchange()},color);
    return await page.locator(`.flame-${color}`).evaluate(async el=>{await Promise.all(el.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished));return Number(getComputedStyle(el).opacity)});

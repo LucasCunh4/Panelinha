@@ -36,13 +36,9 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/correcoes-evidence';
   const reductions=new Set();
   for(const n of [2,3,5,6,11,21,31])for(const penalty of [0,2,6,20,40]){
    await fixture(n,penalty,'dist');const ids=await allIds();await play();
-   assert.equal(await page.locator('.color-picker').getAttribute('data-card-type'),'dist');
-   assert.equal(await page.locator('#colorPickerTitle').textContent(),'Panela de Pressão');
-   assert.match(await page.locator('#colorPickerHint').textContent(),/redistribuir/);
-   const pending=await page.evaluate(()=>CartasTest.getState().pendingAction);assert.equal(pending.cardType,'dist');assert.equal(pending.cardId,600000);
-   await page.locator('[data-color="blue"]').tap();
+   assert.equal(await page.locator('.color-picker').count(),0);assert.equal(await page.evaluate(()=>CartasTest.getState().pendingAction),null);
    const r=await page.evaluate(()=>{const s=CartasTest.getState();return {counts:s.players.map(p=>p.hand.length),top:s.discard.at(-1).type,dist:s.lastDistribution,penalty:s.penalty,color:s.activeColor,current:s.current}});
-   assert.equal(r.top,'dist');assert.equal(r.penalty,0);assert.equal(r.color,'blue');assert.equal(r.current,1);
+   assert.equal(r.top,'dist');assert.equal(r.penalty,0);assert.equal(r.color,'red');assert.equal(r.current,1);
    const cap=n-1,reduction=cap-r.counts[0];assert.ok(Number.isInteger(reduction)&&reduction>=Math.min(1,cap-1)&&reduction<=Math.min(3,cap-1));
    if(n>=5)reductions.add(reduction);
    assert.ok(r.counts.every(c=>c>=1));assert.ok(Math.max(...r.counts.slice(1))-Math.min(...r.counts.slice(1))<=2);
@@ -50,11 +46,11 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/correcoes-evidence';
    assert.deepEqual(await allIds(),ids);await page.locator('.color-picker').waitFor({state:'hidden'});await finish();
   }
   assert.deepEqual([...reductions].sort(),[1,2,3]);
-  console.log('PASS Panela: 35 jogadas pelo seletor tipado; mãos pequenas/20/40/80/120+, redução sorteada 1–3, mínimo, equilíbrio, +2/+6/+20/+40 e conservação de todos os IDs');
+  console.log('PASS Panela: 35 jogadas diretas sem seletor; mãos pequenas/20/40/80/120+, redução sorteada 1–3, mínimo, equilíbrio, +2/+6/+20/+40 e conservação de todos os IDs');
   await fixture(3,0,'wild');const original=await page.evaluate(()=>CartasTest.getState().players.slice(1).map(p=>p.hand.map(c=>c.id)));
   await play();assert.equal(await page.locator('.color-picker').getAttribute('data-card-type'),'wild');await page.locator('[data-color="green"]').tap();
   assert.deepEqual(await page.evaluate(()=>CartasTest.getState().players.slice(1).map(p=>p.hand.map(c=>c.id))),original);assert.equal(await page.evaluate(()=>CartasTest.getState().lastDistribution),null);await page.locator('.color-picker').waitFor({state:'hidden'});
-  await fixture(3,0,'dist');await play();await page.evaluate(()=>CartasTest.getState().players[0].hand[0].type='wild');await page.locator('[data-color="red"]').tap();
+  await fixture(3,0,'wild');await play();await page.evaluate(()=>CartasTest.getState().players[0].hand[0].type='dist');await page.locator('[data-color="red"]').tap();
   assert.equal(await page.evaluate(()=>CartasTest.getState().discard.length),1);assert.equal(await page.evaluate(()=>CartasTest.getState().players[0].hand.length),3);
   await fixture(5,20,'dist');await page.evaluate(()=>{CartasTest.getState().players[0].hand.length=1;document.getElementById('useCardArt').onchange()});const lastIds=await allIds();await play();
   const final=await page.evaluate(()=>{const s=CartasTest.getState();return {finisher:s.finisher,phase:s.phase,hands:s.players.map(p=>p.hand.length),active:s.lastDistribution.active,penalty:s.penalty}});
@@ -108,21 +104,21 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/correcoes-evidence';
   for(const direction of [1,-1]){
    await page.evaluate(direction=>{CartasTest.getState().direction=direction;document.getElementById('useCardArt').onchange()},direction);
    const geometry=await page.locator('#stoveOrbit').evaluate(circle=>{
-    const matrix=circle.getScreenCTM(),point=(x,y)=>new DOMPoint(x,y).matrixTransform(matrix),center=point(245,245),rx=point(451,245),ry=point(245,451),burner=document.getElementById('burner').getBoundingClientRect();
+    const matrix=circle.getScreenCTM(),point=(x,y)=>new DOMPoint(x,y).matrixTransform(matrix),center=point(245,245),rx=point(465,245),ry=point(245,439),burner=document.getElementById('burner').getBoundingClientRect();
     const animation=circle.getAnimations().find(a=>a.effect.getTiming().iterations===Infinity);animation.pause();animation.currentTime=1000;const first=parseFloat(getComputedStyle(circle).strokeDashoffset);animation.currentTime=1500;
     return {rx:Math.hypot(rx.x-center.x,rx.y-center.y),ry:Math.hypot(ry.x-center.x,ry.y-center.y),dx:center.x-burner.x-burner.width/2,dy:center.y-burner.y-burner.height/2,first,second:parseFloat(getComputedStyle(circle).strokeDashoffset),dash:getComputedStyle(circle).strokeDasharray};
    });
-   assert.ok(Math.abs(geometry.rx-geometry.ry)<.01&&Math.abs(geometry.dx)<.1&&Math.abs(geometry.dy)<.1,JSON.stringify(geometry));
+   assert.ok(Math.abs(geometry.rx/geometry.ry-220/194)<.001&&Math.abs(geometry.dx)<.1&&Math.abs(geometry.dy)<.1,JSON.stringify(geometry));
    assert.ok(direction===1?geometry.second>geometry.first:geometry.second<geometry.first);assert.match(geometry.dash,/32.*968/);
   }
   await page.setViewportSize({width:844,height:390});await fixture(3,12);
   await page.evaluate(()=>{const s=CartasTest.getState();s.players[0].hand.forEach(c=>c.color='blue');document.getElementById('useCardArt').onchange()});
   assert.equal(await page.locator('#buyBtn').getAttribute('data-mandatory'),'true');
-  const glow=await page.locator('#pile').evaluate(e=>({animations:e.getAnimations().map(a=>a.animationName),old:getComputedStyle(document.getElementById('buyBtn'),'::after').display,children:e.children.length,filter:e.getAnimations()[0].effect.getKeyframes().map(k=>k.filter)}));
-  assert.ok(glow.animations.includes('whole-pile-glow'));assert.equal(glow.old,'none');assert.equal(glow.children,6);assert.ok(glow.filter.every(f=>/drop-shadow/.test(f)));
+  const glow=await page.locator('#pileAura').evaluate(e=>({animations:e.getAnimations().map(a=>a.animationName),old:getComputedStyle(document.getElementById('buyBtn'),'::after').display,children:e.querySelectorAll('image').length,filter:e.querySelector('feMorphology').getAttribute('operator')}));
+  assert.ok(glow.animations.includes('pile-aura-pulse'));assert.equal(glow.old,'none');assert.equal(glow.children,6);assert.equal(glow.filter,'dilate');
   await page.evaluate(()=>{CartasTest.getState().players[0].hand[0]={id:600000,type:'wild4',color:null};document.getElementById('useCardArt').onchange()});
-  assert.equal(await page.locator('#buyBtn').getAttribute('data-mandatory'),'false');assert.equal(await page.locator('#pile').evaluate(e=>e.getAnimations().length),0);
-  console.log('PASS círculo concêntrico sem elipse nos dois sentidos; brilho da compra aplicado às seis camadas, removido quando há resposta legal');
+  assert.equal(await page.locator('#buyBtn').getAttribute('data-mandatory'),'false');assert.equal(await page.locator('#pileAura').evaluate(e=>e.getAnimations().length),0);
+  console.log('PASS elipse horizontal concêntrica nos dois sentidos; brilho da compra aplicado às seis camadas, removido quando há resposta legal');
   // Hover na superfície da carta; a posição do botão e dos vizinhos não se altera.
   const desktop=await browser.newPage({viewport:{width:1280,height:800}});await desktop.goto(base);await desktop.locator('#singlePlayerBtn').click();await desktop.locator('#profileContinueBtn').click();await desktop.locator('#startBtn').click();
   for(const n of [7,40]){

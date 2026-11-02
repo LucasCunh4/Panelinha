@@ -44,7 +44,7 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/padrao-evidence';
    if(width===844||width===390)await p.screenshot({path:path.join(out,`mesa-${width}x${height}-${duo?'duplas':'individual'}.png`)});
   }
   console.log('PASS 12 layouts individual/duplas, panorama e fallback retrato: caixa da Panela igual à numérica, contain sem borda/recorte CSS, verso em todas as mãos e seis camadas do monte');
-  await p.setViewportSize({width:844,height:390});await fixture();await p.locator('[data-card="76100"]').tap();await p.locator('[data-color=red]').tap();
+  await p.setViewportSize({width:844,height:390});await fixture();await p.locator('[data-card="76100"]').tap();assert.equal(await p.locator('.color-picker').count(),0);
   assert.match(await p.locator('#discard .discard-top .card-image').getAttribute('src'),/panela_de_pressao_400x850.png$/);
   assert.match(await p.locator('.played-card[data-card-id="76100"] .flight-front .card-image').getAttribute('src'),/panela_de_pressao_400x850.png$/);
   await p.locator('.color-picker').waitFor({state:'hidden'});await p.waitForFunction(()=>!document.querySelector('.played-card'));

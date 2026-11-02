@@ -42,7 +42,7 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
    await fixture();await page.evaluate(type=>{const s=CartasTest.getState();s.players[0].hand[0]={id:820000,type,color:null};document.getElementById('useCardArt').onchange()},type);
    assert.equal(await page.locator(`#injectType option[value="${type}"]`).textContent(),label);
    assert.match(await page.locator('[data-card="820000"]').getAttribute('aria-label'),new RegExp(label));assert.equal((await page.locator('[data-card="820000"] .special-name').textContent()).toLowerCase(),label.toLowerCase());
-   await page.locator('[data-card="820000"]').tap();if(type==='dist')await page.locator('[data-color="blue"]').tap();
+   await page.locator('[data-card="820000"]').tap();assert.equal(await page.locator('.color-picker').count(),0);
    assert.ok(await page.evaluate(label=>CartasTest.getState().log.some(l=>l.includes(label)),label));
    if(type==='rotate'){assert.equal(await page.evaluate(()=>CartasTest.getState().activeColor),'blue');assert.match(await page.locator('#history').textContent(),/anti-horário/);}
   }
