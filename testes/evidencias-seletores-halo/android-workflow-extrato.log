@@ -1,0 +1,19 @@
+2026-11-02T15:20:14.7193328Z To get started with the Android XR Emulator System Image SDK, you must agree to the following terms and conditions. As described below, please note that this is a preview, emulated version of the Android XR OS, subject to change, that you use at your own risk.
+2026-11-02T15:20:14.7194767Z This is the Android XR Emulator System Image SDK License Agreement
+2026-11-02T15:20:14.7196674Z 1.1 The Android Android XR Emulator System Image SDK (referred to in the License Agreement as the "SDK" and specifically including the Android system files,, packaged APIs, library files (if and when they are made available), and Google applications and APIs add-ons) is licensed to you subject to the terms of the License Agreement. The License Agreement forms a legally binding contract between you and Google in relation to your use of the SDK.
+2026-11-02T15:20:14.7720584Z To get started with the microXR Emulator System Image SDK, you must agree to the following terms and conditions. As described below, please note that this is a preview, emulated version of microXR, subject to change, that you use at your own risk.
+2026-11-02T15:20:14.7721469Z This is the microXR Emulator System Image SDK License Agreement 1. Introduction
+2026-11-02T15:20:14.7723096Z 1.1 The microXR Emulator System Image SDK (referred to in the License Agreement as the "SDK" and specifically including the Android system files,, packaged APIs, library files (if and when they are made available), and Google applications and APIs add-ons) is licensed to you subject to the terms of the License Agreement. The License Agreement forms a legally binding contract between you and Google in relation to your use of the SDK.
+2026-11-02T15:20:14.7903251Z MIPS Technologies, Inc. (“MIPS”) Internal Evaluation License Agreement for MIPS Android™ System Images for Android Software Development Kit (SDK): This Internal Evaluation License Agreement (this "Agreement") is entered into by and between MIPS and you (as an individual developer or a legal entity -- identified below as “Recipient”). MIPS shall make the Evaluation Software available to Recipient as described in accordance with the terms and conditions set forth below.
+2026-11-02T15:21:56.7936295Z   "versionCode": 5002,
+2026-11-02T15:21:56.7936536Z   "versionName": "0.2.30",
+2026-11-02T15:21:56.7936991Z   "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+2026-11-02T15:21:56.7941222Z OK: APK assinado, identidade fixa e 52 PNGs/jogo originais empacotados.
+2026-11-02T15:22:15.1859360Z   "versionCode": 5003,
+2026-11-02T15:22:15.1859732Z   "versionName": "0.2.30-upgrade-check",
+2026-11-02T15:22:15.1860466Z   "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+2026-11-02T15:22:15.1866306Z OK: APK assinado, identidade fixa e 52 PNGs/jogo originais empacotados.
+2026-11-02T15:22:40.3947968Z Warning: An error occurred while preparing SDK package Google APIs Intel x86_64 Atom System Image: Error on ZipFile unknown archive.
+2026-11-02T15:22:40.6329516Z error: could not connect to TCP port 5554: Connection refused
+2026-11-02T15:22:40.6335291Z The process '/usr/local/lib/android/sdk/platform-tools/adb' failed with exit code 1
+2026-11-02T15:22:40.6341111Z ##[error]The process '/usr/bin/sh' failed with exit code 1

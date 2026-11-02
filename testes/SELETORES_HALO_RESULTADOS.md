@@ -27,4 +27,15 @@ Durante a implementação, o teste de Voltar detectou navegação prematura: a p
 
 Permanecem pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`, certificado da geração 2, Secrets e workflow existentes. Orientação horizontal e imersão não foram alteradas. Os 11 testes de instrumentação continuam exigidos, agora incluindo a lista personalizada e Voltar, além do centro deslocado da órbita.
 
-Versão, verificação do APK real, resultado do emulador e link direto serão acrescentados após o workflow. Testes web não substituem execução nativa; o mecanismo de dados locais permanece inalterado e a partida em andamento continua apenas em memória.
+Execução final [#30](https://github.com/LucasCunh4/Panelinha/actions/runs/41470516186), fonte `ef977278c9bec06382b82d7a5b926f754f8b7951`:
+
+- **Compilação e assinatura aprovadas.** APK principal **0.2.30 / código 5002**; candidato de atualização 5003, não distribuído. A execução #29 foi cancelada para substituir a revisão que ainda emitia callback ao repetir o mesmo valor.
+- APK baixado e verificado novamente localmente com `ferramentas/verificar_apk.py`: assinatura v2, pacote, origem local, landscape/categoria game, todos os PNGs e arquivos exatos do jogo, incluindo `seletores.js`/`seletores.css`. [Metadados do APK](SELETORES_HALO_APK_0.2.30.json).
+- Certificado SHA-256 **`3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`**, igual a `android-identity.json` e ao APK anterior real **0.2.28 / 4802**. Pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`; código 5002 superior também aos códigos 4902/4903 da execução cancelada. Identidade compatível com atualização direta sobre a geração 2, sem desinstalar.
+- SHA-256 do APK **`c3b67db2b1df86f3d0bbe4d425ad512145687b5469cf424c486f21381a9c4671`**, igual ao digest do artefato GitHub; 65.171.547 bytes. Confirmado APK direto com `AndroidManifest.xml`/assets na raiz, sem ZIP externo ou APK aninhado.
+- **Falha de infraestrutura antes de iniciar o emulador:** instalação de `system-images;android-35;google_apis;x86_64` falhou com `Error on ZipFile unknown archive`. A conexão recusada na porta 5554 ocorreu depois, ao tentar encerrar um emulador que não havia iniciado. O roteiro de testes do aplicativo não começou: **0/11 testes nativos executados**.
+- **Pendentes:** execução nativa completa, capturas nas duas paisagens e teste real de atualização/preservação de UID, localStorage e SharedPreferences. Nenhum teste foi desativado. Release pulada pelo fluxo após a falha; APK, metadados e diagnósticos publicados em artefatos separados.
+
+[**Baixar APK 0.2.30 / 5002 diretamente, sem ZIP**](https://github.com/LucasCunh4/Panelinha/actions/runs/41470516186/artifacts/13154908187). Requer login no GitHub; retenção até 31/01/2027.
+
+Todo o trabalho anterior à interrupção foi preservado e salvo no GitHub. Testes web e verificação criptográfica não substituem execução nativa. A identidade de atualização foi conferida nos dois APKs reais; a preservação dos dados não pôde ser exercitada nesta execução. O mecanismo de dados locais permanece inalterado e a partida em andamento continua apenas em memória.
