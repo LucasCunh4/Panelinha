@@ -88,8 +88,9 @@
     if(!active)return;
     const record=active.record,option=record.select.options[index];
     if(!option||option.disabled||option.hidden)return;
-    record.select.selectedIndex=index;close();
-    record.select.dispatchEvent(new Event('input',{bubbles:true}));record.select.dispatchEvent(new Event('change',{bubbles:true}));sync(record);
+    const changed=record.select.selectedIndex!==index;record.select.selectedIndex=index;close();
+    if(changed){record.select.dispatchEvent(new Event('input',{bubbles:true}));record.select.dispatchEvent(new Event('change',{bubbles:true}));}
+    sync(record);
   }
   function keys(event,record){
     if(record.button.disabled)return;

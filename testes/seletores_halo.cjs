@@ -22,8 +22,8 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/seletores-halo-evide
   assert.equal(await p.getByRole('combobox').count(),4);
   assert.ok(await p.locator('select').evaluateAll(es=>es.every(e=>e.getAttribute('aria-hidden')==='true'&&e.tabIndex===-1&&getComputedStyle(e).pointerEvents==='none'&&e.getBoundingClientRect().height<=1)));
   await p.evaluate(()=>{window.__changes=0;window.__nativePointer=0;document.getElementById('timeout').addEventListener('change',()=>window.__changes++);document.querySelectorAll('select').forEach(s=>s.addEventListener('pointerdown',()=>window.__nativePointer++))});
-  await choose('timeout','15');assert.equal(await p.evaluate(()=>window.__changes),1);assert.equal(await p.evaluate(()=>window.__nativePointer),0);assert.match(await trigger('timeout').textContent(),/15 s/);
-  await choose('mode','duo');assert.deepEqual(await p.locator('#goal option').evaluateAll(es=>es.map(e=>e.value)),['5','10','15']);await choose('goal','15');
+  await choose('timeout','15');assert.equal(await p.evaluate(()=>window.__changes),1);await choose('timeout','15');assert.equal(await p.evaluate(()=>window.__changes),1);assert.equal(await p.evaluate(()=>window.__nativePointer),0);assert.match(await trigger('timeout').textContent(),/15 s/);
+  await choose('mode','duo');assert.deepEqual(await p.locator('#goal option').evaluateAll(es=>es.map(e=>e.value)),['5','10','15']);await choose('goal','15');await choose('mode','duo');assert.equal(await p.locator('#goal').inputValue(),'15');
   await choose('duration','single');assert.ok(await trigger('goal').isDisabled());await choose('duration','points');assert.ok(await trigger('goal').isEnabled());
   for(const [width,height] of [[568,320],[667,375],[844,390],[915,412],[1280,800],[390,844]])for(const id of ['mode','duration','goal','timeout']){
    await p.setViewportSize({width,height});await trigger(id).scrollIntoViewIfNeeded();await trigger(id).tap();await list.evaluate(e=>Promise.all(e.getAnimations().map(a=>a.finished.catch(()=>{}))));
