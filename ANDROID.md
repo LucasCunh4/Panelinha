@@ -1,6 +1,6 @@
 # Panelinha Teste — Android
 
-Atualização atual: [novas +4/+6, aviso global e halo reforçado](testes/ARTES_AVISO_HALO_RESULTADOS.md). Artes e overlays do pacote novo, anúncios reais deduplicados e luz mais forte com geometria/condição preservadas. Mantém geração 2, landscape, imersão, offline, regras e workflow; instrumentação ampliada para 12 testes offline + 1 de atualização.
+Atualização atual: [arte oficial do Liquidificador](testes/LIQUIDIFICADOR_RESULTADOS.md). PNG 400×850 com máscara da Panela, associado ao tipo `rotate` no renderizador comum. Regras/rotação, demais artes, assinatura geração 2, landscape, imersão, offline e workflow preservados.
 
 > Assinatura ativa: **geração 2**, autorizada em 30/10/2026 após perda da chave
 > anterior. Identidade pública e certificado aposentado em `android-identity.json`.

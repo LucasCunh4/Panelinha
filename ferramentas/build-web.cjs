@@ -42,6 +42,12 @@ if(padrao.assets.length!==2)throw Error('São duas artes padronizadas');
 for(const entry of padrao.assets){
   if(crypto.createHash('sha256').update(fs.readFileSync(path.join(source,entry.path))).digest('hex')!==entry.sha256)throw Error(`Arte padronizada divergente: ${entry.path}`);
 }
+const liquidificador=JSON.parse(fs.readFileSync(path.join(source,'documentacao/MANIFESTO_LIQUIDIFICADOR.json')));
+if(liquidificador.assets.length!==1)throw Error('O Liquidificador usa somente o PNG oficial, sem prévia');
+for(const entry of liquidificador.assets){
+  const bytes=fs.readFileSync(path.join(source,entry.path));
+  if(crypto.createHash('sha256').update(bytes).digest('hex')!==entry.sha256||bytes.readUInt32BE(16)!==400||bytes.readUInt32BE(20)!==850||bytes[25]!==6)throw Error(`Liquidificador divergente: ${entry.path}`);
+}
 for(const old of especiais.supersededAssets.paths)if(fs.existsSync(path.join(source,old)))throw Error(`Arte substituída ainda no pacote: ${old}`);
 for(const file of ['index.html','mesa.css','mesa.js','escolher-cor.css','escolher-cor.js']){
   const code=fs.readFileSync(path.join(source,file),'utf8');

@@ -1,0 +1,113 @@
+[
+  {
+    "suite": "ajustes_opcoes",
+    "exit": 0,
+    "seconds": 42.6
+  },
+  {
+    "suite": "android-compat",
+    "exit": 0,
+    "seconds": 6.2
+  },
+  {
+    "suite": "artes_aviso_halo",
+    "exit": 0,
+    "seconds": 11.2
+  },
+  {
+    "suite": "artes_penalidades",
+    "exit": 0,
+    "seconds": 76.1
+  },
+  {
+    "suite": "atualizacao_mesa",
+    "exit": 0,
+    "seconds": 53.7
+  },
+  {
+    "suite": "atualizacao_regras",
+    "exit": 0,
+    "seconds": 35.1
+  },
+  {
+    "suite": "correcoes_estabilidade",
+    "exit": 0,
+    "seconds": 42.7
+  },
+  {
+    "suite": "escolher_cor",
+    "exit": 0,
+    "seconds": 44.7
+  },
+  {
+    "suite": "horizontal_identidade",
+    "exit": 0,
+    "seconds": 35.7
+  },
+  {
+    "suite": "integracao",
+    "exit": 0,
+    "seconds": 12.9
+  },
+  {
+    "suite": "leque_continuo",
+    "exit": 0,
+    "seconds": 39.2
+  },
+  {
+    "suite": "liquidificador",
+    "exit": 0,
+    "seconds": 18.2,
+    "additionalValidation": "Repetido após incluir espera pelo pouso na captura do descarte; aprovado."
+  },
+  {
+    "suite": "mesa",
+    "exit": 0,
+    "seconds": 24.9
+  },
+  {
+    "suite": "mesa_atual",
+    "exit": 0,
+    "seconds": 35.9
+  },
+  {
+    "suite": "mesa_fina",
+    "exit": 0,
+    "seconds": 15.8
+  },
+  {
+    "suite": "navegacao",
+    "exit": 0,
+    "seconds": 17.8
+  },
+  {
+    "suite": "padrao_400x850",
+    "exit": 0,
+    "seconds": 8.8
+  },
+  {
+    "suite": "penalidades_padrao",
+    "exit": 0,
+    "seconds": 19.0
+  },
+  {
+    "suite": "preparacao_menu",
+    "exit": 0,
+    "seconds": 3.1
+  },
+  {
+    "suite": "rastro_halo",
+    "exit": 0,
+    "seconds": 30.8
+  },
+  {
+    "suite": "refinamentos_mesa",
+    "exit": 0,
+    "seconds": 14.5
+  },
+  {
+    "suite": "seletores_halo",
+    "exit": 0,
+    "seconds": 22.0
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "package": "Panelinha - Liquidificador oficial no padrao da Panela de Pressao",
+  "file": "liquidificador_oficial_400x850.png",
+  "dimensions_px": {
+    "width": 400,
+    "height": 850
+  },
+  "format": "RGBA PNG",
+  "sha256": "1c6c4e0c71206b4b750673797dfd43c0d7247df5aa7fb08bca80f76d5e0f39a9",
+  "mask_reference": "panela_de_pressao_400x850.png (mesma mascara alpha)",
+  "origin_resolution": [
+    860,
+    1828
+  ],
+  "rendering": "Proporcao preservada; redimensionamento uniforme aproximado, sem esticamento vertical",
+  "intended_card_id": "liquidificador",
+  "gameplay": "Girar as maos dos participantes uma posicao no sentido atual de jogo; nao redistribuir ao acaso; nao escolher cor.",
+  "notes": "O zip substitui somente a arte da carta Liquidificador; nao modifica o comportamento do jogo nem inclui APK."
+}

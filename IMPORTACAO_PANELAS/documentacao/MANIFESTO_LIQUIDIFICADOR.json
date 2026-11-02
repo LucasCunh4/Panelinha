@@ -1,0 +1,15 @@
+{
+  "bundle": "Panelinha — Liquidificador oficial 400x850",
+  "sourceZip": "Panelinha_Liquidificador_CORRIGIDO.zip",
+  "sourceZipSha256": "8f8291c7d035c0fab5f056a6775f4032b807ab42b65f55570ac7d351b5748183",
+  "logicalType": "rotate",
+  "assets": [
+    {
+      "path": "assets/padronizadas/liquidificador_oficial_400x850.png",
+      "sha256": "1c6c4e0c71206b4b750673797dfd43c0d7247df5aa7fb08bca80f76d5e0f39a9",
+      "width": 400,
+      "height": 850,
+      "alphaSha256": "934a687637936ca627554de0610cefbf764b59b9f325514b6667e2957077a71d"
+    }
+  ]
+}

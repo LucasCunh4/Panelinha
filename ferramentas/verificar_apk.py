@@ -70,6 +70,12 @@ with zipfile.ZipFile(apk) as archive:
         data = archive.read(prefix + entry['path'])
         assert hashlib.sha256(data).hexdigest() == entry['sha256'], entry['path']
         assert data[:8] == b'\x89PNG\r\n\x1a\n' and struct.unpack('>II', data[16:24]) == (400,850) and data[25] == 6, 'PNG padronizado deve ser RGBA 400x850'
+    liquidificador = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_LIQUIDIFICADOR.json').read_text())
+    assert len(liquidificador['assets']) == 1
+    for entry in liquidificador['assets']:
+        data = archive.read(prefix + entry['path'])
+        assert hashlib.sha256(data).hexdigest() == entry['sha256'], entry['path']
+        assert data[:8] == b'\x89PNG\r\n\x1a\n' and struct.unpack('>II', data[16:24]) == (400,850) and data[25] == 6, 'Liquidificador deve ser RGBA 400x850'
     for old in especiais['supersededAssets']['paths']:
         assert prefix + old not in archive.namelist(), f'Arte substituída ainda empacotada: {old}'
     for old in penalidades['supersededAssets']['paths']:
@@ -92,7 +98,7 @@ info = {
     'file': apk.name, 'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
     'applicationId': package[1], 'versionCode': int(package[2]), 'versionName': package[3],
     'certificateSha256': match[1].lower(), 'pngsVerified': len(pngs), 'origin': identity['origin'], 'androidCompat': has_compat,
-    'orientation': 'sensorLandscape', 'appCategory': 'game', 'signingGeneration': identity.get('signingGeneration', 1), 'mesaAssetsVerified': len(mesa['asset_files']), 'menuAssetsVerified': len(menu['assets']), 'specialAssetsVerified': len(especiais['assets']), 'penaltyAssetsVerified': len(penalidades['assets']), 'standardCardAssetsVerified': len(padrao['assets']), 'interactiveBasesVerified': len(interacao['assets']),
+    'orientation': 'sensorLandscape', 'appCategory': 'game', 'signingGeneration': identity.get('signingGeneration', 1), 'mesaAssetsVerified': len(mesa['asset_files']), 'menuAssetsVerified': len(menu['assets']), 'specialAssetsVerified': len(especiais['assets']), 'penaltyAssetsVerified': len(penalidades['assets']), 'standardCardAssetsVerified': len(padrao['assets']), 'interactiveBasesVerified': len(interacao['assets']), 'blenderAssetsVerified': len(liquidificador['assets']),
 }
 apk.with_suffix('.json').write_text(json.dumps(info, indent=2) + '\n')
 print(json.dumps(info, indent=2))
