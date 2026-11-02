@@ -29,4 +29,15 @@ Evidências: [logs e capturas](evidencias-ajustes-opcoes/).
 
 Mantidos `com.lucascunha.panelinha.teste`, origem `https://localhost`, assinatura permanente da geração 2, `sensorLandscape`, imersão e mecanismo de dados locais. Nenhuma chave criada; Secrets e workflow preservados. Os 11 testes de instrumentação continuam exigidos, com expectativas atualizadas para Panela sem cor, elipse e halo completo. O teste de atualização continua no fluxo.
 
-Resultado do workflow, versão, certificado do APK baixado e link direto serão registrados após a compilação. Testes web não substituem execução nativa. A partida em andamento continua somente em memória, conforme o comportamento existente.
+Workflow [#28](https://github.com/LucasCunh4/Panelinha/actions/runs/41387326728), fonte `1068d74dfc2f263a71df14ca3c37eb6043054385`:
+
+- Compilação web/release/instrumentação, assinatura e verificadores: **aprovados**. APK principal **0.2.28 / código 4802**; candidato de atualização 4803, não distribuído.
+- APK principal baixado e novamente verificado localmente por `ferramentas/verificar_apk.py`: assinatura v2, pacote, origem, landscape/categoria game, código exato e todas as artes por SHA-256. [Metadados](AJUSTES_OPCOES_APK_0.2.28.json).
+- Certificado SHA-256 **`3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`**, igual ao registro da geração 2 e ao APK anterior real **0.2.27 / código 4702**. Mesmo pacote `com.lucascunha.panelinha.teste` e origem `https://localhost`. Código 4802 maior que 4702/4703: identidade compatível com atualização direta, sem desinstalar.
+- SHA-256 do APK: **`853a1b890d7926e18e5e889b85cb9e2b398ae434afcc72a2524508873bd413e4`**, igual ao digest do artefato GitHub. 65.166.302 bytes. Verificado arquivo APK direto (`AndroidManifest.xml` e assets na raiz), sem ZIP externo/APK aninhado.
+- **Etapa Android falhou: 0/11 testes concluídos.** A instrumentação iniciou `a_imagesAndThreeBotsOffline`; AVD/ADB ficou indisponível (`device offline`), com conexão recusada na porta 5554. Logs coletados não contêm FATAL EXCEPTION/Fatal signal do app, OOM ou segfault do host. Havia cerca de 14 GiB disponíveis após a queda. A causa final da indisponibilidade do emulador não foi identificada; não houve resultado de assertiva funcional do aplicativo.
+- **Pendentes:** execução nativa completa, capturas nativas nas duas orientações horizontais e teste real de atualização/preservação de UID, localStorage e SharedPreferences. Nenhuma verificação removida/desativada. Release pulada pelo fluxo após a falha; APK direto e diagnósticos publicados como artefatos separados.
+
+[**Baixar APK 0.2.28 / 4802 diretamente, sem ZIP**](https://github.com/LucasCunh4/Panelinha/actions/runs/41387326728/artifacts/13115682554). Requer login no GitHub; retenção até 31/01/2027.
+
+Testes web e verificação criptográfica não substituem execução nativa. A identidade de atualização foi conferida nos dois APKs reais; a preservação dos dados não pôde ser exercitada nesta execução. O mecanismo de dados locais permanece inalterado. A partida em andamento continua somente em memória, conforme o comportamento existente.
