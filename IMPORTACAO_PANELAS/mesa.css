@@ -38,7 +38,8 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 .discard-stack{position:absolute;left:0;top:0;transform:translate(-50%,-50%);text-align:center}
 .draw-stack{position:absolute;right:calc(var(--card-width) * .9);top:0;transform:translateY(-50%) rotate(-7deg);text-align:center}
 #buyBtn{display:block;border:0;padding:0;border-radius:9px;background:none;touch-action:manipulation;color:inherit}
-#buyBtn:not(:disabled){filter:drop-shadow(0 0 6px #ffe9a7);outline:2px solid #ffe8ad;outline-offset:5px}
+/* Comprar voluntariamente não é uma obrigação. Só .pile-aura sinaliza a falta de jogada. */
+#buyBtn {filter:none;outline:none}
 #buyBtn:disabled{opacity:.85;cursor:default}#buyBtn:not(:disabled):active{transform:translateY(3px)}
 #discard,#pile{position:relative;isolation:isolate;display:flex;justify-content:center;align-items:center;width:var(--card-width);height:calc(var(--card-width) * 2.025)}
 #discard::before,#discard::after,#pile::before{content:'';position:absolute;inset:0;z-index:-1;border:1px solid #dcc0a4;border-radius:8px;background:#4d3354;box-shadow:0 3px 5px #0006}#discard::before{transform:translate(-5px,2px) rotate(-10deg)}#discard::after{transform:translate(4px,3px) rotate(9deg)}#pile::before{transform:translate(-4px,3px)}
@@ -342,10 +343,8 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 #turnCue[hidden] {display:none}
 #turnCue>span {display:block;transform:scale(.82);opacity:.85;transform-origin:50% 50%}
 #buyBtn {position:relative}
-#buyBtn.mandatory-buy::after {content:'';position:absolute;inset:12% -6px;border:2px solid #ffe6a0;border-radius:10px;pointer-events:none;box-shadow:0 0 10px #ffdc7f,inset 0 0 7px #ffd47c99;animation:mandatory-draw 1.15s ease-in-out infinite}
-@keyframes mandatory-draw {0%,100%{opacity:.7;filter:brightness(1)}50%{opacity:1;filter:brightness(1.4);box-shadow:0 0 19px #ffc568,inset 0 0 9px #ffe7b0}}
 @media(orientation:portrait){#turnCue {right:16px;bottom:clamp(150px,28vh,240px);max-width:140px;font-size:24px}}
-@media(prefers-reduced-motion:reduce){.hand {transition:none}#buyBtn.mandatory-buy::after {animation:none}}
+@media(prefers-reduced-motion:reduce){.hand {transition:none}}
 /* HUD compacto em telas baixas: nome e avatar não avançam sobre o adversário lateral. */
 @media(orientation:landscape) and (max-height:600px){
  .seat.self {display:grid;grid-template-columns:22px minmax(0,1fr);grid-template-rows:auto auto;gap:2px 3px;padding:4px 5px}
@@ -374,7 +373,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 .stove-flow {stroke-width:5;fill:none}
 
 /* O filtro considera a silhueta de TODAS as seis camadas, sem pintar sobre a arte. */
-#buyBtn.mandatory-buy::after {display:none}
+#buyBtn::after {display:none}
 
 
 

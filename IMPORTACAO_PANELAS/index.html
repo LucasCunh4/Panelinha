@@ -109,13 +109,13 @@
             <img class="flame flame-yellow" src="assets/mesa/chama_amarela.png" alt="">
           </div>
           <svg id="stoveDirection" class="stove-direction" viewBox="0 0 490 490" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-            <ellipse id="stoveOrbit" cx="245" cy="245" rx="220" ry="194" pathLength="1000" class="stove-flow stove-glint"/>
-            <ellipse cx="245" cy="245" rx="220" ry="194" pathLength="1000" class="stove-flow stove-tail tail-clockwise tail-long"/>
-            <ellipse cx="245" cy="245" rx="220" ry="194" pathLength="1000" class="stove-flow stove-tail tail-clockwise tail-mid"/>
-            <ellipse cx="245" cy="245" rx="220" ry="194" pathLength="1000" class="stove-flow stove-tail tail-counterclockwise tail-long"/>
-            <ellipse cx="245" cy="245" rx="220" ry="194" pathLength="1000" class="stove-flow stove-tail tail-counterclockwise tail-mid"/>
-            <ellipse cx="245" cy="245" rx="220" ry="194" pathLength="1000" class="stove-flow stove-tail tail-clockwise tail-near"/>
-            <ellipse cx="245" cy="245" rx="220" ry="194" pathLength="1000" class="stove-flow stove-tail tail-counterclockwise tail-near"/>
+            <path id="stoveOrbit" d="M465 245 A220 194 0 0 1 25 245 A220 194 0 0 1 465 245 Z" pathLength="1000" class="stove-flow stove-glint"/>
+            <path d="M465 245 A220 194 0 0 1 25 245 A220 194 0 0 1 465 245 Z" pathLength="1000" class="stove-flow stove-tail tail-clockwise tail-long"/>
+            <path d="M465 245 A220 194 0 0 1 25 245 A220 194 0 0 1 465 245 Z" pathLength="1000" class="stove-flow stove-tail tail-clockwise tail-mid"/>
+            <path d="M465 245 A220 194 0 0 1 25 245 A220 194 0 0 1 465 245 Z" pathLength="1000" class="stove-flow stove-tail tail-counterclockwise tail-long"/>
+            <path d="M465 245 A220 194 0 0 1 25 245 A220 194 0 0 1 465 245 Z" pathLength="1000" class="stove-flow stove-tail tail-counterclockwise tail-mid"/>
+            <path d="M465 245 A220 194 0 0 1 25 245 A220 194 0 0 1 465 245 Z" pathLength="1000" class="stove-flow stove-tail tail-clockwise tail-near"/>
+            <path d="M465 245 A220 194 0 0 1 25 245 A220 194 0 0 1 465 245 Z" pathLength="1000" class="stove-flow stove-tail tail-counterclockwise tail-near"/>
           </svg>
         </div>
         <div class="seat top" id="player2"></div>
@@ -294,6 +294,12 @@ function checkCards(id,ids,isCut){
   if(s.drawn!==null&&ids[0]!==s.drawn)return false;
   return canPlay(c); // Se há punição, SOMENTE + válido ou Panela de Pressão.
 }
+function humanMustDraw(){
+  // Mesma validação do comando de jogar, refeita a cada render; não confundir
+  // permissão para comprar com ausência de carta jogável. Desafio permanece disponível.
+  return s.phase==='playing'&&s.current===0&&canActNow()&&!s.pendingAction&&s.drawn===null&&
+    !s.players[0].hand.some(c=>checkCards(0,[c.id],false));
+}
 function chooseCards(id,ids){
   const isCut=id!==s.current;
   if(!checkCards(id,ids,isCut)){
@@ -438,7 +444,7 @@ const cards=[...s.players[0].hand].sort((a,b)=>(COLORS.indexOf(a.color)+1||9)-(C
 const locked=s.phase==='playing'&&s.current===0&&!canActNow();
 const cutCard=findHumanCut(), handScroll=$('hand').scrollLeft;
 $('hand').innerHTML=cards.map(c=>{
-  const enabled=s.phase==='playing'&&s.current===0&&!locked&&(s.drawn===null||c.id===s.drawn)&&canPlay(c);
+  const enabled=checkCards(0,[c.id],false);
   const cutting=cutCard?.id===c.id;
   const reason=c.type==='dist'&&!canDistribute(c)?'Panela de Pressão indisponível: não há outro destinatário para receber a redução ou penalidade.':(cutting?'Cortar':enabled?'Jogar':'Indisponível')+' '+description(c);
   return `<button type="button" ${cutting?'id="cutBtn" class="cut-eligible"':''} style="border:0;background:none;padding:0" data-card="${c.id}" data-hand-color="${c.color||'wild'}" aria-label="${reason}" title="${reason}" ${enabled||cutting?'':'disabled'}>${cardHTML(c,false,false,!(enabled||cutting))}${cutting?'<span class="cut-bubble"><img src="assets/mesa/corte_faca_balao.png" alt="CORTAR" draggable="false"></span>':''}</button>`;
@@ -464,7 +470,7 @@ if(s.phase!=='playing'){
 }
 $('message').textContent=/^(Aguarde a abertura|Fora do seu turno, toque na carta com o balão)/.test(s.message)?'':s.message||'';$('history').innerHTML=s.log.slice(0,40).map(x=>`<div>${x.replaceAll('<','&lt;').replaceAll('>','&gt;')}</div>`).join('');
 if(s.phase!=='playing')$('buyBtn').disabled=true;
-const mustBuy=s.phase==='playing'&&s.current===0&&canActNow()&&!s.pendingAction&&s.drawn===null&&!s.players[0].hand.some(canPlay)&&!canChallenge(0);
+const mustBuy=humanMustDraw();
 const sixOption=$('injectType').querySelector('[value=wild6]');sixOption.disabled=s.o.wild6===false;if(sixOption.disabled&&$('injectType').value==='wild6')$('injectType').value='wild4';
 $('labSixStatus').textContent='Carta +6 nesta partida: '+(s.o.wild6===false?'desativada':'ativada')+'. A opção é aplicada ao começar uma nova partida.';
 PanelasMesa.render(s,handScroll,{mustBuy});

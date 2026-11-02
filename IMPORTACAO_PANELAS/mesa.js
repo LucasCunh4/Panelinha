@@ -201,18 +201,21 @@
     }
   }
 
-  // Máscara da silhueta real: seis versos, com expansão/halo isotrópicos para fora.
-  // A geometria usa pixels CSS, inclusive os deslocamentos reais das camadas.
+  // Contorno das seis cartas realmente renderizadas, incluindo suas sombras.
+  // Recorta toda a luz para fora do envelope de segurança; só a opacidade pulsa.
   let pileAuraSize='';
   function layoutPileAura(){
-    const pile=$('pile'),button=$('buyBtn'),width=pile.getBoundingClientRect().width,height=pile.getBoundingClientRect().height;
-    if(!width||!height)return;
+    const pile=$('pile'),button=$('buyBtn'),layers=[...pile.children];
+    if(!layers.length)return;
+    const boxes=layers.map(layer=>({box:layer.getBoundingClientRect(),filter:getComputedStyle(layer).filter}));
+    if(!boxes[0].box.width||!boxes[0].box.height)return;
     let aura=$('pileAura');
     if(!aura){
       button.insertAdjacentHTML('afterbegin',`<svg id="pileAura" class="pile-aura" aria-hidden="true" focusable="false">
         <defs><filter id="pileAuraFilter" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-          <feMorphology in="SourceAlpha" operator="dilate" radius="5" result="clearance"/>
-          <feMorphology in="SourceAlpha" operator="dilate" radius="7" result="spread"/>
+          <feComponentTransfer in="SourceAlpha" result="silhouette"><feFuncA type="linear" slope="1000" intercept="-30"/></feComponentTransfer>
+          <feMorphology in="silhouette" operator="dilate" radius="5" result="clearance"/>
+          <feMorphology in="silhouette" operator="dilate" radius="7" result="spread"/>
           <feComposite in="spread" in2="clearance" operator="out" result="outline"/>
           <feGaussianBlur in="outline" stdDeviation="4" result="halo"/>
           <feFlood flood-color="#ffc66e" flood-opacity=".95" result="gold"/>
@@ -221,18 +224,46 @@
           <feComposite in="light" in2="outline" operator="in" result="edge"/>
           <feMerge result="lit"><feMergeNode in="glow"/><feMergeNode in="edge"/></feMerge>
           <feComposite in="lit" in2="clearance" operator="out"/>
-        </filter></defs><g filter="url(#pileAuraFilter)">${Array.from({length:6},(_,depth)=>`<image href="assets/padronizadas/verso_oficial_400x850.png" x="${5-depth}" y="${depth*1.5}" preserveAspectRatio="xMidYMid meet"/>`).join('')}</g></svg>`);
+        </filter></defs><g filter="url(#pileAuraFilter)">${layers.map(()=>'<image href="assets/padronizadas/verso_oficial_400x850.png" preserveAspectRatio="xMidYMid meet"/>').join('')}</g></svg>`);
       aura=$('pileAura');pileAuraSize='';
     }
-    const box=pile.getBoundingClientRect(),parent=button.getBoundingClientRect();
-    const left=box.left-parent.left-button.clientLeft,top=box.top-parent.top-button.clientTop;
-    const key=`${width}:${height}:${left}:${top}`;if(key===pileAuraSize)return;pileAuraSize=key;
-    const pad=26,w=width+5,h=height+7.5;
+    const parent=button.getBoundingClientRect();
+    const left=Math.min(...boxes.map(({box})=>box.left)),top=Math.min(...boxes.map(({box})=>box.top));
+    const w=Math.max(...boxes.map(({box})=>box.right))-left,h=Math.max(...boxes.map(({box})=>box.bottom))-top;
+    const geometry=boxes.map(({box,filter})=>({x:box.left-left,y:box.top-top,width:box.width,height:box.height,filter}));
+    const offsetX=left-parent.left-button.clientLeft,offsetY=top-parent.top-button.clientTop;
+    const key=JSON.stringify([geometry,offsetX,offsetY]);if(key===pileAuraSize)return;pileAuraSize=key;
+    // Reserva para a sombra original (desvio 3px + deslocamento 2px),
+    // afastamento 5px, borda 2px e difusão 4px. Não é uma margem da carta superior.
+    const pad=40;
     aura.setAttribute('viewBox',`${-pad} ${-pad} ${w+pad*2} ${h+pad*2}`);
-    aura.style.cssText=`left:${left-5-pad}px;top:${top-pad}px;width:${w+pad*2}px;height:${h+pad*2}px`;
+    aura.style.cssText=`left:${offsetX-pad}px;top:${offsetY-pad}px;width:${w+pad*2}px;height:${h+pad*2}px`;
     const filter=$('pileAuraFilter');
     for(const [name,value] of Object.entries({x:-pad,y:-pad,width:w+pad*2,height:h+pad*2}))filter.setAttribute(name,value);
-    aura.querySelectorAll('image').forEach(image=>{image.setAttribute('width',width);image.setAttribute('height',height);});
+    aura.querySelectorAll('image').forEach((image,i)=>{
+      const {filter,...rect}=geometry[i];
+      for(const [name,value] of Object.entries(rect))image.setAttribute(name,value);
+      image.style.filter=filter;
+    });
+  }
+
+  let orbitScale=null;
+  function layoutOrbit(scale){
+    if(orbitScale===scale)return;orbitScale=scale;
+    // Somente a metade inferior: seno ao quadrado tem derivada zero nas
+    // laterais. Compensar o cover mantém o acréscimo em exatamente 2px CSS.
+    const extra=2/scale,parts=32,step=Math.PI/parts;
+    let d='M465 245';
+    const point=a=>({x:245+220*Math.cos(a),y:245+194*Math.sin(a)+extra*Math.sin(a)**2,
+      dx:-220*Math.sin(a),dy:194*Math.cos(a)+extra*Math.sin(2*a)});
+    for(let i=0;i<parts;i++){
+      const p=point(i*step),q=point((i+1)*step),k=step/3;
+      const coords=[p.x+k*p.dx,p.y+k*p.dy,q.x-k*q.dx,q.y-k*q.dy,q.x,q.y].map(n=>+n.toFixed(6));
+      d+=` C${coords.join(' ')}`;
+    }
+    // A metade superior continua sendo o arco original, sem alteração.
+    d+=' A220 194 0 0 1 245 51 A220 194 0 0 1 465 245 Z';
+    $('stoveDirection').querySelectorAll('.stove-flow').forEach(path=>path.setAttribute('d',d));
   }
 
   function discardPose(id) {
@@ -435,6 +466,7 @@
     table.style.setProperty('--scene-scale', scale);
     // Deslocamento em pixels CSS, compensando a escala uniforme do cenário.
     table.style.setProperty('--orbit-left', `${836-4/scale}px`);
+    layoutOrbit(scale);
     table.style.setProperty('--scene-x', `${x}px`);
     table.style.setProperty('--scene-y', `${y}px`);
     table.style.setProperty('--burner-y', `${y + 451 * scale}px`);

@@ -54,7 +54,7 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/horizontal-evidence'
   for(const [enabled,type] of [[false,'wild4'],[true,'wild6']])for(const illegal of [true,false]){
    await fixture({penalty:20,highest:type==='wild6'?6:4,lastPenalty:{id:1,type,illegal,challengeable:true},hand:[card()]});
    await p.evaluate(enabled=>{CartasTest.getState().o.wild6=enabled;document.getElementById('useCardArt').onchange()},enabled);
-   assert.equal(await p.locator('#buyBtn.mandatory-buy').count(),0);await p.locator('#challengeBtn').tap();
+   assert.equal(await p.locator('#buyBtn.mandatory-buy').count(),1);await p.locator('#challengeBtn').tap();
    assert.ok(await p.evaluate(illegal=>{const s=CartasTest.getState();return s.penalty===0&&(illegal?s.current===0&&s.players[1].hand.length===22:s.current===1&&s.players[0].hand.length===23)},illegal));
   }
   console.log('PASS desafios procedentes/improcedentes de +4 com +6 desligado e +6 ativado, sem alteração dos valores ou destinos');
@@ -66,13 +66,13 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/horizontal-evidence'
    ['resposta +6',{penalty:6,highest:6,hand:[card('wild6',null)]},false],
    ['resposta Panela',{penalty:20,highest:6,hand:[card('dist',null)]},false],
    ['+2 não rebate +6',{penalty:6,highest:6,hand:[card('draw2','blue')]},true],
-   ['desafio disponível',{penalty:20,highest:6,lastPenalty:{id:3,type:'wild6',challengeable:true},hand:[card()]},false],
+   ['desafio disponível',{penalty:20,highest:6,lastPenalty:{id:3,type:'wild6',challengeable:true},hand:[card()]},true],
    ['bloqueio temporal',{unlockAt:Date.now()+8000,hand:[card()]},false],['bot',{current:1,hand:[card()]},false],
    ['já comprou',{drawn:139000,hand:[card()]},false],['modal pendente',{pendingAction:{id:0,ids:[139000]},hand:[card()]},false]
   ];
   for(const [name,data,expected] of cases){await fixture(data);assert.equal(await p.locator('#buyBtn').evaluate(e=>e.classList.contains('mandatory-buy')),expected,name)}
   await fixture({penalty:20,highest:6,hand:[card()]});const before=await p.evaluate(()=>{const s=CartasTest.getState();return [...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort().join()});await p.screenshot({path:path.join(out,'compra-obrigatoria.png')});await p.locator('#buyBtn').tap();assert.equal(await p.evaluate(()=>CartasTest.getState().penalty),0);assert.equal(await p.locator('#buyBtn.mandatory-buy').count(),0);assert.equal(await p.evaluate(()=>{const s=CartasTest.getState();return [...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].map(c=>c.id).sort().join()}),before);
-  console.log('PASS 13 condições de compra obrigatória, sem brilho indevido com carta/desafio/turno bloqueado; compra por toque remove efeito imediatamente e conserva cartas');
+  console.log('PASS 13 condições de compra obrigatória, sem brilho indevido com carta/turno bloqueado; desafio preservado; compra por toque remove efeito imediatamente e conserva cartas');
   for(const [width,height] of [[568,320],[667,375],[844,390],[915,412],[1280,800],[390,844]])for(const count of [7,15,20,30,40,60,100]){
    await p.setViewportSize({width,height});const hand=Array.from({length:count},(_,i)=>card('num',['red','blue','green','yellow'][i%4],i%10,150000+i));
    await fixture({current:1,hand});await settle();const normal=await p.locator('#hand').evaluate(e=>parseFloat(getComputedStyle(e).transform.split('(')[1]));
