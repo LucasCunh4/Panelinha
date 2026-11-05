@@ -1,0 +1,19 @@
+Workflow #35: https://github.com/LucasCunh4/Panelinha/actions/runs/42052803380
+Job: 127333097450
+Fonte: e7a056e74803ca1e29d6560e3c3f8e7901b5140d
+Build/assinatura/verificação dos dois APKs: sucesso.
+13 testes esperados; iniciou a_imagesAndThreeBotsOffline, nenhum concluído.
+ADB ficou offline; porta 5554 recusou conexão. Teste de atualização não executado.
+Sem FATAL EXCEPTION/Fatal signal/ANR/am_crash nos logs coletados.
+Sem OOM/kill/segfault no kernel do runner coletado; 14 GiB disponíveis.
+Causa raiz do encerramento do AVD não confirmada; não há asserção funcional falhada registrada.
+Release bloqueada corretamente; APK bruto disponível por artefato separado.
+
+11-05 15:18:07.906   557   591 I ActivityManager: Start proc 2723:com.lucascunha.panelinha.teste/u0a209 for added application com.lucascunha.panelinha.teste
+11-05 15:18:08.843   557  1930 I ActivityTaskManager: START u0 {act=android.intent.action.MAIN flg=0x14000000 cmp=com.lucascunha.panelinha.teste/.MainActivity} with LAUNCH_SINGLE_TASK from uid 10209 (BAL_ALLOW_PERMISSION) result code=0
+11-05 15:18:09.057  2723  2723 D LifecycleMonitor: Lifecycle status change: com.lucascunha.panelinha.teste.MainActivity@9542bfe in: PRE_ON_CREATE
+11-05 15:18:11.141   557   591 I ActivityManager: Start proc 2854:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0ai9000 for  {com.lucascunha.panelinha.teste/org.chromium.content.app.SandboxedProcessService0:0}
+11-05 15:18:11.494  2723  2723 D LifecycleMonitor: Lifecycle status change: com.lucascunha.panelinha.teste.MainActivity@9542bfe in: CREATED
+11-05 15:18:11.497  2723  2723 D LifecycleMonitor: Lifecycle status change: com.lucascunha.panelinha.teste.MainActivity@9542bfe in: STARTED
+11-05 15:18:11.502  2723  2723 D LifecycleMonitor: Lifecycle status change: com.lucascunha.panelinha.teste.MainActivity@9542bfe in: RESUMED
+11-05 15:18:12.146   557   578 I ActivityTaskManager: Displayed com.lucascunha.panelinha.teste/.MainActivity for user 0: +3s382ms

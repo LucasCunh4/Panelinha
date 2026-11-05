@@ -1,0 +1,28 @@
+{
+  "apks": [
+    {
+      "file": "Panelinha-Teste-v0.2.34-c5402.apk",
+      "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+      "applicationId": "com.lucascunha.panelinha.teste",
+      "versionCode": 5402,
+      "versionName": "0.2.34",
+      "server": {
+        "hostname": "localhost",
+        "androidScheme": "https"
+      }
+    },
+    {
+      "file": "Panelinha-Teste-v0.2.35-c5502.apk",
+      "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+      "applicationId": "com.lucascunha.panelinha.teste",
+      "versionCode": 5502,
+      "versionName": "0.2.35",
+      "server": {
+        "hostname": "localhost",
+        "androidScheme": "https"
+      }
+    }
+  ],
+  "compatibleUpgrade": true,
+  "actualInstallTest": "pending-emulator-disconnected"
+}

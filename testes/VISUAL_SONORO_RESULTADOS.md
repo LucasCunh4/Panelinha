@@ -26,4 +26,20 @@ Os testes do navegador comprovaram decodificação e disparo das fontes WebAudio
 
 ## Android
 
-Instrumentação ampliada para 13 testes offline, preservando os anteriores, mais atualização/persistência. O novo caso confere cenário, letras, avatares, áudio local e configurações; persistência inclui também volume/silêncio. Compilação, verificação do APK real, resultado do emulador e link serão registrados após concluir o workflow existente.
+Instrumentação ampliada para 13 testes offline, preservando os anteriores, mais atualização/persistência. O novo caso confere cenário, letras, avatares, áudio local e configurações; persistência inclui também volume/silêncio.
+
+Workflow [#35](https://github.com/LucasCunh4/Panelinha/actions/runs/42052803380), fonte `e7a056e74803ca1e29d6560e3c3f8e7901b5140d`, implementação `b331c208dde103322147b3c4c5d6a7b53df8f3ab`:
+
+- Compilação release, instrumentação, assinatura permanente e verificação: **aprovadas**. APK **0.2.35 / código 5502**, candidato de teste de atualização 5503 reservado.
+- APK efetivamente baixado e verificado com `apksigner`, `aapt` e `ferramentas/verificar_apk.py`. Metadados idênticos aos do CI; hash/tamanho correspondem ao artefato GitHub: **96.032.507 bytes**, SHA-256 `2321d5a666a8377d4f9845339750a0a2df5e267380c4fc34f2e638bfd9fbc3d0`.
+- Pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`, release, assinatura v2, landscape por sensor e categoria game confirmados. Certificado geração 2: `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`.
+- 52 PNGs numéricos/coloridos, todas as artes especiais anteriores, Liquidificador e 69 recursos desta integração conferidos byte a byte dentro do APK; todos os scripts/estilos e HTML da fonte presentes. MP3s empacotados localmente, sem servidor remoto.
+- Comparação com o APK real anterior 0.2.34/c5402: mesmo pacote, certificado e origem; código 5502 também supera o candidato 5403. **Compatibilidade de atualização direta confirmada**, sem necessidade de desinstalar. Não houve limpeza de dados nem alteração da identidade.
+- **Emulador: falhou / execução incompleta.** Anunciou 13 testes e iniciou `a_imagesAndThreeBotsOffline`; nenhum caso concluiu. Em seguida o ADB ficou `offline` e a porta 5554 recusou conexão. O aplicativo chegou a CREATED/STARTED/RESUMED/Displayed. Não há FATAL EXCEPTION, Fatal signal, ANR ou asserção funcional falhada nos logs coletados; kernel sem OOM/kill/segfault e runner com 14 GiB disponíveis. A causa raiz do encerramento do AVD não foi confirmada. Isso não comprova aprovação funcional no Android.
+- **Pendentes:** 13 casos nativos, instalação real por cima com teste de retenção de dados e avaliação visual/auditiva em celular físico. A identidade compatível foi verificada, mas não se declara o teste de instalação como executado. Nenhum teste foi desativado; Release permaneceu bloqueada e a falha do workflow está visível.
+
+[**Baixar Panelinha-Teste-v0.2.35-c5502.apk diretamente, sem ZIP**](https://github.com/LucasCunh4/Panelinha/actions/runs/42052803380/artifacts/13428785379). O artefato exige sessão no GitHub. O arquivo baixado contém o próprio APK, sem ZIP externo; metadados e diagnósticos ficam em artefatos separados.
+
+## Problemas encontrados e resolvidos durante a integração
+
+A primeira verificação do cenário falhou em mobile após redimensionar: medidas em pixels obtidas de `innerWidth` podiam realimentar o enquadramento da viewport. O plano passou a usar diretamente unidades da viewport com `min()`, mantendo o mesmo contain para fundo e camadas; as seis dimensões e as regressões finais passaram. O primeiro caso offline da suíte nova também apontava para a primeira carta da mão ordenada, que era uma carta azul indisponível; o teste foi corrigido para tocar especificamente na Panela, sem contornar validação ou modificar o jogo. Logs desses diagnósticos iniciais foram preservados junto das execuções finais aprovadas. A falha de infraestrutura Android acima permanece pendente.

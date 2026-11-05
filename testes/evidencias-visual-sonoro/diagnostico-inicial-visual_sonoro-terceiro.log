@@ -1,0 +1,43 @@
+PASS 69 assets íntegros; cozinha contain, nove letras na ordem, tampa, cinco brilhos, seis utensílios ancorados e seis plumas nas duas panelas, em seis landscapes
+PASS seleção dos nove avatares, persistência, migração dos seis IDs antigos/fallback, nomes e outros dados preservados; perfil acessível em três landscapes
+PASS desbloqueio por toque, 30 MP3 reais decodificados com WebAudio, controle de volume/silêncio persistente e Voltar recolhendo som
+PASS eventos reais de jogar/nove tipos, especiais sem som comum duplicado, Coringa/+4/+6 escolhendo cor, Panela redistribuindo e Liquidificador girando sem seletor; renderizações silenciosas
+PASS corte real, compra e penalidades 2/4/6/8/12/20 conservando cartas, fallback sonoro consistente, anúncio real sem repetição, relógio real sem tick duplicado e vitória
+locator.tap: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for locator('#hand [data-card]').first()[22m
+[2m    - locator resolved to <button disabled type="button" data-card="863002" aria-disabled="true" data-hand-color="blue" data-rule-disabled="true" title="Indisponível 3 Azul" aria-label="Indisponível 3 Azul" data-rule-label="Indisponível 3 Azul">…</button>[22m
+[2m  - attempting tap action[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not enabled[22m
+[2m    - retrying tap action[22m
+[2m    - waiting 20ms[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not enabled[22m
+[2m    - retrying tap action[22m
+[2m      - waiting 100ms[22m
+[2m    56 × waiting for element to be visible, enabled and stable[22m
+[2m       - element is not enabled[22m
+[2m     - retrying tap action[22m
+[2m       - waiting 500ms[22m
+
+    at /workspace/Panelinha/testes/visual_sonoro.cjs:98:105 {
+  log: [
+    "  - waiting for locator('#hand [data-card]').first()",
+    '    - locator resolved to <button disabled type="button" data-card="863002" aria-disabled="true" data-hand-color="blue" data-rule-disabled="true" title="Indisponível 3 Azul" aria-label="Indisponível 3 Azul" data-rule-label="Indisponível 3 Azul">…</button>',
+    '  - attempting tap action',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is not enabled',
+    '    - retrying tap action',
+    '    - waiting 20ms',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is not enabled',
+    '    - retrying tap action',
+    '      - waiting 100ms',
+    '    56 × waiting for element to be visible, enabled and stable',
+    '       - element is not enabled',
+    '     - retrying tap action',
+    '       - waiting 500ms'
+  ],
+  name: 'TimeoutError'
+}

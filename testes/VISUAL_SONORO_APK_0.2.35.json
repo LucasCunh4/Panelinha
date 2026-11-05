@@ -1,0 +1,22 @@
+{
+  "visualSoundAssetsVerified": 69,
+  "file": "Panelinha-Teste-v0.2.35-c5502.apk",
+  "sha256": "2321d5a666a8377d4f9845339750a0a2df5e267380c4fc34f2e638bfd9fbc3d0",
+  "applicationId": "com.lucascunha.panelinha.teste",
+  "versionCode": 5502,
+  "versionName": "0.2.35",
+  "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+  "pngsVerified": 52,
+  "origin": "https://localhost",
+  "androidCompat": true,
+  "orientation": "sensorLandscape",
+  "appCategory": "game",
+  "signingGeneration": 2,
+  "mesaAssetsVerified": 6,
+  "menuAssetsVerified": 2,
+  "specialAssetsVerified": 11,
+  "penaltyAssetsVerified": 22,
+  "standardCardAssetsVerified": 2,
+  "interactiveBasesVerified": 2,
+  "blenderAssetsVerified": 1
+}

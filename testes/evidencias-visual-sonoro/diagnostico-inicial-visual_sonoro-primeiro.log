@@ -1,0 +1,9 @@
+AssertionError [ERR_ASSERTION]: {"width":568,"height":320,"geometry":{"ratio":1.77683765203596,"inside":false,"buttons":true,"anchors":[[69.25595238095238,30.2838004583113],[73.3829365079365,30.2838004583113],[77.15277777777779,30.2838004583113],[81.0391865079365,30.2838004583113],[84.9875992063492,30.2838004583113],[88.87400793650794,30.2838004583113]],"pots":[[80.69940476190476,48.69998237264234],[93.59871031746032,54.49938304248193]],"scroll":true}}
+    at /workspace/Panelinha/testes/visual_sonoro.cjs:31:11 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
