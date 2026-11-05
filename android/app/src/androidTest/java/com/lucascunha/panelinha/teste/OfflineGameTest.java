@@ -346,14 +346,14 @@ public class OfflineGameTest {
         waitFor("innerWidth>innerHeight",15000);waitBars(false);
         tap("#singlePlayerBtn");waitFor("PanelinhaNavigation.current==='profile'",15000);
         js("document.getElementById('playerName').value='Chef Offline';document.getElementById('playerName').dispatchEvent(new Event('input'))");
-        tap("[data-avatar-choice='concha']");tap("#profileContinueBtn");
+        tap("[data-avatar-choice='panela-aventureira']");tap("#profileContinueBtn");
         tap("[data-select-for='timeout']");
         assertEquals("true",js("PanelinhaSelects.isOpen&&document.querySelector('#panelinhaSelectList[role=listbox]')!==null&&document.getElementById('timeout').getAttribute('aria-hidden')==='true'"));
         tap("#panelinhaSelectList [data-value='15']");assertEquals("\"15\"",js("document.getElementById('timeout').value"));
         tap("[data-select-for='timeout']");systemBack();waitFor("!PanelinhaSelects.isOpen&&PanelinhaNavigation.current==='solo'",15000);
         js("document.getElementById('timeout').value='0';document.getElementById('timeout').dispatchEvent(new Event('change',{bubbles:true}))");
         assertEquals("true",js("document.getElementById('wild6').checked"));tap("#wild6");tap("#startBtn");
-        assertEquals("true",js("(()=>{const s=CartasTest.getState();return s.o.wild6===false&&s.identity.name==='Chef Offline'&&s.identity.avatar==='concha'&&[...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].every(c=>c.type!=='wild6')})()"));
+        assertEquals("true",js("(()=>{const s=CartasTest.getState();return s.o.wild6===false&&s.identity.name==='Chef Offline'&&s.identity.avatar==='panela-aventureira'&&[...s.deck,...s.discard,...s.players.flatMap(p=>p.hand)].every(c=>c.type!=='wild6')})()"));
         assertEquals("true",js("document.getElementById('player0').textContent.includes('Chef Offline')"));
         js("(()=>{const s=CartasTest.getState();s.token++;s.current=0;s.unlockAt=0;s.penalty=20;s.highest=4;s.lastPenalty=null;s.o.timeout=0;s.drawn=null;s.pendingAction=null;s.players[0].hand=[{id:99980,type:'num',color:'blue',num:1}];document.getElementById('useCardArt').onchange()})()");
         assertEquals("true",js("document.getElementById('buyBtn').classList.contains('mandatory-buy')&&document.getElementById('hand').classList.contains('human-turn')&&document.getElementById('turnCue').textContent==='SUA VEZ!'"));
@@ -368,6 +368,31 @@ public class OfflineGameTest {
         String profile = new JSONArray("["+js("JSON.stringify(PanelinhaProfile.current)")+"]").getString(0);
         InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("upgrade-check",Context.MODE_PRIVATE).edit().putString("profile",profile).commit();
         SystemClock.sleep(7000); // Flush durável antes de instalar por cima na etapa seguinte.
+    }
+
+    @Test public void m_officialMenuAvatarsAndSoundOffline() throws Exception {
+        waitFor("innerWidth>innerHeight",15000);waitBars(false);
+        assertEquals("9",js("document.querySelectorAll('#homeTitle .title-letter-art').length"));
+        assertEquals("6",js("document.querySelectorAll('.menu-utensil').length"));
+        assertEquals("2",js("document.querySelectorAll('.menu-steam-emitter').length"));
+        waitFor("[...document.querySelectorAll('#frontScene img,#homeTitle img')].every(im=>im.complete&&im.naturalWidth>0)",60000);
+        assertEquals("true",js("(()=>{const r=document.querySelector('.menu-approved-background').getBoundingClientRect();return Math.abs(r.width/r.height-1672/941)<.001&&r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight})()"));
+        tap("#singlePlayerBtn");
+        assertEquals("9",js("document.querySelectorAll('#avatarGallery button').length"));
+        tap("[data-avatar-choice='panela-gamer']");tap("#profileContinueBtn");
+        assertEquals("true",js("PanelinhaProfile.current.avatar==='panela-gamer'&&JSON.parse(localStorage.getItem('panelinha.player.v1')).avatar==='panela-gamer'"));
+        waitFor("PanelinhaSFX.status.unlocked",15000);
+        js("window.__audioDecoded=null;(async()=>{try{const c=new AudioContext();const r=await fetch('assets/menu-oficial/audio/04_panela_de_pressao.mp3');const b=await c.decodeAudioData(await r.arrayBuffer());window.__audioDecoded=b.duration>3;await c.close()}catch(e){window.__audioDecoded=String(e)}})()");
+        waitFor("window.__audioDecoded===true",30000);
+        js("PanelinhaSFX.setVolume(.35);PanelinhaSFX.setMuted(true)");
+        assertEquals("true",js("(()=>{const v=JSON.parse(localStorage.getItem('panelinha.sfx.v1'));return v.volume===.35&&v.muted&&PanelinhaSFX.status.voices===0})()"));
+        js("PanelinhaSFX.setMuted(false)");
+        tap("#startBtn");
+        assertEquals("true",js("!!document.querySelector('#player0 .official-avatar img[src$=\"07_panela_gamer.png\"]')"));
+        String finalProfile = new JSONArray("["+js("JSON.stringify(PanelinhaProfile.current)")+"]").getString(0);
+        String finalSound = new JSONArray("["+js("localStorage.getItem('panelinha.sfx.v1')")+"]").getString(0);
+        InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("upgrade-check",Context.MODE_PRIVATE).edit().putString("profile",finalProfile).putString("sound",finalSound).commit();
+        SystemClock.sleep(7000);
     }
 
     @Test public void l_globalLastCardAnnouncements() throws Exception {

@@ -1,0 +1,48 @@
+[
+  {
+    "package": "Panelinha_01_Menu_e_Sons.zip",
+    "bytes": 8834361,
+    "sha256": "58d55aa6908b5657afeb1878f3aecca90a1504066aa93bd9eaccaaabde2db9b6",
+    "entries": 50,
+    "crc": "OK",
+    "docs": [
+      "Panelinha_Menu_Animacoes_Audios_V2/MANIFESTO.json",
+      "Panelinha_Menu_Animacoes_Audios_V2/PROMPT_PARA_CODEX.md",
+      "Panelinha_Menu_Animacoes_Audios_V2/README.md",
+      "Panelinha_Menu_Animacoes_Audios_V2/utensilios/posicionamento_ganchos.json"
+    ]
+  },
+  {
+    "package": "Panelinha_02_Avatares.zip",
+    "bytes": 18894849,
+    "sha256": "2049132801551d77118d95d44b365484792809253549a6c7a03f229c93a5dc58",
+    "entries": 12,
+    "crc": "OK",
+    "docs": [
+      "Panelinha_Avatares_9_Aprovados/LEIA_ME.md",
+      "Panelinha_Avatares_9_Aprovados/MANIFESTO.json"
+    ]
+  },
+  {
+    "package": "Panelinha_03_Letras_do_Titulo.zip",
+    "bytes": 8063490,
+    "sha256": "1c041cb02ce7cb2a663255e495ec50c542d9ab4296ae394ed0bfcc075467ff2f",
+    "entries": 12,
+    "crc": "OK",
+    "docs": [
+      "Panelinha_Titulo_Letras_Individuais/LEIA_ME.md",
+      "Panelinha_Titulo_Letras_Individuais/MANIFESTO_LETRAS.json"
+    ]
+  },
+  {
+    "package": "Panelinha_04_Tampa_e_Brilhos.zip",
+    "bytes": 4995342,
+    "sha256": "221e0a315f40780b7873b7f0c284cb1210fc5231e8c7c1e80be6e28b8e9aa279",
+    "entries": 8,
+    "crc": "OK",
+    "docs": [
+      "Panelinha_Tampa_e_Brilhos_Animados_V1/LEIA_ME.md",
+      "Panelinha_Tampa_e_Brilhos_Animados_V1/MANIFESTO.json"
+    ]
+  }
+]

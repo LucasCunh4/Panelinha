@@ -1,0 +1,39 @@
+PASS condição real: cor ativa
+PASS condição real: mesmo número
+PASS condição real: mesmo símbolo
+PASS condição real: Coringa
+PASS condição real: +4
+PASS condição real: +6
+PASS condição real: Panela legal
+PASS condição real: sem carta válida
+PASS condição real: bot
+PASS condição real: resposta +2
+PASS condição real: resposta +4
+PASS condição real: resposta +6
+PASS condição real: Panela responde
+PASS condição real: +2 não responde a +6
+PASS condição real: cor não responde a penalidade
+PASS condição real: desafio continua disponível, sem carta de resposta
+PASS condição real: compra já concluída
+PASS condição real: resolvendo escolha
+PASS condição real: fim da rodada
+PASS condição real: janela de corte
+PASS compra real disponibiliza carta válida e retira imediatamente todo o brilho
+PASS alterações de cor, mão e penalidade atualizam a indicação sem condição antiga persistente
+PASS trajetória real: +2px CSS somente embaixo em quatro escalas; topo, lados, centro −4px, chama/descarte e velocidade preservados
+PASS pixels DOM 568x320, pulsação 0ms: zero contato; vãos 5.25/4.75/5.25/4.75px
+PASS pixels DOM 568x320, pulsação 275ms: zero contato; vãos 5.25/4.75/5.25/4.75px
+PASS pixels DOM 568x320, pulsação 550ms: zero contato; vãos 5.25/4.75/5.25/4.75px
+PASS pixels DOM 568x320, pulsação 825ms: zero contato; vãos 5.25/4.75/5.25/4.75px
+PASS pixels DOM 568x320, pulsação 1100ms: zero contato; vãos 5.25/4.75/5.25/4.75px
+PASS pixels DOM 844x390, pulsação 0ms: zero contato; vãos 5.5/5.5/5/5px
+PASS pixels DOM 844x390, pulsação 275ms: zero contato; vãos 5.5/5.5/5/5px
+PASS pixels DOM 844x390, pulsação 550ms: zero contato; vãos 5.5/5.5/5/5px
+PASS pixels DOM 844x390, pulsação 825ms: zero contato; vãos 5.5/5.5/5/5px
+PASS pixels DOM 844x390, pulsação 1100ms: zero contato; vãos 5.5/5.5/5/5px
+PASS pixels DOM 1280x800, pulsação 0ms: zero contato; vãos 5.25/4.75/5.5/4.75px
+PASS pixels DOM 1280x800, pulsação 275ms: zero contato; vãos 5.25/4.75/5.5/4.75px
+PASS pixels DOM 1280x800, pulsação 550ms: zero contato; vãos 5.25/4.75/5.5/4.75px
+PASS pixels DOM 1280x800, pulsação 825ms: zero contato; vãos 5.25/4.75/5.5/4.75px
+PASS pixels DOM 1280x800, pulsação 1100ms: zero contato; vãos 5.25/4.75/5.5/4.75px
+PASS offline e ausência de erros JavaScript

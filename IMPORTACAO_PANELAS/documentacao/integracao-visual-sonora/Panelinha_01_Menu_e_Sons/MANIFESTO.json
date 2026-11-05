@@ -1,0 +1,104 @@
+{
+  "projeto": "Panelinha",
+  "versao": "menu-animacoes-audios-v2",
+  "cozinha": {
+    "arquivo": "fundo/cozinha_menu_aprovada.png",
+    "tamanho_pixels": [
+      1672,
+      941
+    ],
+    "ajuste": "object-fit: contain; sobreposicoes no mesmo sistema de coordenadas",
+    "sem_titulo_ou_botoes_embutidos": true
+  },
+  "utensilios": {
+    "arquivos": [
+      "utensilios/01_concha.png",
+      "utensilios/02_espatula_vazada.png",
+      "utensilios/03_colher_madeira.png",
+      "utensilios/04_pegador_massas.png",
+      "utensilios/05_batedor_arame.png",
+      "utensilios/06_escumadeira.png"
+    ],
+    "arquivo_coordenadas": "utensilios/posicionamento_ganchos.json",
+    "gancho": "topo de cada imagem exatamente no gancho correspondente",
+    "oscilacao_graus": 1.8,
+    "periodos_segundos_sugeridos": [
+      3.5,
+      3.9,
+      4.2,
+      3.7,
+      4.4,
+      4.0
+    ],
+    "transform_origin": "50% 0%",
+    "evitar": "movimento sincronizado, balanco excessivo, ganchos duplicados"
+  },
+  "fumaca": {
+    "arquivos": [
+      "fumaca/01_vapor_leve.png",
+      "fumaca/02_vapor_suave.png",
+      "fumaca/03_vapor_espiral.png",
+      "fumaca/04_vapor_espiral_alternativo.png",
+      "fumaca/05_vapor_multiplas_espirais.png",
+      "fumaca/06_vapor_tres_espirais.png",
+      "fumaca/07_vapor_redemoinho.png",
+      "fumaca/08_vapor_redemoinho_brilhante.png"
+    ],
+    "tipo": "variantes de plumas com alpha; não são quadros interpolados perfeitos",
+    "sugestao": "2 ou 3 plumas por panela, fade-in -> subida + oscilacao -> fade-out; cruzar aparicoes",
+    "plumas": [
+      {
+        "panela": "grande esquerda",
+        "centro_x_pct": 80.7,
+        "ponto_saida_y_pct": 48.7,
+        "altura_pct": 20.0,
+        "duracao_seg": 5.2
+      },
+      {
+        "panela": "pequena direita",
+        "centro_x_pct": 93.6,
+        "ponto_saida_y_pct": 54.5,
+        "altura_pct": 15.5,
+        "duracao_seg": 4.6
+      }
+    ],
+    "observacao": "posicoes iniciais aproximadas, ajustar olhando a imagem. Em ambas as panelas existe tampa; vapor discreto pelas juncoes e bordas da tampa."
+  },
+  "audios": {
+    "arquivos": [
+      "01_jogar_carta.mp3",
+      "02_comprar_carta.mp3",
+      "03_mais6.mp3",
+      "04_panela_de_pressao.mp3",
+      "05_liquidificador.mp3",
+      "06_mais2.mp3",
+      "07_mais4.mp3",
+      "08_bloqueio.mp3",
+      "09_inverter.mp3",
+      "10_coringa_escolher_cor.mp3",
+      "11_corte.mp3",
+      "12_ultima_carta.mp3",
+      "13_punicao_12.mp3",
+      "13_punicao_2.mp3",
+      "13_punicao_4.mp3",
+      "13_punicao_6.mp3",
+      "14_demo_5_segundos.mp3",
+      "14_tick_contagem.mp3",
+      "14_tick_final.mp3",
+      "15_vitoria.mp3",
+      "16_derrota.mp3",
+      "17_botao_clique.mp3",
+      "17_botao_confirmar.mp3",
+      "18_menu_abrir.mp3",
+      "18_menu_fechar.mp3",
+      "19_distribuir.mp3",
+      "19_embaralhar.mp3",
+      "20_inicio_rodada.mp3",
+      "21_escolher_cor.mp3",
+      "22_jogador_pronto.mp3"
+    ],
+    "formato": "mp3",
+    "usar_exatamente_versoes": "01-03 aprovados V1; 04-05 aprovados V2; demais aprovados em levas 2-4",
+    "nota": "Utilizar efeitos individuais para cronometro e penalidades; demo 5 segundos e apenas exemplo de escuta"
+  }
+}

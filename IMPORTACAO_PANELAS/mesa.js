@@ -336,6 +336,7 @@
     maskCards();return ends;
   }
   function updateClock(state,now=Date.now()) {
+    window.PanelinhaSFX?.clock(state,now);
     const remaining=state.deadline-now;
     let badge=$('turnClock');
     if(!badge){badge=document.createElement('span');badge.id='turnClock';badge.className='turn-clock';badge.setAttribute('role','timer');$('table').append(badge);}
@@ -485,9 +486,11 @@
     const wasOpen = !$('tableMenu').classList.contains('hide');
     $('tableMenu').classList.add('hide');
     $('tableMenuBtn').setAttribute('aria-expanded', 'false');
+    if(wasOpen)window.PanelinhaSFX?.event('menu-close');
     if (wasOpen) $('tableMenuBtn').focus({preventScroll:true});
   }
   $('tableMenuBtn').onclick = () => {
+    window.PanelinhaSFX?.event('menu-open');
     $('tableMenu').classList.remove('hide');
     $('tableMenuBtn').setAttribute('aria-expanded', 'true');
     $('closeTableMenu').focus({preventScroll:true});

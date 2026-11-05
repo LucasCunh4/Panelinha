@@ -22,6 +22,7 @@
   function clearEntrance(){entrance.forEach(a=>a.cancel());entrance.clear();ghost?.remove();ghost=null;}
   function writeHistory(route,replace=false){history[replace?'replaceState':'pushState']({panelinha:route,profileFor:profileDestination},'',`#${routes[route].hash}`);}
   function show(route,focus=true){
+    window.PanelinhaSFX?.navigate(route);
     window.PanelinhaSelects?.close({restoreFocus:false,animate:false});
     if(route==='profile')PanelinhaProfile.open();
     current=route;document.body.dataset.screen=route;
@@ -53,6 +54,7 @@
     ask({title:'Sair da mesa?',text:'A partida atual será encerrada. Deseja voltar às configurações?',cancel:'Continuar jogando',confirm:'Encerrar partida',action:()=>hooks.leaveMatch()});
   }
   function back({native=false}={}){
+    if(window.PanelinhaSFX?.closeSettings())return true;
     if(window.PanelinhaSelects?.close())return true;
     if(!$('navDialog').hidden){hideDialog();return true;}
     if(current==='game'){

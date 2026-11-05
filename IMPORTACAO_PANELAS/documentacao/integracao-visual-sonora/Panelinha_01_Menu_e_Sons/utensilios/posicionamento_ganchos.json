@@ -1,0 +1,81 @@
+{
+  "projeto": "Panelinha",
+  "versao": "utensilios-pendulares-v1",
+  "fundo_referencia": "referencia/fundo_menu_aprovado.png",
+  "dimensoes_fundo": [
+    1672,
+    941
+  ],
+  "coordenadas": "percentuais do quadro completo do fundo, com object-fit: contain",
+  "camada_de_animacao": "PNG transparente, fundo NÃO foi modificado",
+  "canvas_png": [
+    245,
+    570
+  ],
+  "transform_origin": "center top (50% 0%)",
+  "altura_relativa_pct": 16.472,
+  "topo_relativo_pct": 30.287,
+  "amplitude_graus_sugerida": 1.8,
+  "itens": [
+    {
+      "ordem": 1,
+      "nome": "Concha",
+      "arquivo": "png/01_concha.png",
+      "left_pct": 69.258,
+      "top_pct": 30.287,
+      "height_pct": 16.472,
+      "phase_sec": 0.0
+    },
+    {
+      "ordem": 2,
+      "nome": "Espátula vazada",
+      "arquivo": "png/02_espatula_vazada.png",
+      "left_pct": 73.385,
+      "top_pct": 30.287,
+      "height_pct": 16.472,
+      "phase_sec": 0.42
+    },
+    {
+      "ordem": 3,
+      "nome": "Colher de madeira",
+      "arquivo": "png/03_colher_madeira.png",
+      "left_pct": 77.153,
+      "top_pct": 30.287,
+      "height_pct": 16.472,
+      "phase_sec": 0.78
+    },
+    {
+      "ordem": 4,
+      "nome": "Pegador de massas",
+      "arquivo": "png/04_pegador_massas.png",
+      "left_pct": 81.041,
+      "top_pct": 30.287,
+      "height_pct": 16.472,
+      "phase_sec": 0.18
+    },
+    {
+      "ordem": 5,
+      "nome": "Batedor de arame",
+      "arquivo": "png/05_batedor_arame.png",
+      "left_pct": 84.988,
+      "top_pct": 30.287,
+      "height_pct": 16.472,
+      "phase_sec": 0.61
+    },
+    {
+      "ordem": 6,
+      "nome": "Escumadeira",
+      "arquivo": "png/06_escumadeira.png",
+      "left_pct": 88.876,
+      "top_pct": 30.287,
+      "height_pct": 16.472,
+      "phase_sec": 0.95
+    }
+  ],
+  "observacoes": [
+    "Pontos de encaixe sugeridos, devem ser verificados em Android landscape",
+    "Não incluir ganchos novos: já existem no fundo",
+    "Animação apenas nas PNGs, não no fundo, sem alterar layout do menu",
+    "Sem títulos, botões nem textos embutidos"
+  ]
+}

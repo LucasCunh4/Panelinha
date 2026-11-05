@@ -1,0 +1,117 @@
+[
+  {
+    "suite": "ajustes_opcoes",
+    "exitCode": 0,
+    "seconds": 42.2
+  },
+  {
+    "suite": "android-compat",
+    "exitCode": 0,
+    "seconds": 6.0
+  },
+  {
+    "suite": "artes_aviso_halo",
+    "exitCode": 0,
+    "seconds": 12.7
+  },
+  {
+    "suite": "artes_penalidades",
+    "exitCode": 0,
+    "seconds": 77.3
+  },
+  {
+    "suite": "atualizacao_mesa",
+    "exitCode": 0,
+    "seconds": 52.0
+  },
+  {
+    "suite": "atualizacao_regras",
+    "exitCode": 0,
+    "seconds": 39.8
+  },
+  {
+    "suite": "correcoes_estabilidade",
+    "exitCode": 0,
+    "seconds": 50.7
+  },
+  {
+    "suite": "escolher_cor",
+    "exitCode": 0,
+    "seconds": 49.9
+  },
+  {
+    "suite": "horizontal_identidade",
+    "exitCode": 0,
+    "seconds": 30.8
+  },
+  {
+    "suite": "integracao",
+    "exitCode": 0,
+    "seconds": 13.1
+  },
+  {
+    "suite": "leque_continuo",
+    "exitCode": 0,
+    "seconds": 43.0
+  },
+  {
+    "suite": "liquidificador",
+    "exitCode": 0,
+    "seconds": 20.6
+  },
+  {
+    "suite": "mesa",
+    "exitCode": 0,
+    "seconds": 28.9
+  },
+  {
+    "suite": "mesa_atual",
+    "exitCode": 0,
+    "seconds": 44.2
+  },
+  {
+    "suite": "mesa_fina",
+    "exitCode": 0,
+    "seconds": 17.0
+  },
+  {
+    "suite": "navegacao",
+    "exitCode": 0,
+    "seconds": 21.2
+  },
+  {
+    "suite": "padrao_400x850",
+    "exitCode": 0,
+    "seconds": 13.1
+  },
+  {
+    "suite": "penalidades_padrao",
+    "exitCode": 0,
+    "seconds": 25.2
+  },
+  {
+    "suite": "preparacao_menu",
+    "exitCode": 0,
+    "seconds": 4.6
+  },
+  {
+    "suite": "rastro_halo",
+    "exitCode": 0,
+    "seconds": 41.1
+  },
+  {
+    "suite": "refinamentos_mesa",
+    "exitCode": 0,
+    "seconds": 16.2
+  },
+  {
+    "suite": "seletores_halo",
+    "exitCode": 0,
+    "seconds": 31.8
+  },
+  {
+    "suite": "visual_sonoro",
+    "exitCode": 0,
+    "seconds": 28.7
+  }
+]

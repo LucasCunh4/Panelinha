@@ -1,0 +1,546 @@
+{
+  "version": 1,
+  "sourceHead": "e90ff4b81ee2cf17d41e17de762e824bda359894",
+  "packages": [
+    {
+      "package": "Panelinha_01_Menu_e_Sons.zip",
+      "bytes": 8834361,
+      "sha256": "58d55aa6908b5657afeb1878f3aecca90a1504066aa93bd9eaccaaabde2db9b6",
+      "entries": 50,
+      "crc": "OK",
+      "docs": [
+        "Panelinha_Menu_Animacoes_Audios_V2/MANIFESTO.json",
+        "Panelinha_Menu_Animacoes_Audios_V2/PROMPT_PARA_CODEX.md",
+        "Panelinha_Menu_Animacoes_Audios_V2/README.md",
+        "Panelinha_Menu_Animacoes_Audios_V2/utensilios/posicionamento_ganchos.json"
+      ]
+    },
+    {
+      "package": "Panelinha_02_Avatares.zip",
+      "bytes": 18894849,
+      "sha256": "2049132801551d77118d95d44b365484792809253549a6c7a03f229c93a5dc58",
+      "entries": 12,
+      "crc": "OK",
+      "docs": [
+        "Panelinha_Avatares_9_Aprovados/LEIA_ME.md",
+        "Panelinha_Avatares_9_Aprovados/MANIFESTO.json"
+      ]
+    },
+    {
+      "package": "Panelinha_03_Letras_do_Titulo.zip",
+      "bytes": 8063490,
+      "sha256": "1c041cb02ce7cb2a663255e495ec50c542d9ab4296ae394ed0bfcc075467ff2f",
+      "entries": 12,
+      "crc": "OK",
+      "docs": [
+        "Panelinha_Titulo_Letras_Individuais/LEIA_ME.md",
+        "Panelinha_Titulo_Letras_Individuais/MANIFESTO_LETRAS.json"
+      ]
+    },
+    {
+      "package": "Panelinha_04_Tampa_e_Brilhos.zip",
+      "bytes": 4995342,
+      "sha256": "221e0a315f40780b7873b7f0c284cb1210fc5231e8c7c1e80be6e28b8e9aa279",
+      "entries": 8,
+      "crc": "OK",
+      "docs": [
+        "Panelinha_Tampa_e_Brilhos_Animados_V1/LEIA_ME.md",
+        "Panelinha_Tampa_e_Brilhos_Animados_V1/MANIFESTO.json"
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "path": "assets/menu-oficial/audio/01_jogar_carta.mp3",
+      "sha256": "279d434ad339b92aaefaa6e25a37aa25c0671d7575650a2731495b4522e93c9f",
+      "bytes": 12060,
+      "duration": 0.574694
+    },
+    {
+      "path": "assets/menu-oficial/audio/02_comprar_carta.mp3",
+      "sha256": "22c4daf2e6464be975a522cc44d41350bc8a228a3a3593948c08f1897bbc6036",
+      "bytes": 10493,
+      "duration": 0.496327
+    },
+    {
+      "path": "assets/menu-oficial/audio/03_mais6.mp3",
+      "sha256": "340a6ebb13e8925302481bd40216ed1184d1fefa22ead79a85a2c5fd516e080b",
+      "bytes": 32435,
+      "duration": 1.593469
+    },
+    {
+      "path": "assets/menu-oficial/audio/04_panela_de_pressao.mp3",
+      "sha256": "4b9e773eea96e94a07500b68c8ff2bb9de8b6c98ad7d3517ad4d53dd29e057cc",
+      "bytes": 90322,
+      "duration": 3.73551
+    },
+    {
+      "path": "assets/menu-oficial/audio/05_liquidificador.mp3",
+      "sha256": "0f3e1d85f232d0e857df223cfeb39917dad4faa76e1dbcbe012bf40e5648a21e",
+      "bytes": 92203,
+      "duration": 3.813878
+    },
+    {
+      "path": "assets/menu-oficial/audio/06_mais2.mp3",
+      "sha256": "3653e29c44532a625b953e68de6b404b80d9951afc95f7051fa7b1b3e8528fc1",
+      "bytes": 18329,
+      "duration": 0.888163
+    },
+    {
+      "path": "assets/menu-oficial/audio/07_mais4.mp3",
+      "sha256": "08be06b29a3b9b0072676c5f727c12e561203f7b3315f245237c0d91f12dfb11",
+      "bytes": 25121,
+      "duration": 1.227755
+    },
+    {
+      "path": "assets/menu-oficial/audio/08_bloqueio.mp3",
+      "sha256": "48dd34178884dbc836e60cbcc4b1a8c55b44bd9777dab2a0cd348cf35cd13c21",
+      "bytes": 21986,
+      "duration": 1.07102
+    },
+    {
+      "path": "assets/menu-oficial/audio/09_inverter.mp3",
+      "sha256": "36101e2920d4ccb2d5dff9eb4296d777a19cfc7358edc5d69f439e65b90e88b1",
+      "bytes": 29823,
+      "duration": 1.462857
+    },
+    {
+      "path": "assets/menu-oficial/audio/10_coringa_escolher_cor.mp3",
+      "sha256": "c010c1eb6583c12edf04cce3323fde577dd9bb44d5e06c9b98c75a247533d34f",
+      "bytes": 39750,
+      "duration": 1.959184
+    },
+    {
+      "path": "assets/menu-oficial/audio/11_corte.mp3",
+      "sha256": "0996f79dfe78d19a5f5f20dca5e1ba5ab2a05fc9498303b329c3324f1b55176c",
+      "bytes": 24048,
+      "duration": 0.940408
+    },
+    {
+      "path": "assets/menu-oficial/audio/12_ultima_carta.mp3",
+      "sha256": "1de849fa0ed2180bf6b6f0636515a4cf351e7e17d56a9c08d9899fcf7228199e",
+      "bytes": 28307,
+      "duration": 1.959184
+    },
+    {
+      "path": "assets/menu-oficial/audio/13_punicao_12.mp3",
+      "sha256": "f066bd36c8a39faa97801822a4699d435ffef6bd7e5cafa778328f2d8b2ad02e",
+      "bytes": 38943,
+      "duration": 1.828571
+    },
+    {
+      "path": "assets/menu-oficial/audio/13_punicao_2.mp3",
+      "sha256": "0bdee0821269ad6bbc551242307b74dbd5fa4e5df8c6807aa2b8599172d09543",
+      "bytes": 20969,
+      "duration": 0.940408
+    },
+    {
+      "path": "assets/menu-oficial/audio/13_punicao_4.mp3",
+      "sha256": "5d1926b718b4e01f28ad99e823ed764da9ea5c6e2a345b1b7ccbc47adaf38c63",
+      "bytes": 24724,
+      "duration": 1.17551
+    },
+    {
+      "path": "assets/menu-oficial/audio/13_punicao_6.mp3",
+      "sha256": "375e984a79ab6609034b77dd931fdb6eb94c51309733126e1a92e0e3e29ea530",
+      "bytes": 31458,
+      "duration": 1.410612
+    },
+    {
+      "path": "assets/menu-oficial/audio/14_demo_5_segundos.mp3",
+      "sha256": "bfb457e9ed7fd050032875ea405cfb747476f9f920685b7fc7b7a16ec5992362",
+      "bytes": 32992,
+      "duration": 5.851429
+    },
+    {
+      "path": "assets/menu-oficial/audio/14_tick_contagem.mp3",
+      "sha256": "8660a318b5a8cfaaa0417ba56bf997d0905e472c3d7980e39d3c21453ac58d11",
+      "bytes": 3092,
+      "duration": 0.261224
+    },
+    {
+      "path": "assets/menu-oficial/audio/14_tick_final.mp3",
+      "sha256": "29534b588ccd369edda50d81e65a2380a2b29e27b5aa7cf2a5bbfc0a17ea09d3",
+      "bytes": 6561,
+      "duration": 0.574694
+    },
+    {
+      "path": "assets/menu-oficial/audio/15_vitoria.mp3",
+      "sha256": "db0effc43e3aa81f88b8bdc36ab3be6ee1eeab50a8e6a24197013497716120ac",
+      "bytes": 58960,
+      "duration": 3.657143
+    },
+    {
+      "path": "assets/menu-oficial/audio/16_derrota.mp3",
+      "sha256": "98eb068baf2953d1767425f17f0a66ead8f93ebc2856e3325c0059e17fc975b1",
+      "bytes": 27796,
+      "duration": 2.873469
+    },
+    {
+      "path": "assets/menu-oficial/audio/17_botao_clique.mp3",
+      "sha256": "87eac234391e8942f849147fc255a634ced70f4d5987747aeef58e3b1281e673",
+      "bytes": 3485,
+      "duration": 0.261224
+    },
+    {
+      "path": "assets/menu-oficial/audio/17_botao_confirmar.mp3",
+      "sha256": "50f324657ab40204a1f019dcddf447b5f79f3d8bae3c6b62418cae27afbef598",
+      "bytes": 8076,
+      "duration": 0.626939
+    },
+    {
+      "path": "assets/menu-oficial/audio/18_menu_abrir.mp3",
+      "sha256": "8bfa364c68d51439abbf7a19259249260838f43d6e551535bbc8ee7cf99e01e3",
+      "bytes": 8359,
+      "duration": 0.574694
+    },
+    {
+      "path": "assets/menu-oficial/audio/18_menu_fechar.mp3",
+      "sha256": "e05ce8b430d3fe46340988b3d1010fa99b2b0f27008ca1bfb0dbb33d2723ba6c",
+      "bytes": 6925,
+      "duration": 0.496327
+    },
+    {
+      "path": "assets/menu-oficial/audio/19_distribuir.mp3",
+      "sha256": "703939483918f386566ba1453e207d0f0486b46bc9ba91ff04d6da369a151653",
+      "bytes": 40896,
+      "duration": 2.089796
+    },
+    {
+      "path": "assets/menu-oficial/audio/19_embaralhar.mp3",
+      "sha256": "7c263d16ae80aff11945434554f765f6059a44ee0636b601f4f0b3be2edfd5d2",
+      "bytes": 37945,
+      "duration": 2.298776
+    },
+    {
+      "path": "assets/menu-oficial/audio/20_inicio_rodada.mp3",
+      "sha256": "cc34d3e4739119bf0a9cd51be26a058cb1c19498465a89beef1d6244912c44d5",
+      "bytes": 32301,
+      "duration": 2.481633
+    },
+    {
+      "path": "assets/menu-oficial/audio/21_escolher_cor.mp3",
+      "sha256": "34c7ce542bc0440c4ce97bbda538ae135977537758abfa6a0c3b72553ce075da",
+      "bytes": 10082,
+      "duration": 0.757551
+    },
+    {
+      "path": "assets/menu-oficial/audio/22_jogador_pronto.mp3",
+      "sha256": "965d6ab58a2ee5a558d9f333a088a763483fc72f18f9be30b460072e3eee2303",
+      "bytes": 11904,
+      "duration": 1.149388
+    },
+    {
+      "path": "assets/menu-oficial/fumaca/01_vapor_leve.png",
+      "sha256": "3a2281df816649b27e15d560020549eadf4a192e61377839f7888c439a094934",
+      "bytes": 801069,
+      "width": 1086,
+      "height": 1448,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/menu-oficial/fumaca/02_vapor_suave.png",
+      "sha256": "9413e9ac68fc5b565fb7660dee6d7e34977af4ec45a6f4cbf7c2fc4440cf0542",
+      "bytes": 757830,
+      "width": 1086,
+      "height": 1448,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/menu-oficial/fumaca/03_vapor_espiral.png",
+      "sha256": "2206f70f944f45952068c7b618bce42cf086e2e07376f627a2ecb920b07f1eb8",
+      "bytes": 1027936,
+      "width": 1086,
+      "height": 1448,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/menu-oficial/fumaca/04_vapor_espiral_alternativo.png",
+      "sha256": "cea1acb42b77c31a601a35b4b7bd9dd72cc95c88cfd07471bef2c0dff26c82da",
+      "bytes": 680604,
+      "width": 1086,
+      "height": 1448,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/menu-oficial/fumaca/05_vapor_multiplas_espirais.png",
+      "sha256": "cdc1e97c3910c8a7808ebe3a7ac62b6dbe359170aad22be2a1315eb7f581e72e",
+      "bytes": 659856,
+      "width": 1086,
+      "height": 1448,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/menu-oficial/fumaca/06_vapor_tres_espirais.png",
+      "sha256": "78e54cf1d8f479d5e3a2e153520b9b25e03dd3a269c429e7f9b84aa5c1e674b7",
+      "bytes": 822319,
+      "width": 1086,
+      "height": 1448,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/menu-oficial/fumaca/07_vapor_redemoinho.png",
+      "sha256": "43e40b6562f1067dd222ddc144ec7c198dcdec6299c72ce23bc1fbd4f1ec60b6",
+      "bytes": 207729,
+      "width": 1086,
+      "height": 1448,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/menu-oficial/fumaca/08_vapor_redemoinho_brilhante.png",
+      "sha256": "7807615c649d70e72011d48ce2b49229dde0799373259f18602ae75f0b2ba5a8",
+      "bytes": 882989,
+      "width": 1086,
+      "height": 1448,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/menu-oficial/fundo/cozinha_menu_aprovada.png",
+      "sha256": "f13abe00e7e199fe3cc8e5045780a0da6ee77594f4edcfae373b3e054b51f252",
+      "bytes": 2094589,
+      "width": 1672,
+      "height": 941,
+      "mode": "RGB"
+    },
+    {
+      "path": "assets/menu-oficial/utensilios/01_concha.png",
+      "sha256": "c03a8bfaf7c20392f0f0e14ccdda7b77d000a52065a1729fbbc7d923a4eec4e6",
+      "bytes": 78711,
+      "width": 245,
+      "height": 570,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/menu-oficial/utensilios/02_espatula_vazada.png",
+      "sha256": "55dc5e3c6dad62dc816b03b853461ea8dc69b937d402305ab8166fe4f9719f45",
+      "bytes": 95865,
+      "width": 245,
+      "height": 570,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/menu-oficial/utensilios/03_colher_madeira.png",
+      "sha256": "9bdea0a04a97910d9136bb446d5816fcd32ccd58591405609281cb6ea7b023d3",
+      "bytes": 87715,
+      "width": 245,
+      "height": 570,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/menu-oficial/utensilios/04_pegador_massas.png",
+      "sha256": "85796a58ccd787f78f091d0f291cecdf02a2e421ead699a6a9635d9a216ec6ee",
+      "bytes": 86140,
+      "width": 245,
+      "height": 570,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/menu-oficial/utensilios/05_batedor_arame.png",
+      "sha256": "68881bfe3567850032f37fa1c6359832e917fb91706319c6b1777b19f8549c60",
+      "bytes": 109485,
+      "width": 245,
+      "height": 570,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/menu-oficial/utensilios/06_escumadeira.png",
+      "sha256": "2e72002c2f5c62149fd3efb4d6152b17e57d0e3a48cb851ecfed3cd156dd476d",
+      "bytes": 120259,
+      "width": 245,
+      "height": 570,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/avatares/01_frigideira_chef.png",
+      "sha256": "b91eff7d56094e5fb145e797ba448ba9a26d888a5244e989a333d89261da0807",
+      "bytes": 2170635,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB"
+    },
+    {
+      "path": "assets/avatares/02_leiteira_bigode.png",
+      "sha256": "877f20c5e2b0e2adae35adc0ce0e9172c91d0d70771099bcbab0262345a5e7db",
+      "bytes": 2049368,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB"
+    },
+    {
+      "path": "assets/avatares/03_panela_pressao.png",
+      "sha256": "4e09108f3238e23c7b2b59b928ace012c7852bd25066410014c41fc270190bd5",
+      "bytes": 1984717,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB"
+    },
+    {
+      "path": "assets/avatares/04_panela_dj.png",
+      "sha256": "853bebbbe3e9551a27e3e9a9d583e12b9c3e57fb4fc7f06216a39f4cfd57fd5a",
+      "bytes": 1988756,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB"
+    },
+    {
+      "path": "assets/avatares/05_wok_monoculo.png",
+      "sha256": "dd762700379f0f7ed765eb8a547371534a78ed8c4dbca225a920eec6f576bad3",
+      "bytes": 2120957,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB"
+    },
+    {
+      "path": "assets/avatares/06_panela_aventureira.png",
+      "sha256": "e40d8870dd461ea112550c393a5f6eaf4cc3b81f36d1aa3d3b0615f5325c6ef0",
+      "bytes": 2073453,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB"
+    },
+    {
+      "path": "assets/avatares/07_panela_gamer.png",
+      "sha256": "f44a1e9ec12a3afdbefa280a825ce0d924d9b71686f69b7b7f325433d8b9e22e",
+      "bytes": 2037187,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB"
+    },
+    {
+      "path": "assets/avatares/08_panela_piloto.png",
+      "sha256": "ca84f737727d011c34c47c3f36e363823c70580fa69365274139f6a43cdf38ba",
+      "bytes": 2061320,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB"
+    },
+    {
+      "path": "assets/avatares/09_panela_escoteira.png",
+      "sha256": "712630a2761981b3593df7224ea365200464979a2d7bc56dd6f9f4f8710280e3",
+      "bytes": 2160314,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGB"
+    },
+    {
+      "path": "assets/titulo/letras/01_P.png",
+      "sha256": "693691633b342bc76ebe7cfefc878c2a4fa829090f6cc272d1ce026d5fc6c6a0",
+      "bytes": 1040244,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/titulo/letras/02_A.png",
+      "sha256": "1926f75c67f83f67e2374aaa09dee959ebebbdbb878eec3664184c72972e58a6",
+      "bytes": 1220303,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/titulo/letras/03_N.png",
+      "sha256": "8fca50d9a83814d0ca55133b504160a41e4f5f6bc7a0afff55a27aa3d60391b5",
+      "bytes": 1199235,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/titulo/letras/04_E.png",
+      "sha256": "bad49135d5eda10eddbcf8c9c24f4c6acadbc97d895c74ffc34ffd946205f8ec",
+      "bytes": 1156677,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/titulo/letras/05_L.png",
+      "sha256": "1c026f07191a374289af2ae5caf69880683da404837f17e61684387cf4443b12",
+      "bytes": 904756,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/titulo/letras/06_I.png",
+      "sha256": "a28d3fda4f0fb959482458515b0203e1bb8e3a3e2b3a818668a3a504f8d6dbbd",
+      "bytes": 844198,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/titulo/letras/07_N.png",
+      "sha256": "530a04ffca9c88af9b9d4ab01cfc0e9a6a8c58501e3c4bd977354ef1d23f944a",
+      "bytes": 1289978,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/titulo/letras/08_H.png",
+      "sha256": "a67a8ba92f8e8082a8597440d0ed6a3b79ca32d6bb869b9843d3a546bcad4c0e",
+      "bytes": 1225825,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/titulo/letras/09_A.png",
+      "sha256": "e19c4184d9d5d0bf53263ee12579d597b4bd8022a0081ca94cf6b8aaef74e251",
+      "bytes": 1135738,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/titulo-efeitos/brilhos/01_brilho_quatro_pontas.png",
+      "sha256": "72e4ba7eacd4775df5f798b1952f60a63013ed54d11560e5813600d5fb0f853f",
+      "bytes": 692046,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/titulo-efeitos/brilhos/02_cluster_tres_estrelas.png",
+      "sha256": "ff683d95d8b5fb6284cf6a0a8fb65aede847d9c133d763e5c51cbcc2649656fa",
+      "bytes": 272477,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/titulo-efeitos/brilhos/03_estrela_intensa.png",
+      "sha256": "98356648dad64f2a3665d29acb60d5869a90253d5f0963a38da38d80ce6a6cda",
+      "bytes": 1235584,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/titulo-efeitos/brilhos/04_brilho_alongado.png",
+      "sha256": "4d79399eab52b52a600f567da99b11a6b10791799cd4a859ea583542bbe86044",
+      "bytes": 778897,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/titulo-efeitos/brilhos/05_explosao_de_brilhos.png",
+      "sha256": "2e34c8e95f6e96127a62848f2cd1922db223e3f02efcbe9e929e16d4276e745f",
+      "bytes": 1136836,
+      "width": 1254,
+      "height": 1254,
+      "mode": "RGBA"
+    },
+    {
+      "path": "assets/titulo-efeitos/tampa/tampa_sobre_letra_P.png",
+      "sha256": "85279426f2c685877bed11b0ae95b4679b98d70dda11b518623123892b798158",
+      "bytes": 1336613,
+      "width": 1536,
+      "height": 1024,
+      "mode": "RGBA"
+    }
+  ]
+}

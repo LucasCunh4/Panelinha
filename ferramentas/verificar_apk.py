@@ -80,7 +80,14 @@ with zipfile.ZipFile(apk) as archive:
         assert prefix + old not in archive.namelist(), f'Arte substituída ainda empacotada: {old}'
     for old in penalidades['supersededAssets']['paths']:
         assert prefix+old not in archive.namelist(), f'Arte +4/+6 antiga ainda empacotada: {old}'
-    for name in ['anuncios.js', 'anuncios.css', 'seletores.js', 'seletores.css', 'perfil.js', 'escolher-cor.js', 'escolher-cor.css', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js']:
+    visual_sound = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_VISUAL_SONORO.json').read_text())
+    assert len(visual_sound['assets']) == 69
+    for entry in visual_sound['assets']:
+        data = archive.read(prefix + entry['path'])
+        assert len(data) == entry['bytes'] and hashlib.sha256(data).hexdigest() == entry['sha256'], entry['path']
+        if 'width' in entry:
+            assert struct.unpack('>II', data[16:24]) == (entry['width'], entry['height']), entry['path']
+    for name in ['menu-arte.js', 'menu-arte.css', 'sons.js', 'sons.css', 'anuncios.js', 'anuncios.css', 'seletores.js', 'seletores.css', 'perfil.js', 'escolher-cor.js', 'escolher-cor.css', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js']:
         assert archive.read(prefix + name) == (root / 'IMPORTACAO_PANELAS' / name).read_bytes(), f'Jogo alterado no APK: {name}'
     original_html = (root / 'IMPORTACAO_PANELAS/index.html').read_bytes()
     has_compat = prefix + 'android-compat.js' in archive.namelist()
@@ -95,6 +102,7 @@ with zipfile.ZipFile(apk) as archive:
     assert config['server']['hostname'] == 'localhost' and config['server']['androidScheme'] == 'https'
     assert 'url' not in config['server'], 'O APK não deve depender de servidor remoto'
 info = {
+    'visualSoundAssetsVerified': len(visual_sound['assets']),
     'file': apk.name, 'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
     'applicationId': package[1], 'versionCode': int(package[2]), 'versionName': package[3],
     'certificateSha256': match[1].lower(), 'pngsVerified': len(pngs), 'origin': identity['origin'], 'androidCompat': has_compat,

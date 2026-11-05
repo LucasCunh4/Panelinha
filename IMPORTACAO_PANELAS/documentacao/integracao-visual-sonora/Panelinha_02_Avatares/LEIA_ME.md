@@ -1,0 +1,1 @@
+Pacote dos 9 avatares aprovados do Panelinha. Gamer com controle corrigido; futebol excluído. Todos os PNGs em 1254 × 1254. Escolha um avatar na tela de identificação e preserve sua proporção no jogo.

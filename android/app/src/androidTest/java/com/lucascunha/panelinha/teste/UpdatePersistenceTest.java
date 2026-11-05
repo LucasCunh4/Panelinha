@@ -20,11 +20,13 @@ public class UpdatePersistenceTest {
         assertEquals("preservado-v0.1", InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("upgrade-check", Context.MODE_PRIVATE).getString("sentinel",null));
         String profile = InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("upgrade-check", Context.MODE_PRIVATE).getString("profile",null);
         final String profileCheck = profile==null?"true":"localStorage.getItem('panelinha.player.v1')==="+org.json.JSONObject.quote(profile);
+        String sound = InstrumentationRegistry.getInstrumentation().getTargetContext().getSharedPreferences("upgrade-check", Context.MODE_PRIVATE).getString("sound",null);
+        final String soundCheck = sound==null?"true":"localStorage.getItem('panelinha.sfx.v1')==="+org.json.JSONObject.quote(sound);
         WebView web = activity.getActivity().getBridge().getWebView();
         long end=SystemClock.uptimeMillis()+45000;
         while(SystemClock.uptimeMillis()<end){
             AtomicReference<String> result=new AtomicReference<>();CountDownLatch latch=new CountDownLatch(1);
-            InstrumentationRegistry.getInstrumentation().runOnMainSync(()->web.evaluateJavascript("location.origin==='https://localhost' && localStorage.getItem('panelinha-upgrade-check')==='preservado-v0.1' && ("+profileCheck+")",v->{result.set(v);latch.countDown();}));
+            InstrumentationRegistry.getInstrumentation().runOnMainSync(()->web.evaluateJavascript("location.origin==='https://localhost' && localStorage.getItem('panelinha-upgrade-check')==='preservado-v0.1' && ("+profileCheck+") && ("+soundCheck+")",v->{result.set(v);latch.countDown();}));
             assertTrue(latch.await(15,TimeUnit.SECONDS));
             if("true".equals(result.get()))return;
             SystemClock.sleep(200);

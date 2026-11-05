@@ -1,6 +1,6 @@
 # Panelinha Teste — Android
 
-Atualização atual: [arte oficial do Liquidificador](testes/LIQUIDIFICADOR_RESULTADOS.md). PNG 400×850 com máscara da Panela, associado ao tipo `rotate` no renderizador comum. Regras/rotação, demais artes, assinatura geração 2, landscape, imersão, offline e workflow preservados.
+Atualização atual: [integração visual e sonora oficial](testes/VISUAL_SONORO_RESULTADOS.md). Cozinha em camadas, nove letras, tampa/brilhos, nove avatares e efeitos sonoros locais. Todas as cartas e regras, assinatura geração 2, landscape, imersão, offline e workflow preservados. O Liquidificador oficial 400×850 continua integrado.
 
 > Assinatura ativa: **geração 2**, autorizada em 30/10/2026 após perda da chave
 > anterior. Identidade pública e certificado aposentado em `android-identity.json`.

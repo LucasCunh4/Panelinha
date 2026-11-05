@@ -1,0 +1,11 @@
+PASS 36 layouts: leques completos 7/15/20/30/60/100, sigilo/parceiro, mão centralizada e monte junto ao descarte
+PASS chama cresce gradualmente até +20 e limita em +40; volta a .74/escala 1 ao encerrar penalidade
+PASS +20: vinte cartas individuais, sequência progressivamente acelerada <1.85s; lógica registra imediatamente e sem fantasmas
+PASS compras +40/+80/+100: conservação exata e todas as cartas individuais em menos de 1.85s
+PASS compra de bot também anima vinte versos, sem revelar a mão
+PASS histórico visual limitado às três últimas, ordem correta, poses variadas e integração do voo/pouso
+PASS reciclagem do descarte mantém três representações históricas com identidades visuais distintas
+PASS corte durante o voo: dois descartes únicos, um efeito +2 e nenhuma carta fantasma
+PASS efeito Bloqueio aponta para o jogador correto nos dois sentidos; regra preservada
+PASS cronômetro 5/4/3/2/1 humano e três bots, some após turno e não aparece sem limite habilitado
+PASS rotação e movimento reduzido sem mutação, bloqueio de toque ou cartas fantasmas

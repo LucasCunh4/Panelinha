@@ -53,9 +53,16 @@ for(const file of ['index.html','mesa.css','mesa.js','escolher-cor.css','escolhe
   const code=fs.readFileSync(path.join(source,file),'utf8');
   for(const old of [...especiais.supersededAssets.paths,...penalidades.supersededAssets.paths])if(code.includes(path.basename(old)))throw Error(`Referência ativa à arte substituída: ${file}`);
 }
+const visualSound=JSON.parse(fs.readFileSync(path.join(source,'documentacao/MANIFESTO_VISUAL_SONORO.json')));
+if(visualSound.assets.length!==69)throw Error('A integração exige 39 PNGs e 30 MP3s oficiais');
+for(const entry of visualSound.assets){
+  const bytes=fs.readFileSync(path.join(source,entry.path));
+  if(bytes.length!==entry.bytes||crypto.createHash('sha256').update(bytes).digest('hex')!==entry.sha256)throw Error(`Recurso visual/sonoro divergente: ${entry.path}`);
+  if(entry.width&&(bytes.readUInt32BE(16)!==entry.width||bytes.readUInt32BE(20)!==entry.height))throw Error(`Dimensões oficiais divergentes: ${entry.path}`);
+}
 fs.rmSync(output, {recursive:true, force:true});
 fs.mkdirSync(output, {recursive:true});
-for (const name of ['anuncios.js', 'anuncios.css', 'index.html', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js', 'seletores.js', 'seletores.css', 'perfil.js', 'escolher-cor.js', 'escolher-cor.css', 'assets']) fs.cpSync(path.join(source, name), path.join(output, name), {recursive:true});
+for (const name of ['menu-arte.js', 'menu-arte.css', 'sons.js', 'sons.css', 'anuncios.js', 'anuncios.css', 'index.html', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js', 'seletores.js', 'seletores.css', 'perfil.js', 'escolher-cor.js', 'escolher-cor.css', 'assets']) fs.cpSync(path.join(source, name), path.join(output, name), {recursive:true});
 require('esbuild').buildSync({
   entryPoints:[path.join(__dirname, 'android-compat.js')],
   outfile:path.join(output, 'android-compat.js'),

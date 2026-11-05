@@ -27,7 +27,8 @@
   function receive(event){
     if(!event||typeof event.id!=='string'||!owner||owner.phase!=='playing'||event.matchId!==matchId||event.round!==owner.round||seen.has(event.id))return false;
     if(!Number.isInteger(event.playerId)||event.playerId<0||event.playerId>3||typeof event.playerName!=='string')return false;
-    seen.add(event.id);queue.push(Object.freeze({...event}));next();return true;
+    seen.add(event.id);queue.push(Object.freeze({...event}));next();
+    document.dispatchEvent(new CustomEvent('panelinha:ultima-carta-confirmada',{detail:event}));return true;
   }
   document.addEventListener(type,event=>receive(event.detail));
   function announce(state,playerId,playerName,stage){

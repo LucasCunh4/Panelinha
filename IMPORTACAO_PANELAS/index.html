@@ -34,6 +34,8 @@
 <link rel="stylesheet" href="escolher-cor.css">
 <link rel="stylesheet" href="anuncios.css">
 <link rel="stylesheet" href="seletores.css">
+<link rel="stylesheet" href="menu-arte.css">
+<link rel="stylesheet" href="sons.css">
 </head>
 <body>
 <main class="container app-container">
@@ -71,7 +73,7 @@
     <h1 id="profileTitle" class="screen-title">Seu nome e avatar</h1>
     <form id="profileForm" class="profile-layout">
       <div class="profile-identification"><div class="profile-preview"><div id="profilePreviewAvatar"></div><strong id="profilePreviewName"></strong></div><label for="playerName">Como quer aparecer na mesa?</label><input id="playerName" name="nickname" maxlength="32" autocomplete="nickname" enterkeyhint="done" placeholder="Seu nome"></div>
-      <div class="profile-choices"><p>Escolha seu avatar</p><div id="avatarGallery" role="group" aria-label="Avatares temporários"></div></div>
+      <div class="profile-choices"><p>Escolha seu avatar</p><div id="avatarGallery" role="group" aria-label="Avatares oficiais"></div></div>
       <button id="profileContinueBtn" type="submit" class="hero-button hero-gold">Continuar</button>
     </form>
   </section>
@@ -157,6 +159,8 @@
 </main><div id="modalRoot"></div>
 <div id="navDialog" class="nav-dialog" role="alertdialog" aria-modal="true" aria-labelledby="navDialogTitle" aria-describedby="navDialogText" hidden><div class="nav-dialog-panel"><h2 id="navDialogTitle"></h2><p id="navDialogText"></p><button id="cancelLeaveBtn" class="hero-button hero-gold">Continuar jogando</button><button id="confirmLeaveBtn" class="hero-button hero-violet">Encerrar partida</button></div></div>
 <script src="perfil.js"></script>
+<script src="menu-arte.js"></script>
+<script src="sons.js"></script>
 <script src="anuncios.js"></script>
 <script src="escolher-cor.js"></script>
 <script src="mesa.js"></script>
@@ -214,8 +218,8 @@ function clearJobs(){if(botTimer)clearTimeout(botTimer);if(cutTimer)clearTimeout
 function startMatch(){clearJobs();let o=settings();s={o,identity:PanelinhaProfile.current,players:[0,1,2,3].map(i=>({id:i,hand:[],score:0})),teams:[0,0],deck:[],discard:[],activeColor:null,direction:1,current:0,penalty:0,highest:0,lastPenalty:null,finisher:null,round:0,phase:'playing',drawn:null,cutOpen:false,unlockAt:0,lastActor:null,lastDistribution:null,preUno:false,unoWindow:null,log:[],message:'',deadline:0,pendingAction:null,token:0,reveal:false,summary:[],pastWinners:[],modal:null};PanelinhaAnnouncements.start(s);$('menu').classList.add('hide');$('game').classList.remove('hide');$('backBtn').classList.remove('hide');PanelasMesa.closeMenu();$('reveal').checked=false;newRound();PanelinhaNavigation.enterGame();}
 function top(){return s.discard[s.discard.length-1];}
 function nextActive(from,steps=1){let i=from;for(let st=0;st<steps;st++){let tries=0;do{i=(i+4+s.direction)%4;tries++;}while(s.players[i].hand.length===0&&tries<4);}return i;}
-function refill(){if(s.deck.length||s.discard.length<=1)return;let t=s.discard.pop();s.deck=shuffle(s.discard);s.discard=[t];log('Monte reabastecido com os descartes.');}
-function drawCard(id){refill();let c=s.deck.pop();if(c){s.players[id].hand.push(c);PanelasMesa.recordDraw(s,id,c);}return c||null;}
+function refill(){if(s.deck.length||s.discard.length<=1)return;let t=s.discard.pop();s.deck=shuffle(s.discard);s.discard=[t];log('Monte reabastecido com os descartes.');PanelinhaSFX.event('deck-refilled');}
+function drawCard(id){refill();let c=s.deck.pop();if(c){s.players[id].hand.push(c);PanelasMesa.recordDraw(s,id,c);PanelinhaSFX.event('card-drawn');}return c||null;}
 function drawMany(id,n){let got=0;for(let i=0;i<n;i++){if(!drawCard(id))break;got++;}return got;}
 function redistribute(extra=0,exclude=[],actor=null){
   const eligible=s.players.filter(p=>p.hand.length>0&&!exclude.includes(p.id));
@@ -256,13 +260,13 @@ function redistribute(extra=0,exclude=[],actor=null){
   log(`Panela de Pressão ALEATÓRIA (${text})${extra?` · punição: ${added.length}/${extra} cartas adicionadas`:''}.`);
 }
 function rotateHands(exclude=[]){let order=[];for(let i=0;i<4;i++)if(s.players[i].hand.length>0&&!exclude.includes(i))order.push(i);if(order.length<2)return;const next={};for(const id of order){let to=id;let count=0;do{to=(to+4+s.direction)%4;count++;}while(!order.includes(to)&&count<4);next[to]=s.players[id].hand;}for(let id of order)s.players[id].hand=next[id];log(`Liquidificador: mãos transferidas no sentido ${s.direction===-1?'horário':'anti-horário'}.`);}
-function newRound(){PanelinhaAnnouncements.round(s);clearJobs();s.token++;s.round++;s.players.forEach(p=>p.hand=[]);s.deck=buildDeck(s.o);s.discard=[];s.direction=1;s.current=0;s.penalty=0;s.highest=0;s.lastPenalty=null;s.finisher=null;s.drawn=null;s.preUno=false;s.unoWindow=null;s.cutOpen=false;s.unlockAt=0;s.lastActor=null;s.lastDistribution=null;s.pendingAction=null;s.phase='playing';s.message='';for(let j=0;j<7;j++)for(const p of s.players)drawCard(p.id);let first=s.deck.pop();s.discard.push(first);s.activeColor=first.color||pick(COLORS);log(`Rodada ${s.round}: carta inicial ${description(first)}.`);
+function newRound(){PanelinhaSFX.event('round-prepare');PanelinhaAnnouncements.round(s);clearJobs();s.token++;s.round++;s.players.forEach(p=>p.hand=[]);s.deck=buildDeck(s.o);s.discard=[];s.direction=1;s.current=0;s.penalty=0;s.highest=0;s.lastPenalty=null;s.finisher=null;s.drawn=null;s.preUno=false;s.unoWindow=null;s.cutOpen=false;s.unlockAt=0;s.lastActor=null;s.lastDistribution=null;s.pendingAction=null;s.phase='playing';s.message='';for(let j=0;j<7;j++)for(const p of s.players)drawCard(p.id);let first=s.deck.pop();s.discard.push(first);s.activeColor=first.color||pick(COLORS);log(`Rodada ${s.round}: carta inicial ${description(first)}.`);
 if(first.type==='skip'){s.current=1;log('Bloqueio inicial: primeiro jogador pulado.');}
 else if(first.type==='reverse'){s.direction=-1;s.current=3;log('Inverter inicial: sentido invertido.');}
 else if(power(first)){s.penalty=power(first);s.highest=power(first);log(`Penalidade inicial de +${s.penalty}.`);}
 else if(first.type==='dist')redistribute();
 else if(first.type==='rotate')rotateHands();
-if(s.finisher!==null){finishRound();return;}startTurn();}
+if(s.finisher!==null){finishRound();return;}PanelinhaSFX.event('round-start');startTurn();}
 function startTurn(pauseMs=0){
   if(!s||s.phase!=='playing')return;
   s.drawn=null;s.preUno=false;s.token++;
@@ -326,7 +330,7 @@ function commitColorChoice(state,action,color){
     s.pendingAction=null;$('modalRoot').innerHTML='';
     log('Escolha cancelada: a identidade da carta pendente mudou.');render();queueBots();return false;
   }
-  return applyPlay(action.id,action.ids,action.isCut,color);
+  const applied=applyPlay(action.id,action.ids,action.isCut,color);if(applied)PanelinhaSFX.event('color-chosen');return applied;
 }
 function applyPlay(id,ids,isCut,color){
   // Guarda de segurança também para bots/modal: nenhuma jogada atravessa uma penalidade.
@@ -340,6 +344,7 @@ function applyPlay(id,ids,isCut,color){
   p.hand=p.hand.filter(q=>q.id!==c.id);
   s.discard.push(c);if(c.type!=='rotate'&&c.type!=='dist')s.activeColor=c.color||color||s.activeColor;
   s.drawn=null;s.pendingAction=null;s.lastActor=id;s.lastDistribution=null;
+  PanelinhaSFX.event('card-played',{cardType:c.type,cut:isCut});
   log(`${names(id)} ${isCut?'CORTOU com':'jogou'} ${description(c)}${COLOR_CHOOSERS.has(c.type)&&p.hand.length?' (cor: '+CN[s.activeColor]+')':''}.`);
   if(p.hand.length===1){const announced=(id===0?s.preUno:Math.random()<.75);if(announced){log(`${names(id)} anunciou ÚLTIMA CARTA.`);if(id!==0)PanelinhaAnnouncements.announce(s,id,names(id),'after-play');}else{s.unoWindow={id};log(`${names(id)} ficou com 1 carta sem anunciar!`);}}
   s.preUno=false;
@@ -361,17 +366,17 @@ function applyPlay(id,ids,isCut,color){
   startTurn(CUT_PAUSE_MS); // corte imediato; próximo jogador aguarda a pausa.
   return true;
 }
-function finishPenaltyDraw(id){clearJobs();closeUnoOnAction();let amount=s.penalty;let got=drawMany(id,amount);log(`${names(id)} comprou ${got} cartas da penalidade (+${amount}) e perdeu o turno.`);s.penalty=0;s.highest=0;s.lastPenalty=null;if(s.finisher!==null){finishRound();return;}s.current=nextActive(id);startTurn();}
+function finishPenaltyDraw(id){clearJobs();closeUnoOnAction();let amount=s.penalty;let got=drawMany(id,amount);PanelinhaSFX.event('penalty-resolved',{amount});log(`${names(id)} comprou ${got} cartas da penalidade (+${amount}) e perdeu o turno.`);s.penalty=0;s.highest=0;s.lastPenalty=null;if(s.finisher!==null){finishRound();return;}s.current=nextActive(id);startTurn();}
 function challenge(){if(!canChallenge(0)||!canActNow())return;clearJobs();closeUnoOnAction();const offender=s.lastPenalty.id,total=s.penalty;
-if(s.lastPenalty.illegal){drawMany(offender,total);log(`Desafio CORRETO: ${names(offender)} recebeu +${total}. Você mantém o turno.`);s.penalty=0;s.highest=0;s.lastPenalty=null;startTurn();}
-else{drawMany(0,total+2);log(`Desafio INCORRETO: você recebeu +${total+2} e perdeu a vez.`);s.penalty=0;s.highest=0;s.lastPenalty=null;if(s.finisher!==null){finishRound();return;}s.current=nextActive(0);startTurn();}}
+if(s.lastPenalty.illegal){drawMany(offender,total);PanelinhaSFX.event('penalty-resolved',{amount:total});log(`Desafio CORRETO: ${names(offender)} recebeu +${total}. Você mantém o turno.`);s.penalty=0;s.highest=0;s.lastPenalty=null;startTurn();}
+else{drawMany(0,total+2);PanelinhaSFX.event('penalty-resolved',{amount:total+2});log(`Desafio INCORRETO: você recebeu +${total+2} e perdeu a vez.`);s.penalty=0;s.highest=0;s.lastPenalty=null;if(s.finisher!==null){finishRound();return;}s.current=nextActive(0);startTurn();}}
 function canChallenge(id){return s.phase==='playing'&&s.o.challenge&&s.penalty>0&&s.current===id&&s.lastPenalty&&s.lastPenalty.challengeable&&(['wild4','wild6'].includes(s.lastPenalty.type));}
 function buyHuman(){if(!s||s.phase!=='playing'||s.current!==0||s.drawn!==null||!canActNow())return;clearJobs();closeUnoOnAction();if(s.penalty){finishPenaltyDraw(0);return;}let got=null,n=0;do{got=drawCard(0);if(!got)break;n++;}while(s.o.infinite&&!canPlay(got)&&n<200);log(`${names(0)} comprou ${n} carta(s).`);if(got&&canPlay(got)){s.drawn=got.id;s.message='Você pode jogar a carta comprada ou guardá-la e passar.';render();}
 else{s.message='Nenhuma carta válida comprada. Turno encerrado.';s.current=nextActive(0);startTurn();}}
 function keepPass(){if(s.phase!=='playing'||s.current!==0||s.drawn===null||!canActNow())return;clearJobs();log(`${names(0)} guardou a carta comprada e passou.`);s.drawn=null;s.current=nextActive(0);startTurn();}
 function callUno(){if(s.phase!=='playing')return;if(s.players[0].hand.length>=2){if(!s.preUno)PanelinhaAnnouncements.announce(s,0,names(0),'preemptive');s.preUno=true;s.message='Última carta anunciada preventivamente; agora descarte para ficar com uma.';log(`${names(0)} anunciou a última carta preventivamente.`);}
 else if(s.players[0].hand.length===1&&s.unoWindow&&s.unoWindow.id===0){s.unoWindow=null;log(`${names(0)} anunciou última carta antes de ser denunciado.`);PanelinhaAnnouncements.announce(s,0,names(0),'after-play');}render();}
-function reportUno(by=0){if(!s||!s.unoWindow||s.phase!=='playing')return;let id=s.unoWindow.id;if(id===by)return;s.unoWindow=null;let got=drawMany(id,2);log(`${names(by)} denunciou ${names(id)} por esquecer ÚLTIMA CARTA (+${got}).`);render();}
+function reportUno(by=0){if(!s||!s.unoWindow||s.phase!=='playing')return;let id=s.unoWindow.id;if(id===by)return;s.unoWindow=null;let got=drawMany(id,2);PanelinhaSFX.event('penalty-resolved',{amount:2});log(`${names(by)} denunciou ${names(id)} por esquecer ÚLTIMA CARTA (+${got}).`);render();}
 function handPoints(p){return p.hand.reduce((a,c)=>a+VALUE[c.type],0);}
 function specialCount(p){return p.hand.filter(c=>SPECIAL.has(c.type)).length;}
 function effectCount(p){return p.hand.filter(c=>c.type==='skip'||c.type==='reverse').length;}
@@ -386,6 +391,7 @@ else{const reached=s.players.filter(p=>p.score>=s.o.goal);if(reached.length){let
 if(s.o.single||victor){s.phase='gameOver';s.winner=victor;}
 const summary=s.summary.map(x=>`${x.place}º ${names(x.id)} — ${x.cost} pts nas cartas, ${x.remaining} cartas`).join(' | ');
 s.message=(s.phase==='gameOver'?(victor?`🏆 Vitória da partida: ${victor}. `:'🏆 Rodada única concluída. '):'Rodada encerrada. ')+summary;
+PanelinhaSFX.event('round-result',{won:victor?(s.o.duo?victor==='Equipe '+names(0)+' + Bot 2':victor===names(0)):(s.o.duo?s.finisher%2===0:s.finisher===0)});
 render();}
 function victories(id){return s.pastWinners?s.pastWinners.filter(x=>x===id).length:0;}
 function queueBots(){

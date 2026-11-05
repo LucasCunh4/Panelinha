@@ -1,0 +1,45 @@
+{
+  "projeto": "Panelinha",
+  "total": 9,
+  "itens": [
+    {
+      "arquivo": "avatares/01_frigideira_chef.png",
+      "nome": "Frigideira de óculos"
+    },
+    {
+      "arquivo": "avatares/02_leiteira_bigode.png",
+      "nome": "Leiteira de bigode"
+    },
+    {
+      "arquivo": "avatares/03_panela_pressao.png",
+      "nome": "Panela de pressão"
+    },
+    {
+      "arquivo": "avatares/04_panela_dj.png",
+      "nome": "Panela DJ"
+    },
+    {
+      "arquivo": "avatares/05_wok_monoculo.png",
+      "nome": "Wok de monóculo"
+    },
+    {
+      "arquivo": "avatares/06_panela_aventureira.png",
+      "nome": "Panela aventureira"
+    },
+    {
+      "arquivo": "avatares/07_panela_gamer.png",
+      "nome": "Panela gamer (controle corrigido)"
+    },
+    {
+      "arquivo": "avatares/08_panela_piloto.png",
+      "nome": "Panela piloto"
+    },
+    {
+      "arquivo": "avatares/09_panela_escoteira.png",
+      "nome": "Panela escoteira"
+    }
+  ],
+  "excluidos": [
+    "jogador de futebol"
+  ]
+}

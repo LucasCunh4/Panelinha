@@ -1,0 +1,70 @@
+{
+  "titulo": "PANELINHA",
+  "resolucao_original_px": [
+    1254,
+    1254
+  ],
+  "formato": "PNG RGBA",
+  "letras": [
+    {
+      "posicao": 1,
+      "letra": "P",
+      "arquivo": "letras/01_P.png",
+      "animar_individualmente": true
+    },
+    {
+      "posicao": 2,
+      "letra": "A",
+      "arquivo": "letras/02_A.png",
+      "animar_individualmente": true
+    },
+    {
+      "posicao": 3,
+      "letra": "N",
+      "arquivo": "letras/03_N.png",
+      "animar_individualmente": true
+    },
+    {
+      "posicao": 4,
+      "letra": "E",
+      "arquivo": "letras/04_E.png",
+      "animar_individualmente": true
+    },
+    {
+      "posicao": 5,
+      "letra": "L",
+      "arquivo": "letras/05_L.png",
+      "animar_individualmente": true
+    },
+    {
+      "posicao": 6,
+      "letra": "I",
+      "arquivo": "letras/06_I.png",
+      "animar_individualmente": true
+    },
+    {
+      "posicao": 7,
+      "letra": "N",
+      "arquivo": "letras/07_N.png",
+      "animar_individualmente": true
+    },
+    {
+      "posicao": 8,
+      "letra": "H",
+      "arquivo": "letras/08_H.png",
+      "animar_individualmente": true
+    },
+    {
+      "posicao": 9,
+      "letra": "A",
+      "arquivo": "letras/09_A.png",
+      "animar_individualmente": true
+    }
+  ],
+  "orientacoes": [
+    "Manter as nove letras como imagens separadas, nunca achatá-las no fundo.",
+    "P, A, N, E, L, I, N, H, A: preservar a ordem, inclusive as duas letras A e N.",
+    "Aplicar transformações/tempos de animação individualmente em cada letra.",
+    "Manter proporção natural, sem esticar e sem adicionar fundo às PNGs."
+  ]
+}

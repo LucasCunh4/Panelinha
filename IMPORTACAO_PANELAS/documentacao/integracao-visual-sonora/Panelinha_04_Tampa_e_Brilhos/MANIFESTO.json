@@ -1,0 +1,59 @@
+{
+  "projeto": "Panelinha",
+  "pacote": "Tampa e brilhos separados para animação do título",
+  "formato": "PNG com canal alfa/transparência",
+  "assets": [
+    {
+      "arquivo": "tampa/tampa_sobre_letra_P.png",
+      "descricao": "Tampa roxa e dourada que ficará acima da letra P",
+      "dimensoes_px": [
+        1536,
+        1024
+      ]
+    },
+    {
+      "arquivo": "brilhos/01_brilho_quatro_pontas.png",
+      "descricao": "Brilho de quatro pontas",
+      "dimensoes_px": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "arquivo": "brilhos/02_cluster_tres_estrelas.png",
+      "descricao": "Três brilhos pequenos agrupados",
+      "dimensoes_px": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "arquivo": "brilhos/03_estrela_intensa.png",
+      "descricao": "Estrela dourada intensa",
+      "dimensoes_px": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "arquivo": "brilhos/04_brilho_alongado.png",
+      "descricao": "Brilho dourado alongado",
+      "dimensoes_px": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "arquivo": "brilhos/05_explosao_de_brilhos.png",
+      "descricao": "Conjunto de pontos brilhantes com intensidade forte",
+      "dimensoes_px": [
+        1254,
+        1254
+      ]
+    }
+  ],
+  "instrucoes": {
+    "tampa": "posicionar acima do P, em camada independente; movimento de balanço vertical/rotação discreto; ponto de origem próximo à borda inferior da tampa conforme efeito desejado",
+    "brilhos": "distribuir ao redor das letras, em camadas independentes; variar escala, opacidade, rotação, tempo e fase para efeito de cintilação; não acrescentar brilho ao PNG do fundo ou às letras"
+  }
+}

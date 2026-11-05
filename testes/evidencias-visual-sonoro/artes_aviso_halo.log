@@ -1,0 +1,5 @@
+PASS humano preventivo real, nome correto, RNG/bot inalterado, sem repetição por descarte/render/replay; 3s de leitura, saída e interação livre
+PASS anúncio tardio conserva a janela original e novo anúncio legítimo recebe ID novo; só ter uma carta não notifica
+PASS quatro participantes reais, três bots anunciando pelo motor, Individual/Duplas, parceiro/adversários, fila legível sem pausar turnos; evento público sem cartas secretas
+PASS ausência de falso aviso para bots sem anúncio, limpeza na nova rodada, offline, redução de movimento e três layouts sem bloquear toques
+PASS halo com geometria pixel a pixel preservada, mesmos seis retângulos/raios/desfoque; luminosidade integrada 1.34× a anterior
