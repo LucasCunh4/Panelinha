@@ -1,0 +1,142 @@
+[
+  {
+    "suite": "sync-android",
+    "exitCode": 0,
+    "seconds": 0.77
+  },
+  {
+    "suite": "android-compat",
+    "exitCode": 0,
+    "seconds": 7.35
+  },
+  {
+    "suite": "artes_aviso_halo",
+    "exitCode": 0,
+    "seconds": 14.69
+  },
+  {
+    "suite": "ajustes_opcoes",
+    "exitCode": 0,
+    "seconds": 44.99
+  },
+  {
+    "suite": "atualizacao_mesa",
+    "exitCode": 0,
+    "seconds": 54.8
+  },
+  {
+    "suite": "atualizacao_regras",
+    "exitCode": 0,
+    "seconds": 34.6
+  },
+  {
+    "suite": "artes_penalidades",
+    "exitCode": 0,
+    "seconds": 74.09
+  },
+  {
+    "suite": "correcoes_estabilidade",
+    "exitCode": 0,
+    "seconds": 47.69
+  },
+  {
+    "suite": "horizontal_identidade",
+    "exitCode": 0,
+    "seconds": 36.65
+  },
+  {
+    "suite": "escolher_cor",
+    "exitCode": 0,
+    "seconds": 46.79
+  },
+  {
+    "suite": "integracao",
+    "exitCode": 0,
+    "seconds": 12.5
+  },
+  {
+    "suite": "liquidificador",
+    "exitCode": 0,
+    "seconds": 20.8
+  },
+  {
+    "suite": "mesa",
+    "exitCode": 0,
+    "seconds": 27.36
+  },
+  {
+    "suite": "leque_continuo",
+    "exitCode": 0,
+    "seconds": 41.85
+  },
+  {
+    "suite": "mesa_fina",
+    "exitCode": 0,
+    "seconds": 18.26
+  },
+  {
+    "suite": "mesa_atual",
+    "exitCode": 0,
+    "seconds": 43.2
+  },
+  {
+    "suite": "multiplayer_lobby",
+    "exitCode": 0,
+    "seconds": 33.66
+  },
+  {
+    "suite": "navegacao",
+    "exitCode": 0,
+    "seconds": 20.44
+  },
+  {
+    "suite": "preparacao_menu",
+    "exitCode": 0,
+    "seconds": 4.26
+  },
+  {
+    "suite": "padrao_400x850",
+    "exitCode": 0,
+    "seconds": 11.4
+  },
+  {
+    "suite": "penalidades_padrao",
+    "exitCode": 0,
+    "seconds": 21.24
+  },
+  {
+    "suite": "refinamentos_mesa",
+    "exitCode": 0,
+    "seconds": 16.11
+  },
+  {
+    "suite": "visual_sonoro",
+    "exitCode": 0,
+    "seconds": 17.79
+  },
+  {
+    "suite": "rastro_halo",
+    "exitCode": 0,
+    "seconds": 37.2
+  },
+  {
+    "suite": "dry-run",
+    "exitCode": 0,
+    "seconds": 2.34
+  },
+  {
+    "suite": "versao-android",
+    "exitCode": 0,
+    "seconds": 0.11
+  },
+  {
+    "suite": "seletores_halo",
+    "exitCode": 0,
+    "seconds": 28.76
+  },
+  {
+    "suite": "backend",
+    "exitCode": 0,
+    "seconds": 20.65
+  }
+]

@@ -28,7 +28,8 @@
   $('avatarGallery').querySelectorAll('button').forEach(b=>b.onclick=()=>{selected=b.dataset.avatarChoice;preview()});
   $('playerName').addEventListener('input',preview);
   function open(){selected=saved.avatar;$('playerName').value=saved.name;preview();}
-  function commit(){saved=normalize({name:$('playerName').value,avatar:selected});try{localStorage.setItem(key,JSON.stringify(saved));}catch{}return {...saved};}
+  function save(value){saved=normalize(value);try{localStorage.setItem(key,JSON.stringify(saved));}catch{}return {...saved};}
+  function commit(){return save({name:$('playerName').value,avatar:selected});}
   open();
-  window.PanelinhaProfile={open,commit,avatarHTML,escape,get current(){return {...saved}}};
+  window.PanelinhaProfile={open,commit,save,avatarHTML,escape,get current(){return {...saved}},get avatars(){return avatars.map(([id,label])=>({id,label}));}};
 })();

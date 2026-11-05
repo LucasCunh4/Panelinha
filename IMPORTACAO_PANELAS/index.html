@@ -36,6 +36,7 @@
 <link rel="stylesheet" href="seletores.css">
 <link rel="stylesheet" href="menu-arte.css">
 <link rel="stylesheet" href="sons.css">
+<link rel="stylesheet" href="multiplayer.css">
 </head>
 <body>
 <main class="container app-container">
@@ -85,13 +86,26 @@
   <section id="createRoom" class="front-screen branch-screen hide" aria-labelledby="createTitle">
     <button class="screen-back" data-nav-back aria-label="Voltar para Multiplayer">‹ <span>Voltar</span></button>
     <div class="branch-emblem" aria-hidden="true">✦</div><h1 id="createTitle" class="screen-title">Criar sala</h1>
-    <p class="coming-soon">Em breve, a cozinha vai reunir sua turma.<br>A criação de salas estará disponível em uma próxima atualização.</p>
+    <p class="coming-soon">Prepare uma sala para até quatro participantes. As partidas online chegam na próxima atualização.</p>
+    <p class="mp-server-status" data-mp-server-status role="status"></p>
+    <button id="createLobbyBtn" type="button" class="hero-button hero-gold mp-entry-button" disabled>Criar sala</button>
+    <p id="createLobbyError" class="mp-error" role="alert"></p>
   </section>
   <section id="joinRoom" class="front-screen branch-screen hide" aria-labelledby="joinTitle">
     <button class="screen-back" data-nav-back aria-label="Voltar para Multiplayer">‹ <span>Voltar</span></button>
     <div class="branch-emblem" aria-hidden="true">✦</div><h1 id="joinTitle" class="screen-title">Entrar na sala</h1>
-    <div class="invite-preparation"><label for="roomCode">Código da sala</label><input id="roomCode" inputmode="text" placeholder="Código de convite" disabled aria-describedby="joinNotice" autocomplete="off"></div>
-    <p id="joinNotice" class="coming-soon">Em breve você poderá entrar na cozinha dos seus amigos.<br>O multiplayer estará disponível em uma próxima atualização.</p>
+    <form id="joinLobbyForm"><div class="invite-preparation"><label for="roomCode">Código da sala</label><input id="roomCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="000000" disabled aria-describedby="joinNotice" autocomplete="off" required></div><button id="joinLobbyBtn" class="hero-button hero-gold mp-entry-button" disabled>Entrar na sala</button></form>
+    <p id="joinNotice" class="coming-soon">Entre pelo código de seis números. As partidas online chegam na próxima atualização.</p>
+    <p class="mp-server-status" data-mp-server-status role="status"></p><p id="joinLobbyError" class="mp-error" role="alert"></p>
+  </section>
+  <section id="multiplayerLobby" class="front-screen lobby-screen hide" aria-labelledby="lobbyTitle">
+    <button class="screen-back" data-nav-back aria-label="Sair do lobby">‹ <span>Voltar</span></button>
+    <header class="lobby-header"><h1 id="lobbyTitle" class="screen-title">Sua sala</h1><span id="lobbyConnectionStatus" role="status"></span></header>
+    <div class="lobby-invite"><span>Código <strong id="lobbyCode"></strong></span><button id="copyRoomCode" class="btn">Copiar código</button><button id="shareRoomLink" class="btn alt">Compartilhar link</button></div>
+    <div id="lobbyPlayers" class="lobby-players" role="list" aria-label="Quatro lugares da sala"></div>
+    <p id="lobbyNotice" class="lobby-notice" role="status" aria-live="polite"></p>
+    <div class="lobby-actions"><button id="lobbyReadyBtn" class="btn good">Pronto</button><button id="lobbyRulesBtn" class="btn alt">Regras</button><button id="lobbyProfileBtn" class="btn alt">Meu perfil</button><button id="lobbyCloseBtn" class="btn warn">Encerrar sala</button><button id="lobbyStartBtn" class="btn" disabled aria-describedby="lobbyPhaseNotice">Iniciar partida</button></div>
+    <p id="lobbyPhaseNotice" class="lobby-phase-notice">Fase 1: prepare a sala. As partidas online serão habilitadas na Fase 2.</p>
   </section>
   <section id="menu" class="panel front-screen hide" aria-labelledby="settingsTitle"><button class="screen-back" data-nav-back aria-label="Voltar à identificação">‹ <span>Voltar</span></button><h2 id="settingsTitle">Sua partida</h2><p class="muted">Prepare a mesa para jogar com três bots.</p>
     <div class="grid settings-grid">
@@ -498,5 +512,8 @@ window.CartasTest={getState:()=>s,createDeck:o=>buildDeck(o),newRound:()=>s&&new
 })();
 </script>
 <script src="seletores.js"></script>
+<script src="multiplayer-config.js"></script>
+<script src="multiplayer-connection.js"></script>
+<script src="multiplayer.js"></script>
 </body>
 </html>

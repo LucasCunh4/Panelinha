@@ -9,6 +9,7 @@
     multiplayer:{id:'multiplayer',parent:'profile',hash:'multiplayer',focus:'multiplayerTitle'},
     create:{id:'createRoom',parent:'multiplayer',hash:'criar-sala',focus:'createTitle'},
     join:{id:'joinRoom',parent:'multiplayer',hash:'entrar-na-sala',focus:'joinTitle'},
+    lobby:{id:'multiplayerLobby',parent:'multiplayer',hash:'sala',focus:'lobbyTitle'},
     game:{id:'game',parent:'solo',hash:'mesa',focus:'tableMenuBtn'}
   };
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -26,6 +27,7 @@
     window.PanelinhaSelects?.close({restoreFocus:false,animate:false});
     if(route==='profile')PanelinhaProfile.open();
     current=route;document.body.dataset.screen=route;
+    window.PanelinhaMultiplayer?.routeChanged(route);
     for(const [name,r] of Object.entries(routes))$(r.id).classList.toggle('hide',name!==route);
     if(route!=='game'){
       const screen=$(routes[route].id);animate(screen,[{opacity:0},{opacity:1}],{duration:180,easing:'ease-out'});
@@ -34,6 +36,8 @@
   }
   function go(route){
     if(!routes[route]||route==='game'||current==='game')return false;
+    if(route==='lobby'&&!window.PanelinhaMultiplayer?.active)return false;
+    if(current==='lobby'&&route!=='lobby'&&window.PanelinhaMultiplayer?.active){PanelinhaMultiplayer.requestLeave(()=>go(route));return false;}
     clearEntrance();writeHistory(route);show(route);return true;
   }
   function hideDialog(){
@@ -56,6 +60,7 @@
   function back({native=false}={}){
     if(window.PanelinhaSFX?.closeSettings())return true;
     if(window.PanelinhaSelects?.close())return true;
+    if(window.PanelinhaMultiplayer?.handleBack(current))return true;
     if(!$('navDialog').hidden){hideDialog();return true;}
     if(current==='game'){
       if($('cancelColor')){$('cancelColor').click();return true;}
@@ -111,7 +116,9 @@
   addEventListener('popstate',event=>{
     if(window.PanelinhaSelects?.consumeBack(event))return;
     const target=routes[event.state?.panelinha]?event.state.panelinha:'home';
-    if(target==='profile'&&['solo','multiplayer'].includes(event.state?.profileFor))profileDestination=event.state.profileFor;
+    if(target==='profile'&&['solo','multiplayer','join'].includes(event.state?.profileFor))profileDestination=event.state.profileFor;
+    if(current==='lobby'&&window.PanelinhaMultiplayer?.active){writeHistory('lobby');back();return;}
+    if(target==='lobby'&&!window.PanelinhaMultiplayer?.active){writeHistory('multiplayer',true);show('multiplayer');return;}
     if(current==='game'&&hooks?.getState()){
       // Restaura a âncora da mesa antes de perguntar; cancelar nunca abandona a partida.
       writeHistory('game');back();return;
@@ -124,5 +131,5 @@
   });
   reduced.addEventListener('change',()=>{if(reduced.matches)clearEntrance();});
   writeHistory('home',true);show('home',false);
-  window.PanelinhaNavigation={go,back,requestLeave,returnToSettings,enterGame,attach:value=>{hooks=value;},get current(){return current;}};
+  window.PanelinhaNavigation={go,back,requestLeave,returnToSettings,enterGame,attach:value=>{hooks=value;},openInvite(code){$('roomCode').value=code;profileDestination='join';go('profile');},get current(){return current;}};
 })();
