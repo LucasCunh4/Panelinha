@@ -6,10 +6,10 @@ Repositório: `LucasCunh4/Panelinha`. Trabalhe a partir da versão atual da bran
 
 Vou disponibilizar EXATAMENTE estes quatro ZIPs, com estes nomes (se estiverem em uma pasta do repositório, localize-os; se estiverem anexados à tarefa, extraia-os):
 
-1. `Panelinha_Menu_Animacoes_Audios_V2.zip` — fundo aprovado, 6 utensílios, 8 variantes de vapor, 30 MP3, manifestos e instruções.
-2. `Panelinha_Avatares_9_Aprovados.zip` — os 9 avatares oficiais aprovados.
-3. `Panelinha_Titulo_PANELINHA_9_Letras_PNG.zip` — 9 letras PNG independentes, na ordem PANELINHA.
-4. `Panelinha_Tampa_e_5_Brilhos_Animados.zip` — tampa para o P e 5 brilhos PNG independentes.
+1. `Panelinha_01_Menu_e_Sons.zip` — fundo aprovado, 6 utensílios, 8 variantes de vapor, 30 MP3, manifestos e instruções.
+2. `Panelinha_02_Avatares.zip` — os 9 avatares oficiais aprovados.
+3. `Panelinha_03_Letras_do_Titulo.zip` — 9 letras PNG independentes, na ordem PANELINHA.
+4. `Panelinha_04_Tampa_e_Brilhos.zip` — tampa para o P e 5 brilhos PNG independentes.
 
 Extraia os ZIPs, confira a integridade e LEIA os READMEs e manifestos internos ANTES de modificar código. Não invente artes alternativas nem baixe substituições externas. Não confunda estes pacotes com versões antigas (V1) que possam existir no projeto.
 
@@ -34,7 +34,7 @@ Use os oito sprites de `Panelinha_Menu_Animacoes_Audios_V2/fumaca/` como **varia
 
 ## 4) Título PANELINHA formado por 9 imagens individuais
 
-Use os PNGs `Panelinha_Titulo_Letras_Individuais/letras/01_P.png` até `09_A.png`, disponíveis dentro de `Panelinha_Titulo_PANELINHA_9_Letras_PNG.zip`, seguindo o `MANIFESTO_LETRAS.json`.
+Use os PNGs `Panelinha_Titulo_Letras_Individuais/letras/01_P.png` até `09_A.png`, disponíveis dentro de `Panelinha_03_Letras_do_Titulo.zip`, seguindo o `MANIFESTO_LETRAS.json`.
 
 - Renderize cada letra como elemento separado, na ordem exata **P-A-N-E-L-I-N-H-A**. As letras A e N duplicadas têm arquivos individuais próprios; não as troque.
 - Preserve os acabamentos branco brilhante, contorno dourado/roxo e a proporção das letras. Não use uma fonte comum por cima nem achate as letras em uma única imagem.
@@ -43,13 +43,13 @@ Use os PNGs `Panelinha_Titulo_Letras_Individuais/letras/01_P.png` até `09_A.png
 
 ## 5) Tampa sobre o P e cinco brilhos
 
-Extraia `Panelinha_Tampa_e_5_Brilhos_Animados.zip`, leia `MANIFESTO.json` e use `tampa/tampa_sobre_letra_P.png` como camada **independente**, alinhada à primeira letra P. A tampa deve saltitar/balançar discretamente acima da letra, sem se desprender visualmente.
+Extraia `Panelinha_04_Tampa_e_Brilhos.zip`, leia `MANIFESTO.json` e use `tampa/tampa_sobre_letra_P.png` como camada **independente**, alinhada à primeira letra P. A tampa deve saltitar/balançar discretamente acima da letra, sem se desprender visualmente.
 
 Use também, em camadas independentes, as cinco imagens de `brilhos/` para cintilar ao redor do título. Animar em fases distintas com mudanças suaves de opacidade, escala e rotação, evitando exagero e flashes incômodos. Ajustar no mesmo sistema de coordenadas do título; `pointer-events: none` em todos os enfeites. Respeitar redução de movimento.
 
 ## 6) Substituir seleção de avatar pelos 9 aprovados
 
-Extraia `Panelinha_Avatares_9_Aprovados.zip`, leia `MANIFESTO.json` e `LEIA_ME.md` e utilize os NOVE PNGs de `avatares/`:
+Extraia `Panelinha_02_Avatares.zip`, leia `MANIFESTO.json` e `LEIA_ME.md` e utilize os NOVE PNGs de `avatares/`:
 
 1. frigideira chef com óculos; 2. leiteira de bigode; 3. panela de pressão; 4. panela DJ; 5. wok com monóculo; 6. panela aventureira; 7. panela gamer com controle; 8. panela piloto; 9. panela escoteira.
 
