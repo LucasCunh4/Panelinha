@@ -29,4 +29,26 @@ A instrumentação Android existente foi ampliada para verificar o PNG 400×850 
 
 ## Android
 
-ApplicationId `com.lucascunha.panelinha.teste`, origem `https://localhost`, geração 2, Secrets, landscape, imersão, dados locais e workflow preservados. Nenhuma chave criada. Próximo código deve superar 5302 e o candidato reservado 5303. O APK real será verificado antes da entrega; resultados nativos/falhas serão registrados separadamente dos testes web.
+ApplicationId `com.lucascunha.panelinha.teste`, origem `https://localhost`, geração 2, Secrets, landscape, imersão, dados locais e workflow preservados. Nenhuma chave criada. Execução [**#34**](https://github.com/LucasCunh4/Panelinha/actions/runs/41494958701), fonte `0134d0855f1b454639dba678ada4d358b9e67d4b`:
+
+- **Compilação e assinatura aprovadas:** APK **0.2.34 / código 5402**. Candidato 5403 reservado à instrumentação de atualização, não distribuído.
+- APK preservado no ambiente após a interrupção e verificado em **05/11/2026** por `ferramentas/verificar_apk.py`: assinatura v2, certificado ativo, pacote, origem, sensorLandscape/categoria game, 52 PNGs e demais artes anteriores, PNG do Liquidificador por SHA-256/dimensões/RGBA e cópia exata do código web. [Metadados verificados](LIQUIDIFICADOR_APK_0.2.34.json).
+- Certificado SHA-256 **`3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`**, igual a `android-identity.json` e ao APK anterior real **0.2.33 / 5302**. Mesmo pacote `com.lucascunha.panelinha.teste` e origem `https://localhost`; 5402 também supera o candidato 5303. [Comparação dos APKs reais](evidencias-liquidificador/comparacao-identidade-apks.json). Identidade compatível com atualização direta, sem desinstalar.
+- SHA-256 do APK **`97433fea0d5dddcfa831a858416c4b5c0391e35e493fb9a4660516ae30d9d8c0`**, igual ao digest do GitHub; **52.551.204 bytes**. Metadados locais e do CI idênticos. Confirmado APK com `AndroidManifest.xml`/assets na raiz, sem ZIP externo ou APK aninhado.
+
+**Android nativo: interrompido, não aprovado.** Em 02/11, o AVD iniciou, instalou o aplicativo e começou `a_imagesAndThreeBotsOffline` às 17:55:05 UTC, com `numtests=12`. O logcat registra `MainActivity` criada/retomada/exibida. O dispositivo perdeu a conexão: `adb devices` passou a listar `emulator-5554 offline`; os diagnósticos ADB falharam e a tentativa de encerramento encontrou a porta 5554 recusada. O primeiro teste possui apenas status de início (`INSTRUMENTATION_STATUS_CODE: 1`), sem resultado. **0/12 testes offline concluídos; teste adicional de atualização não executado.**
+
+É uma interrupção do ambiente/ADB, sem asserção funcional reprovada registrada. A causa raiz da queda do AVD **não foi determinada** pelos arquivos disponíveis. Logcat sem `FATAL EXCEPTION`/`Fatal signal` do aplicativo, kernel do host sem OOM/segfault e aproximadamente 14GiB disponíveis. Isso não comprova aprovação funcional no Android. [Trechos da execução](evidencias-liquidificador/github-android-diagnostico.txt) e arquivos de instrumentação/ADB/memória junto das evidências; diagnósticos completos no artefato `resultados-android-34-1`.
+
+Permanecem pendentes instrumentação nativa completa, confirmação visual/toque nas duas paisagens Android e instalação por cima com preservação efetiva de UID/localStorage/SharedPreferences. Nenhum teste desativado. O workflow terminou com falha nos testes; Release corretamente pulada, APK já assinado/verificado disponibilizado como artefato direto com metadados/diagnósticos separados.
+
+[**Baixar APK 0.2.34 / 5402 diretamente, sem ZIP**](https://github.com/LucasCunh4/Panelinha/actions/runs/41494958701/artifacts/13166476449). Requer login no GitHub; retenção até 31/01/2027.
+
+A compatibilidade de atualização foi conferida pela identidade/versão dos dois APKs reais. A execução da atualização continua pendente. O mecanismo de dados locais não foi alterado; a partida em andamento continua apenas em memória.
+
+## Retomada em 05/11/2026
+
+Nenhuma perda identificada: checkout original acessível, sem alterações não commitadas, implementação preservada no commit `0134d08`, imagem/hash corretos, logs das 22 suítes e APK completo recuperados. Os testes web/versionamento/build são os já executados na etapa anterior; nesta retomada foram recuperados os resultados e executada a verificação final do APK, sem repetir ou alegar novos testes nativos.
+
+A branch remota avançou até `33152bc` somente com documentos e quatro ZIPs de integração visual/sonora. Foram incorporados por fast-forward, preservando o histórico. Comparação `0134d08..33152bc` confirmou nenhum arquivo do jogo, Android, ferramentas, identidade ou workflow alterado. Menu/sons, avatares, letras, tampa/brilhos e especificação multiplayer são materiais adicionados ao repositório; **não são funcionalidades novas implementadas no jogo nesta retomada**. Última implementação funcional continua sendo a arte oficial do Liquidificador. Não houve nova geração de assinatura ou APK nesta retomada.
+

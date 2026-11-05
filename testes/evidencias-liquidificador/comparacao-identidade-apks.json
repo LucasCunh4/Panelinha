@@ -1,0 +1,39 @@
+{
+  "previous": {
+    "file": "Panelinha-Teste-v0.2.33-c5302.apk",
+    "sha256": "1bf105f311aee2ac332067e77e98b9d2d1a2dc5b97dcf6cce2126fe2fb3974b1",
+    "applicationId": "com.lucascunha.panelinha.teste",
+    "versionCode": 5302,
+    "versionName": "0.2.33",
+    "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+    "server": {
+      "hostname": "localhost",
+      "androidScheme": "https"
+    }
+  },
+  "next": {
+    "file": "Panelinha-Teste-v0.2.34-c5402.apk",
+    "sha256": "97433fea0d5dddcfa831a858416c4b5c0391e35e493fb9a4660516ae30d9d8c0",
+    "applicationId": "com.lucascunha.panelinha.teste",
+    "versionCode": 5402,
+    "versionName": "0.2.34",
+    "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+    "pngsVerified": 52,
+    "origin": "https://localhost",
+    "androidCompat": true,
+    "orientation": "sensorLandscape",
+    "appCategory": "game",
+    "signingGeneration": 2,
+    "mesaAssetsVerified": 6,
+    "menuAssetsVerified": 2,
+    "specialAssetsVerified": 11,
+    "penaltyAssetsVerified": 22,
+    "standardCardAssetsVerified": 2,
+    "interactiveBasesVerified": 2,
+    "blenderAssetsVerified": 1
+  },
+  "samePackageCertificateOrigin": true,
+  "higherCodeThanPreviousAndReservedUpgrade": true,
+  "realAndroidUpdateExecuted": false,
+  "reason": "Emulador perdeu conexão no primeiro teste; atualização não alcançada."
+}
