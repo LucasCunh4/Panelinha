@@ -1,0 +1,13 @@
+{
+  "previousCode": 5602,
+  "newCode": 5802,
+  "sameFields": [
+    "applicationId",
+    "certificateSha256",
+    "origin",
+    "signingGeneration",
+    "orientation"
+  ],
+  "compatibleSignatureAndPackage": true,
+  "runtimeDataRetention": "pending-avd-offline"
+}

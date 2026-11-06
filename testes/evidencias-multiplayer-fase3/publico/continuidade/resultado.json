@@ -1,0 +1,12 @@
+{
+  "health": {
+    "phase": 3,
+    "gameplay": true
+  },
+  "clients": 4,
+  "idleSeconds": 70,
+  "pausedStatePreserved": true,
+  "originalIdentityRestored": true,
+  "hostSuccessionPermanent": true,
+  "resumeCountdown": true
+}

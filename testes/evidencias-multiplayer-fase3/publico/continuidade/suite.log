@@ -1,0 +1,4 @@
+PASS quatro humanos na publicação HTTPS/WSS, início manual e pausa autoritativa; 70 segundos sem comandos
+PASS pausa mantém conexões, cartas, versão e prazos após repouso; sem heartbeat
+PASS saída do host transfere cargo definitivamente; retorno na mesma origem restaura mão/assento sem recuperar cargo; sucessor retoma com 3–2–1
+PASS encerrar sala durante pausa invalida código e retorna todos ao menu; nenhuma exceção JS

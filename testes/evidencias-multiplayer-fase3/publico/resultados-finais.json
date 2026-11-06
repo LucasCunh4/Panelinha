@@ -1,0 +1,19 @@
+{
+  "continuity": {
+    "passed": true,
+    "clients": 4,
+    "idleSeconds": 70
+  },
+  "duo": {
+    "passed": true,
+    "plays": 74,
+    "buys": 32
+  },
+  "soloFinal": {
+    "passed": true,
+    "plays": 80,
+    "buys": 42
+  },
+  "finalPublishedCommit": "98bb1ef3f18c0b44e9079f5402a6db28626a7436",
+  "finalWorkerVersion": "1f1f48ee-174f-4867-bf27-f0992ed06366"
+}

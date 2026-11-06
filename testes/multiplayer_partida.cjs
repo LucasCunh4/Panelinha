@@ -4,9 +4,15 @@ const base=process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/',server=process
 (async()=>{
  fs.mkdirSync(out,{recursive:true});const launch={executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',args:['--no-sandbox'],...(process.env.PANELAS_BROWSER_PROXY?{proxy:{server:process.env.PANELAS_BROWSER_PROXY,bypass:'localhost,127.0.0.1'}}:{})};
  const browsers=[await chromium.launch(launch),await chromium.launch(launch)],pages=[],errors=[],snapshots=[];
+ const responses=new Map();
  const data=p=>p.evaluate(()=>PanelinhaLobbyConnection.current),table=p=>p.evaluate(()=>CartasTest.getState());
  const delay=ms=>new Promise(r=>setTimeout(r,ms));
- async function fresh(i){const c=await browsers[i%2].newContext({viewport:{width:844,height:390},hasTouch:true,isMobile:true});await c.addInitScript(({server,base})=>window.PanelinhaServerConfig={serverUrl:server,inviteBaseUrl:base},{server,base});const p=await c.newPage();p.on('pageerror',e=>errors.push(e.message));p.on('websocket',s=>s.on('framereceived',f=>{try{const m=JSON.parse(f.payload);if(m.state?.game)snapshots.push(m.state.game);}catch{}}));pages.push(p);await p.goto(base);return p;}
+ async function fresh(i){const c=await browsers[i%2].newContext({viewport:{width:844,height:390},hasTouch:true,isMobile:true});await c.addInitScript(({server,base})=>window.PanelinhaServerConfig={serverUrl:server,inviteBaseUrl:base},{server,base});const p=await c.newPage();p.on('pageerror',e=>errors.push(e.message));const received=[];responses.set(p,received);p.on('websocket',socket=>{const requests=new Map();socket.on('framesent',f=>{try{const m=JSON.parse(f.payload);requests.set(m.id,m.type);}catch{}});socket.on('framereceived',f=>{try{const m=JSON.parse(f.payload);if(m.state?.game)snapshots.push(m.state.game);if(['ack','error'].includes(m.type))received.push({command:requests.get(m.id),type:m.type,code:m.code,preUno:m.state?.game?.preUno});}catch{}});});pages.push(p);await p.goto(base);return p;}
+ async function intent(p,type,action){
+  const list=responses.get(p),start=list.length;await action();const until=Date.now()+10000;let result;
+  while(!(result=list.slice(start).find(r=>r.command===type))){assert.ok(Date.now()<until,'Sem resposta à intenção '+type);await delay(20);}
+  if(result.type==='error'){if(result.code==='STALE_STATE')return null;throw Error(type+' recusado: '+result.code);}return result;
+ }
  async function ready(p){await p.locator('#lobbyReadyBtn').tap();await p.waitForFunction(()=>{const v=PanelinhaLobbyConnection.current;return v.state.players.find(p=>p.id===v.selfId).ready;});}
  async function tapCard(p,id){const b=p.locator(`[data-card="${id}"]`);const expand=await b.evaluate(b=>b.parentElement.classList.contains('grouped-hand')&&!b.classList.contains('group-expanded'));if(expand){await b.tap();await p.waitForTimeout(220);}await b.tap();}
  try{
@@ -22,18 +28,18 @@ const base=process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/',server=process
   const deadline=Date.now()+150000;let plays=0,bought=0,announced=false,flight=false,logged=0;
   while(Date.now()<deadline){
    const views=await Promise.all(pages.map(data));if(views[0].state.game.phase!=='playing')break;
-   if(!announced){const caller=views.findIndex(v=>v.state.game.actions.announce&&v.state.game.players[v.state.game.self].count===2&&!v.state.game.countdownAt);if(caller>=0){await pages[caller].locator('#unoBtn').tap();await pages[caller].waitForFunction(()=>CartasTest.getState().preUno);announced=true;continue;}}
+   if(!announced){const caller=views.findIndex(v=>v.state.game.actions.announce&&v.state.game.players[v.state.game.self].count===2&&!v.state.game.countdownAt);if(caller>=0){const reply=await intent(pages[caller],'announce',()=>pages[caller].locator('#unoBtn').tap());if(!reply)continue;assert.equal(reply.preUno,true);announced=true;continue;}}
    const newest=Math.max(...views.map(v=>v.state.version));
    const index=views.findIndex(v=>v.state.version===newest&&v.state.game.self===v.state.game.current);if(index<0){await delay(25);continue;}const p=pages[index],g=views[index].state.game;
    if(g.unlockAt>g.serverNow||g.countdownAt){await delay(50);continue;}
    const token=g.token;
    if(g.actions.legal.length){
-    if(g.actions.announce&&g.players[g.self].count===2){await p.locator('#unoBtn').tap();await p.waitForFunction(()=>CartasTest.getState().preUno);announced=true;}
-    const hand=g.players[g.self].hand,card=hand.filter(c=>g.actions.legal.includes(c.id)).sort((a,b)=>(a.type==='num'?0:1)-(b.type==='num'?0:1))[0];await tapCard(p,card.id);
-    if(['wild','wild4','wild6'].includes(card.type)&&hand.length>1){await p.locator('.color-picker').waitFor();await p.locator('[data-color=red]').click();}
+    if(g.actions.announce&&g.players[g.self].count===2){const reply=await intent(p,'announce',()=>p.locator('#unoBtn').tap());if(!reply)continue;assert.equal(reply.preUno,true);announced=true;}
+    const hand=g.players[g.self].hand,card=hand.filter(c=>g.actions.legal.includes(c.id)).sort((a,b)=>(a.type==='num'?0:1)-(b.type==='num'?0:1))[0];const reply=await intent(p,'play',async()=>{await tapCard(p,card.id);
+    if(['wild','wild4','wild6'].includes(card.type)&&hand.length>1){await p.locator('.color-picker').waitFor();await p.locator('[data-color=red]').click();}});if(!reply)continue;
     await p.waitForFunction(token=>PanelinhaLobbyConnection.current.state.game.token!==token,token);plays++;flight=flight||await p.locator('.played-card').count()>0;
-   }else if(g.actions.draw){const glow=await p.locator('#buyBtn').getAttribute('data-mandatory');if((await data(p)).state.version!==views[index].state.version)continue;assert.equal(glow,'true');await p.locator('#buyBtn').tap();await p.waitForFunction(({token,version})=>{const v=PanelinhaLobbyConnection.current;return v.state.game.token!==token||v.state.version!==version;},{token,version:views[index].state.version});bought++;}
-   else if(g.actions.pass){await p.locator('#passBtn').tap();await p.waitForFunction(token=>PanelinhaLobbyConnection.current.state.game.token!==token,token);}
+   }else if(g.actions.draw){const glow=await p.locator('#buyBtn').getAttribute('data-mandatory');if((await data(p)).state.version!==views[index].state.version)continue;assert.equal(glow,'true');if(!await intent(p,'draw',()=>p.locator('#buyBtn').tap()))continue;await p.waitForFunction(({token,version})=>{const v=PanelinhaLobbyConnection.current;return v.state.game.token!==token||v.state.version!==version;},{token,version:views[index].state.version});bought++;}
+   else if(g.actions.pass){if(!await intent(p,'pass',()=>p.locator('#passBtn').tap()))continue;await p.waitForFunction(token=>PanelinhaLobbyConnection.current.state.game.token!==token,token);}
    else await delay(50);
    if(plays+bought>=logged+20){logged=plays+bought;console.log('PROGRESS partida: '+plays+' descartes, '+bought+' compras; mãos '+(await data(pages[0])).state.game.players.map(p=>p.count).join('/'));}
   }

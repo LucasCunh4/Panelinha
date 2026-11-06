@@ -1,0 +1,9 @@
+PASS quatro navegadores/contextos na Mesa V1, identidade própria embaixo, parceiro/oponentes com visibilidade correta e contagem 3–2–1
+PROGRESS partida: 17 descartes, 3 compras; mãos 1/5/12/4
+PROGRESS partida: 30 descartes, 10 compras; mãos 3/1/4/9
+PASS partida completa autoritativa em Individual, 33 descartes animados, 10 compras, seletor de ingredientes, anúncio real e pontuação
+page.waitForFunction: Timeout 30000ms exceeded.
+    at /workspace/Panelinha/testes/multiplayer_partida.cjs:44:97 {
+  log: [],
+  name: 'TimeoutError'
+}

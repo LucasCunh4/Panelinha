@@ -1,6 +1,6 @@
 # Panelinha Teste — Android
 
-Entrega atual: [multiplayer Fase 3](MULTIPLAYER_FASE_3_RESULTADOS.md). Pausa/retomada, bot por inatividade e reconexão usam a mesma mesa e o servidor autoritativo. O motor offline e a identidade Android permanecem intactos. O relatório registra a nova compilação e distingue testes de navegador, verificação do APK e execução nativa.
+Entrega atual: [multiplayer Fase 3](MULTIPLAYER_FASE_3_RESULTADOS.md). Pausa/retomada, bot por inatividade e reconexão usam a mesma mesa e o servidor autoritativo. O motor offline e a identidade Android permanecem intactos. APK **0.2.38/c5802** assinado e verificado, com download direto no relatório. O AVD ficou offline no primeiro caso (0/13 concluídos); retenção real de dados após atualização ainda pendente.
 
 Atualização atual: [multiplayer Fase 2](MULTIPLAYER_FASE_2_RESULTADOS.md). A Mesa V1 usa visões filtradas do servidor online; Um jogador continua local. `motor.js` é compartilhado pelo navegador e servidor, e `online.js`/`online.css` integram a mesa sem duplicar regras. Build e verificador exigem esses três novos arquivos também no APK offline. Assinatura, pacote, origem, landscape, imersão e dados locais foram preservados. APK **0.2.36/c5602** assinado e verificado, com download direto no relatório da Fase 2. O emulador caiu no primeiro caso (0/13 concluídos); atualização com retenção real de dados ainda pendente.
 

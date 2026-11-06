@@ -1,0 +1,11 @@
+{
+  "workerVersion": "1f1f48ee-174f-4867-bf27-f0992ed06366",
+  "commit": "98bb1ef3f18c0b44e9079f5402a6db28626a7436",
+  "files": {
+    "online.js": "083688624f65ee36bc69a94e0b2a2aeed8fe1ea48c89bc3b3ab94c9c00ade6d9",
+    "online.css": "6e9cce2f5e75c0636cf5ccaf9fa86d74afb630789edc3e199c3f0c7a903aa4fb",
+    "multiplayer-connection.js": "2c44ec8723b61130f41ae9386872ea3322b9ffa0c87f346a47ed7cc041bb1f7d",
+    "mesa.js": "55f27851ff893c848c97ced26df7e599fcfb842e8974d461491cade5633583ae",
+    "motor.js": "d3692c92777a04fe44f50247770897364f4811dcdbbf5e7a22db207474fe2d2d"
+  }
+}

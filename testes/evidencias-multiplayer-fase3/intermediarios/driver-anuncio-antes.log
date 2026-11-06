@@ -1,0 +1,7 @@
+PASS quatro navegadores/contextos na Mesa V1, identidade própria embaixo, parceiro/oponentes com visibilidade correta e contagem 3–2–1
+PROGRESS partida: 16 descartes, 4 compras; mãos 7/5/3/9
+page.waitForFunction: Timeout 30000ms exceeded.
+    at /workspace/Panelinha/testes/multiplayer_partida.cjs:25:239 {
+  log: [],
+  name: 'TimeoutError'
+}
