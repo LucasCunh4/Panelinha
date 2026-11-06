@@ -1,0 +1,40 @@
+/* Plataformas em camadas: tampo dourado, frente roxa e profundidade lateral. */
+.final-podium{isolation:isolate;position:relative;padding:5px 10px 9px;border:1px solid #b78b54;border-radius:20px;background:radial-gradient(ellipse at 50% 15%,#97602c88,transparent 56%),linear-gradient(140deg,#482054,#1e102d);box-shadow:inset 0 0 0 3px #a6773b20,0 5px 22px #10061f66;color:#fff0d3;animation:podium-scene-in 260ms ease-out both}
+.final-podium h2{text-align:center;font:clamp(23px,4.8vh,34px)/1.1 PanelinhaDisplay,system-ui,sans-serif;color:#ffe29a;margin:2px 0 8px;text-shadow:0 2px #5e3245}
+.podium-scene{display:grid;grid-template-columns:1fr 1.15fr 1fr;align-items:end;gap:12px;padding:8px 4px 0}
+.podium-tier{position:relative;min-width:0;text-align:center;--platform-h:54px}
+.podium-tier[data-place="1"]{grid-column:2;grid-row:1;--platform-h:84px}
+.podium-tier[data-place="2"]{grid-column:1;grid-row:1;--platform-h:58px}
+.podium-tier[data-place="3"]{grid-column:3;grid-row:1;--platform-h:38px}
+.podium-people{display:flex;align-items:flex-end;justify-content:center;gap:8px;flex-wrap:wrap;position:relative;z-index:2;padding-bottom:8px}
+.podium-person{min-width:0;max-width:170px;flex:1 1 70px;display:flex;flex-direction:column;align-items:center;gap:5px}
+.podium-person>.official-avatar{display:block;width:clamp(44px,13.5vh,88px);height:clamp(44px,13.5vh,88px);border-radius:50%;overflow:hidden;filter:drop-shadow(0 4px 5px #0e0719a0);animation:podium-person-in 380ms 360ms cubic-bezier(.2,.7,.2,1) both}
+.podium-name{display:block;width:100%;font:700 clamp(12px,1.5vw,17px)/1.2 system-ui,sans-serif;overflow-wrap:anywhere;text-align:center;color:#fff3dc;text-shadow:0 1px 4px #120617;animation:podium-name-in 240ms 650ms ease-out both}
+.podium-platform{position:relative;height:var(--platform-h);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:5px 9px;border:1px solid #bd8e4e;border-top-color:#ffe4aa;border-radius:5px 5px 11px 11px;background:linear-gradient(100deg,#42224c,#704477 48%,#351d43);box-shadow:inset 4px 0 #c19a5b25,inset -7px 0 #160d292e,0 6px 0 #21102d,0 8px 12px #0d0619b0;animation:podium-platform-in 400ms 100ms cubic-bezier(.2,.7,.25,1) both}
+.podium-platform::before{content:'';position:absolute;left:-1px;right:-1px;top:-10px;height:11px;background:linear-gradient(#f5d38a,#aa713f);clip-path:polygon(7% 0,93% 0,100% 100%,0 100%)}
+.podium-place{font:clamp(23px,5vh,36px)/1 PanelinhaDisplay,system-ui,sans-serif;color:#ffe0a1;text-shadow:0 2px #53283b}
+.podium-score{font-size:11px;color:#f9dfb3}
+.podium-champion .podium-platform{background:linear-gradient(105deg,#80512d,#e4b864 45%,#9c6537);border-color:#ffe19b;box-shadow:inset 0 1px #fff5c9,0 7px 0 #5b342b,0 0 23px #f5c45c60}
+.podium-champion .podium-place{color:#fff6ce;text-shadow:0 2px #80572f}.podium-champion .podium-score{color:#3d2232;font-weight:700}
+.podium-champion .official-avatar{outline:2px solid #ffdf88;outline-offset:3px;box-shadow:0 0 22px #ffd87780}
+.podium-champion::before{content:'';position:absolute;inset:-10px -12px 20%;z-index:-1;border-radius:50%;background:radial-gradient(ellipse,#ffd77a55,transparent 68%);animation:podium-champion-glow 2.6s 800ms ease-in-out infinite}
+.podium-sparkles{position:absolute;left:0;right:0;top:-16px;z-index:3;pointer-events:none;color:#ffe5a6;font-size:22px;letter-spacing:.5em;text-shadow:0 0 10px #f7c663;animation:podium-stars 2.6s 800ms ease-in-out infinite}
+.podium-fourth{display:flex;align-items:center;justify-content:center;gap:12px;max-width:70%;margin:14px auto 0;padding:5px 12px;border:1px solid #a67e7555;border-radius:12px;background:#21112c88}
+.podium-fourth .podium-people{padding:0;flex:1}.podium-fourth .podium-person{flex-direction:row;max-width:none;gap:9px}.podium-fourth .official-avatar{width:32px;height:32px;flex:none}.podium-fourth .podium-name{text-align:left;font-size:13px}.podium-fourth .podium-platform{height:auto;padding:0;border:0;background:none;box-shadow:none;animation:none;flex:none}.podium-fourth .podium-platform::before{display:none}.podium-fourth .podium-place{font-size:23px}
+.duo-podium .podium-scene{grid-template-columns:1.15fr 1fr}.duo-podium .podium-tier[data-place="1"]{grid-column:1}.duo-podium .podium-tier[data-place="2"]{grid-column:2}.duo-podium .podium-person{flex-basis:80px;max-width:170px}
+.podium-tied .podium-person{flex-basis:64px;max-width:110px}.podium-tied .official-avatar{width:42px;height:42px}.podium-tied .podium-name{font-size:12px}
+.table[data-phase=gameOver] .hand-panel>#controls{width:calc(100% - 24px);max-width:1100px;max-height:calc(100% - 24px);padding:12px;border-color:#c99c61;background:linear-gradient(145deg,#2f193ef5,#1c102bf7)}
+.final-details{margin-top:10px;padding:9px;border:1px solid #c1996055;border-radius:12px;background:#29163288}.final-details>summary{color:#efcf97;font-size:13px}
+@keyframes podium-scene-in{from{opacity:0}to{opacity:1}}
+@keyframes podium-platform-in{from{opacity:0;transform:translateY(16px) scaleY(.8)}to{opacity:1;transform:none}}
+@keyframes podium-person-in{from{opacity:0;transform:translateY(-12px) scale(.86)}to{opacity:1;transform:none}}
+@keyframes podium-name-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes podium-champion-glow{0%,100%{opacity:.55}50%{opacity:1}}
+@keyframes podium-stars{0%,100%{opacity:.5;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+@media(max-height:420px){.final-podium{padding:4px 8px 7px}.final-podium h2{font-size:25px;margin-bottom:4px}.podium-tier[data-place="1"]{--platform-h:65px}.podium-tier[data-place="2"]{--platform-h:45px}.podium-tier[data-place="3"]{--platform-h:30px}.podium-name{font-size:13px}.podium-person>.official-avatar{width:46px;height:46px}.podium-fourth{margin-top:10px;padding:4px 10px}.podium-fourth .official-avatar{width:28px;height:28px}.podium-fourth .podium-name{font-size:12px}.podium-score{font-size:10px}.podium-sparkles{font-size:17px;top:-12px}.podium-people{gap:6px;padding-bottom:6px}}
+@media(prefers-reduced-motion:reduce){.final-podium,.final-podium *,.final-podium::before,.podium-champion::before{animation:none!important}}
+
+/* Atualizações do placar/Pronto preservam a entrada já apresentada. */
+.final-podium.podium-revisited,.podium-revisited .podium-platform,.podium-revisited .podium-person>.official-avatar,.podium-revisited .podium-name{animation:none}
+.table[data-phase=gameOver] .hand-panel>#controls>.controls{display:flex;flex-flow:row nowrap;gap:8px}
+.table[data-phase=gameOver] .hand-panel>#controls>.controls>.btn{width:auto;flex:1}

@@ -40,6 +40,7 @@
 <link rel="stylesheet" href="online.css">
 <link rel="stylesheet" href="efeitos-mesa.css">
 <link rel="stylesheet" href="partida-ui.css">
+<link rel="stylesheet" href="podio.css">
 </head>
 <body>
 <main class="container app-container">
@@ -181,6 +182,7 @@
 <script src="anuncios.js"></script>
 <script src="escolher-cor.js"></script>
 <script src="motor.js"></script>
+<script src="podio.js"></script>
 <script src="partida-ui.js"></script>
 <script src="efeitos-mesa.js"></script>
 <script src="mesa.js"></script>
@@ -236,7 +238,7 @@ function settings(){return {duo:$('mode').value==='duo',single:$('duration').val
 function names(i){if(s?.online)return s.players[i]?.name||'Jogador';return i===0?(s?.identity?.name||PanelinhaProfile.current.name):'Bot '+i;}
 function safeName(i){return PanelinhaProfile.escape(names(i));}
 function clearJobs(){if(botTimer)clearTimeout(botTimer);if(cutTimer)clearTimeout(cutTimer);botTimer=null;cutTimer=null;}
-function startMatch(){clearJobs();let o=settings();s={o,identity:PanelinhaProfile.current,players:[0,1,2,3].map(i=>({id:i,hand:[],score:0})),teams:[0,0],deck:[],discard:[],activeColor:null,direction:1,current:0,penalty:0,highest:0,lastPenalty:null,finisher:null,round:0,phase:'playing',drawn:null,cutOpen:false,unlockAt:0,lastActor:null,lastDistribution:null,preUno:false,unoWindow:null,log:[],message:'',deadline:0,pendingAction:null,token:0,reveal:false,summary:[],pastWinners:[],modal:null};PanelinhaAnnouncements.start(s);$('menu').classList.add('hide');$('game').classList.remove('hide');$('backBtn').classList.remove('hide');PanelasMesa.closeMenu();$('reveal').checked=false;newRound();PanelinhaNavigation.enterGame();}
+function startMatch(){clearJobs();let o=settings();s={o,identity:PanelinhaProfile.current,players:[0,1,2,3].map(i=>({id:i,hand:[],score:0,avatar:i===0?PanelinhaProfile.current.avatar:PanelinhaProfile.avatars[i].id})),teams:[0,0],deck:[],discard:[],activeColor:null,direction:1,current:0,penalty:0,highest:0,lastPenalty:null,finisher:null,round:0,phase:'playing',drawn:null,cutOpen:false,unlockAt:0,lastActor:null,lastDistribution:null,preUno:false,unoWindow:null,log:[],message:'',deadline:0,pendingAction:null,token:0,reveal:false,summary:[],pastWinners:[],modal:null};PanelinhaAnnouncements.start(s);$('menu').classList.add('hide');$('game').classList.remove('hide');$('backBtn').classList.remove('hide');PanelasMesa.closeMenu();$('reveal').checked=false;newRound();PanelinhaNavigation.enterGame();}
 function top(){return rules.top();}
 function nextActive(from,steps=1){return rules.nextActive(from,steps);}
 function refill(){return rules.refill();}
@@ -257,9 +259,9 @@ function canActNow(){if(s?.online)return Date.now()>=(s.presentationUntil||0)&&P
 function findHumanCut(){
   if(s?.online)return PanelinhaOnline.connected&&Date.now()<s.unlockAt?s.players[0].hand.find(c=>s.actions.cuts.includes(c.id))||null:null;
   if(!s||Date.now()<(s.presentationUntil||0)||s.phase!=='playing'||!s.o.cut||!s.cutOpen||Date.now()>=s.unlockAt||s.finisher!==null||s.current===0||s.pendingAction)return null;
-  return s.players[0].hand.find(c=>equals(c,top())&&canPlay(c))||null;
+  return s.players[0].hand.find(c=>rules.checkCards(0,[c.id],true))||null;
 }
-function penaltyText(){return `PENALIDADE +${s.penalty}: é obrigatório comprar ${s.penalty} cartas e perder o turno, ou rebater com +${s.highest} ou maior${s.o.dist?' / Panela de Pressão':''}. Não é permitido jogar cartas comuns.`;}
+function penaltyText(){return `PENALIDADE +${s.penalty}: é obrigatório comprar ${s.penalty} cartas e perder o turno, ou rebater com +${s.highest} ou maior. Não é permitido jogar cartas comuns.`;}
 
 function closeUnoOnAction(){return rules.closeUnoOnAction();}
 function canDistribute(c){if(s?.online)return s.actions.distributePossible.includes(c.id);return rules.canDistribute(c);}
@@ -316,7 +318,7 @@ function queueBots(){
   if(s.current!==0&&s.cutOpen&&s.finisher===null){
     cutTimer=setTimeout(()=>{
       if(!s||s.token!==token||s.phase!=='playing'||s.pendingAction||Date.now()>=s.unlockAt)return;
-      if(Math.random()<.22){const candidates=s.players.filter(p=>p.id!==s.current&&p.id!==0).flatMap(p=>p.hand.filter(c=>equals(c,top())&&canPlay(c)).map(c=>({id:p.id,card:c})));if(candidates.length){const cut=pick(candidates);applyPlay(cut.id,[cut.card.id],true,cut.card.color||(COLOR_CHOOSERS.has(cut.card.type)?pick(COLORS):s.activeColor));}}
+      if(Math.random()<.22){const candidates=s.players.filter(p=>p.id!==s.current&&p.id!==0).flatMap(p=>p.hand.filter(c=>checkCards(p.id,[c.id],true)).map(c=>({id:p.id,card:c})));if(candidates.length){const cut=pick(candidates);applyPlay(cut.id,[cut.card.id],true,cut.card.color||(COLOR_CHOOSERS.has(cut.card.type)?pick(COLORS):s.activeColor));}}
     },Math.max(0,(s.presentationUntil||0)-Date.now())+Math.min(700,Math.max(0,s.unlockAt-Math.max(Date.now(),s.presentationUntil||0)-1)));
   }
   if(s.current!==0){
@@ -349,7 +351,7 @@ function showColors(){
     cancel(){if(s!==state||s.pendingAction!==action)return;s.pendingAction=null;render();queueBots();}
   });
 }
-function finishControlHTML(){if(s?.online)return PanelinhaOnline.resultHTML();let ranks=PanelinhaMatchUI.scoreHTML(s,names)+s.summary.map(x=>`<div class="notice"><strong>${x.place}º — ${safeName(x.id)}</strong> · ${x.cost} pontos nas cartas restantes (${x.remaining} cartas)</div>`).join('');return `<div class="banner">${s.phase==='gameOver'?(s.winner?`🏆 ${PanelinhaProfile.escape(s.winner)} venceu a partida!`:'🏆 Rodada única concluída!'):'Rodada concluída.'}</div>${ranks}<div class="controls">${s.phase==='roundOver'?'<button id="nextRound" class="btn good">Próxima rodada</button>':'<button id="newMatch" class="btn good">Nova partida</button>'}<button id="backLobby" class="btn alt">Voltar às configurações</button></div>`;}
+function finishControlHTML(){if(s?.online)return PanelinhaOnline.resultHTML();let ranks=PanelinhaMatchUI.scoreHTML(s,names)+s.summary.map(x=>`<div class="notice"><strong>${x.place}º — ${safeName(x.id)}</strong> · ${x.cost} pontos nas cartas restantes (${x.remaining} cartas)</div>`).join('');return `${PanelinhaPodium.html(s,names)}<div class="banner" ${s.phase==='gameOver'?'hidden':''}>${s.phase==='gameOver'?(s.winner?`🏆 ${PanelinhaProfile.escape(s.winner)} venceu a partida!`:'🏆 Rodada única concluída!'):'Rodada concluída.'}</div>${s.phase==='gameOver'?'<details class="final-details"><summary>Placar e última rodada</summary>':''}${ranks}${s.phase==='gameOver'?'</details>':''}<div class="controls">${s.phase==='roundOver'?'<button id="nextRound" class="btn good">Próxima rodada</button>':'<button id="newMatch" class="btn good">Nova partida</button>'}<button id="backLobby" class="btn alt">Voltar às configurações</button></div>`;}
 function render(){if(!s)return;PanelinhaTableEffects.paint(s,renderTable);}
 function renderTable(){if(!s)return;PanelasMesa.beforeRender(s);$('roundLabel').textContent=`Rodada ${s.round} · ${s.o.duo?'Duplas':'Individual'}`;$('status').textContent=s.phase==='playing'?`Vez de ${names(s.current)}`:s.phase==='roundOver'?'Fim da rodada':'Fim da partida';
 $('score').innerHTML=s.o.duo?`<span>${safeName(0)} + ${safeName(2)}: ${s.teams[0]}</span><span>${safeName(1)} + ${safeName(3)}: ${s.teams[1]}</span>`:s.players.map(p=>`<span>${safeName(p.id)}: ${p.score}</span>`).join('');
@@ -400,7 +402,7 @@ $('testPenalty').onclick=()=>{if(!s||s.online||s.phase!=='playing'||s.finisher!=
 // Atualiza cronômetro sem recriar toda a interface. Estouro: compra automática e turno perdido.
 ticker=setInterval(()=>{if(s?.online){PanelinhaOnline.tick();return;}if(!s||s.phase!=='playing')return;PanelasMesa.updateClock(s,Date.now());if(s.cutOpen&&Date.now()>=s.unlockAt){s.cutOpen=false;render();}if(s.current===0&&s.unlockAt&&Date.now()>=s.unlockAt){s.unlockAt=0;render();}
 if(s.o.timeout&&s.deadline){let left=Math.max(0,Math.ceil((s.deadline-Date.now())/1000));let el=$('stateText');if(el){let base=`Sentido: ${s.direction===-1?'horário':'anti-horário'} · Cor: ${CN[s.activeColor]} · Monte: ${s.deck.length} · ${s.penalty?'PENALIDADE +'+s.penalty:'Sem penalidade'}`;el.textContent=base+' · Tempo: '+left+'s';}
-if(left===0&&!s.pendingAction&&canActNow()){let id=s.current;clearJobs();s.token++;log(`Tempo de ${names(id)} esgotado.`);if(s.penalty){finishPenaltyDraw(id);}else{closeUnoOnAction();drawMany(id,1);s.current=nextActive(id);startTurn();}}}},250);
+if(left===0&&!s.pendingAction&&canActNow()){let id=s.current;clearJobs();s.token++;log(`Tempo de ${names(id)} esgotado.`);if(s.penalty){finishPenaltyDraw(id);}else{closeUnoOnAction();const got=drawMany(id,1);rules.holdPenaltyPurchase(id,got,'timeout');s.current=nextActive(id);startTurn();}}}},250);
 // Ganchos de inspeção para testes automatizados pelo Codex.
 PanelinhaNavigation.attach({getState:()=>s,leaveMatch:backToMenu});
 window.PanelinhaTableBridge={getState:()=>s,render,cardHTML,names,canPlayDraw:id=>s?.drawn===id&&checkCards(0,[id],false),playDraw:id=>chooseCards(0,[id]),keepDraw:keepPass,setOnline(value){clearJobs();s=value;},clearOnline(){if(!s?.online)return;clearJobs();s=null;$('modalRoot').innerHTML='';PanelinhaAnnouncements.reset();PanelasMesa.reset();}};

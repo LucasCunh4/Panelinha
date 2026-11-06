@@ -104,7 +104,7 @@ export function perform(room,actor,type,data,now=Date.now()){
   }else if(type==='report'){
     exact(data,[]);requireValue(s.unoWindow&&s.unoWindow.id!==seat,'ILLEGAL_MOVE',409);core.reportUno(seat);
   }else requireValue(false);
-  if(wasCurrent){member(room,seat).missedTurns=0;if(!s.o.timeout&&s.current===seat)s.idleAt=now+idleDelay;}
+  if(wasCurrent){member(room,seat).missedTurns=0;if(!s.o.timeout&&s.current===seat)s.idleAt=Math.max(now,s.unlockAt||0)+idleDelay;}
   completed(room,before);
 }
 export function pauseMatch(room,now=Date.now()){
@@ -143,6 +143,7 @@ export function advance(room,now=Date.now()){
     for(const key of TIMERS)s[key]=s.frozen[key]>0?release+s.frozen[key]:0;
     s.paused=false;s.resumeAt=0;s.frozen=null;emit(s,'sound',{name:'round-start'});
   }
+  if(s.presentationUntil&&now<s.presentationUntil){refreshAutomation(room,now);return JSON.stringify(s)!==before;}
   if(s.presentationUntil&&now>=s.presentationUntil)s.presentationUntil=0;
   if(s.reportAt&&now>=s.reportAt){s.reportAt=0;const reporters=s.players.filter(p=>automated(member(room,p.id))&&p.id!==s.unoWindow?.id);if(s.unoWindow&&reporters.length&&random()<.36)core.reportUno(reporters[randomInt(reporters.length)].id);}
   if(s.botCutAt&&now>=s.botCutAt){
@@ -159,7 +160,7 @@ export function advance(room,now=Date.now()){
   if(s.deadline&&now>=s.deadline){
     const id=s.current,p=member(room,id),wasHuman=!automated(p);core.log('Tempo de '+p.name+' esgotado.');
     if(s.penalty)core.finishPenaltyDraw(id);
-    else{core.closeUnoOnAction();core.drawMany(id,1);s.current=core.nextActive(id);startTurn();}
+    else{core.closeUnoOnAction();const got=core.drawMany(id,1);core.holdPenaltyPurchase(id,got,'timeout');s.current=core.nextActive(id);startTurn();}
     if(wasHuman){p.missedTurns=(p.missedTurns||0)+1;if(p.missedTurns>=2){p.idleBot=true;core.log(p.name+' passou ao bot por inatividade.');}}
   }else if(s.idleAt&&now>=s.idleAt){
     const p=member(room,s.current);s.idleAt=0;if(!automated(p)){p.idleBot=true;core.log(p.name+' passou ao bot após dois minutos sem ação válida.');}
@@ -169,6 +170,7 @@ export function advance(room,now=Date.now()){
 export function nextWake(room,now=Date.now()){
   const s=room.game;if(!s)return Infinity;if(s.phase!=='playing')return s.presentationUntil?Math.max(now+1,s.presentationUntil):Infinity;
   if(s.paused)return s.resumeAt?Math.max(now+1,s.resumeAt):Infinity;
+  if(s.presentationUntil>now)return s.presentationUntil;
   return Math.min(...[s.presentationUntil,s.unlockAt,s.deadline,s.botAt,s.botCutAt,s.reportAt,s.idleAt].filter(t=>t>0).map(t=>Math.max(now+1,t)),Infinity);
 }
 export function gameView(room,viewerId,now=Date.now()){
@@ -181,7 +183,7 @@ export function gameView(room,viewerId,now=Date.now()){
   const visible=seat=>seat===self||(s.o.duo&&seat%2===self%2);
   return {matchId:s.matchId,self,serverNow:now,o:{...s.o},round:s.round,phase:s.phase,activeColor:s.activeColor,direction:s.direction,current:s.current,
     penalty:s.penalty,highest:s.highest,finisher:s.finisher,drawn:s.current===self?s.drawn:null,cutOpen:s.cutOpen,unlockAt:s.unlockAt,deadline:s.deadline,
-    presentationUntil:s.presentationUntil||0,lastDistribution:s.lastDistribution,lastRotation:s.lastRotation||null,roundScore:s.roundScore||null,countdownAt:s.countdownAt,paused:!!s.paused,resumeAt:s.resumeAt||0,remaining:s.paused?{turn:s.frozen.deadline,cut:s.frozen.unlockAt,presentation:s.frozen.presentationUntil}:null,lastActor:s.lastActor,preUno:!!s.preUnoById[self],unoWindow:s.unoWindow,teams:[...s.teams],
+    presentationUntil:s.presentationUntil||0,lastDistribution:s.lastDistribution,lastRotation:s.lastRotation||null,blockedPlayer:s.blockedPlayer??null,lastPenaltyPurchase:s.lastPenaltyPurchase?{...Object.fromEntries(Object.entries(s.lastPenaltyPurchase).filter(([key])=>key!=='cardIds')),...(s.lastPenaltyPurchase.actor===self?{cardIds:s.lastPenaltyPurchase.cardIds}:{})}:null,finalStandings:s.finalStandings||null,roundScore:s.roundScore||null,countdownAt:s.countdownAt,paused:!!s.paused,resumeAt:s.resumeAt||0,remaining:s.paused?{turn:s.frozen.deadline,cut:s.frozen.unlockAt,presentation:s.frozen.presentationUntil}:null,lastActor:s.lastActor,preUno:!!s.preUnoById[self],unoWindow:s.unoWindow,teams:[...s.teams],
     summary:s.summary,winner:s.winner||null,winnerId:s.winnerId??null,winnerTeam:s.winnerTeam??null,token:s.token,deckCount:s.deck.length,discard:s.discard.slice(-3),message:s.current!==self&&s.message.startsWith('Você')?'':s.message,log:s.log.slice(0,40),
     players:s.players.map(p=>{const m=member(room,p.id);return {id:p.id,memberId:m.id,name:m.name,avatar:m.avatar,team:m.team,bot:m.bot,substituted:!m.bot&&automated(m),idleBot:!!m.idleBot,connected:m.connected!==false,score:p.score,count:p.hand.length,...(visible(p.id)?{hand:p.hand.map(c=>({...c}))}:{})};}),
     actions:{legal,cuts,draw,reclaim:!!member(room,self).idleBot,distributePossible:own.hand.filter(c=>c.type==='dist'&&core.canDistribute(c)).map(c=>c.id),pass:enabled&&s.phase==='playing'&&s.current===self&&core.canActNow()&&s.drawn!==null,challenge:enabled&&!!core.canChallenge(self)&&core.canActNow(),

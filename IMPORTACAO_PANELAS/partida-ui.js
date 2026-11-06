@@ -5,7 +5,7 @@
     cut:['Cortes + cartas idênticas','Permite cortar com uma carta idêntica à do descarte durante a janela de 2,2 segundos. A segunda carta idêntica também é jogada por um comando separado.'],
     challenge:['Desafiar +4 e +6','Quem recebe a penalidade pode contestar a última +4 ou +6. Se o autor tinha outra jogada legal, ele compra o acumulado; caso contrário, quem desafiou compra o acumulado mais duas cartas.'],
     wild6:['Carta +6','Inclui duas cartas +6 no baralho. Elas escolhem a cor e acumulam seis cartas de penalidade, seguindo as regras da partida.'],
-    dist:['Panela de Pressão','Recolhe e redistribui as mãos. Quem jogou recebe de uma a três cartas a menos quando possível; ninguém fica sem cartas pela redistribuição. Também resolve penalidades acumuladas. Não escolhe cor.'],
+    dist:['Panela de Pressão','Recolhe e redistribui as mãos. Quem jogou recebe de uma a três cartas a menos quando possível; ninguém fica sem cartas pela redistribuição. Não pode ser usada durante penalidades de compra. Não escolhe cor.'],
     rotate:['Liquidificador','Cada mão passa uma posição no sentido atual da partida. As quantidades e cartas são preservadas, sem escolher cor nem redistribuir aleatoriamente.']
   };
   const help=document.createElement('section');help.id='settingHelp';help.className='setting-help';help.hidden=true;help.setAttribute('role','dialog');help.setAttribute('aria-labelledby','settingHelpTitle');
@@ -63,5 +63,5 @@
     for(const {fill,start,end} of cache.bars){fill.style.transform=`scaleX(${end})`;if(!reduced.matches)fill.animate([{transform:`scaleX(${start})`},{transform:`scaleX(${end})`}],{duration:1100,easing:'cubic-bezier(.2,.65,.25,1)',fill:'both'});}
   }
   reduced.addEventListener('change',()=>{if(reduced.matches)document.querySelectorAll('.score-fill').forEach(n=>n.getAnimations().forEach(a=>a.finish()));});
-  enhance();window.PanelinhaMatchUI={enhance,closeHelp,consumeBack,scoreHTML,mountScore};
+  enhance();window.PanelinhaMatchUI={enhance,closeHelp,consumeBack,scoreHTML,mountScore,mountPodium:(...args)=>PanelinhaPodium.mount(...args)};
 })();

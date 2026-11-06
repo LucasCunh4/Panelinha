@@ -15,3 +15,5 @@
 @media(prefers-reduced-motion:reduce){.table-flight{will-change:auto}.flame{filter:saturate(1.12) brightness(1)}}
 .rotation-pack>img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .pressure-received{position:fixed;transform:translate(-50%,-50%);padding:7px 14px;border:1px solid #f6d183;border-radius:99px;background:linear-gradient(#75458b,#352044);box-shadow:0 3px 12px #15071c99;color:#fff0b9;font:clamp(28px,5vh,38px)/1 PanelinhaDisplay,system-ui,sans-serif;pointer-events:none;white-space:nowrap}
+.penalty-purchase-transition #controls,.penalty-purchase-transition #turnCue{visibility:hidden}
+.penalty-purchase-transition #hand{pointer-events:none}

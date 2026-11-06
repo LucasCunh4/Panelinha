@@ -34,16 +34,17 @@ test('snapshots e eventos não enviam mãos adversárias, cartas de compra ou in
   }
  }
 });
-for(const total of [20,40,80])for(const penalty of [0,2,12,40])test('Panela online: '+total+' cartas e +'+penalty+', redução, equilíbrio e conservação',()=>{
+for(const total of [20,40,80])for(const penalty of [0,2,12,40])test('Panela online: '+total+' cartas e +'+penalty+', validação, equilíbrio e conservação',()=>{
  const f=fixture(),s=f.s;s.players.forEach(p=>p.hand=[]);for(let i=0;i<total;i++)s.players[i%4].hand.push(f.card());
  const special=f.card('dist',null,null);s.players[0].hand.push(special);s.penalty=penalty;s.highest=penalty?6:0;f.seal();const count=s.cardCount,cap=s.players[0].hand.length-1,originalColor=s.activeColor;
+ if(penalty){const before=JSON.stringify(s);assert.throws(()=>perform(f.r,f.actor(0),'play',{cardId:special.id},5000),e=>e.code==='ILLEGAL_MOVE');assert.equal(JSON.stringify(s),before);conserve(s);return;}
  perform(f.r,f.actor(0),'play',{cardId:special.id},5000);conserve(s);const counts=s.players.map(p=>p.hand.length);
  assert.ok(cap-counts[0]>=1&&cap-counts[0]<=3);assert.ok(counts.every(n=>n>=1));assert.ok(Math.max(...counts.slice(1))-Math.min(...counts.slice(1))<=2);
  assert.equal(s.penalty,0);assert.equal(s.cardCount,count);assert.equal(s.activeColor,originalColor);assert.equal(s.pendingAction,null);
 });
 test('Panela pode bater sem seletor, mantém autor fora e Liquidificador conserva cor/direção',()=>{
  for(const duo of [false,true]){
-  const f=fixture({duo,single:true}),c=f.card('dist',null,null);f.s.players[0].hand=[c];f.s.penalty=20;f.s.highest=6;f.seal();perform(f.r,f.actor(0),'play',{cardId:c.id},5000);
+  const f=fixture({duo,single:true}),c=f.card('dist',null,null);f.s.players[0].hand=[c];f.seal();perform(f.r,f.actor(0),'play',{cardId:c.id},5000);
   assert.equal(f.s.phase,'gameOver');assert.equal(f.s.finisher,0);assert.equal(f.s.players[0].hand.length,0);assert.equal(f.s.penalty,0);assert.ok(f.s.players.slice(1).every(p=>p.hand.length));conserve(f.s);
  }
  for(const direction of [-1,1]){

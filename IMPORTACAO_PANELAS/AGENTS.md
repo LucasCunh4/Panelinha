@@ -17,3 +17,5 @@
 - Verso e frente da Panela usam somente `assets/padronizadas/*_400x850.png`, com `MANIFESTO_PADRAO_400X850.json`. Não restaurar as duas versões antigas de `assets/especiais/`; as outras 11 imagens especiais permanecem. Reutilizar os componentes e `contain`, sem cortar, esticar, adicionar bordas ou alterar as demais artes.
 
 - Panela de Pressão (`dist`) nunca abre seletor nem escolhe cor; conserva a cor ativa e resolve redistribuição própria. Somente Coringa/+4/+6 usam `COLOR_CHOOSERS` e o seletor de ingredientes. A classificação de incolores é separada da escolha de cor.
+
+- Atualização autorizada: Bloqueio impede corte do jogador pulado até a próxima ação válida; Panela é proibida durante qualquer penalidade de compra. Compras punitivas usam `drawSequence` e `presentationUntil` compartilhados, com prazo autoritativo limitado, sem ACK de cliente. Pódio só em `gameOver`, a partir de `finalStandings` oficial; por pontos, ordenar total e vitórias, exibindo empates sem desempate adicional.

@@ -47,7 +47,7 @@
     if(!record||record.owner!==state){
       seat.textContent='';
       const identity=id===0?seat:document.createElement('div');if(id!==0){identity.className='seat-identity';seat.append(identity);}
-      const avatar=document.createElement('div');avatar.innerHTML=state.online?PanelinhaProfile.avatarHTML(player.avatar):id===0?PanelinhaProfile.avatarHTML(state.identity?.avatar):panAvatar(id);identity.append(avatar.firstElementChild);
+      const avatar=document.createElement('div');avatar.innerHTML=(state.online||player.avatar)?PanelinhaProfile.avatarHTML(player.avatar):id===0?PanelinhaProfile.avatarHTML(state.identity?.avatar):panAvatar(id);identity.append(avatar.firstElementChild);
       const label=document.createElement('div');label.className='name';const text=document.createTextNode('');label.append(text);
       const team=document.createElement('span');team.className='tag';label.append(team);identity.append(label);
       const count=document.createElement('div');count.className='sub';identity.append(count);
@@ -398,8 +398,9 @@
     if(!target||reducedMotion.matches||typeof target.animate!=='function')return;
     const card=target.querySelector('.card'),r=card.getBoundingClientRect();
     if(!r.width||!r.height||!play.width||!play.height)return;
+    if(card.dataset.cardType==='wild')play.height=play.width*850/400;
     const tx=r.x+r.width/2,ty=r.y+r.height/2;
-    const dx=tx-play.x,dy=ty-play.y,sx=card.offsetWidth/play.width,sy=card.offsetHeight/play.height;
+    const dx=tx-play.x,dy=ty-play.y,sx=card.offsetWidth/play.width,sy=card.dataset.cardType==='wild'?sx:card.offsetHeight/play.height;
     const key=Number(target.dataset.visualKey),angle=rotation(target),arc=Math.min(46,Math.hypot(dx,dy)*.12),duration=540;
     const sprite=document.createElement('div');sprite.className='played-card flying-card';
     Object.assign(sprite.style,{left:`${play.x-play.width/2}px`,top:`${play.y-play.height/2}px`,width:`${play.width}px`,height:`${play.height}px`});
@@ -583,7 +584,7 @@
     if(!$('pile').children.length)$('pile').innerHTML = Array.from({length:5},(_,i)=>`<span class="pile-layer deck-back" aria-hidden="true" style="--depth:${5-i}"></span>`).join('')+'<div class="card deck-back"></div>';
     attr($('pile'),'aria-label','Monte de compra');
     layoutPileAura();
-    document.querySelector('.draw-stack .stack-label').textContent = state.penalty ? `COMPRAR +${state.penalty}` : 'COMPRAR';
+    document.querySelector('.draw-stack .stack-label').textContent = state.lastPenaltyPurchase&&Date.now()<(state.presentationUntil||0)?`COMPRANDO ${state.lastPenaltyPurchase.count}`:state.penalty ? `COMPRAR +${state.penalty}` : 'COMPRAR';
     for (const player of state.players) {
       const seat = $(`player${player.id}`);
       if(player.id===2)fitTopIdentity();

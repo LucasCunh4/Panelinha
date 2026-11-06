@@ -90,13 +90,13 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 ## 8. Panela de Pressão e Liquidificador
 
 - **Panela de Pressão (incolor, 2 opcionais):** recolhe as mãos dos participantes ainda ativos, embaralha e redistribui **quantidades aleatórias**, com mínimo de uma carta por participante, conservando todas as cartas. Se o autor continua com cartas após descartar, sorteia-se redução de 1 a 3 cartas, limitada pelo mínimo de uma carta: com 2 cartas recebe 1; com 1 permanece com 1. Os demais recebem quantidades aproximadamente iguais, com diferença máxima de 2 e mínimo 1, e identidades de cartas embaralhadas. A soma é conservada exatamente.
-- Se usada para defender-se de uma penalidade +N pendente: retirar N cartas do monte, incluir no pool de redistribuição, redistribuir aleatoriamente com a mesma redução do autor e equilíbrio dos demais e **encerrar completamente** a punição. Ex. +20: acrescentar 20 ao pool, não cobrar +20 de alguém depois.
+- **Panela de Pressão proibida durante penalidades:** não pode responder a +2/+4/+6 ou acumulados, absorver cartas da punição nem encerrá-la. Somente acúmulos legalmente válidos, desafio permitido ou compra da penalidade. Fora de punições, a redistribuição permanece inalterada.
 - **Liquidificador (incolor, 2 opcionais):** gira as mãos entre os ainda ativos no sentido corrente; **não pode** ser usado contra penalidade acumulada.
-- **Panela de Pressão nunca escolhe cor**, em jogadas normais, cortes, compras, penalidades ou última carta. Resolve a redistribuição diretamente e conserva a cor ativa anterior; é especial incolor própria, fora do fluxo Coringa/+4/+6. Liquidificador nunca abre seleção nem altera a cor ativa anterior. Panela de Pressão pode ser a última carta: o autor é finalizador pelo descarte e fica isento de receber cartas; a redistribuição (incluindo eventual penalidade) ocorre somente entre os restantes antes do encerramento/pontuação, em Individual e Duplas. Sem cartas após o descarte, não abre escolha de cor. Se sua **última carta** foi Liquidificador, não precisa selecionar cor; individual: efeito aplica-se entre os outros três antes de calcular classificação. Duplas: equipe vencedora encerra a rodada; não precisa aplicar efeito ao parceiro/outros para pontuação individual inexistente.
+- **Panela de Pressão nunca escolhe cor**, em qualquer contexto legal (normal, corte, compra ou última carta). Resolve a redistribuição diretamente e conserva a cor ativa anterior; é especial incolor própria, fora do fluxo Coringa/+4/+6. Liquidificador nunca abre seleção nem altera a cor ativa anterior. Panela de Pressão pode ser a última carta: o autor é finalizador pelo descarte e fica isento de receber cartas; a redistribuição normal ocorre somente entre os restantes antes do encerramento/pontuação, em Individual e Duplas. Sem cartas após o descarte, não abre escolha de cor. Se sua **última carta** foi Liquidificador, não precisa selecionar cor; individual: efeito aplica-se entre os outros três antes de calcular classificação. Duplas: equipe vencedora encerra a rodada; não precisa aplicar efeito ao parceiro/outros para pontuação individual inexistente.
 - Próximo turno após giro/distribuição normal: jogador seguinte a quem usou a carta, conforme sentido atual.
 
 - A redistribuição nunca produz zeros nem novo finalizador. Um finalizador já existente durante a resolução de penalidades continua excluído; o encerramento/pontuação anteriores permanecem válidos.
-- Caso limite sem outro destinatário ativo: uma Panela de Pressão não pode absorver penalidade mantendo o limite do autor; essa resposta inviável fica indisponível. O jogador pode rebater com outra carta válida ou comprar a penalidade. Sem outro destinatário, uma redução obrigatória também seria impossível, então a carta fica indisponível. Com apenas uma carta após o descarte e sem penalidade, pode conservar essa carta; o último descarte normal pode encerrar. Essas guardas conservam as cartas nos estados extremos.
+- Caso limite sem outro destinatário ativo: sem outro destinatário, uma redução obrigatória também seria impossível, então a carta fica indisponível. Com apenas uma carta após o descarte e sem penalidade, pode conservar essa carta; o último descarte normal pode encerrar. Essas guardas conservam as cartas nos estados extremos.
 
 ## 9. Rodadas e classificação
 
@@ -108,7 +108,7 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 - Duplas: equipe cujo jogador zera primeiro recebe **1 ponto**, oponente 0; meta definida 5/10/15, ou rodada única. Uma equipe pode ganhar mesmo que companheiro tenha cartas.
 - Ao atingir a meta, vence quem tiver **mais pontos totais** se mais de um ultrapassar na mesma rodada; se empatar em pontos totais, vence quem tiver **mais rodadas vencidas**. Persistindo empate, critério final pendente.
 - Tela pós-rodada: classificação, pontos conquistados na rodada, pontos acumulados; todos os jogadores precisam tocar **Continuar** para ir à próxima rodada.
-- Tela fim de partida: **pódio animado + estatísticas** e celebração elaborada com panelas, tampas e ingredientes voando.
+- Tela fim de partida: pódio animado com avatares oficiais, nomes, campeão destacado e estatísticas preservadas. Em pontos, classificação final por total acumulado e vitórias; posições secundárias ainda empatadas compartilham a colocação (ex.: 1º, 2º, 2º, 4º). O empate do campeão mantém a rodada extra já existente. Em Duplas, equipes em 1º/2º. Pódio somente em `gameOver`, nunca entre rodadas.
 
 ## 10. Lobby e sala ONLINE — ainda a desenvolver
 
@@ -173,3 +173,8 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 3. Revisar possíveis bugs do V3, com testes automáticos em compras +N, cortes simultâneos, múltiplas cartas idênticas, bot conservador, Panela de Pressão aleatória com limite do autor e pontuação de final de rodada.
 4. Definir com usuário critérios residuais de empate e casos extremos de abertura/primeira carta especial sem autor (antes de partida online).
 5. Depois: UI fogão, menus/lobby e só então servidor online/Android, em etapas testáveis.
+
+### Correções de jogabilidade e apresentação
+
+- Bloqueio pula integralmente o jogador: ele não joga nem corta esse Bloqueio para escapar. A restrição termina na próxima ação válida; cortes legais posteriores permanecem.
+- Compras de punição, desafio, denúncia e tempo esgotado conservam a lógica imediata, mas suspendem ações até terminar o cronograma compartilhado das cartas individuais. O comprador vê as frentes; demais clientes veem versos. O servidor libera pelo prazo limitado, sem depender de ACK de cliente; pausa e reconexão preservam o tempo restante.

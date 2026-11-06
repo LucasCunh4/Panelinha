@@ -2,7 +2,7 @@
 (() => {'use strict';
   const $=id=>document.getElementById(id),motion=matchMedia('(prefers-reduced-motion: reduce)');
   const back='assets/padronizadas/verso_oficial_400x850.png';
-  let owner=null,round=null,previous=null,pressure=null,frame=0,decision=null,lastOrigin=null;
+  let owner=null,round=null,previous=null,pressure=null,frame=0,decision=null,lastOrigin=null,seenPurchase=0;
   const draws=new Set(),masked=new Set(),nodes=new Set();
   const bridge=()=>window.PanelinhaTableBridge;
   function cardNode(card,visible){
@@ -21,7 +21,7 @@
   function point(actor,id){return PanelasMesa.handPoint(actor,id,true);}
   function center(){const r=$('discard').getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2,width:r.width,height:r.height};}
   function closeDecision(){if(!decision)return;lastOrigin={id:decision.id,...decision.point,node:decision.node.querySelector('.card'),angle:0};masked.delete(decision.id);remove(decision.node);decision=null;}
-  function reset(){clearTimeout(frame);pressure=null;previous=null;owner=null;round=null;closeDecision();lastOrigin=null;draws.clear();masked.clear();for(const n of [...nodes])remove(n);$('table').classList.remove('pressure-transition','pressure-hands-hidden');}
+  function reset(){clearTimeout(frame);pressure=null;previous=null;owner=null;round=null;seenPurchase=0;closeDecision();lastOrigin=null;draws.clear();masked.clear();for(const n of [...nodes])remove(n);$('table').classList.remove('pressure-transition','pressure-hands-hidden','penalty-purchase-transition');}
   function clock(s){return pressure.duration-(s.paused?s.remaining?.presentation||0:Math.max(0,(s.presentationUntil||0)-Date.now()));}
   function animatePressure(s,p,elapsed){
     if(motion.matches)return;
@@ -115,7 +115,10 @@
       const top=s.discard.at(-1);
       pressure={kind,meta,serial:meta.serial,duration:meta.duration,old:old.map(h=>h.filter(c=>c.id!==top.id)),points:old.map((h,actor)=>h.filter(c=>c.id!==top.id).map(c=>point(actor,c.id)))};
     }
-    const elapsed=pressure?Math.max(0,clock(s)):Infinity,busy=!!pressure&&elapsed<pressure.duration;
+    const matches=pressure&&meta?.serial===pressure.serial&&kind===pressure.kind;
+    const elapsed=matches?Math.max(0,clock(s)):Infinity,busy=!!matches&&elapsed<pressure.duration;
+    const purchase=s.lastPenaltyPurchase,purchaseBusy=!!purchase&&(s.paused?(s.remaining?.presentation||0)>0:Date.now()<(s.presentationUntil||0));
+    $('table').classList.toggle('penalty-purchase-transition',purchaseBusy);
     $('table').classList.toggle('pressure-transition',busy);
     $('table').classList.toggle('pressure-hands-hidden',busy&&elapsed>=690);
     if(busy&&elapsed<(pressure.kind==='rotation'?940:1260))s.players.forEach((p,i)=>p.hand=pressure.old[i]);
@@ -127,23 +130,39 @@
       for(const n of nodes)if(/^(pressure|rotation)-/.test(n.dataset.effect||''))for(const a of n.getAnimations())s.paused?a.pause():a.play();
       clearTimeout(frame);if(!s.paused){const next=(pressure.kind==='rotation'?[690,940,1580,2000]:[690,1260,2000]).find(t=>t>elapsed+1)||2000;frame=setTimeout(()=>{if(bridge().getState()===s)bridge().render();},Math.max(16,next-elapsed));}
     }else if(pressure){for(const n of [...nodes])if(/^(pressure|rotation)-/.test(n.dataset.effect||''))remove(n);if(pressure.kind==='pressure'&&!pressure.notified){pressure.notified=true;showReceived(s,pressure.meta);}}
-    window.PanelinhaMatchUI?.mountScore(s,!busy);
+    if(purchaseBusy){
+      const progress=penaltyProgress(s);
+      for(const entry of draws)if(entry.purchase===purchase.serial){entry.animation.currentTime=progress;s.paused?entry.animation.pause():entry.animation.play();}
+      clearTimeout(frame);if(!s.paused)frame=setTimeout(()=>{if(bridge().getState()===s)bridge().render();},Math.max(1,s.presentationUntil-Date.now()));
+    }
+    window.PanelinhaMatchUI?.mountScore(s,!busy&&!purchaseBusy);
+    window.PanelinhaMatchUI?.mountPodium?.(s,!busy&&!purchaseBusy);
   }
+  function penaltyProgress(s){return Math.max(0,s.lastPenaltyPurchase.duration-(s.paused?(s.remaining?.presentation||0):Math.max(0,(s.presentationUntil||0)-Date.now())));}
   function animateDraws(events,s){
-    const ends=new Map();if(!events.length||Date.now()<(s.presentationUntil||0))return ends;
-    if(motion.matches){showDecision(s);return ends;}
-    let elapsed=0,ownIndex=0;
-    const ownCount=events.filter(event=>event.actor===0).length;
-    const ownSteps=Array.from({length:ownCount},(_,i)=>Math.max(500,1100*Math.pow(.96,i)));
-    const sequenceScale=Math.min(1,14000/(ownSteps.reduce((sum,step)=>sum+step,0)||1));
-    events.forEach(event=>{
+    const ends=new Map(),purchase=s.lastPenaltyPurchase;
+    const forced=!!purchase&&(s.paused?(s.remaining?.presentation||0)>0:Date.now()<(s.presentationUntil||0));
+    if(forced){
+      if(seenPurchase===purchase.serial)return ends;
+      seenPurchase=purchase.serial;
+      const actor=purchase.actor,player=s.players[actor],r=$('pile').getBoundingClientRect();
+      const cards=actor===0&&purchase.cardIds?purchase.cardIds.map(id=>player.hand.find(c=>c.id===id)).filter(Boolean):player.hand.slice(-purchase.count);
+      events=cards.map(card=>({actor,id:card.id,card,x:r.x+r.width/2,y:r.y+r.height/2,width:r.width,height:r.height}));
+    }
+    if(!events.length||Date.now()<(s.presentationUntil||0)&&!forced)return ends;
+    if(motion.matches){if(!forced)showDecision(s);return ends;}
+    let ownIndex=0;
+    const ownCount=events.filter(event=>event.actor===0).length,schedule=PanelinhaRules.drawSequence(ownCount);
+    const progress=forced?penaltyProgress(s):0;
+    events.forEach((event,i)=>{
       const end=point(event.actor,event.id),detailed=event.actor===0;
-      const eligible=detailed&&s.drawn===event.id&&bridge().canPlayDraw(event.id);
-      const step=detailed?ownSteps[ownIndex++]*sequenceScale:240,delay=elapsed;
-      const duration=detailed?(ownCount===1||eligible?2400:Math.max(420,step*1.65)):850;
-      elapsed+=step;
+      const eligible=!forced&&detailed&&s.drawn===event.id&&bridge().canPlayDraw(event.id);
+      const plan=detailed?schedule.items[ownIndex++]:{delay:i*240,duration:850},delay=plan.delay;
+      const duration=eligible?2400:plan.duration;
+      if(forced&&progress>=delay+duration)return;
       const card=event.card,present=s.players[event.actor].hand.some(c=>c.id===event.id);
       const start={x:event.x,y:event.y,width:event.width,height:event.height};
+      if(detailed&&card?.type==='wild'){start.height=start.width*850/400;end.height=end.width*850/400;}
       const n=sprite(card,detailed,start,'draw');Object.assign(n.dataset,{actor:event.actor,cardId:event.id,presentation:detailed?'preview':'direct',duration});
       const height=Math.min(innerHeight*.5,300),width=height*400/850,cx=innerWidth/2,cy=innerHeight*.46;
       const transform=(x,y,w,h,angle=0)=>`translate(calc(-50% + ${x-start.x}px),calc(-50% + ${y-start.y}px)) rotate(${angle}deg) scale(${w/start.width},${h/start.height})`;
@@ -161,7 +180,8 @@
         {opacity:1,transform:destination}
       ];
       const animation=n.animate(frames,{duration,delay,easing:detailed?'linear':'cubic-bezier(.25,.5,.25,1)',fill:'both'});
-      if(present)masked.add(event.id);const entry={id:event.id,node:n};draws.add(entry);ends.set(event.id,delay+duration);
+      if(present)masked.add(event.id);const entry={id:event.id,node:n,animation,purchase:forced?purchase.serial:null};draws.add(entry);ends.set(event.id,delay+duration);
+      if(forced){animation.currentTime=progress;if(s.paused)animation.pause();}
       animation.onfinish=()=>{draws.delete(entry);if(eligible&&bridge().getState()===s&&bridge().canPlayDraw(event.id)&&!s.pendingAction){remove(n);showDecision(s,card);}else{masked.delete(event.id);remove(n);PanelasMesa.maskCards();}};
     });return ends;
   }

@@ -51,3 +51,14 @@
  .color-picker[data-card-type=wild4] .color-picker-card,.color-picker[data-card-type=wild6] .color-picker-card {--picker-width:min(360px,calc((100vh - 32px)*400/850),calc(100vw - 240px))}
  @supports(height:100svh){.color-picker[data-card-type=wild4] .color-picker-card,.color-picker[data-card-type=wild6] .color-picker-card {--picker-width:min(360px,calc((100svh - 32px)*400/850),calc(100vw - 240px))}}
 }
+/* Coringa comum: PNG completo 400×850, sem base 2:3 ou camadas de outra arte. */
+.card.art-card[data-card-type=wild]{height:auto!important;aspect-ratio:400 / 850!important;flex-shrink:0}
+.card.art-card[data-card-type=wild]>.card-image{width:100%!important;height:auto!important;aspect-ratio:400 / 850!important;object-fit:contain!important;max-height:none;border-radius:0}
+.color-picker[data-card-type=wild] .color-picker-card{--picker-width:min(360px,calc(100vw - 40px),calc((100vh - 132px)*400/850));height:calc(var(--picker-width)*850/400);aspect-ratio:400 / 850}
+@media(orientation:landscape) and (max-height:500px){.color-picker[data-card-type=wild] .color-picker-card{--picker-width:min(360px,calc((100vh - 32px)*400/850),calc(100vw - 240px))}}
+.color-picker[data-card-type=wild] .wild-color-highlight{inset:auto;border:2px solid #fff3;border-radius:45%;background:#fff1;box-shadow:0 0 8px #ffe8a955;animation:wild-color-glow 2.4s ease-in-out infinite alternate}
+.color-picker[data-card-type=wild] .wild-color-highlight.ingredient-hover,.color-picker[data-card-type=wild] .wild-color-highlight.ingredient-pressed{animation:none;transform:scale(1.06);border-color:#fff6;background:#fff2;box-shadow:0 0 12px #ffe9a9aa}
+.color-picker[data-card-type=wild] .wild-color-highlight.ingredient-selected{animation:ingredient-choice 200ms ease-out both}
+.color-picker[data-card-type=wild] .wild-color-hit{min-width:0;min-height:0;border-radius:45%}
+@keyframes wild-color-glow{from{opacity:.45}to{opacity:.85}}
+@media(prefers-reduced-motion:reduce){.color-picker[data-card-type=wild] .wild-color-highlight{animation:none!important;transform:none!important;opacity:.7}}

@@ -100,21 +100,26 @@
     const hit=layout?`left:clamp(22px,${(x+w/2)*100}%,calc(100% - 22px));top:clamp(22px,${(y+h/2)*100}%,calc(100% - 22px));width:max(44px,${w*100}%);height:max(44px,${h*100}%);transform:translate(-50%,-50%)`:`left:${x*100}%;top:${y*100}%;width:${w*100}%;height:${h*100}%`;
     return `<div class="ingredient-layer" data-ingredient="${color}" style="--origin-x:${(x+w/2)*100}%;--origin-y:${(y+h/2)*100}%"><img src="${path}" alt="" draggable="false"></div><button type="button" class="colorbtn ingredient-hit" data-color="${color}" aria-label="${label}" style="${hit}"></button>`;
   }
+  function wildChoicesHTML(){
+    // Os quatro símbolos de cor fazem parte do PNG completo, sem ingredientes sobrepostos.
+    return [['red','Vermelho',35,32],['yellow','Amarelo',50,32],['blue','Azul',35,40],['green','Verde',50,40]].map(([color,label,x,y])=>
+      `<div class="ingredient-layer wild-color-highlight" data-ingredient="${color}" style="left:${x}%;top:${y}%;width:15%;height:8%;--origin-x:50%;--origin-y:50%"></div><button type="button" class="colorbtn ingredient-hit wild-color-hit" data-color="${color}" aria-label="${label}" style="left:${color==='red'||color==='blue'?7:51}%;top:${color==='red'||color==='yellow'?22:42}%;width:42%;height:18%"></button>`).join('');
+  }
   let closeCurrent=null;
   function open(root,{cardType,choose,cancel}){
     // Recusa explícita: especiais sem escolha jamais usam este componente.
     if(!['wild','wild4','wild6'].includes(cardType))return false;
     const type=cardType;
-    const layout=penaltyLayouts[type],base=layout?.base||`${assets}escolher_cor_base.png`;
+    const layout=penaltyLayouts[type],base=layout?.base||`${assets}Coringa_400x850.png`;
     const title=type==='wild4'?'+4 — Escolher cor':type==='wild6'?'+6 — Escolher cor':'Escolher cor';
-    const hint='Toque em um ingrediente';
+    const hint=type==='wild'?'Toque na cor desejada':'Toque em um ingrediente';
     closeCurrent?.();
     const previous=document.activeElement;
     const overlay=document.createElement('div');overlay.className='modal-wrap color-picker';overlay.dataset.cardType=type;overlay.classList.toggle('penalty-picker',!!layout);
     overlay.innerHTML=`<section class="color-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="colorPickerTitle" aria-describedby="colorPickerHint">
       <h2 id="colorPickerTitle">${title}</h2><p id="colorPickerHint">${hint}</p>
       <div class="color-picker-card"><img class="color-picker-base" src="${base}" alt="" draggable="false">
-      ${ingredients.map(ingredient=>ingredientHTML(layout,ingredient)).join('')}
+      ${type==='wild'?wildChoicesHTML():ingredients.map(ingredient=>ingredientHTML(layout,ingredient)).join('')}
       </div><button type="button" class="btn alt" id="cancelColor">Cancelar</button>
       <span class="sr-only" role="status" aria-live="polite"></span>
     </section>`;
