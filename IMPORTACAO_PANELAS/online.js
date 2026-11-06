@@ -63,7 +63,7 @@
     const local=seat=>Number.isInteger(seat)?(seat-g.self+4)%4:seat,deadline=time=>connection.localDeadline(time,g.serverNow);
     Object.assign(current,{roomCode:value.state.code,o:g.o,round:g.round,phase:g.phase,activeColor:g.activeColor,direction:g.direction,current:local(g.current),
       penalty:g.penalty,highest:g.highest,finisher:g.finisher===null?null:local(g.finisher),drawn:g.drawn,cutOpen:g.cutOpen,
-      unlockAt:deadline(g.unlockAt),deadline:deadline(g.deadline),countdownAt:deadline(g.countdownAt),paused:!!g.paused,resumeAt:deadline(g.resumeAt),remaining:g.remaining,
+      presentationUntil:deadline(g.presentationUntil),lastDistribution:g.lastDistribution?{...g.lastDistribution,active:g.lastDistribution.active.map(local),actor:local(g.lastDistribution.actor),beforeCounts:[0,1,2,3].map(i=>g.lastDistribution.beforeCounts[(i+g.self)%4]),afterCounts:[0,1,2,3].map(i=>g.lastDistribution.afterCounts[(i+g.self)%4])}:null,unlockAt:deadline(g.unlockAt),deadline:deadline(g.deadline),countdownAt:deadline(g.countdownAt),paused:!!g.paused,resumeAt:deadline(g.resumeAt),remaining:g.remaining,
       lastActor:g.lastActor===null?null:local(g.lastActor),preUno:g.preUno,unoWindow:g.unoWindow?{id:local(g.unoWindow.id)}:null,
       teams:g.self%2?[g.teams[1],g.teams[0]]:g.teams,summary:g.summary.map(p=>({...p,id:local(p.id)})),winner:g.winner,token:g.token,
       deck:Array(g.deckCount).fill(null),discard:g.discard,message:g.message,log:g.log,actions:g.actions});

@@ -8,8 +8,10 @@
       "sha256": "9f7372f6b36198cbb2990020869e98a2f2bb6850ac057bfa263dc2993a9acf2a"
     },
     {
-      "path": "assets/especiais/carta_escolher_cor_montada_preview.png",
-      "sha256": "df297ea83edb538acff839eb3944fed23788284fbb5c1c5a82bfce3fca83084d"
+      "path": "assets/especiais/Coringa_400x850.png",
+      "sha256": "d5b1fb8a12ad98082057c9648eefa7d08ba49de31b2aa3b2c7ed39817a313e6f",
+      "width": 400,
+      "height": 850
     },
     {
       "path": "assets/especiais/escolher_cor_alfaces.png",
@@ -54,5 +56,9 @@
       "assets/especiais/carta_panela_de_pressao.png",
       "assets/especiais/verso_todas_as_cartas.png"
     ]
+  },
+  "staticWildcardSource": {
+    "zip": "Panelinha_Ajustes_Visuais_Coringa_400x850.zip",
+    "sha256": "1591860e3ec4ab794e2af9e4d0bd7429cc729cd4a740681f393536d5b9c2338d"
   }
 }

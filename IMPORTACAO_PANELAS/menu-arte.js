@@ -14,7 +14,7 @@
   const positions=[69.258,73.385,77.153,81.041,84.988,88.876],periods=[3.5,3.9,4.2,3.7,4.4,4],phases=[0,.42,.78,.18,.61,.95];
   tools.forEach((file,i)=>{
     const anchor=document.createElement('span');anchor.className='menu-tool-anchor';
-    Object.assign(anchor.style,{left:positions[i]+'%',top:'30.287%',height:'16.472%'});
+    Object.assign(anchor.style,{left:(positions[i]+.55)+'%',top:'30.287%',height:'16.472%'});
     const tool=img(root+'utensilios/'+file+'.png','menu-utensil',anchor);
     tool.style.setProperty('--period',periods[i]+'s');tool.style.setProperty('--phase',-phases[i]+'s');plane.append(anchor);
   });

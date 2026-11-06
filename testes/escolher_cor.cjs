@@ -29,7 +29,7 @@ const evidence=process.env.PANELAS_SCREENSHOTS||'/workspace/work/escolher-cor-ev
   assert.ok(await p.evaluate(async assets=>{await Promise.all(assets.map(async a=>{const im=new Image();im.src=a.path;await im.decode();if(!im.naturalWidth)throw Error(a.path)}));return true},manifest.assets));
   console.log('PASS 11 artes especiais remanescentes: bytes SHA-256, HTTP, decodificação e arquivos completos; 52 frentes anteriores intactas pelo build');
   await setup('dist');assert.match(await p.locator('[data-card="9000"] .card-image').getAttribute('src'),/panela_de_pressao_400x850.png$/);
-  await setup();assert.match(await p.locator('[data-card="9000"] .card-image').getAttribute('src'),/carta_escolher_cor_montada_preview.png$/);
+  await setup();assert.match(await p.locator('[data-card="9000"] .card-image').getAttribute('src'),/Coringa_400x850.png$/);
   const backs=await p.locator('.hidden-card,.deck-back').evaluateAll(es=>es.map(e=>getComputedStyle(e).backgroundImage));assert.ok(backs.length>6&&backs.every(x=>x.includes('verso_oficial_400x850.png')));
   assert.equal(await p.locator('#pile>.deck-back').count(),6);assert.equal(await p.locator('#pile .pan-avatar,#pile .deck-brand').count(),0);
   await p.screenshot({path:path.join(evidence,'mesa-versos.png')});

@@ -287,7 +287,7 @@
     const playing=new Set([...flights].filter(f=>f.kind==='play').map(f=>f.key));
     document.querySelectorAll('.discard-layer').forEach(node=>node.classList.toggle('in-flight',playing.has(Number(node.dataset.visualKey))));
     $('discard').classList.toggle('receiving-card',playing.has(Number($('discard').querySelector('.discard-top')?.dataset.visualKey)));
-    document.querySelectorAll('[data-card],[data-hand-card]').forEach(node=>node.classList.toggle('drawing-card',drawingIds.has(Number(node.dataset.card||node.dataset.handCard))));
+    document.querySelectorAll('[data-card],[data-hand-card]').forEach(node=>node.classList.toggle('drawing-card',drawingIds.has(Number(node.dataset.card||node.dataset.handCard))||PanelinhaTableEffects.drawing(Number(node.dataset.card||node.dataset.handCard))));
   }
   function handPoint(actor,id,target=false) {
     const seat=$(`player${actor}`),area=actor===0?$('hand'):(seat.querySelector('.subhand,.back')||seat);
@@ -309,32 +309,9 @@
     if(!snapshot||snapshot.state!==state||snapshot.round!==state.round||reducedMotion.matches)return;
     const r=$('pile').getBoundingClientRect();
     if(!r.width||!r.height)return;
-    pendingDraws.push({actor,id:card.id,x:r.x+r.width/2,y:r.y+r.height/2,width:r.width,height:r.height});
+    pendingDraws.push({actor,card:{...card},id:card.id,x:r.x+r.width/2,y:r.y+r.height/2,width:r.width,height:r.height});
   }
-  function animateDraws(events,state) {
-    if(!events.length||reducedMotion.matches||typeof $('pile').animate!=='function')return new Map();
-    const count=events.length,ends=new Map();let elapsed=0;
-    const intervals=events.map((_,i)=>8+84*Math.pow(.91,i));
-    const factor=Math.min(1,1400/intervals.reduce((a,b)=>a+b,0));
-    events.forEach((event,i)=>{
-      const delay=elapsed;elapsed+=intervals[i]*factor;
-      const duration=Math.max(240,420-count*1.6);
-      const end=handPoint(event.actor,event.id,true),present=state.players[event.actor].hand.some(c=>c.id===event.id);
-      if(!end.width||!end.height)return;
-      const face=event.actor===0||state.reveal||(state.o.duo&&event.actor===2);
-      const sprite=document.createElement('div');sprite.className='drawn-card flying-card';
-      Object.assign(sprite.dataset,{actor:String(event.actor),cardId:String(event.id),sequence:String(i),delay:String(delay),duration:String(duration)});
-      Object.assign(sprite.style,{left:`${event.x-event.width/2}px`,top:`${event.y-event.height/2}px`,width:`${event.width}px`,height:`${event.height}px`});
-      const back=document.createElement('span');back.className='card deck-back';sprite.append(back);
-      if(face&&present){const card=end.node.matches('.card')?end.node:end.node.querySelector('.card');if(card){const front=document.createElement('div');front.className='flight-front';front.append(card.cloneNode(true));sprite.append(front);front.animate([{opacity:0},{offset:.4,opacity:0},{opacity:1}],{duration,delay,fill:'both'});}}
-      $('playAnimations').append(sprite);if(present)drawingIds.add(event.id);
-      const dx=end.x-event.x,dy=end.y-event.y,sx=end.width/event.width,sy=end.height/event.height;
-      const animation=sprite.animate([{opacity:0,transform:'translate(0,0) scale(.96)'},{offset:.08,opacity:1,transform:'translate(0,-4px) scale(1)'},{offset:.87,opacity:1,transform:`translate(${dx}px,${dy}px) rotate(${end.angle}deg) scale(${sx*1.035},${sy*1.035})`},{opacity:1,transform:`translate(${dx}px,${dy}px) rotate(${end.angle}deg) scale(${sx},${sy})`}],{duration,delay,easing:'cubic-bezier(.25,.1,.25,1)',fill:'both'});
-      const flight={node:sprite,animation,kind:'draw',id:event.id};flights.add(flight);ends.set(event.id,delay+duration);
-      animation.onfinish=()=>{sprite.remove();flights.delete(flight);drawingIds.delete(event.id);maskCards();};
-    });
-    maskCards();return ends;
-  }
+  function animateDraws(events,state) { return PanelinhaTableEffects.animateDraws(events,state); }
   function updateClock(state,now=Date.now()) {
     window.PanelinhaSFX?.clock(state,now);
     const remaining=state.deadline-now;
@@ -393,7 +370,7 @@
     if (!appended || !Number.isInteger(actor) || actor < 0 || actor > 3) {
       clearFlights(); return;
     }
-    const point=handPoint(actor,card.id),hidden=actor!==0&&!$(`player${actor}`).querySelector('.subhand');
+    const point=PanelinhaTableEffects.playOrigin(card.id)||handPoint(actor,card.id),hidden=actor!==0&&!$(`player${actor}`).querySelector('.subhand');
     if(!point.width||!point.height)return;
     let blocked=null;
     const repeated=snapshot.lastActor===actor&&snapshot.topCard?.type===card.type&&snapshot.topCard?.color===card.color&&snapshot.topCard?.num===card.num;
@@ -526,8 +503,8 @@
     tableDirection(state.direction);
     const heat=Math.min(1,Math.log1p(Math.max(0,state.penalty))/Math.log(21));
     $('burner').style.setProperty('--heat-scale',String(1+heat*.16));
-    $('burner').style.setProperty('--heat-opacity',String(.74+heat*.18));
-    $('burner').style.setProperty('--heat-brightness',String(1+heat*.24));
+    $('burner').style.setProperty('--heat-opacity',String(.83+heat*.12));
+    $('burner').style.setProperty('--heat-brightness',String(1.10+heat*.20));
     $('table').dataset.penalty=String(state.penalty);
     $('table').setAttribute('aria-label', `Mesa de jogo · ${state.activeColor ? colorNames[state.activeColor] : 'sem cor ativa'}`);
     layout();
@@ -604,5 +581,5 @@
     positionTurnCue();
   });
   nativeTable(false);
-  window.PanelasMesa = { render, renderSeat, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {cancelAnimationFrame(cueLayoutFrame);cueAnimation?.cancel();cueAnimation=null;cueOwner=null;cueRound=null;wasHumanTurn=false;$('turnCue').hidden=true;$('hand').classList.remove('human-turn');$('hand').dataset.turnScale='1';$('buyBtn').classList.remove('mandatory-buy');clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
+  window.PanelasMesa = { handPoint,maskCards,render, renderSeat, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {PanelinhaTableEffects.reset();cancelAnimationFrame(cueLayoutFrame);cueAnimation?.cancel();cueAnimation=null;cueOwner=null;cueRound=null;wasHumanTurn=false;$('turnCue').hidden=true;$('hand').classList.remove('human-turn');$('hand').dataset.turnScale='1';$('buyBtn').classList.remove('mandatory-buy');clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
 })();

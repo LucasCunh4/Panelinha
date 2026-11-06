@@ -1,5 +1,5 @@
-/* PNGs oficiais intactos: fundo e enfeites compartilham o mesmo enquadramento contain. */
-:root{--menu-scene-w:min(100vw,177.6833156vh);--menu-scene-h:min(56.2799043vw,100vh)}
+/* PNGs oficiais intactos: fundo e enfeites compartilham o mesmo enquadramento cover. */
+:root{--menu-scene-w:max(100vw,177.6833156vh);--menu-scene-h:max(56.2799043vw,100vh)}
 .menu-icon-defs{position:absolute;width:0;height:0;overflow:hidden}
 .kitchen-scene{background:#20112f}
 .menu-art-plane{position:absolute;left:50%;top:50%;width:var(--menu-scene-w);height:var(--menu-scene-h);transform:translate(-50%,-50%);pointer-events:none}
@@ -43,3 +43,18 @@
 body:not([data-screen=home]) .menu-art-plane::after{content:'';position:absolute;inset:0;background:#20112f91}
 body[data-screen=game] .menu-art-plane{display:none}
 @media(prefers-reduced-motion:reduce){.menu-utensil,.menu-vapor,.title-letter,.title-lid,.title-sparkle{animation:none!important}.menu-vapor{opacity:.13}.menu-vapor:not(:first-child){display:none}.title-sparkle{opacity:.45}}
+
+/* Conteúdo no viewport; cenário e pontos de suspensão usam o mesmo cover. */
+#home.home-screen{inset:0;width:100%;height:100%;transform:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,3vh,32px);padding:24px max(24px,env(safe-area-inset-left))}
+#home .game-title{position:relative;inset:auto;width:min(76vw,850px);flex:none;margin:0}
+.title-letters{justify-content:center}
+.title-letter{flex:0 0 14%;margin-left:-3.6%}.title-letter:first-child{margin-left:0}
+.title-lid{width:45%;left:25%;top:1%}
+#home .home-actions{position:relative;inset:auto;width:min(46vw,440px);gap:clamp(10px,2.5vh,20px)}
+#home .hero-button{min-height:clamp(48px,10vh,78px)}
+.player-avatar.official-avatar{overflow:hidden;border-radius:50%}
+.official-avatar img{border-radius:50%;object-fit:cover}
+.seat .official-avatar,.seat .pan-avatar{border-radius:50%;overflow:hidden;transform:scale(1.12);transform-origin:center}
+@media(orientation:portrait){#home .game-title{width:94vw}#home .home-actions{width:min(78vw,440px)}}
+@media(orientation:landscape) and (max-height:420px){#home.home-screen{gap:8px;padding-block:10px}#home .game-title{width:min(63vw,640px)}#home .home-actions{width:min(42vw,380px)}}
+#home .game-title{align-self:center}

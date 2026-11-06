@@ -1,0 +1,15 @@
+/* Cartas aprovadas intactas; somente escala proporcional e composição em CSS. */
+.table-flight{position:fixed;transform:translate(-50%,-50%);transform-origin:center;pointer-events:none;will-change:transform,opacity;filter:drop-shadow(0 7px 10px #10071e80)}
+.table-effect-card>.card,.table-effect-card>img{display:block;width:100%!important;min-width:0!important;height:100%!important;object-fit:contain;padding:0;border:0;border-radius:0;background:transparent}
+.table-effect-card>.card .card-image{width:100%;height:100%;object-fit:contain}
+.pressure-transition #hand,.pressure-transition .controls{pointer-events:none}
+.pressure-transition #controls{visibility:hidden}
+.pressure-hands-hidden #hand,.pressure-hands-hidden .seat .subhand,.pressure-hands-hidden .seat .back,.pressure-hands-hidden .seat .sub{visibility:hidden}
+.pressure-transition #turnCue{visibility:hidden}
+.draw-choice{pointer-events:auto;z-index:4}
+.draw-choice-actions{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);display:flex;gap:12px;white-space:nowrap}
+.draw-choice-actions .btn{min-width:98px;min-height:44px;border:1px solid #efc87d;box-shadow:0 4px 14px #15071bb0}
+/* O queimador não se move: apenas a camada de chama ganha 3px para a esquerda. */
+.flame{translate:-3px 0}
+@keyframes flame-flicker{0%,100%{filter:saturate(1.12) brightness(.98)}19%{filter:saturate(1.16) brightness(1.04)}48%{filter:saturate(1.1) brightness(1)}76%{filter:saturate(1.14) brightness(1.02)}}
+@media(prefers-reduced-motion:reduce){.table-flight{will-change:auto}.flame{filter:saturate(1.12) brightness(1)}}

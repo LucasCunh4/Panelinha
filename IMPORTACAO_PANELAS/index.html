@@ -38,6 +38,7 @@
 <link rel="stylesheet" href="sons.css">
 <link rel="stylesheet" href="multiplayer.css">
 <link rel="stylesheet" href="online.css">
+<link rel="stylesheet" href="efeitos-mesa.css">
 </head>
 <body>
 <main class="container app-container">
@@ -179,6 +180,7 @@
 <script src="anuncios.js"></script>
 <script src="escolher-cor.js"></script>
 <script src="motor.js"></script>
+<script src="efeitos-mesa.js"></script>
 <script src="mesa.js"></script>
 <script src="navegacao.js"></script>
 <script>
@@ -211,7 +213,7 @@ function cardAssetPath(c){
   if(c?.type==='wild4')return 'assets/cartas_mais4_mais6/carta_mais4_completa.png';
   if(c?.type==='wild6')return 'assets/cartas_mais4_mais6/carta_mais6_completa.png';
   if(c?.type==='dist')return 'assets/padronizadas/panela_de_pressao_400x850.png';
-  if(c?.type==='wild')return 'assets/especiais/carta_escolher_cor_montada_preview.png';
+  if(c?.type==='wild')return 'assets/especiais/Coringa_400x850.png';
   if(!c||!c.color||!ASSET_COLOR_DIR[c.color])return null;
   const face=c.type==='num'&&Number.isInteger(c.num)&&c.num>=0&&c.num<=9?String(c.num):ASSET_FACE[c.type];
   return face===undefined?null:`assets/cartas/${ASSET_COLOR_DIR[c.color]}/${face}.png`;
@@ -221,7 +223,7 @@ function cardHTML(c,small=false,selected=false,invalid=false){
   const label=`<small>${c.color?CN[c.color]:''}</small><span class="${c.type==='dist'||c.type==='rotate'?'special-name':''}">${SHORT[c.type]||descriptor(c)}</span><small>${c.type==='num'?'':(c.color?'⇄':'★')}</small>`;
   const path=$('useCardArt')?.checked?cardAssetPath(c):null;
   if(!path)return `<span class="${base}" title="${name}">${label}</span>`;
-  return `<span class="${base} art-card${['dist','rotate','wild4','wild6'].includes(c.type)?' standard-card':c.type==='wild'?' official-special':''}" title="${name}" data-card-type="${c.type}" data-asset="${path}"><img class="card-image" src="${path}" alt="${name}" loading="lazy" draggable="false" onerror="this.parentNode.classList.add('asset-unavailable')"><span class="art-fallback">${label}</span></span>`;
+  return `<span class="${base} art-card${['dist','rotate','wild4','wild6','wild'].includes(c.type)?' standard-card':''}" title="${name}" data-card-type="${c.type}" data-asset="${path}"><img class="card-image" src="${path}" alt="${name}" loading="lazy" draggable="false" onerror="this.parentNode.classList.add('asset-unavailable')"><span class="art-fallback">${label}</span></span>`;
 }
 function buildDeck(o){return rules.buildDeck(o);}
 function log(msg){return rules.log(msg);}
@@ -244,15 +246,15 @@ function newRound(){return rules.newRound();}
 function startTurn(pauseMs=0){
   if(!s||s.phase!=='playing')return;
   s.drawn=null;s.preUno=false;s.token++;
-  s.unlockAt=Date.now()+(s.o.cut?pauseMs:Math.min(400,pauseMs));
+  s.unlockAt=Math.max(Date.now(),s.presentationUntil||0)+(s.o.cut?pauseMs:Math.min(400,pauseMs));
   s.cutOpen=!!(s.o.cut&&pauseMs>0&&s.finisher===null);
   s.deadline=s.o.timeout?s.unlockAt+s.o.timeout*1000:0;
   render();queueBots();
 }
-function canActNow(){if(s?.online)return PanelinhaOnline.connected&&!s.paused&&!s.players[0].substituted&&Date.now()>=s.unlockAt;return rules.canActNow();}
+function canActNow(){if(s?.online)return Date.now()>=(s.presentationUntil||0)&&PanelinhaOnline.connected&&!s.paused&&!s.players[0].substituted&&Date.now()>=s.unlockAt;return rules.canActNow();}
 function findHumanCut(){
   if(s?.online)return PanelinhaOnline.connected&&Date.now()<s.unlockAt?s.players[0].hand.find(c=>s.actions.cuts.includes(c.id))||null:null;
-  if(!s||s.phase!=='playing'||!s.o.cut||!s.cutOpen||Date.now()>=s.unlockAt||s.finisher!==null||s.current===0||s.pendingAction)return null;
+  if(!s||Date.now()<(s.presentationUntil||0)||s.phase!=='playing'||!s.o.cut||!s.cutOpen||Date.now()>=s.unlockAt||s.finisher!==null||s.current===0||s.pendingAction)return null;
   return s.players[0].hand.find(c=>equals(c,top())&&canPlay(c))||null;
 }
 function penaltyText(){return `PENALIDADE +${s.penalty}: é obrigatório comprar ${s.penalty} cartas e perder o turno, ou rebater com +${s.highest} ou maior${s.o.dist?' / Panela de Pressão':''}. Não é permitido jogar cartas comuns.`;}
@@ -313,7 +315,7 @@ function queueBots(){
     cutTimer=setTimeout(()=>{
       if(!s||s.token!==token||s.phase!=='playing'||s.pendingAction||Date.now()>=s.unlockAt)return;
       if(Math.random()<.22){const candidates=s.players.filter(p=>p.id!==s.current&&p.id!==0).flatMap(p=>p.hand.filter(c=>equals(c,top())&&canPlay(c)).map(c=>({id:p.id,card:c})));if(candidates.length){const cut=pick(candidates);applyPlay(cut.id,[cut.card.id],true,cut.card.color||(COLOR_CHOOSERS.has(cut.card.type)?pick(COLORS):s.activeColor));}}
-    },Math.min(700,Math.max(0,s.unlockAt-Date.now()-1)));
+    },Math.max(0,(s.presentationUntil||0)-Date.now())+Math.min(700,Math.max(0,s.unlockAt-Math.max(Date.now(),s.presentationUntil||0)-1)));
   }
   if(s.current!==0){
     const minimum=s.unlockAt-Date.now()+20;
@@ -322,7 +324,7 @@ function queueBots(){
   }
   if(s.unoWindow&&s.unoWindow.id===0){setTimeout(()=>{
     if(s&&s.token===token&&s.phase==='playing'&&s.unoWindow&&s.unoWindow.id===0&&Math.random()<.36)reportUno(pick([1,2,3]));
-  },850);}
+  },Math.max(0,(s.presentationUntil||0)-Date.now())+850);}
 }
 function botTurn(){return rules.botTurn();}
 function colorForPlay(card,hand){return rules.colorForPlay(card,hand);}
@@ -346,7 +348,8 @@ function showColors(){
   });
 }
 function finishControlHTML(){if(s?.online)return PanelinhaOnline.resultHTML();let ranks=s.summary.map(x=>`<div class="notice"><strong>${x.place}º — ${safeName(x.id)}</strong> · ${x.cost} pontos nas cartas restantes (${x.remaining} cartas)</div>`).join('');return `<div class="banner">${s.phase==='gameOver'?(s.winner?`🏆 ${PanelinhaProfile.escape(s.winner)} venceu a partida!`:'🏆 Rodada única concluída!'):'Rodada concluída.'}</div>${ranks}<div class="controls">${s.phase==='roundOver'?'<button id="nextRound" class="btn good">Próxima rodada</button>':'<button id="newMatch" class="btn good">Nova partida</button>'}<button id="backLobby" class="btn alt">Voltar às configurações</button></div>`;}
-function render(){if(!s)return;PanelasMesa.beforeRender(s);$('roundLabel').textContent=`Rodada ${s.round} · ${s.o.duo?'Duplas':'Individual'}`;$('status').textContent=s.phase==='playing'?`Vez de ${names(s.current)}`:s.phase==='roundOver'?'Fim da rodada':'Fim da partida';
+function render(){if(!s)return;PanelinhaTableEffects.paint(s,renderTable);}
+function renderTable(){if(!s)return;PanelasMesa.beforeRender(s);$('roundLabel').textContent=`Rodada ${s.round} · ${s.o.duo?'Duplas':'Individual'}`;$('status').textContent=s.phase==='playing'?`Vez de ${names(s.current)}`:s.phase==='roundOver'?'Fim da rodada':'Fim da partida';
 $('score').innerHTML=s.o.duo?`<span>${safeName(0)} + ${safeName(2)}: ${s.teams[0]}</span><span>${safeName(1)} + ${safeName(3)}: ${s.teams[1]}</span>`:s.players.map(p=>`<span>${safeName(p.id)}: ${p.score}</span>`).join('');
 $('stateText').textContent=s.phase==='playing'?`Sentido: ${s.direction===-1?'horário':'anti-horário'} · Cor: ${CN[s.activeColor]} · Monte: ${s.deck.length} · ${s.penalty?'PENALIDADE OBRIGATÓRIA +'+s.penalty:'Sem penalidade'}${s.o.timeout&&s.deadline?' · Tempo: '+Math.max(0,Math.ceil((s.deadline-Date.now())/1000))+'s':''}`:s.message;
 for(let i=0;i<4;i++)PanelasMesa.renderSeat(s,i,names(i),cardHTML);
@@ -367,7 +370,7 @@ if(s.phase!=='playing'){
   $('nextRound')?.addEventListener('click',newRound);$('newMatch')?.addEventListener('click',startMatch);$('backLobby')?.addEventListener('click',backToMenu);
 }else{
   const mine=s.current===0;
-  const canCall=s.players[0].hand.length===2||(s.players[0].hand.length===1&&s.unoWindow?.id===0);
+  const canCall=s.online?s.actions.announce&&canActNow():rules.canAnnounceUNO(0);
   const canReport=s.unoWindow&&s.unoWindow.id!==0;
   const penaltyBanner=mine&&s.penalty?`<div class="penalty-alert">⚠️ ${penaltyText()}</div>`:'';
 
@@ -398,7 +401,7 @@ if(s.o.timeout&&s.deadline){let left=Math.max(0,Math.ceil((s.deadline-Date.now()
 if(left===0&&!s.pendingAction&&canActNow()){let id=s.current;clearJobs();s.token++;log(`Tempo de ${names(id)} esgotado.`);if(s.penalty){finishPenaltyDraw(id);}else{closeUnoOnAction();drawMany(id,1);s.current=nextActive(id);startTurn();}}}},250);
 // Ganchos de inspeção para testes automatizados pelo Codex.
 PanelinhaNavigation.attach({getState:()=>s,leaveMatch:backToMenu});
-window.PanelinhaTableBridge={getState:()=>s,render,cardHTML,setOnline(value){clearJobs();s=value;},clearOnline(){if(!s?.online)return;clearJobs();s=null;$('modalRoot').innerHTML='';PanelinhaAnnouncements.reset();PanelasMesa.reset();}};
+window.PanelinhaTableBridge={getState:()=>s,render,cardHTML,canPlayDraw:id=>s?.drawn===id&&checkCards(0,[id],false),playDraw:id=>chooseCards(0,[id]),keepDraw:keepPass,setOnline(value){clearJobs();s=value;},clearOnline(){if(!s?.online)return;clearJobs();s=null;$('modalRoot').innerHTML='';PanelinhaAnnouncements.reset();PanelasMesa.reset();}};
 window.CartasTest={getState:()=>s,createDeck:o=>buildDeck(o),newRound:()=>s&&newRound(),describe:description,assetFor:cardAssetPath};
 })();
 </script>

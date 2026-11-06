@@ -15,7 +15,7 @@ function fixture(options={}){
 }
 test('pausa sem limite congela todos os prazos e bloqueia todas as intenções de cartas',()=>{
   const f=fixture({timeout:15});f.actor(0).bot=true;Object.assign(f.s,{unlockAt:7200,deadline:22200,cutOpen:true,botAt:7250,botCutAt:5700,reportAt:5850,unoWindow:{id:1}});
-  pauseMatch(f.r,5500);const frozen=structuredClone(f.s.frozen),before=JSON.stringify(f.s);assert.deepEqual(frozen,{unlockAt:1700,deadline:16700,countdownAt:0,botAt:1750,botCutAt:200,reportAt:350,idleAt:0});
+  pauseMatch(f.r,5500);const frozen=structuredClone(f.s.frozen),before=JSON.stringify(f.s);assert.deepEqual(frozen,{presentationUntil:0,unlockAt:1700,deadline:16700,countdownAt:0,botAt:1750,botCutAt:200,reportAt:350,idleAt:0});
   assert.equal(nextWake(f.r,999999),Infinity);assert.equal(advance(f.r,999999),false);assert.equal(JSON.stringify(f.s),before);
   for(const type of ['play','cut','draw','pass','challenge','announce','report'])assert.throws(()=>perform(f.r,f.actor(0),type,{},999999),e=>e.code==='GAME_PAUSED');
   for(const p of f.r.players){const a=gameView(f.r,p.id,999999).actions;assert.deepEqual(a.legal,[]);assert.deepEqual(a.cuts,[]);for(const k of ['draw','pass','challenge','announce','report','mustBuy'])assert.equal(a[k],false);}
@@ -59,7 +59,7 @@ test('sem limite: bot assume em 120000 ms sem ação válida e aguarda sua açã
 });
 test('compra válida sem limite renova inatividade; anúncio fora do turno não renova outro jogador',()=>{
   const f=fixture();engine(f.r,5000).startTurn();f.s.deck.push(f.card());f.seal();perform(f.r,f.actor(0),'draw',{},10000);assert.equal(f.s.idleAt,130000);
-  f.s.players[1].hand=f.s.players[1].hand.slice(0,2);f.seal();perform(f.r,f.actor(1),'announce',{},11000);assert.equal(f.s.idleAt,130000);
+  f.s.players[1].hand=f.s.players[1].hand.slice(0,2);f.seal();assert.throws(()=>perform(f.r,f.actor(1),'announce',{},11000),e=>e.code==='ILLEGAL_MOVE');assert.equal(f.s.idleAt,130000);
 });
 test('pausa congela a inatividade e retorno de conexão durante pausa não libera bot antes da retomada',()=>{
   const f=fixture();engine(f.r,5000).startTurn();advance(f.r,5000);pauseMatch(f.r,124000);assert.equal(f.s.frozen.idleAt,1000);advance(f.r,999999);assert.equal(f.actor(0).idleBot,false);
@@ -112,13 +112,13 @@ test('duas intenções concorrentes da mesma versão só alteram as cartas uma v
   const winner=results.findIndex(r=>r.status==='fulfilled'),after=await f.read();assert.equal(after.game.penalty,4);assert.equal(after.game.discard.length,2);conserve(after.game);
   const ack=await cutters[winner].send('cut',data[winner],0,ids[winner]);assert.equal(ack.duplicate,true);assert.deepEqual((await f.read()).game,after.game);await f.clients[0].command('close-room');
 });
-test('anúncio e denúncia concorrentes obedecem a primeira intenção válida, sem penalidade dupla',async t=>{
+test('anúncio tardio inválido não impede denúncia concorrente nem duplica penalidade',async t=>{
   const f=await live(t,'race-uno'),saved=await f.read(),s=saved.game,{core}=engine(saved,Date.now());
   Object.assign(s,{deck:Array.from({length:10},()=>core.make('num','blue',2)),discard:[core.make('num','red',7)],current:3,lastActor:0,unoWindow:{id:0},unlockAt:Date.now()+2200,countdownAt:0,cutOpen:true,deadline:0,idleAt:0,botAt:0,botCutAt:0,reportAt:0});
   for(const p of s.players)p.hand=Array.from({length:p.id===0?1:3},()=>core.make('num','red',7));s.cardCount=s.deck.length+s.discard.length+s.players.flatMap(p=>p.hand).length;await f.write(saved);
   for(const c of f.clients)await c.command('sync');const caller=f.clients.find(c=>c.state.game.self===0),reporter=f.clients.find(c=>c.state.game.self===1),version=caller.state.version;
-  const results=await Promise.allSettled([caller.send('announce',{},version),reporter.send('report',{},version)]);assert.equal(results.filter(r=>r.status==='fulfilled').length,1);assert.equal(results.filter(r=>r.status==='rejected'&&r.reason.code==='STALE_STATE').length,1);
-  const after=await f.read();assert.equal(after.game.unoWindow,null);assert.equal(after.game.players[0].hand.length,results[0].status==='fulfilled'?1:3);conserve(after.game);await f.clients[0].command('close-room');
+  const results=await Promise.allSettled([caller.send('announce',{},version),reporter.send('report',{},version)]);assert.equal(results.filter(r=>r.status==='fulfilled').length,1);assert.equal(results.filter(r=>r.status==='rejected'&&['ILLEGAL_MOVE','STALE_STATE'].includes(r.reason.code)).length,1);
+  const after=await f.read();assert.equal(after.game.unoWindow,null);assert.equal(after.game.players[0].hand.length,3);conserve(after.game);await f.clients[0].command('close-room');
 });
 test('clientes da Fase 2 precisam atualizar antes de iniciar sem perder identidade nem código',async t=>{
   const {mf,url}=await startRuntime();t.after(()=>mf.dispose());const user=await session(url,'cliente-fase2'),code=await create(url,user),old=await connect(url,code,{...user,clientPhase:2});

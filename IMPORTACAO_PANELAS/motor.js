@@ -51,7 +51,8 @@ function drawCard(id){refill();let c=s.deck.pop();if(c){s.players[id].hand.push(
 function drawMany(id,n){let got=0;for(let i=0;i<n;i++){if(!drawCard(id))break;got++;}return got;}
 
 function redistribute(extra=0,exclude=[],actor=null){
-  const eligible=s.players.filter(p=>p.hand.length>0&&!exclude.includes(p.id));
+  const eligible=s.players.filter(p=>!exclude.includes(p.id)&&(p.id===actor||p.hand.length>0));
+  const beforeCounts=s.players.map(p=>p.hand.length);
   if(!eligible.length)return;
   const cap=actor===null?null:s.players[actor].hand.length;
   let collected=[];
@@ -84,14 +85,14 @@ function redistribute(extra=0,exclude=[],actor=null){
   const penaltyIds=new Set(added.map(c=>c.id));
   for(const p of eligible)for(const c of p.hand)if(penaltyIds.has(c.id))PanelasMesa.recordDraw(s,p.id,c);
   const text=eligible.map(p=>`${names(p.id)}: ${p.hand.length}`).join(' · ');
-  s.lastDistribution={counts:text,penaltyAdded:added.length,active:eligible.map(p=>p.id),actor,actorLimit:cap,actorReduction:author?reduction:null,actorReceived:author?author.hand.length:null,total:collected.length};
+  s.lastDistribution={beforeCounts,afterCounts:s.players.map(p=>p.hand.length),counts:text,penaltyAdded:added.length,active:eligible.map(p=>p.id),actor,actorLimit:cap,actorReduction:author?reduction:null,actorReceived:author?author.hand.length:null,total:collected.length};
   if(s.unoWindow&&s.players[s.unoWindow.id].hand.length!==1)s.unoWindow=null;
   log(`Panela de Pressão ALEATÓRIA (${text})${extra?` · punição: ${added.length}/${extra} cartas adicionadas`:''}.`);
 }
 
 function rotateHands(exclude=[]){let order=[];for(let i=0;i<4;i++)if(s.players[i].hand.length>0&&!exclude.includes(i))order.push(i);if(order.length<2)return;const next={};for(const id of order){let to=id;let count=0;do{to=(to+4+s.direction)%4;count++;}while(!order.includes(to)&&count<4);next[to]=s.players[id].hand;}for(let id of order){s.players[id].hand=next[id];if(s.preUnoById)delete s.preUnoById[id];}log(`Liquidificador: mãos transferidas no sentido ${s.direction===-1?'horário':'anti-horário'}.`);}
 
-function newRound(starter=0,direction=1){PanelinhaSFX.event('round-prepare');PanelinhaAnnouncements.round(s);clearJobs();s.token++;s.round++;s.players.forEach(p=>p.hand=[]);s.deck=buildDeck(s.o);s.discard=[];s.direction=direction;s.current=starter;s.penalty=0;s.highest=0;s.lastPenalty=null;s.finisher=null;s.drawn=null;s.preUno=false;s.unoWindow=null;s.cutOpen=false;s.unlockAt=0;s.lastActor=null;s.lastDistribution=null;s.pendingAction=null;s.phase='playing';s.message='';for(let j=0;j<7;j++)for(const p of s.players)drawCard(p.id);let first=s.deck.pop();s.discard.push(first);s.activeColor=first.color||pick(COLORS);log(`Rodada ${s.round}: carta inicial ${description(first)}.`);
+function newRound(starter=0,direction=1){PanelinhaSFX.event('round-prepare');PanelinhaAnnouncements.round(s);clearJobs();s.token++;s.round++;s.players.forEach(p=>p.hand=[]);s.deck=buildDeck(s.o);s.discard=[];s.direction=direction;s.current=starter;s.penalty=0;s.highest=0;s.lastPenalty=null;s.finisher=null;s.drawn=null;s.preUno=false;s.unoWindow=null;s.cutOpen=false;s.unlockAt=0;s.lastActor=null;s.lastDistribution=null;s.presentationUntil=0;s.pendingAction=null;s.phase='playing';s.message='';for(let j=0;j<7;j++)for(const p of s.players)drawCard(p.id);let first=s.deck.pop();s.discard.push(first);s.activeColor=first.color||pick(COLORS);log(`Rodada ${s.round}: carta inicial ${description(first)}.`);
 if(first.type==='skip'){s.current=(starter+s.direction+4)%4;log('Bloqueio inicial: primeiro jogador pulado.');}
 else if(first.type==='reverse'){s.direction*=-1;s.current=(starter+s.direction+4)%4;log('Inverter inicial: sentido invertido.');}
 else if(power(first)){s.penalty=power(first);s.highest=power(first);log(`Penalidade inicial de +${s.penalty}.`);}
@@ -99,7 +100,7 @@ else if(first.type==='dist')redistribute();
 else if(first.type==='rotate')rotateHands();
 if(s.finisher!==null){finishRound();return;}PanelinhaSFX.event('round-start');startTurn();}
 
-function canActNow(){return !!s&&now()>=s.unlockAt;}
+function canActNow(){return !!s&&!s.paused&&now()>=Math.max(s.unlockAt||0,s.presentationUntil||0);}
 
 function closeUnoOnAction(){if(s.unoWindow)s.unoWindow=null;}
 
@@ -115,7 +116,7 @@ function canDistribute(c){
 function canPlay(c){if(c.type==='dist'&&!canDistribute(c))return false;if(s.penalty){return (power(c)>0&&power(c)>=s.highest)||c.type==='dist';}let t=top();if(isColorless(c))return true;return c.color===s.activeColor||(!isColorless(t)&&c.type===t.type&&(c.type==='num'?c.num===t.num:true));}
 
 function checkCards(id,ids,isCut){
-  if(!s||s.phase!=='playing'||ids.length!==1)return false;
+  if(!s||s.phase!=='playing'||s.paused||now()<(s.presentationUntil||0)||ids.length!==1)return false;
   const c=s.players[id].hand.find(q=>q.id===ids[0]);
   if(!c)return false;
   if(isCut)return !!(s.o.cut&&s.cutOpen&&now()<s.unlockAt&&s.finisher===null&&id!==s.current&&equals(c,top())&&canPlay(c));
@@ -126,7 +127,13 @@ function checkCards(id,ids,isCut){
 
 function resolvePressurePlay(actor,repeatedOwnCut){
   const extra=s.penalty;s.penalty=0;s.highest=0;s.lastPenalty=null;
-  if(!repeatedOwnCut)redistribute(extra,[s.finisher].filter(x=>x!==null),actor);
+  if(!repeatedOwnCut){
+    redistribute(extra,[s.finisher].filter(x=>x!==null),actor);
+    if(s.lastDistribution){
+      s.presentationUntil=now()+2000;
+      Object.assign(s.lastDistribution,{serial:(s.distributionSerial=(s.distributionSerial||0)+1),duration:2000});
+    }
+  }
 }
 
 function applyPlay(id,ids,isCut,color){
@@ -175,10 +182,26 @@ else{s.message='Nenhuma carta válida comprada. Turno encerrado.';s.current=next
 
 function keepPass(id=0){if(s.phase!=='playing'||s.current!==id||s.drawn===null||!canActNow())return;clearJobs();log(`${names(id)} guardou a carta comprada e passou.`);s.drawn=null;s.current=nextActive(id);startTurn();}
 
-function announceUNO(id=0){if(s.phase!=='playing')return;if(s.players[id].hand.length>=2){if(!preAnnounced(id))PanelinhaAnnouncements.announce(s,id,names(id),'preemptive');s.preUno=true;if(s.preUnoById)s.preUnoById[id]=true;s.message='Última carta anunciada preventivamente; agora descarte para ficar com uma.';log(`${names(id)} anunciou a última carta preventivamente.`);}
-else if(s.players[id].hand.length===1&&s.unoWindow&&s.unoWindow.id===id){s.unoWindow=null;log(`${names(id)} anunciou última carta antes de ser denunciado.`);PanelinhaAnnouncements.announce(s,id,names(id),'after-play');}render();}
+// O anúncio preventivo usa a mesma validação do descarte, incluindo mão comprada.
+function canAnnounceUNO(id=0){
+  if(!s||s.phase!=='playing'||s.current!==id||!canActNow()||preAnnounced(id)||s.players[id].hand.length!==2)return false;
+  return s.players[id].hand.some(c=>{
+    if(!checkCards(id,[c.id],false))return false;
+    if(c.type!=='rotate')return true; // Panela após descarte de duas conserva mínimo 1.
+    // Liquidificador entrega ao autor a mão anterior na direção vigente.
+    let from=id;for(let n=0;n<4;n++){from=(from+4-s.direction)%4;if(s.players[from].hand.length)return s.players[from].hand.length===1;}
+    return false;
+  });
+}
+function announceUNO(id=0){
+  if(!canAnnounceUNO(id))return false;
+  PanelinhaAnnouncements.announce(s,id,names(id),'preemptive');
+  s.preUno=true;if(s.preUnoById)s.preUnoById[id]=true;
+  s.message='Última carta anunciada preventivamente; agora descarte para ficar com uma.';
+  log(`${names(id)} anunciou a última carta preventivamente.`);render();return true;
+}
 
-function reportUno(by=0){if(!s||!s.unoWindow||s.phase!=='playing')return;let id=s.unoWindow.id;if(id===by)return;s.unoWindow=null;let got=drawMany(id,2);PanelinhaSFX.event('penalty-resolved',{amount:2});log(`${names(by)} denunciou ${names(id)} por esquecer ÚLTIMA CARTA (+${got}).`);render();}
+function reportUno(by=0){if(!s||!s.unoWindow||s.phase!=='playing'||now()<(s.presentationUntil||0))return;let id=s.unoWindow.id;if(id===by)return;s.unoWindow=null;let got=drawMany(id,2);PanelinhaSFX.event('penalty-resolved',{amount:2});log(`${names(by)} denunciou ${names(id)} por esquecer ÚLTIMA CARTA (+${got}).`);render();}
 
 function handPoints(p){return p.hand.reduce((a,c)=>a+VALUE[c.type],0);}
 
@@ -218,7 +241,7 @@ s.current=nextActive(id);startTurn();}
 function colorForPlay(card,hand){return card.color||(COLOR_CHOOSERS.has(card.type)?bestColor(hand):s.activeColor);}
 
 function bestColor(cards){let counts=COLORS.map(color=>({color,n:cards.filter(c=>c.color===color).length})).sort((a,b)=>b.n-a.n);return counts[0].n?counts[0].color:pick(COLORS);}
-const functions={make,shuffle,descriptor,description,isColorless,equals,power,buildDeck,log,top,nextActive,refill,drawCard,drawMany,redistribute,rotateHands,newRound,canActNow,closeUnoOnAction,canDistribute,canPlay,checkCards,resolvePressurePlay,applyPlay,finishPenaltyDraw,challenge,buy,keepPass,announceUNO,reportUno,handPoints,specialCount,effectCount,numberCount,rankPlayers,finishRound,victories,botTurn,colorForPlay,bestColor,canChallenge};
+const functions={make,shuffle,descriptor,description,isColorless,equals,power,buildDeck,log,top,nextActive,refill,drawCard,drawMany,redistribute,rotateHands,newRound,canActNow,closeUnoOnAction,canDistribute,canPlay,checkCards,resolvePressurePlay,applyPlay,finishPenaltyDraw,challenge,buy,keepPass,canAnnounceUNO,announceUNO,reportUno,handPoints,specialCount,effectCount,numberCount,rankPlayers,finishRound,victories,botTurn,colorForPlay,bestColor,canChallenge};
 return Object.fromEntries(Object.entries(functions).map(([name,fn])=>[name,(...args)=>{s=ctx.getState();return fn(...args)}]));
 }
 globalThis.PanelinhaRules=Object.freeze({create,COLORS,CN,TYPES,SHORT,COLORLESS,COLOR_CHOOSERS,SPECIAL,VALUE,CUT_PAUSE_MS});

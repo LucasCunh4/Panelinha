@@ -116,7 +116,7 @@ export class LobbyRoom extends DurableObject {
     if(current.status==='match')requireValue(['ready','leave','close-room','next-round','play','cut','draw','pass','challenge','announce','report','pause','resume','reclaim','sync'].includes(message.type),'MATCH_STARTED',409);
     if(current.status==='match'&&!['leave','close-room','sync'].includes(message.type))requireValue((actor.clientPhase||1)>=3,'UPGRADE_REQUIRED',409);
     switch(message.type){
-      case 'ready':exact(data,['ready']);requireValue(typeof data.ready==='boolean');requireValue(!next.game||next.game.phase!=='playing','ILLEGAL_MOVE',409);self.ready=data.ready;break;
+      case 'ready':exact(data,['ready']);requireValue(typeof data.ready==='boolean');requireValue(!next.game||(next.game.phase!=='playing'&&Date.now()>=(next.game.presentationUntil||0)),'ILLEGAL_MOVE',409);self.ready=data.ready;break;
       case 'profile':Object.assign(self,profile(data));break;
       case 'team':{
         exact(data,['team']);requireValue(next.rules.duo&&[1,2].includes(data.team));
