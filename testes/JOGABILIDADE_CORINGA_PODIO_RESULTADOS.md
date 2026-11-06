@@ -19,4 +19,17 @@
 
 ## Android e limites
 
-A compilação assinada final será feita pelo workflow existente. A verificação do APK real, link e resultado da instrumentação serão acrescentados após a execução. Identidade, Secrets, origem e workflow preservados. Não foram executadas baterias completas de regressão, conforme solicitado. Navegador com emulação de toque não substitui Android físico. Sem garantia de retomada de partida local em memória após encerramento do aplicativo.
+[Baixar APK 0.2.43 / código 6302 diretamente, sem ZIP](https://github.com/LucasCunh4/Panelinha/actions/runs/42314648666/artifacts/13550402143). É necessário estar conectado ao GitHub. Artefato retido até 04/02/2027.
+
+[Workflow #43](https://github.com/LucasCunh4/Panelinha/actions/runs/42314648666), fonte `4db3f5537f2e8624f4277d4b13cc0acddee6b0b4`: compilação e assinatura aprovadas. O APK real baixado foi novamente verificado com `ferramentas/verificar_apk.py`: metadados idênticos aos do Actions e SHA-256 idêntico ao digest do artefato. Os módulos novos e alterados coincidem byte a byte com o fonte, incluindo `podio.js`/`podio.css`; recursos e sons aprovados conservados.
+
+- Pacote: `com.lucascunha.panelinha.teste`; origem `https://localhost`.
+- Certificado gen. 2: `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`.
+- Versão: `0.2.43`, código `6302 > 6202` da anterior 0.2.42.
+- SHA-256 APK: `0b5756f324daaa93211048aa2a0c6f195ad495e314a8edd6fe153792935ccb37`.
+- Mesmo pacote/certificado/origem, release sem debug, `sensorLandscape` e assets locais: identidade compatível com instalação por cima da geração 2. Não houve rotação de chave, alteração de Secrets, limpeza de dados ou mudança no workflow.
+
+**Instrumentação Android não aprovada:** o emulador/ADB ficou `offline` durante `a_imagesAndThreeBotsOffline`. O relatório contém apenas o início do primeiro caso (`INSTRUMENTATION_STATUS_CODE: 1`), sem conclusão: **0/13 testes concluídos**. Não há falha de asserção do aplicativo registrada nesses resultados; a causa raiz da perda do emulador não foi determinada. O teste real de atualização preservando dados não foi executado e permanece pendente. A Release foi corretamente pulada pelo gate existente; o APK assinado foi disponibilizado como artefato direto. Nenhum teste foi desativado ou declarado aprovado indevidamente. Não foram executadas baterias completas de regressão, conforme solicitado. Navegador com emulação de toque não substitui Android físico. Sem garantia de retomada de partida local em memória após encerramento do aplicativo.
+
+
+Verificação pós-publicação: `/health` aprovado e hashes públicos de `motor.js`, `podio.js` e `online.js` iguais aos arquivos testados.
