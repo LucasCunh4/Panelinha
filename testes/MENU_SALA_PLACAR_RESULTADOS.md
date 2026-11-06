@@ -20,3 +20,12 @@ Verificações efetivamente executadas:
 4. Uma compilação web: aprovada; manifestos e artes aprovadas preservados. Build/verificador incluem `partida-ui.js/css`. Teste Android de três bots passou a consultar os IDs do estado, pois nomes não são mais texto visível na mesa; nenhum teste desativado.
 
 Capturas/logs fora do Git: `/workspace/work/menu-sala-placar`. Sem baterias extensas ou emulador local. Resultado do workflow Android e verificação final de assinatura serão acrescentados após a geração. Pacote, origem, certificado de geração 2, armazenamento local e Secrets não foram alterados.
+
+## Entrega Android
+
+- Commit do aplicativo `76d7ff6`, uma execução nº 40: https://github.com/LucasCunh4/Panelinha/actions/runs/42259735935
+- APK **0.2.40 / 6002**, 94.603.132 bytes. Compilação e assinatura aprovadas no CI; arquivo baixado e verificado novamente com `ferramentas/verificar_apk.py`, incluindo novas fontes web, artes/sons, orientação, pacote e origem. Hash idêntico ao metadado do CI.
+- Certificado geração 2 `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`, pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`. Código 6002 > 5902, identidade preservada: compatível com atualização direta, sem desinstalar.
+- [Download do APK sem ZIP](https://github.com/LucasCunh4/Panelinha/actions/runs/42259735935/artifacts/13524147798) — requer login GitHub.
+- **Instrumentação Android: 0/13 concluídos.** AVD/ADB ficou `offline` no primeiro teste `a_imagesAndThreeBotsOffline`, sem resultado de assertiva do aplicativo. A causa raiz da indisponibilidade não foi isolada. Execução terminou com falha nessa etapa; APK foi publicado como artefato e Release foi pulada. Teste de instalação/atualização e retenção real de dados permanece pendente; não houve desativação de testes nem reexecução do workflow.
+- Worker existente atualizado para `981116cb-4417-484c-a46b-7bf5559fbb73`; mesmas classes/bindings/URL, health público HTTP 200, Fase 3 ativa.
