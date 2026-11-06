@@ -150,6 +150,7 @@ const base = process.env.PANELAS_TEST_URL || 'http://127.0.0.1:8000/';
   await page.route('**/assets/cartas/**/*.png',route=>route.abort());
   await page.evaluate(()=>{const s=CartasTest.getState();s.players[0].hand=[{id:30000,type:'num',color:'red',num:7}];document.querySelector('#useCardArt').checked=true;document.querySelector('#useCardArt').onchange();});
   await page.locator('[data-card="30000"] .asset-unavailable').waitFor();
+  await page.locator('[data-card="30000"] .art-fallback').waitFor({state:'visible'});
   assert.ok(await page.locator('[data-card="30000"] .art-fallback').isVisible());
   console.log('PASS fallback textual quando PNG falha');
   await page.unroute('**/assets/cartas/**/*.png');

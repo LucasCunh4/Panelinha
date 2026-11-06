@@ -267,7 +267,7 @@ public class OfflineGameTest {
         assertEquals("true",js("[...document.fonts].some(f=>f.family==='PanelinhaDisplay'&&f.status==='loaded')"));
         tap("#multiplayerBtn");tap("#profileContinueBtn");tap("#createRoomBtn");waitFor("PanelinhaNavigation.current==='create'",15000);
         systemBack();waitFor("PanelinhaNavigation.current==='multiplayer'",15000);
-        tap("#joinRoomBtn");assertEquals("true",js("document.getElementById('roomCode').disabled&&document.getElementById('roomCode').value.length===0"));
+        tap("#joinRoomBtn");assertEquals("true",js("document.getElementById('roomCode').disabled===!PanelinhaLobbyConnection.configured&&document.getElementById('roomCode').value.length===0"));
         // Somente o emulador/dispositivo de instrumentação: gesto real pela borda.
         int modeId = activity.getActivity().getResources().getIdentifier("config_navBarInteractionMode", "integer", "android");
         int previousMode = activity.getActivity().getResources().getInteger(modeId);

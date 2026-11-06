@@ -47,7 +47,7 @@
       const ws=new WebSocket(base.replace(/^http/,'ws')+'/v1/rooms/'+target+'/ws');socket=ws;let joined=false,finished=false,fatal=null;
       const finish=(e)=>{if(finished)return;finished=true;clearTimeout(timer);e?reject(e):resolve(state);};
       const timer=setTimeout(()=>{finish(error('O servidor demorou a responder. Tente novamente.'));ws.close();},12000);
-      ws.addEventListener('open',()=>{if(epoch!==generation){ws.close();return;}ws.send(JSON.stringify({v:1,id:uid(),type:'auth',data:{token,profile:PanelinhaProfile.current}}));});
+      ws.addEventListener('open',()=>{if(epoch!==generation){ws.close();return;}ws.send(JSON.stringify({v:1,id:uid(),type:'auth',data:{token,profile:PanelinhaProfile.current,clientPhase:2}}));});
       ws.addEventListener('message',e=>{
         if(epoch!==generation)return;let m;try{m=JSON.parse(e.data);}catch{return;}
         if(m.v!==1)return;

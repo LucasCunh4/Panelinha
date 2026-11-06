@@ -1,0 +1,13 @@
+PASS quatro navegadores/contextos na Mesa V1, identidade própria embaixo, parceiro/oponentes com visibilidade correta e contagem 3–2–1
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+'false' !== 'true'
+
+    at /workspace/Panelinha/testes/multiplayer_partida.cjs:33:36 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 'false',
+  expected: 'true',
+  operator: 'strictEqual',
+  diff: 'simple'
+}

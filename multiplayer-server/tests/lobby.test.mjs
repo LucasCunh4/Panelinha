@@ -44,7 +44,7 @@ test('quatro clientes, quinto rejeitado, nomes iguais e snapshots sem credenciai
 
 test('bots prontos, humano substitui bot, configurações e resets seletivos de Pronto',async t=>{
   const f=await fixture(t);await f.a.command('add-bot');await f.a.command('add-bot');await f.a.command('add-bot');await f.a.command('ready',{ready:true});
-  assert.ok(f.a.state.allReady);assert.equal(f.a.state.canStart,false);
+  assert.ok(f.a.state.allReady);assert.equal(f.a.state.canStart,true);
   const u=await session(f.url,'second'),b=await connect(f.url,f.code,u);
   await waitFor(()=>f.a.state.players.some(p=>p?.id===b.selfId));assert.equal(f.a.state.players.find(p=>p.id===f.a.selfId).ready,true);assert.equal(b.state.players.find(p=>p.id===b.selfId).ready,false);
   await b.command('ready',{ready:true});await f.a.command('profile',{name:'Novo nome',avatar:'panela-dj'});assert.equal(f.a.state.players.find(p=>p.id===f.a.selfId).ready,true);
@@ -57,11 +57,11 @@ test('bots prontos, humano substitui bot, configurações e resets seletivos de 
   const bot=f.a.state.players.find(p=>p.bot);await f.a.command('remove-bot',{playerId:bot.id});assert.equal(f.a.state.players.find(p=>p?.id===f.a.selfId).ready,true);
 });
 
-test('autoridade do anfitrião, equipes no máximo dois humanos e início online proibido',async t=>{
+test('autoridade do anfitrião, equipes no máximo dois humanos e início exige quatro prontos',async t=>{
   const f=await fixture(t),b=await connect(f.url,f.code,await session(f.url,'second')),c=await connect(f.url,f.code,await session(f.url,'third'));
   for(const [type,data] of [['rules',{rules:DEFAULT_RULES}],['add-bot',{}],['kick',{playerId:f.a.selfId}],['close-room',{}],['start',{}]])await assert.rejects(b.command(type,data),e=>e.code==='NOT_HOST');
   await f.a.command('rules',{rules:{...DEFAULT_RULES,duo:true,goal:5}});await f.a.command('team',{team:1});await c.command('team',{team:2});await b.command('team',{team:1});await assert.rejects(c.command('team',{team:1}),e=>e.code==='TEAM_FULL');
-  await assert.rejects(f.a.command('start'),e=>e.code==='PHASE_UNAVAILABLE');assert.equal(f.a.state.phase,'lobby');
+  await assert.rejects(f.a.command('start'),e=>e.code==='NOT_READY');assert.equal(f.a.state.phase,'lobby');
   await assert.rejects(f.a.command('play',{cardId:1}),e=>e.code==='BAD_PAYLOAD');assert.equal(f.a.state.phase,'lobby');
 });
 

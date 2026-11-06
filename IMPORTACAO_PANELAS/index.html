@@ -37,6 +37,7 @@
 <link rel="stylesheet" href="menu-arte.css">
 <link rel="stylesheet" href="sons.css">
 <link rel="stylesheet" href="multiplayer.css">
+<link rel="stylesheet" href="online.css">
 </head>
 <body>
 <main class="container app-container">
@@ -86,7 +87,7 @@
   <section id="createRoom" class="front-screen branch-screen hide" aria-labelledby="createTitle">
     <button class="screen-back" data-nav-back aria-label="Voltar para Multiplayer">‹ <span>Voltar</span></button>
     <div class="branch-emblem" aria-hidden="true">✦</div><h1 id="createTitle" class="screen-title">Criar sala</h1>
-    <p class="coming-soon">Prepare uma sala para até quatro participantes. As partidas online chegam na próxima atualização.</p>
+    <p class="coming-soon">Prepare uma sala para quatro participantes. Jogue com seus amigos ou complete as vagas com bots.</p>
     <p class="mp-server-status" data-mp-server-status role="status"></p>
     <button id="createLobbyBtn" type="button" class="hero-button hero-gold mp-entry-button" disabled>Criar sala</button>
     <p id="createLobbyError" class="mp-error" role="alert"></p>
@@ -95,7 +96,7 @@
     <button class="screen-back" data-nav-back aria-label="Voltar para Multiplayer">‹ <span>Voltar</span></button>
     <div class="branch-emblem" aria-hidden="true">✦</div><h1 id="joinTitle" class="screen-title">Entrar na sala</h1>
     <form id="joinLobbyForm"><div class="invite-preparation"><label for="roomCode">Código da sala</label><input id="roomCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="000000" disabled aria-describedby="joinNotice" autocomplete="off" required></div><button id="joinLobbyBtn" class="hero-button hero-gold mp-entry-button" disabled>Entrar na sala</button></form>
-    <p id="joinNotice" class="coming-soon">Entre pelo código de seis números. As partidas online chegam na próxima atualização.</p>
+    <p id="joinNotice" class="coming-soon">Entre pelo código de seis números. Escolha sua equipe e confirme Pronto para começar.</p>
     <p class="mp-server-status" data-mp-server-status role="status"></p><p id="joinLobbyError" class="mp-error" role="alert"></p>
   </section>
   <section id="multiplayerLobby" class="front-screen lobby-screen hide" aria-labelledby="lobbyTitle">
@@ -105,7 +106,7 @@
     <div id="lobbyPlayers" class="lobby-players" role="list" aria-label="Quatro lugares da sala"></div>
     <p id="lobbyNotice" class="lobby-notice" role="status" aria-live="polite"></p>
     <div class="lobby-actions"><button id="lobbyReadyBtn" class="btn good">Pronto</button><button id="lobbyRulesBtn" class="btn alt">Regras</button><button id="lobbyProfileBtn" class="btn alt">Meu perfil</button><button id="lobbyCloseBtn" class="btn warn">Encerrar sala</button><button id="lobbyStartBtn" class="btn" disabled aria-describedby="lobbyPhaseNotice">Iniciar partida</button></div>
-    <p id="lobbyPhaseNotice" class="lobby-phase-notice">Fase 1: prepare a sala. As partidas online serão habilitadas na Fase 2.</p>
+    <p id="lobbyPhaseNotice" class="lobby-phase-notice">Preencha os quatro lugares e confirme Pronto. O anfitrião inicia a partida.</p>
   </section>
   <section id="menu" class="panel front-screen hide" aria-labelledby="settingsTitle"><button class="screen-back" data-nav-back aria-label="Voltar à identificação">‹ <span>Voltar</span></button><h2 id="settingsTitle">Sua partida</h2><p class="muted">Prepare a mesa para jogar com três bots.</p>
     <div class="grid settings-grid">
@@ -177,6 +178,7 @@
 <script src="sons.js"></script>
 <script src="anuncios.js"></script>
 <script src="escolher-cor.js"></script>
+<script src="motor.js"></script>
 <script src="mesa.js"></script>
 <script src="navegacao.js"></script>
 <script>
@@ -193,13 +195,14 @@ const VALUE={num:2,draw2:4,skip:4,reverse:4,wild4:6,wild6:8,wild:10,dist:10,rota
 const CUT_PAUSE_MS=2200; // tempo mínimo antes de o próximo jogador agir; corte aparece imediatamente
 let uid=0,s=null,botTimer=null,cutTimer=null,ticker=null;
 const rnd=n=>Math.floor(Math.random()*n),pick=a=>a[rnd(a.length)];
-function make(type,color=null,num=null){return {id:++uid,type,color,num};}
-function shuffle(a){for(let i=a.length-1;i>0;i--){let j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
-function descriptor(c){if(!c)return '—';return c.type==='num'?String(c.num):TYPES[c.type];}
-function description(c){return descriptor(c)+(c.color?' '+CN[c.color]:'');}
-function isColorless(c){return COLORLESS.has(c.type)}
-function equals(a,b){return a&&b&&a.type===b.type&&(a.type==='num'?a.num===b.num&&a.color===b.color:(!a.color||a.color===b.color));}
-function power(c){return c.type==='draw2'?2:c.type==='wild4'?4:c.type==='wild6'?6:0;}
+const rules=PanelinhaRules.create({getState:()=>s,name:names,clearJobs,render,queueBots,startTurn,draw:(...args)=>PanelasMesa.recordDraw(...args),sound:(...args)=>PanelinhaSFX.event(...args),round:(...args)=>PanelinhaAnnouncements.round(...args),announce:(...args)=>PanelinhaAnnouncements.announce(...args)});
+function make(type,color=null,num=null){return rules.make(type,color,num);}
+function shuffle(a){return rules.shuffle(a);}
+function descriptor(c){return rules.descriptor(c);}
+function description(c){return rules.description(c);}
+function isColorless(c){return rules.isColorless(c);}
+function equals(a,b){return rules.equals(a,b);}
+function power(c){return rules.power(c);}
 // Mantém os nomes de arquivo EXATOS do ZIP oficial de prévia (inclusive mais_2.png).
 const ASSET_COLOR_DIR={red:'vermelho',blue:'azul',green:'verde',yellow:'amarelo'};
 const ASSET_FACE={draw2:'mais_2',skip:'bloqueio',reverse:'inverter'};
@@ -220,67 +223,24 @@ function cardHTML(c,small=false,selected=false,invalid=false){
   if(!path)return `<span class="${base}" title="${name}">${label}</span>`;
   return `<span class="${base} art-card${['dist','rotate','wild4','wild6'].includes(c.type)?' standard-card':c.type==='wild'?' official-special':''}" title="${name}" data-card-type="${c.type}" data-asset="${path}"><img class="card-image" src="${path}" alt="${name}" loading="lazy" draggable="false" onerror="this.parentNode.classList.add('asset-unavailable')"><span class="art-fallback">${label}</span></span>`;
 }
-function buildDeck(o){let a=[];for(const color of COLORS){for(let n=0;n<=9;n++){a.push(make('num',color,n),make('num',color,n));}for(let k=0;k<2;k++){a.push(make('draw2',color),make('skip',color),make('reverse',color));}}for(let k=0;k<4;k++)a.push(make('wild4'),make('wild'));if(o.wild6!==false)for(let k=0;k<2;k++)a.push(make('wild6'));if(o.dist)for(let k=0;k<2;k++)a.push(make('dist'));if(o.rotate)for(let k=0;k<2;k++)a.push(make('rotate'));return shuffle(a);}
-function log(msg){s.log.unshift(`[${new Date().toLocaleTimeString('pt-BR')}] ${msg}`);s.log=s.log.slice(0,70);}
+function buildDeck(o){return rules.buildDeck(o);}
+function log(msg){return rules.log(msg);}
 function updateGoals(){const duo=$('mode').value==='duo';$('goal').innerHTML=(duo?[5,10,15]:[10,20,30,50]).map(v=>`<option value="${v}">${v} pontos</option>`).join('');$('goal').value=duo?'5':'10';$('goal').disabled=$('duration').value==='single';}
 $('wild6').onchange=()=>{$('challengeSettingLabel').textContent=$('wild6').checked?'Desafiar +4 e +6':'Desafiar +4';};
 $('mode').onchange=updateGoals;$('duration').onchange=updateGoals;updateGoals();
 function settings(){return {duo:$('mode').value==='duo',single:$('duration').value==='single',goal:Number($('goal').value),timeout:Number($('timeout').value),infinite:$('infinite').checked,cut:$('cut').checked,challenge:$('challenge').checked,wild6:$('wild6').checked,dist:$('dist').checked,rotate:$('rotate').checked};}
-function names(i){return i===0?(s?.identity?.name||PanelinhaProfile.current.name):'Bot '+i;}
+function names(i){if(s?.online)return s.players[i]?.name||'Jogador';return i===0?(s?.identity?.name||PanelinhaProfile.current.name):'Bot '+i;}
 function safeName(i){return PanelinhaProfile.escape(names(i));}
 function clearJobs(){if(botTimer)clearTimeout(botTimer);if(cutTimer)clearTimeout(cutTimer);botTimer=null;cutTimer=null;}
 function startMatch(){clearJobs();let o=settings();s={o,identity:PanelinhaProfile.current,players:[0,1,2,3].map(i=>({id:i,hand:[],score:0})),teams:[0,0],deck:[],discard:[],activeColor:null,direction:1,current:0,penalty:0,highest:0,lastPenalty:null,finisher:null,round:0,phase:'playing',drawn:null,cutOpen:false,unlockAt:0,lastActor:null,lastDistribution:null,preUno:false,unoWindow:null,log:[],message:'',deadline:0,pendingAction:null,token:0,reveal:false,summary:[],pastWinners:[],modal:null};PanelinhaAnnouncements.start(s);$('menu').classList.add('hide');$('game').classList.remove('hide');$('backBtn').classList.remove('hide');PanelasMesa.closeMenu();$('reveal').checked=false;newRound();PanelinhaNavigation.enterGame();}
-function top(){return s.discard[s.discard.length-1];}
-function nextActive(from,steps=1){let i=from;for(let st=0;st<steps;st++){let tries=0;do{i=(i+4+s.direction)%4;tries++;}while(s.players[i].hand.length===0&&tries<4);}return i;}
-function refill(){if(s.deck.length||s.discard.length<=1)return;let t=s.discard.pop();s.deck=shuffle(s.discard);s.discard=[t];log('Monte reabastecido com os descartes.');PanelinhaSFX.event('deck-refilled');}
-function drawCard(id){refill();let c=s.deck.pop();if(c){s.players[id].hand.push(c);PanelasMesa.recordDraw(s,id,c);PanelinhaSFX.event('card-drawn');}return c||null;}
-function drawMany(id,n){let got=0;for(let i=0;i<n;i++){if(!drawCard(id))break;got++;}return got;}
-function redistribute(extra=0,exclude=[],actor=null){
-  const eligible=s.players.filter(p=>p.hand.length>0&&!exclude.includes(p.id));
-  if(!eligible.length)return;
-  const cap=actor===null?null:s.players[actor].hand.length;
-  let collected=[];
-  for(const p of eligible){collected.push(...p.hand);p.hand=[];}
-  const added=[];
-  for(let i=0;i<extra;i++){refill();const c=s.deck.pop();if(!c)break;collected.push(c);added.push(c);}
-  shuffle(collected);
-  const author=eligible.find(p=>p.id===actor);
-  const others=shuffle(eligible.filter(p=>p!==author));
-  const counts=new Map();
-  // A redução é sorteada após o descarte; mínimo 1, sem reincluir quem bateu.
-  const reduction=author&&cap>1?1+rnd(Math.min(3,cap-1)):0;
-  if(author)counts.set(actor,cap-reduction);
-  const remaining=collected.length-(author?counts.get(actor):0);
-  if(others.length){
-    const base=Math.floor(remaining/others.length),rest=remaining%others.length;
-    const portions=others.map((_,i)=>base+(i<rest?1:0));
-    // Variações pequenas preservam o total, o mínimo e a diferença máxima de 2.
-    for(let i=0;i<others.length*3;i++){
-      const from=rnd(others.length),to=rnd(others.length);
-      if(from===to||portions[from]<=1)continue;
-      const trial=portions.slice();trial[from]--;trial[to]++;
-      if(Math.max(...trial)-Math.min(...trial)<=2){portions[from]--;portions[to]++;}
-    }
-    others.forEach((p,i)=>counts.set(p.id,portions[i]));
-  }
-  let offset=0;
-  for(const p of eligible){const n=counts.get(p.id);p.hand=collected.slice(offset,offset+n);offset+=n;}
-  if(offset!==collected.length||eligible.some(p=>p.hand.length<1)||(author&&author.hand.length!==cap-reduction)||(others.length&&Math.max(...others.map(p=>p.hand.length))-Math.min(...others.map(p=>p.hand.length))>2))throw Error('Panela de Pressão: conservação/limites inválidos');
-  const penaltyIds=new Set(added.map(c=>c.id));
-  for(const p of eligible)for(const c of p.hand)if(penaltyIds.has(c.id))PanelasMesa.recordDraw(s,p.id,c);
-  const text=eligible.map(p=>`${names(p.id)}: ${p.hand.length}`).join(' · ');
-  s.lastDistribution={counts:text,penaltyAdded:added.length,active:eligible.map(p=>p.id),actor,actorLimit:cap,actorReduction:author?reduction:null,actorReceived:author?author.hand.length:null,total:collected.length};
-  if(s.unoWindow&&s.players[s.unoWindow.id].hand.length!==1)s.unoWindow=null;
-  log(`Panela de Pressão ALEATÓRIA (${text})${extra?` · punição: ${added.length}/${extra} cartas adicionadas`:''}.`);
-}
-function rotateHands(exclude=[]){let order=[];for(let i=0;i<4;i++)if(s.players[i].hand.length>0&&!exclude.includes(i))order.push(i);if(order.length<2)return;const next={};for(const id of order){let to=id;let count=0;do{to=(to+4+s.direction)%4;count++;}while(!order.includes(to)&&count<4);next[to]=s.players[id].hand;}for(let id of order)s.players[id].hand=next[id];log(`Liquidificador: mãos transferidas no sentido ${s.direction===-1?'horário':'anti-horário'}.`);}
-function newRound(){PanelinhaSFX.event('round-prepare');PanelinhaAnnouncements.round(s);clearJobs();s.token++;s.round++;s.players.forEach(p=>p.hand=[]);s.deck=buildDeck(s.o);s.discard=[];s.direction=1;s.current=0;s.penalty=0;s.highest=0;s.lastPenalty=null;s.finisher=null;s.drawn=null;s.preUno=false;s.unoWindow=null;s.cutOpen=false;s.unlockAt=0;s.lastActor=null;s.lastDistribution=null;s.pendingAction=null;s.phase='playing';s.message='';for(let j=0;j<7;j++)for(const p of s.players)drawCard(p.id);let first=s.deck.pop();s.discard.push(first);s.activeColor=first.color||pick(COLORS);log(`Rodada ${s.round}: carta inicial ${description(first)}.`);
-if(first.type==='skip'){s.current=1;log('Bloqueio inicial: primeiro jogador pulado.');}
-else if(first.type==='reverse'){s.direction=-1;s.current=3;log('Inverter inicial: sentido invertido.');}
-else if(power(first)){s.penalty=power(first);s.highest=power(first);log(`Penalidade inicial de +${s.penalty}.`);}
-else if(first.type==='dist')redistribute();
-else if(first.type==='rotate')rotateHands();
-if(s.finisher!==null){finishRound();return;}PanelinhaSFX.event('round-start');startTurn();}
+function top(){return rules.top();}
+function nextActive(from,steps=1){return rules.nextActive(from,steps);}
+function refill(){return rules.refill();}
+function drawCard(id){return rules.drawCard(id);}
+function drawMany(id,n){return rules.drawMany(id,n);}
+function redistribute(extra=0,exclude=[],actor=null){return rules.redistribute(extra,exclude,actor);}
+function rotateHands(exclude=[]){return rules.rotateHands(exclude);}
+function newRound(){return rules.newRound();}
 function startTurn(pauseMs=0){
   if(!s||s.phase!=='playing')return;
   s.drawn=null;s.preUno=false;s.token++;
@@ -289,39 +249,27 @@ function startTurn(pauseMs=0){
   s.deadline=s.o.timeout?s.unlockAt+s.o.timeout*1000:0;
   render();queueBots();
 }
-function canActNow(){return !!s&&Date.now()>=s.unlockAt;}
+function canActNow(){if(s?.online)return Date.now()>=s.unlockAt;return rules.canActNow();}
 function findHumanCut(){
+  if(s?.online)return PanelinhaOnline.connected&&Date.now()<s.unlockAt?s.players[0].hand.find(c=>s.actions.cuts.includes(c.id))||null:null;
   if(!s||s.phase!=='playing'||!s.o.cut||!s.cutOpen||Date.now()>=s.unlockAt||s.finisher!==null||s.current===0||s.pendingAction)return null;
   return s.players[0].hand.find(c=>equals(c,top())&&canPlay(c))||null;
 }
 function penaltyText(){return `PENALIDADE +${s.penalty}: é obrigatório comprar ${s.penalty} cartas e perder o turno, ou rebater com +${s.highest} ou maior${s.o.dist?' / Panela de Pressão':''}. Não é permitido jogar cartas comuns.`;}
 
-function closeUnoOnAction(){if(s.unoWindow)s.unoWindow=null;}
-function canDistribute(c){
-  const author=s.players.find(p=>p.hand.some(q=>q.id===c.id));
-  if(!author)return true;
-  const after=author.hand.length-1;
-  // Sem outro destinatário não há como reduzir/repassar uma penalidade.
-  // A última carta normal pode encerrar; seu autor não recebe cartas.
-  return s.players.some(p=>p.id!==author.id&&p.hand.length>0)||(!s.penalty&&after<=1);
-}
-function canPlay(c){if(c.type==='dist'&&!canDistribute(c))return false;if(s.penalty){return (power(c)>0&&power(c)>=s.highest)||c.type==='dist';}let t=top();if(isColorless(c))return true;return c.color===s.activeColor||(!isColorless(t)&&c.type===t.type&&(c.type==='num'?c.num===t.num:true));}
-function checkCards(id,ids,isCut){
-  if(!s||s.phase!=='playing'||ids.length!==1)return false;
-  const c=s.players[id].hand.find(q=>q.id===ids[0]);
-  if(!c)return false;
-  if(isCut)return !!(s.o.cut&&s.cutOpen&&Date.now()<s.unlockAt&&s.finisher===null&&id!==s.current&&equals(c,top())&&canPlay(c));
-  if(id!==s.current||!canActNow())return false;
-  if(s.drawn!==null&&ids[0]!==s.drawn)return false;
-  return canPlay(c); // Se há punição, SOMENTE + válido ou Panela de Pressão.
-}
+function closeUnoOnAction(){return rules.closeUnoOnAction();}
+function canDistribute(c){if(s?.online)return s.actions.distributePossible.includes(c.id);return rules.canDistribute(c);}
+function canPlay(c){if(s?.online)return s.actions.legal.includes(c.id)||s.actions.cuts.includes(c.id);return rules.canPlay(c);}
+function checkCards(id,ids,isCut){if(s?.online)return id===0&&ids.length===1&&PanelinhaOnline.connected&&(isCut?(Date.now()<s.unlockAt&&s.actions.cuts.includes(ids[0])):s.actions.legal.includes(ids[0]));return rules.checkCards(id,ids,isCut);}
 function humanMustDraw(){
+  if(s?.online)return PanelinhaOnline.connected&&s.actions.mustBuy;
   // Mesma validação do comando de jogar, refeita a cada render; não confundir
   // permissão para comprar com ausência de carta jogável. Desafio permanece disponível.
   return s.phase==='playing'&&s.current===0&&canActNow()&&!s.pendingAction&&s.drawn===null&&
     !s.players[0].hand.some(c=>checkCards(0,[c.id],false));
 }
 function chooseCards(id,ids){
+  if(s?.online)return PanelinhaOnline.play(ids[0],id!==s.current);
   const isCut=id!==s.current;
   if(!checkCards(id,ids,isCut)){
     s.message=s.penalty?penaltyText():(!canActNow()&&!isCut?'Aguarde a abertura do próximo turno.':'Carta inválida para esta jogada.');
@@ -333,10 +281,7 @@ function chooseCards(id,ids){
   applyPlay(id,ids,isCut,s.activeColor);
 }
 // Efeito próprio da Panela: o seletor de cor nunca decide qual efeito executar.
-function resolvePressurePlay(actor,repeatedOwnCut){
-  const extra=s.penalty;s.penalty=0;s.highest=0;s.lastPenalty=null;
-  if(!repeatedOwnCut)redistribute(extra,[s.finisher].filter(x=>x!==null),actor);
-}
+function resolvePressurePlay(actor,repeatedOwnCut){return rules.resolvePressurePlay(actor,repeatedOwnCut);}
 function commitColorChoice(state,action,color){
   if(s!==state||s.pendingAction!==action||!COLORS.includes(color))return false;
   const card=s.players[action.id].hand.find(c=>c.id===action.cardId);
@@ -346,68 +291,21 @@ function commitColorChoice(state,action,color){
   }
   const applied=applyPlay(action.id,action.ids,action.isCut,color);if(applied)PanelinhaSFX.event('color-chosen');return applied;
 }
-function applyPlay(id,ids,isCut,color){
-  // Guarda de segurança também para bots/modal: nenhuma jogada atravessa uma penalidade.
-  if(!checkCards(id,ids,isCut)){if(id===0){s.pendingAction=null;$('modalRoot').innerHTML='';s.message=s.penalty?penaltyText():'Jogada recusada: turno ou carta inválidos.';render();}return false;}
-  clearJobs();
-  const p=s.players[id],c=p.hand.find(x=>x.id===ids[0]);
-  // Mesmo participante cortando a própria carta idêntica: segundo descarte sem repetir efeito.
-  const repeatedOwnCut=isCut&&s.lastActor===id&&equals(c,top());
-  const illegal=(c.type==='wild4'||c.type==='wild6')&&p.hand.some(q=>q.id!==c.id&&q.type!=='wild4'&&q.type!=='wild6'&&canPlay(q));
-  closeUnoOnAction();
-  p.hand=p.hand.filter(q=>q.id!==c.id);
-  s.discard.push(c);if(c.type!=='rotate'&&c.type!=='dist')s.activeColor=c.color||color||s.activeColor;
-  s.drawn=null;s.pendingAction=null;s.lastActor=id;s.lastDistribution=null;
-  PanelinhaSFX.event('card-played',{cardType:c.type,cut:isCut});
-  log(`${names(id)} ${isCut?'CORTOU com':'jogou'} ${description(c)}${COLOR_CHOOSERS.has(c.type)&&p.hand.length?' (cor: '+CN[s.activeColor]+')':''}.`);
-  if(p.hand.length===1){const announced=(id===0?s.preUno:Math.random()<.75);if(announced){log(`${names(id)} anunciou ÚLTIMA CARTA.`);if(id!==0)PanelinhaAnnouncements.announce(s,id,names(id),'after-play');}else{s.unoWindow={id};log(`${names(id)} ficou com 1 carta sem anunciar!`);}}
-  s.preUno=false;
-  if(p.hand.length===0&&s.finisher===null){s.finisher=id;log(`${names(id)} terminou suas cartas!`);}
-  if(c.type==='dist'){
-    resolvePressurePlay(id,repeatedOwnCut);
-  }else if(power(c)){
-    if(!repeatedOwnCut){s.penalty+=power(c);s.highest=power(c);}
-    if(!repeatedOwnCut)s.lastPenalty={id,type:c.type,illegal,challengeable:p.hand.length>0};
-    else if(s.lastPenalty)s.lastPenalty.challengeable=p.hand.length>0;
-    log(`Penalidade acumulada: +${s.penalty}${repeatedOwnCut?' (segunda cópia, sem novo efeito)':''}.`);
-  }else if(c.type==='rotate'){
-    if(!repeatedOwnCut&&!(s.o.duo&&s.finisher!==null))rotateHands([s.finisher].filter(x=>x!==null));
-  }else{s.lastPenalty=null;}
-  if(c.type==='reverse'&&!repeatedOwnCut)s.direction*=-1;
-  if(s.finisher!==null&&(!s.penalty||s.players.every(q=>q.hand.length===0))){finishRound();return true;}
-  s.current=nextActive(id,c.type==='skip'?2:1);
-  s.message=c.type==='dist'&&s.lastDistribution?'Panela de Pressão aleatória: '+s.lastDistribution.counts:(isCut?'Corte executado. A sequência agora segue de quem cortou.':'');
-  startTurn(CUT_PAUSE_MS); // corte imediato; próximo jogador aguarda a pausa.
-  return true;
-}
-function finishPenaltyDraw(id){clearJobs();closeUnoOnAction();let amount=s.penalty;let got=drawMany(id,amount);PanelinhaSFX.event('penalty-resolved',{amount});log(`${names(id)} comprou ${got} cartas da penalidade (+${amount}) e perdeu o turno.`);s.penalty=0;s.highest=0;s.lastPenalty=null;if(s.finisher!==null){finishRound();return;}s.current=nextActive(id);startTurn();}
-function challenge(){if(!canChallenge(0)||!canActNow())return;clearJobs();closeUnoOnAction();const offender=s.lastPenalty.id,total=s.penalty;
-if(s.lastPenalty.illegal){drawMany(offender,total);PanelinhaSFX.event('penalty-resolved',{amount:total});log(`Desafio CORRETO: ${names(offender)} recebeu +${total}. Você mantém o turno.`);s.penalty=0;s.highest=0;s.lastPenalty=null;startTurn();}
-else{drawMany(0,total+2);PanelinhaSFX.event('penalty-resolved',{amount:total+2});log(`Desafio INCORRETO: você recebeu +${total+2} e perdeu a vez.`);s.penalty=0;s.highest=0;s.lastPenalty=null;if(s.finisher!==null){finishRound();return;}s.current=nextActive(0);startTurn();}}
-function canChallenge(id){return s.phase==='playing'&&s.o.challenge&&s.penalty>0&&s.current===id&&s.lastPenalty&&s.lastPenalty.challengeable&&(['wild4','wild6'].includes(s.lastPenalty.type));}
-function buyHuman(){if(!s||s.phase!=='playing'||s.current!==0||s.drawn!==null||!canActNow())return;clearJobs();closeUnoOnAction();if(s.penalty){finishPenaltyDraw(0);return;}let got=null,n=0;do{got=drawCard(0);if(!got)break;n++;}while(s.o.infinite&&!canPlay(got)&&n<200);log(`${names(0)} comprou ${n} carta(s).`);if(got&&canPlay(got)){s.drawn=got.id;s.message='Você pode jogar a carta comprada ou guardá-la e passar.';render();}
-else{s.message='Nenhuma carta válida comprada. Turno encerrado.';s.current=nextActive(0);startTurn();}}
-function keepPass(){if(s.phase!=='playing'||s.current!==0||s.drawn===null||!canActNow())return;clearJobs();log(`${names(0)} guardou a carta comprada e passou.`);s.drawn=null;s.current=nextActive(0);startTurn();}
-function callUno(){if(s.phase!=='playing')return;if(s.players[0].hand.length>=2){if(!s.preUno)PanelinhaAnnouncements.announce(s,0,names(0),'preemptive');s.preUno=true;s.message='Última carta anunciada preventivamente; agora descarte para ficar com uma.';log(`${names(0)} anunciou a última carta preventivamente.`);}
-else if(s.players[0].hand.length===1&&s.unoWindow&&s.unoWindow.id===0){s.unoWindow=null;log(`${names(0)} anunciou última carta antes de ser denunciado.`);PanelinhaAnnouncements.announce(s,0,names(0),'after-play');}render();}
-function reportUno(by=0){if(!s||!s.unoWindow||s.phase!=='playing')return;let id=s.unoWindow.id;if(id===by)return;s.unoWindow=null;let got=drawMany(id,2);PanelinhaSFX.event('penalty-resolved',{amount:2});log(`${names(by)} denunciou ${names(id)} por esquecer ÚLTIMA CARTA (+${got}).`);render();}
-function handPoints(p){return p.hand.reduce((a,c)=>a+VALUE[c.type],0);}
-function specialCount(p){return p.hand.filter(c=>SPECIAL.has(c.type)).length;}
-function effectCount(p){return p.hand.filter(c=>c.type==='skip'||c.type==='reverse').length;}
-function numberCount(p){return p.hand.filter(c=>c.type==='num').length;}
-function rankPlayers(){let others=s.players.filter(p=>p.id!==s.finisher);others.sort((a,b)=>handPoints(a)-handPoints(b)||specialCount(a)-specialCount(b)||effectCount(a)-effectCount(b)||numberCount(a)-numberCount(b)||a.id-b.id);return [s.players[s.finisher],...others];}
-function finishRound(){PanelinhaAnnouncements.round(s);clearJobs();s.token++;s.phase='roundOver';s.unoWindow=null;const ranks=rankPlayers();s.summary=ranks.map((p,i)=>({id:p.id,place:i+1,remaining:p.hand.length,cost:handPoints(p)}));
-s.pastWinners.push(s.finisher);
-if(s.o.duo){let team=s.finisher%2;s.teams[team]++;log(`Rodada encerrada: equipe ${team===0?names(0)+' + Bot 2':'Bot 1 + Bot 3'} ganhou 1 ponto.`);}
-else{ranks.forEach((p,i)=>p.score+=3-i);log(`Classificação: ${ranks.map((p,i)=>`${i+1}º ${names(p.id)} (${handPoints(p)} pontos na mão)`).join('; ')}.`);}
-let victor=null;if(s.o.duo){const reached=s.teams.map((v,i)=>({v,i})).filter(x=>x.v>=s.o.goal);if(reached.length)victor=reached.sort((a,b)=>b.v-a.v)[0].i===0?'Equipe '+names(0)+' + Bot 2':'Equipe Bot 1 + Bot 3';}
-else{const reached=s.players.filter(p=>p.score>=s.o.goal);if(reached.length){let ordered=[...reached].sort((a,b)=>b.score-a.score||victories(b.id)-victories(a.id));if(ordered.length>1&&ordered[0].score===ordered[1].score&&victories(ordered[0].id)===victories(ordered[1].id)){log('Empate em pontos e vitórias: rodada extra de desempate.');}else victor=names(ordered[0].id);}}
-if(s.o.single||victor){s.phase='gameOver';s.winner=victor;}
-const summary=s.summary.map(x=>`${x.place}º ${names(x.id)} — ${x.cost} pts nas cartas, ${x.remaining} cartas`).join(' | ');
-s.message=(s.phase==='gameOver'?(victor?`🏆 Vitória da partida: ${victor}. `:'🏆 Rodada única concluída. '):'Rodada encerrada. ')+summary;
-PanelinhaSFX.event('round-result',{won:victor?(s.o.duo?victor==='Equipe '+names(0)+' + Bot 2':victor===names(0)):(s.o.duo?s.finisher%2===0:s.finisher===0)});
-render();}
-function victories(id){return s.pastWinners?s.pastWinners.filter(x=>x===id).length:0;}
+function applyPlay(id,ids,isCut,color){if(!checkCards(id,ids,isCut)){if(id===0){s.pendingAction=null;$('modalRoot').innerHTML='';s.message=s.penalty?penaltyText():'Jogada recusada: turno ou carta inválidos.';render();}return false;}return rules.applyPlay(id,ids,isCut,color);}
+function finishPenaltyDraw(id){return rules.finishPenaltyDraw(id);}
+function challenge(){if(s?.online)return PanelinhaOnline.command('challenge');return rules.challenge();}
+function canChallenge(id){if(s?.online)return id===0&&PanelinhaOnline.connected&&s.actions.challenge;return s.phase==='playing'&&s.o.challenge&&s.penalty>0&&s.current===id&&s.lastPenalty&&s.lastPenalty.challengeable&&(['wild4','wild6'].includes(s.lastPenalty.type));}
+function buyHuman(){if(s?.online)return PanelinhaOnline.command('draw');return rules.buy();}
+function keepPass(){if(s?.online)return PanelinhaOnline.command('pass');return rules.keepPass();}
+function callUno(){if(s?.online)return PanelinhaOnline.command('announce');return rules.announceUNO();}
+function reportUno(by=0){if(s?.online)return PanelinhaOnline.command('report');return rules.reportUno(by);}
+function handPoints(p){return rules.handPoints(p);}
+function specialCount(p){return rules.specialCount(p);}
+function effectCount(p){return rules.effectCount(p);}
+function numberCount(p){return rules.numberCount(p);}
+function rankPlayers(){return rules.rankPlayers();}
+function finishRound(){return rules.finishRound();}
+function victories(id){return rules.victories(id);}
 function queueBots(){
   clearJobs();if(!s||s.phase!=='playing'||s.pendingAction)return;
   const token=s.token;
@@ -426,18 +324,9 @@ function queueBots(){
     if(s&&s.token===token&&s.phase==='playing'&&s.unoWindow&&s.unoWindow.id===0&&Math.random()<.36)reportUno(pick([1,2,3]));
   },850);}
 }
-function botTurn(){if(!s||s.phase!=='playing'||s.current===0||s.pendingAction)return;if(!canActNow()){queueBots();return;}let id=s.current;
-const p=s.players[id];let choices=p.hand.filter(canPlay);let chosen=null;
-if(s.penalty){let defending=choices.filter(c=>power(c));let distributed=choices.find(c=>c.type==='dist');if(distributed&&(!defending.length||s.penalty>=8))chosen=distributed;else if(defending.length)chosen=defending.sort((a,b)=>power(a)-power(b))[0];else chosen=distributed||null;}
-else if(choices.length){let numeric=choices.filter(c=>c.type==='num');let colored=choices.filter(c=>!isColorless(c)&&c.type!=='num');let regularWild=choices.filter(c=>c.type==='wild');let specials=choices.filter(c=>isColorless(c)&&c.type!=='wild');chosen=pick(numeric.length?numeric:colored.length?colored:regularWild.length?regularWild:specials);}
-if(chosen){let color=colorForPlay(chosen,p.hand.filter(c=>c.id!==chosen.id));applyPlay(id,[chosen.id],false,color);return;}
-if(s.penalty){finishPenaltyDraw(id);return;}
-let drawn=null,n=0;do{drawn=drawCard(id);if(!drawn)break;n++;}while(s.o.infinite&&!canPlay(drawn)&&n<200);log(`${names(id)} comprou ${n} carta(s).`);
-if(drawn&&canPlay(drawn)){// Bots use a bought special only when they have no other ordinary play.
-let normal=p.hand.some(c=>c.id!==drawn.id&&c.type==='num'&&canPlay(c));if(!normal){applyPlay(id,[drawn.id],false,colorForPlay(drawn,p.hand.filter(c=>c.id!==drawn.id)));return;}}
-s.current=nextActive(id);startTurn();}
-function colorForPlay(card,hand){return card.color||(COLOR_CHOOSERS.has(card.type)?bestColor(hand):s.activeColor);}
-function bestColor(cards){let counts=COLORS.map(color=>({color,n:cards.filter(c=>c.color===color).length})).sort((a,b)=>b.n-a.n);return counts[0].n?counts[0].color:pick(COLORS);}
+function botTurn(){return rules.botTurn();}
+function colorForPlay(card,hand){return rules.colorForPlay(card,hand);}
+function bestColor(cards){return rules.bestColor(cards);}
 function clickHandCard(cardId){
   if(!s||s.phase!=='playing')return;
   if(s.current!==0){s.message='Fora do seu turno, toque na carta com o balão de faca quando aparecer.';render();return;}
@@ -456,9 +345,9 @@ function showColors(){
     cancel(){if(s!==state||s.pendingAction!==action)return;s.pendingAction=null;render();queueBots();}
   });
 }
-function finishControlHTML(){let ranks=s.summary.map(x=>`<div class="notice"><strong>${x.place}º — ${safeName(x.id)}</strong> · ${x.cost} pontos nas cartas restantes (${x.remaining} cartas)</div>`).join('');return `<div class="banner">${s.phase==='gameOver'?(s.winner?`🏆 ${PanelinhaProfile.escape(s.winner)} venceu a partida!`:'🏆 Rodada única concluída!'):'Rodada concluída.'}</div>${ranks}<div class="controls">${s.phase==='roundOver'?'<button id="nextRound" class="btn good">Próxima rodada</button>':'<button id="newMatch" class="btn good">Nova partida</button>'}<button id="backLobby" class="btn alt">Voltar às configurações</button></div>`;}
+function finishControlHTML(){if(s?.online)return PanelinhaOnline.resultHTML();let ranks=s.summary.map(x=>`<div class="notice"><strong>${x.place}º — ${safeName(x.id)}</strong> · ${x.cost} pontos nas cartas restantes (${x.remaining} cartas)</div>`).join('');return `<div class="banner">${s.phase==='gameOver'?(s.winner?`🏆 ${PanelinhaProfile.escape(s.winner)} venceu a partida!`:'🏆 Rodada única concluída!'):'Rodada concluída.'}</div>${ranks}<div class="controls">${s.phase==='roundOver'?'<button id="nextRound" class="btn good">Próxima rodada</button>':'<button id="newMatch" class="btn good">Nova partida</button>'}<button id="backLobby" class="btn alt">Voltar às configurações</button></div>`;}
 function render(){if(!s)return;PanelasMesa.beforeRender(s);$('roundLabel').textContent=`Rodada ${s.round} · ${s.o.duo?'Duplas':'Individual'}`;$('status').textContent=s.phase==='playing'?`Vez de ${names(s.current)}`:s.phase==='roundOver'?'Fim da rodada':'Fim da partida';
-$('score').innerHTML=s.o.duo?`<span>${safeName(0)} + Bot 2: ${s.teams[0]}</span><span>Bot 1 + Bot 3: ${s.teams[1]}</span>`:s.players.map(p=>`<span>${safeName(p.id)}: ${p.score}</span>`).join('');
+$('score').innerHTML=s.o.duo?`<span>${safeName(0)} + ${safeName(2)}: ${s.teams[0]}</span><span>${safeName(1)} + ${safeName(3)}: ${s.teams[1]}</span>`:s.players.map(p=>`<span>${safeName(p.id)}: ${p.score}</span>`).join('');
 $('stateText').textContent=s.phase==='playing'?`Sentido: ${s.direction===-1?'horário':'anti-horário'} · Cor: ${CN[s.activeColor]} · Monte: ${s.deck.length} · ${s.penalty?'PENALIDADE OBRIGATÓRIA +'+s.penalty:'Sem penalidade'}${s.o.timeout&&s.deadline?' · Tempo: '+Math.max(0,Math.ceil((s.deadline-Date.now())/1000))+'s':''}`:s.message;
 for(let i=0;i<4;i++)PanelasMesa.renderSeat(s,i,names(i),cardHTML);
 $('discard').innerHTML=PanelasMesa.discardHTML(s.discard,cardHTML,s);$('centerMsg').innerHTML=`Cor: <strong>${CN[s.activeColor]}</strong><div>${s.penalty?'⚠️ OBRIGATÓRIO +'+s.penalty:'Carta central'}</div>`;
@@ -497,23 +386,26 @@ const mustBuy=humanMustDraw();
 const sixOption=$('injectType').querySelector('[value=wild6]');sixOption.disabled=s.o.wild6===false;if(sixOption.disabled&&$('injectType').value==='wild6')$('injectType').value='wild4';
 $('labSixStatus').textContent='Carta +6 nesta partida: '+(s.o.wild6===false?'desativada':'ativada')+'. A opção é aplicada ao começar uma nova partida.';
 PanelasMesa.render(s,handScroll,{mustBuy});
+if(s.online){$('buyBtn').disabled=!s.actions.draw||!PanelinhaOnline.connected||!!s.pendingAction;PanelinhaOnline.bindResults();}
 $('cutBtn')?.scrollIntoView({block:'nearest',inline:'nearest'});}
-function backToMenu(){PanelinhaAnnouncements.reset();clearJobs();s=null;$('menu').classList.remove('hide');$('game').classList.add('hide');$('backBtn').classList.add('hide');$('modalRoot').innerHTML='';PanelasMesa.reset();PanelinhaNavigation.returnToSettings();}
-$('useCardArt').onchange=()=>{if(s)render();};$('startBtn').onclick=startMatch;$('backBtn').onclick=()=>PanelinhaNavigation.requestLeave();$('reveal').onchange=()=>{if(s){s.reveal=$('reveal').checked;render();}};
-$('injectBtn').onclick=()=>{if(!s||s.phase!=='playing')return;let type=$('injectType').value,color=$('injectColor').value;if(type==='wild6'&&s.o.wild6===false)return;s.players[0].hand.push(make(type,(['num','draw2','skip','reverse'].includes(type)?color:null),type==='num'?7:null));log(`Teste: carta ${TYPES[type]} adicionada à sua mão.`);render();};
-$('testPenalty').onclick=()=>{if(!s||s.phase!=='playing'||s.finisher!==null)return;clearJobs();s.current=0;s.penalty=20;s.highest=2;s.lastPenalty=null;s.drawn=null;s.cutOpen=false;s.unlockAt=0;s.deadline=s.o.timeout?Date.now()+s.o.timeout*1000:0;s.token++;log('Teste: penalidade acumulada +20 direcionada a você.');render();};
+function backToMenu(){if(s?.online)return PanelinhaMultiplayer.requestLeave();PanelinhaAnnouncements.reset();clearJobs();s=null;$('menu').classList.remove('hide');$('game').classList.add('hide');$('backBtn').classList.add('hide');$('modalRoot').innerHTML='';PanelasMesa.reset();PanelinhaNavigation.returnToSettings();}
+$('useCardArt').onchange=()=>{if(s)render();};$('startBtn').onclick=startMatch;$('backBtn').onclick=()=>PanelinhaNavigation.requestLeave();$('reveal').onchange=()=>{if(s&&!s.online){s.reveal=$('reveal').checked;render();}};
+$('injectBtn').onclick=()=>{if(!s||s.online||s.phase!=='playing')return;let type=$('injectType').value,color=$('injectColor').value;if(type==='wild6'&&s.o.wild6===false)return;s.players[0].hand.push(make(type,(['num','draw2','skip','reverse'].includes(type)?color:null),type==='num'?7:null));log(`Teste: carta ${TYPES[type]} adicionada à sua mão.`);render();};
+$('testPenalty').onclick=()=>{if(!s||s.online||s.phase!=='playing'||s.finisher!==null)return;clearJobs();s.current=0;s.penalty=20;s.highest=2;s.lastPenalty=null;s.drawn=null;s.cutOpen=false;s.unlockAt=0;s.deadline=s.o.timeout?Date.now()+s.o.timeout*1000:0;s.token++;log('Teste: penalidade acumulada +20 direcionada a você.');render();};
 // Atualiza cronômetro sem recriar toda a interface. Estouro: compra automática e turno perdido.
-ticker=setInterval(()=>{if(!s||s.phase!=='playing')return;PanelasMesa.updateClock(s,Date.now());if(s.cutOpen&&Date.now()>=s.unlockAt){s.cutOpen=false;render();}if(s.current===0&&s.unlockAt&&Date.now()>=s.unlockAt){s.unlockAt=0;render();}
+ticker=setInterval(()=>{if(s?.online){PanelinhaOnline.tick();return;}if(!s||s.phase!=='playing')return;PanelasMesa.updateClock(s,Date.now());if(s.cutOpen&&Date.now()>=s.unlockAt){s.cutOpen=false;render();}if(s.current===0&&s.unlockAt&&Date.now()>=s.unlockAt){s.unlockAt=0;render();}
 if(s.o.timeout&&s.deadline){let left=Math.max(0,Math.ceil((s.deadline-Date.now())/1000));let el=$('stateText');if(el){let base=`Sentido: ${s.direction===-1?'horário':'anti-horário'} · Cor: ${CN[s.activeColor]} · Monte: ${s.deck.length} · ${s.penalty?'PENALIDADE +'+s.penalty:'Sem penalidade'}`;el.textContent=base+' · Tempo: '+left+'s';}
 if(left===0&&!s.pendingAction&&canActNow()){let id=s.current;clearJobs();s.token++;log(`Tempo de ${names(id)} esgotado.`);if(s.penalty){finishPenaltyDraw(id);}else{closeUnoOnAction();drawMany(id,1);s.current=nextActive(id);startTurn();}}}},250);
 // Ganchos de inspeção para testes automatizados pelo Codex.
 PanelinhaNavigation.attach({getState:()=>s,leaveMatch:backToMenu});
+window.PanelinhaTableBridge={getState:()=>s,render,cardHTML,setOnline(value){clearJobs();s=value;},clearOnline(){if(!s?.online)return;clearJobs();s=null;$('modalRoot').innerHTML='';PanelinhaAnnouncements.reset();PanelasMesa.reset();}};
 window.CartasTest={getState:()=>s,createDeck:o=>buildDeck(o),newRound:()=>s&&newRound(),describe:description,assetFor:cardAssetPath};
 })();
 </script>
 <script src="seletores.js"></script>
 <script src="multiplayer-config.js"></script>
 <script src="multiplayer-connection.js"></script>
+<script src="online.js"></script>
 <script src="multiplayer.js"></script>
 </body>
 </html>

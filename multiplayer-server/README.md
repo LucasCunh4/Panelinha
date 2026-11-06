@@ -1,8 +1,8 @@
-# Panelinha — servidor e lobby da Fase 1
+# Panelinha — servidor, lobby e partidas da Fase 2
 
-Cloudflare Worker com um registrador de códigos e um Durable Object SQLite por sala. A implementação atende ao lobby; **não executa partidas de cartas online**. O botão de início permanece desabilitado e o servidor rejeita essa ação.
+Cloudflare Worker com um registrador de códigos e um Durable Object SQLite por sala. O servidor executa partidas autoritativas Individual/Duplas usando o mesmo núcleo de regras do jogo offline. O anfitrião inicia com quatro lugares preenchidos e todos os humanos Pronto. Cada cliente recebe somente sua mão, a do parceiro em Duplas e informações públicas dos adversários.
 
-Fonte funcional: [MULTIPLAYER_ESPECIFICACAO.md](../MULTIPLAYER_ESPECIFICACAO.md). Entrega, evidências e preparação da conta: [MULTIPLAYER_FASE_1_RESULTADOS.md](../MULTIPLAYER_FASE_1_RESULTADOS.md).
+Fonte funcional: [MULTIPLAYER_ESPECIFICACAO.md](../MULTIPLAYER_ESPECIFICACAO.md). Entrega e limites atuais: [MULTIPLAYER_FASE_2_RESULTADOS.md](../MULTIPLAYER_FASE_2_RESULTADOS.md). Preparação original da conta: [Fase 1](../MULTIPLAYER_FASE_1_RESULTADOS.md).
 
 Publicado com autorização em 06/11/2026: **https://panelinha-lobby.lucas260802.workers.dev/**. A versão web e a API usam esse endereço; `multiplayer-config.js` já aponta para ele. O APK anteriormente instalado não recebe essa configuração automaticamente.
 
@@ -36,6 +36,8 @@ Com os dois serviços acima ativos:
 
 ```bash
 node testes/multiplayer_lobby.cjs
+node testes/multiplayer_partida.cjs
+PANELAS_TEST_MODE=solo node testes/multiplayer_partida.cjs
 ```
 
 O teste precisa de Playwright e Chromium, como as suítes web existentes. Aceita `CHROMIUM_PATH`, `PANELAS_TEST_URL`, `PANELINHA_TEST_SERVER`, `PANELAS_SCREENSHOTS` e, quando necessário no ambiente, `PANELAS_BROWSER_PROXY`. Abre dois processos Chromium, com quatro contextos simultâneos e identidades independentes, além dos contextos de teste de rejeição/erro. As comunicações passam pelo Worker informado, local ou público. A configuração de teste também ajusta o endereço dos convites para o mesmo ambiente; a verificação offline desabilita explicitamente o servidor.
@@ -71,7 +73,7 @@ Todas as respostas da API usam `Cache-Control: no-store`. Erros possuem `v`, `co
 
 | Método e rota | Finalidade |
 | --- | --- |
-| `GET /health` | Saúde: fase 1 e `gameplay: false`. |
+| `GET /health` | Saúde: fase 2 e `gameplay: true`. |
 | `POST /v1/sessions`, corpo `{}` | Gera token privado criptográfico para esta origem/aparelho. |
 | `POST /v1/rooms`, Bearer privado, corpo `{id, profile}` | Reserva código exclusivo; `id` torna a criação idempotente. |
 | `GET /v1/rooms/:code` | Confirma existência pública; não autentica jogador. |
@@ -83,7 +85,7 @@ Entre a resposta HTTP de criação e a autenticação WebSocket do criador há u
 
 ## Protocolo WebSocket
 
-Primeiro envio: `{v: 1, id, type: "auth", data: {token, profile}}`. Os demais envios acrescentam `version` com a versão mais recente recebida do servidor. `id` deve ser único por intenção, com 1–64 caracteres alfanuméricos, `_` ou `-`.
+Primeiro envio: `{v: 1, id, type: "auth", data: {token, profile, clientPhase: 2}}`. O campo aditivo `clientPhase` permite informar clientes antigos para atualizar antes de iniciar. Os demais envios acrescentam `version` com a versão mais recente recebida do servidor. `id` deve ser único por intenção, com 1–64 caracteres alfanuméricos, `_` ou `-`.
 
 | `type` | `data` | Permissão / efeito |
 | --- | --- | --- |
@@ -94,25 +96,29 @@ Primeiro envio: `{v: 1, id, type: "auth", data: {token, profile}}`. Os demais en
 | `add-bot` | `{}` | Anfitrião; preenche vaga. |
 | `remove-bot` | `{playerId}` | Anfitrião; remove bot. |
 | `kick` | `{playerId}` | Anfitrião; bloqueia identidade humana até encerrar a sala. |
-| `leave` | `{}` | Libera vaga; se necessário sorteia sucessor conectado. |
+| `leave` | `{}` | Libera vaga no lobby; na partida preserva assento/mão com bot substituto. Sorteia sucessor conectado se necessário. |
 | `close-room` | `{}` | Anfitrião; invalida código e avisa todos. |
-| `start` | `{}` | Sempre rejeitado com `PHASE_UNAVAILABLE`. |
+| `start` | `{}` | Anfitrião, quatro prontos e clientes atualizados; sorteia assentos e inicia contagem 3–2–1. |
+| `next-round` | `{}` | Anfitrião, rodada encerrada e quatro prontos; mantém assentos/pontos. |
+| `play`, `cut` | `{cardId, color?}` | Carta própria válida; cor exigida somente para Coringa/+4/+6 quando ainda há cartas. |
+| `draw`, `pass`, `challenge` | `{}` | Validados pelo motor e pelo relógio do servidor. |
+| `announce`, `report` | `{}` | Anúncio/denúncia reais de última carta. |
 
-`rules` tem exatamente os campos `duo`, `single`, `goal`, `timeout`, `infinite`, `cut`, `challenge`, `wild6`, `dist`, `rotate`, reutilizando opções e valores do jogo local. Não há ações de cartas, transferência voluntária de anfitrião, espectadores, chat ou reações.
+`rules` tem exatamente os campos `duo`, `single`, `goal`, `timeout`, `infinite`, `cut`, `challenge`, `wild6`, `dist`, `rotate`, reutilizando opções e valores do jogo local. Regras/perfis/equipes ficam bloqueados durante toda a partida. Não há transferência voluntária de anfitrião, espectadores, chat ou reações. Pausa e substituição por inatividade ficam para a Fase 3.
 
-Respostas: `joined` informa o próprio `selfId`; `state` transmite a visão pública; `ack` confirma a intenção; `error` informa rejeição; `closed` encerra o lobby. Estados contêm versão, código, regras, anfitrião e quatro posições públicas (`id`, nome, avatar, bot, equipe, Pronto/conectado), sem baralho, mãos, tokens ou IDs de conexão. `canStart` permanece `false` mesmo com quatro prontos.
+Respostas: `joined` informa o próprio `selfId`; `state` transmite a visão por destinatário; `ack` confirma a intenção; `error` informa rejeição; `closed` encerra a sala. Durante partida, `game` contém mãos filtradas, últimos descartes, ações válidas, eventos filtrados e prazos do servidor. Não inclui baralho, mãos adversárias, tokens, IDs de conexão ou marcador privado de desafio. `canStart` reflete quatro prontos e suporte dos clientes à Fase 2. `ready` também confirma resultados; após a partida, todos confirmam para retornar ao mesmo lobby.
 
 Reenvio idêntico de uma intenção já processada recebe ACK sem reaplicar. São mantidas as últimas 128 intenções; comandos com versão antiga recebem `STALE_STATE` e snapshot atual. Reutilizar ID com conteúdo diferente é rejeitado. O cliente atualiza a tela e permite tentar novamente, sem reenviar automaticamente uma intenção ambígua.
 
 ## Persistência e conexões
 
 - `RoomRegistry`: códigos e reservas únicos, hashes SHA-256 dos tokens, IDs internos, controle de duplicidade, limites e IDs de criação. Reserva usa transação síncrona SQLite, parâmetros vinculados e chave única; códigos preservam zeros à esquerda.
-- `LobbyRoom`: snapshot canônico em SQLite, incluindo permissões, bloqueios e deduplicação. O token original não é gravado no servidor.
+- `LobbyRoom`: snapshot canônico em SQLite, incluindo partida completa, permissões, bloqueios e deduplicação. O token original não é gravado no servidor. Classe e binding existentes foram mantidos, sem recriar namespaces.
 - `acceptWebSocket` e `serializeAttachment` preservam identificação mínima de cada transporte; o construtor restaura SQL e reconcilia com `getWebSockets()` após retomada.
 - Token com 256 bits de entropia salvo localmente por origem do servidor em `panelinha.multiplayer.identities.v1`; último código em `panelinha.multiplayer.room.v1`. Não são apagadas as chaves existentes de perfil, áudio ou jogo.
 - Uma identidade tem uma única controladora, inclusive entre salas. A conexão substituída não consegue remover a nova vaga ao fechar. Reentrada após desconexão ocupa vaga disponível e começa Não pronto; não existe reserva no lobby.
-- Não há polling/heartbeat da aplicação nem temporizador recorrente mantendo objetos ativos. Alarmes pontuais expiram reservas, conexões sem autenticação e limites. Latência e silêncio de cliente autenticado não causam expulsão. Reconexão de transporte no cliente usa até quatro tentativas com espera limitada.
-- Ao fechar a conexão confirmadamente, libera-se a vaga. Se o anfitrião sair, o sucessor é sorteado criptograficamente entre humanos conectados, definitivamente. Sem humanos, bots não mantêm a sala viva.
+- Não há polling/heartbeat da aplicação nem temporizador recorrente mantendo objetos ativos. Alarmes pontuais tratam reservas, autenticação e prazos de turno/corte/bots. Latência isolada não causa expulsão. Reconexão de transporte no cliente usa até quatro tentativas com espera limitada.
+- No lobby, desconexão confirmada libera vaga. Na partida, o titular conserva assento/mão e pode retornar com sua identidade local; visitantes não entram. O bot substituto preserva nome/avatar. Se o anfitrião sair, o sucessor é sorteado criptograficamente entre humanos conectados, definitivamente. Sem humanos, bots não mantêm a sala viva.
 
 ## Limites e segurança
 

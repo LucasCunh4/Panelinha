@@ -46,7 +46,7 @@
     if(!record||record.owner!==state){
       seat.textContent='';
       const identity=id===0?seat:document.createElement('div');if(id!==0){identity.className='seat-identity';seat.append(identity);}
-      const avatar=document.createElement('div');avatar.innerHTML=id===0?PanelinhaProfile.avatarHTML(state.identity?.avatar):panAvatar(id);identity.append(avatar.firstElementChild);
+      const avatar=document.createElement('div');avatar.innerHTML=state.online?PanelinhaProfile.avatarHTML(player.avatar):id===0?PanelinhaProfile.avatarHTML(state.identity?.avatar):panAvatar(id);identity.append(avatar.firstElementChild);
       const label=document.createElement('div');label.className='name';const text=document.createTextNode('');label.append(text);
       const team=document.createElement('span');team.className='tag';label.append(team);identity.append(label);
       const count=document.createElement('div');count.className='sub';identity.append(count);
@@ -57,8 +57,8 @@
     const active=state.phase==='playing'&&state.current===id;seat.classList.toggle('active',active);
     const label=name+(active?' ⏳':'')+(state.o.duo?' ':'');if(record.text.data!==label)record.text.data=label;
     attr(record.label,'title',name);record.team.hidden=!state.o.duo;
-    const team=id%2?'B':'A';if(record.team.textContent!==team)record.team.textContent=team;
-    const count=`${player.hand.length} cartas${id===0?'':' · bot'}`;if(record.count.textContent!==count)record.count.textContent=count;
+    const team=state.online?String(player.team):id%2?'B':'A';if(record.team.textContent!==team)record.team.textContent=team;
+    const count=`${player.hand.length} cartas${state.online?(player.bot||player.substituted?' · bot':''):(id===0?'':' · bot')}`;if(record.count.textContent!==count)record.count.textContent=count;
     if(!record.area)return;
     const show=state.reveal||(state.o.duo&&id===2),area=record.area;
     let changed=false;
@@ -561,7 +561,7 @@
     for (const player of state.players) {
       const seat = $(`player${player.id}`);
       if(player.id===2)fitTopIdentity();
-      attr(seat,'aria-label', `${player.id === 0 ? state.identity?.name||PanelinhaProfile.current.name : `Bot ${player.id}`}, ${player.hand.length} cartas${state.current === player.id && state.phase === 'playing' ? ', na vez' : ''}`);
+      attr(seat,'aria-label', `${state.online?player.name:player.id === 0 ? state.identity?.name||PanelinhaProfile.current.name : `Bot ${player.id}`}, ${player.hand.length} cartas${state.current === player.id && state.phase === 'playing' ? ', na vez' : ''}`);
       const back = seat.querySelector('.back');
       if (back) {
         fan(back,Infinity);

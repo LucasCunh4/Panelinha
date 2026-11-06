@@ -1,0 +1,15 @@
+
+> panelinha@0.1.0 sync:android
+> npm run build && cap sync android
+
+
+> panelinha@0.1.0 build
+> node ferramentas/build-web.cjs
+
+Web preparado: jogo e 52 PNGs originais, com compatibilidade do host Android. Origem inalterada.
+✔ Copying web assets from dist to android/app/src/main/assets/public in 90.38ms
+✔ Creating capacitor.config.json in android/app/src/main/assets in 617.21μs
+✔ copy android in 96.29ms
+✔ Updating Android plugins in 547.93μs
+✔ update android in 16.56ms
+[info] Sync finished in 0.128s

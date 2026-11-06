@@ -11,6 +11,9 @@ export const MESSAGES = {
   TEAM_FULL:'Esta equipe já possui dois jogadores humanos.', RATE_LIMIT:'Muitas solicitações. Aguarde um pouco e tente novamente.',
   STALE_STATE:'A sala mudou. Confira a atualização e tente novamente.', REQUEST_REUSED:'O identificador desta ação já foi usado com outros dados.',
   PHASE_UNAVAILABLE:'Partidas online serão habilitadas na Fase 2.', SESSION_REPLACED:'Esta identificação foi conectada em outra janela.',
+  NOT_READY:'Preencha as quatro posições e confirme Pronto de todos os humanos.',
+  ILLEGAL_MOVE:'Esta ação não é válida neste momento da partida.', MATCH_STARTED:'A partida já começou; somente participantes originais podem retornar.',
+  UPGRADE_REQUIRED:'Atualize a página em todos os aparelhos para iniciar partidas online.',
   MESSAGE_TOO_LARGE:'A mensagem excede o tamanho permitido.', INTERNAL_ERROR:'Não foi possível concluir agora. Tente novamente.',
   ORIGIN_DENIED:'Esta origem não está autorizada para o multiplayer.', NO_CAPACITY:'Não há códigos disponíveis agora.'
 };

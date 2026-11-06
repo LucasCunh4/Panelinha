@@ -87,7 +87,7 @@ with zipfile.ZipFile(apk) as archive:
         assert len(data) == entry['bytes'] and hashlib.sha256(data).hexdigest() == entry['sha256'], entry['path']
         if 'width' in entry:
             assert struct.unpack('>II', data[16:24]) == (entry['width'], entry['height']), entry['path']
-    for name in ['multiplayer-config.js', 'multiplayer-connection.js', 'multiplayer.js', 'multiplayer.css', 'menu-arte.js', 'menu-arte.css', 'sons.js', 'sons.css', 'anuncios.js', 'anuncios.css', 'seletores.js', 'seletores.css', 'perfil.js', 'escolher-cor.js', 'escolher-cor.css', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js']:
+    for name in ['online.js', 'online.css', 'motor.js', 'multiplayer-config.js', 'multiplayer-connection.js', 'multiplayer.js', 'multiplayer.css', 'menu-arte.js', 'menu-arte.css', 'sons.js', 'sons.css', 'anuncios.js', 'anuncios.css', 'seletores.js', 'seletores.css', 'perfil.js', 'escolher-cor.js', 'escolher-cor.css', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js']:
         assert archive.read(prefix + name) == (root / 'IMPORTACAO_PANELAS' / name).read_bytes(), f'Jogo alterado no APK: {name}'
     original_html = (root / 'IMPORTACAO_PANELAS/index.html').read_bytes()
     has_compat = prefix + 'android-compat.js' in archive.namelist()

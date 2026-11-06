@@ -30,10 +30,10 @@ const launch={executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',args
   await a.evaluate(()=>{window.__readySounds=0;document.addEventListener('panelinha:sfx',e=>{if(e.detail.key==='ready')window.__readySounds++;});});
   for(const p of [a,b,c,d]){await p.locator('#lobbyReadyBtn').tap();await p.waitForFunction(()=>{const v=PanelinhaLobbyConnection.current;return v.state.players.find(p=>p.id===v.selfId).ready;});}
   await a.waitForFunction(()=>window.__readySounds===4);
-  await a.waitForFunction(()=>PanelinhaLobbyConnection.current.state.allReady);assert.ok(await a.locator('#lobbyStartBtn').isDisabled());assert.equal(await a.evaluate(()=>CartasTest.getState()),null);
+  await a.waitForFunction(()=>PanelinhaLobbyConnection.current.state.allReady);assert.equal(await a.locator('#lobbyStartBtn').isDisabled(),!(await data(a)).state.canStart);assert.equal(await a.evaluate(()=>CartasTest.getState()),null);
   await a.locator('#lobbyProfileBtn').tap();await a.locator('#lobbyProfileName').fill('Chef <b>Aurora</b>');await a.locator('[data-lobby-avatar=panela-dj]').tap();await a.locator('#lobbyDialogConfirm').tap();await a.locator('#lobbyDialog').waitFor({state:'hidden'});
   await b.waitForFunction(()=>PanelinhaLobbyConnection.current.state.players.some(p=>p.name==='Chef <b>Aurora</b>'&&p.avatar==='panela-dj'&&p.ready));assert.equal(await a.evaluate(()=>PanelinhaProfile.current.name),'Chef <b>Aurora</b>');assert.equal(await b.locator('.lobby-player-name b').count(),0);
-  console.log('PASS quinto humano rejeitado, Pronto dos quatro, perfil/nome/avatar atualizados sem desmarcar, início online indisponível e motor offline não iniciado');
+  console.log('PASS quinto humano rejeitado, Pronto dos quatro, perfil/nome/avatar atualizados sem desmarcar, início manual condicionado a Pronto e motor offline não iniciado');
   const offlineBefore=await a.evaluate(()=>Object.fromEntries(['mode','duration','goal','timeout','infinite','cut','challenge','wild6','dist','rotate'].map(id=>{const e=document.getElementById(id);return [id,e.type==='checkbox'?e.checked:e.value];})));
   await a.locator('#lobbyRulesBtn').tap();await a.locator('[data-select-for=mpRule-mode]').tap();await a.locator('#panelinhaSelectList [data-value=duo]').tap();await a.locator('#lobbyDialogConfirm').tap();await a.locator('#lobbyDialog').waitFor({state:'hidden'});
   await b.waitForFunction(()=>PanelinhaLobbyConnection.current.state.rules.duo&&PanelinhaLobbyConnection.current.state.players.every(p=>!p.ready));

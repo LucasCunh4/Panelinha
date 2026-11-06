@@ -1,5 +1,7 @@
 # Panelinha — resultados da Fase 1 do multiplayer
 
+Registro histórico da Fase 1. A etapa seguinte está em [MULTIPLAYER_FASE_2_RESULTADOS.md](MULTIPLAYER_FASE_2_RESULTADOS.md), incluindo partidas autoritativas e suas validações; as restrições de jogabilidade abaixo descrevem a entrega original.
+
 Data: 05/11/2026. Branch: `android/apk-testes`. Base conferida na API do GitHub: `b66b6605ef67fbf57899258110787d5d3da5efa6`, após a integração visual/sonora 0.2.35. Os dois documentos de requisitos foram lidos integralmente. O checkout e o histórico existentes foram preservados.
 
 **Atualizado em 06/11/2026:** após autorização explícita do proprietário, servidor e lobby publicados em **https://panelinha-lobby.lucas260802.workers.dev/**. Resultados da publicação e dos testes públicos na última seção deste documento. Partidas online continuam desabilitadas.

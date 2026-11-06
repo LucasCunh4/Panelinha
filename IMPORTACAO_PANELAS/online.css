@@ -1,0 +1,6 @@
+body[data-online=true] #tableMenu .debug{display:none}
+.online-match-panel{border:1px solid #ba9473;border-radius:14px;padding:10px;background:#33203f;color:#ffe5b7}
+.online-match-panel h3{font:22px PanelinhaDisplay,system-ui,sans-serif;margin:0 0 8px}
+#onlineRoomStatus{font-size:13px;line-height:1.5}
+#onlineCountdown{position:fixed;left:50%;top:36%;transform:translate(-50%,-50%);z-index:65;pointer-events:none;font:90px PanelinhaDisplay,system-ui,sans-serif;color:#ffe199;text-shadow:0 3px #733a4e,0 0 20px #2a123e;background:#28152fe8;border:2px solid #deb06b;border-radius:50%;width:125px;height:125px;display:grid;place-items:center;box-shadow:0 8px 40px #180d27aa}
+#onlineCountdown[hidden]{display:none}

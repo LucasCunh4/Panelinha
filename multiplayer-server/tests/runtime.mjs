@@ -30,6 +30,6 @@ export async function connect(base,code,user){
   function send(type,data={},version=state?.version,id=crypto.randomUUID()){
     return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{pending.delete(id);reject(Error('Resposta não recebida'));},5000);pending.set(id,{resolve:m=>{clearTimeout(timer);resolve(m);},reject:e=>{clearTimeout(timer);reject(e);}});ws.send(JSON.stringify({v:1,id,type,...(type==='auth'?{}:{version}),data}));});
   }
-  await send('auth',{token:user.token,profile:user.profile});
+  await send('auth',{token:user.token,profile:user.profile,clientPhase:user.clientPhase??2});
   return {ws,messages,send,get state(){return state;},get selfId(){return selfId;},get closed(){return closed;},async command(type,data={},id){await new Promise(r=>setTimeout(r,15));try{return await send(type,data,state.version,id);}catch(e){if(e.code!=='STALE_STATE')throw e;return send(type,data,state.version);}}};
 }

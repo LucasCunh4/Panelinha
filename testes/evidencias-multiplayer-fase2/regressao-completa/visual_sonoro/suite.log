@@ -1,0 +1,7 @@
+PASS 69 assets íntegros; cozinha contain, nove letras na ordem, tampa, cinco brilhos, seis utensílios ancorados e seis plumas nas duas panelas, em seis landscapes
+PASS seleção dos nove avatares, persistência, migração dos seis IDs antigos/fallback, nomes e outros dados preservados; perfil acessível em três landscapes
+PASS desbloqueio por toque, 30 MP3 reais decodificados com WebAudio, controle de volume/silêncio persistente e Voltar recolhendo som
+PASS eventos reais de jogar/nove tipos, especiais sem som comum duplicado, Coringa/+4/+6 escolhendo cor, Panela redistribuindo e Liquidificador girando sem seletor; renderizações silenciosas
+PASS corte real, compra e penalidades 2/4/6/8/12/20 conservando cartas, fallback sonoro consistente, anúncio real sem repetição, relógio real sem tick duplicado e vitória
+PASS som do anúncio real dos três bots e humano, derrota real, abertura/fechamento de opções; nenhum evento Pronto fictício
+PASS offline com som local carregado, silêncio cancela fontes, movimento reduzido, sem URL externa/erros JS ou áudio; nenhum lobby/Pronto inventado

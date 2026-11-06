@@ -1,0 +1,4 @@
+PASS PNG oficial por hash/HTTP/decodificação, RGBA 400x850, máscara alfa idêntica à Panela e cantos transparentes
+PASS configurações reais Individual/Duplas, ativada: duas cartas; desativada: zero cartas, baralhos 118/116 preservados
+PASS 12 cenários: caixa igual a numérica/Panela, frentes na mão/parceiro/descarte/voo, transferência de mãos inteiras nos dois sentidos e modos, sem RNG/redistribuição/seletor, cor e IDs preservados
+PASS indisponível contra penalidade, compra real com verso preservado/frente nova na mão e jogada offline em Duplas; sem erros JavaScript

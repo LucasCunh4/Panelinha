@@ -54,6 +54,7 @@
   function requestLeave(){
     const state=hooks?.getState();
     if(!state)return;
+    if(state.online){PanelinhaMultiplayer.requestLeave();return;}
     if(state.phase!=='playing'){hooks.leaveMatch();return;}
     ask({title:'Sair da mesa?',text:'A partida atual será encerrada. Deseja voltar às configurações?',cancel:'Continuar jogando',confirm:'Encerrar partida',action:()=>hooks.leaveMatch()});
   }
@@ -131,5 +132,8 @@
   });
   reduced.addEventListener('change',()=>{if(reduced.matches)clearEntrance();});
   writeHistory('home',true);show('home',false);
-  window.PanelinhaNavigation={go,back,requestLeave,returnToSettings,enterGame,attach:value=>{hooks=value;},openInvite(code){$('roomCode').value=code;profileDestination='join';go('profile');},get current(){return current;}};
+  window.PanelinhaNavigation={go,back,requestLeave,returnToSettings,enterGame,
+    enterOnline(){if(current==='game')return;clearEntrance();writeHistory('game');show('game',false);animate($('stoveScene'),[{opacity:.15},{opacity:1}],{duration:240,easing:'ease-out'});},
+    exitOnline(route='lobby'){clearEntrance();writeHistory(route,true);show(route);},
+    attach:value=>{hooks=value;},openInvite(code){$('roomCode').value=code;profileDestination='join';go('profile');},get current(){return current;}};
 })();

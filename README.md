@@ -1,6 +1,6 @@
-# Panelas
+# Panelinha
 
-Protótipo local de jogo de cartas com **1 humano + 3 bots**, modos individual/duplas e laboratório. Ainda não há multiplayer online. As 52 artes coloridas são temporárias.
+Jogo de cartas com modo offline **1 humano + 3 bots**, Individual/Duplas e laboratório. A Fase 2 integra partidas multiplayer autoritativas à Mesa V1, preservando as artes e sons oficiais. Estado, testes e limitações atuais: [MULTIPLAYER_FASE_2_RESULTADOS.md](MULTIPLAYER_FASE_2_RESULTADOS.md). Endereço de testes: https://panelinha-lobby.lucas260802.workers.dev/.
 
 O pacote foi integrado na branch `integracao/panelas-importacao`, a partir do commit `b071202`. Não havia código anterior para substituir. A estrutura original foi preservada em `IMPORTACAO_PANELAS/`, inclusive documentação e referências visuais. Na integração original, os arquivos importados foram mantidos idênticos aos do ZIP. A mesa v1 atualiza apenas a apresentação, mantendo os PNGs e o código das regras.
 
@@ -14,9 +14,9 @@ python3 -m http.server 8000 --bind 0.0.0.0 --directory IMPORTACAO_PANELAS
 
 Abra o endereço HTTP do servidor no navegador. Para testar no celular pela mesma rede de um computador, use `http://IP_DO_COMPUTADOR:8000/`. Abrir o HTML por `file://` no Android não é o fluxo validado. O endereço de loopback da máquina na nuvem não fica acessível pelo celular.
 
-## Prévia acessível pelo celular
+## Versão web acessível pelo celular
 
-O ambiente desta integração não disponibiliza uma ferramenta de URL pública nem encaminhamento público de portas. O servidor foi executado e validado internamente; **não foi publicado um site**.
+A versão atual está em **https://panelinha-lobby.lucas260802.workers.dev/**. O modo Um jogador usa os recursos locais; Multiplayer conecta à API/WSS do mesmo endereço. Estado da publicação e testes: [Fase 2](MULTIPLAYER_FASE_2_RESULTADOS.md).
 
 Para hospedar sem backend, publique o conteúdo desta branch em uma hospedagem estática. No GitHub Pages, se disponível para o repositório: Settings → Pages → Deploy from a branch → `interface/mesa-v1` → `/ (root)` → Save. Use a URL HTTPS mostrada pelo próprio GitHub após a publicação. O `index.html` da raiz encaminha para `IMPORTACAO_PANELAS/`, mantendo os caminhos relativos das imagens. A ativação do Pages não foi feita nesta tarefa.
 
@@ -59,8 +59,8 @@ O HTML gerado tem aproximadamente 27 MiB; não é necessário versioná-lo. Ele 
 
 O jogo também tem um contêiner **Capacitor**, mantendo esta versão web independente e seus arquivos originais.
 
-[Baixar APK recomendado v0.1.1](distribuicao/Panelinha-Teste-v0.1.1-c102.apk?raw=true) · [Configurar assinatura e próximas versões](ANDROID.md) · [Histórico Android](VERSOES_ANDROID.md)
+[APK atual e validações](MULTIPLAYER_FASE_2_RESULTADOS.md) · [Assinatura e próximas versões](ANDROID.md) · [Histórico Android](VERSOES_ANDROID.md)
 
 No Android 7.0 ou posterior, com WebView atualizado, baixe o APK e abra-o para instalar. Se o sistema pedir, permita a instalação pelo navegador usado. As próximas versões devem ser instaladas por cima, escolhendo **Atualizar**, sem desinstalar nem limpar dados. O jogo contra três bots e o laboratório usam os arquivos locais do APK e não dependem de internet.
 
-A assinatura é exclusiva e fixa; a automação fica em **Actions → APK Android de testes** após integração à `main`. É necessário configurar os quatro Secrets da chave original conforme `ANDROID.md` antes da primeira execução bem-sucedida do workflow. Não use uma chave de depuração nova. Veja os resultados e limites dos testes em `testes/ANDROID_RESULTADOS.md`.
+A assinatura permanente é a geração 2 registrada em `android-identity.json`; os quatro Secrets já estão configurados. A automação existente **Actions → APK Android de testes** compila a branch `android/apk-testes`, com versão crescente e APK direto. Não use uma chave substituta. Os relatos de integrações antigas acima são históricos; os resultados atuais ficam no relatório da Fase 2.

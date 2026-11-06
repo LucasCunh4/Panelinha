@@ -15,7 +15,7 @@ const view=p=>p.evaluate(()=>PanelinhaLobbyConnection.current);
 try{
  const first=await context(),second=await context(),a=await page(first);await a.goto(base);
  assert.equal(await a.evaluate(()=>PanelinhaServerConfig.serverUrl),target.origin);
- const health=await a.evaluate(()=>fetch('/health').then(r=>r.json()));assert.deepEqual(health,{v:1,phase:1,gameplay:false});
+ const health=await a.evaluate(()=>fetch('/health').then(r=>r.json()));assert.deepEqual(health,{v:1,phase:2,gameplay:true});
  await a.locator('#multiplayerBtn').tap();await a.locator('#playerName').fill('Teste repouso A');await a.locator('#profileContinueBtn').tap();await a.locator('#createRoomBtn').tap();await a.locator('#createLobbyBtn').tap();await connected(a);
  const initial=await view(a),code=initial.state.code,b=await page(second);await b.goto(base+'?sala='+code);await b.locator('#playerName').fill('Teste repouso B');await b.locator('#profileContinueBtn').tap();await b.locator('#joinLobbyBtn').tap();await connected(b);const originalB=(await view(b)).selfId;
  for(let i=0;i<2;i++){await a.locator('.lobby-player.is-empty .lobby-moderate').first().tap();await a.waitForFunction(n=>PanelinhaLobbyConnection.current.state.players.filter(p=>p?.bot).length===n,i+1);}
@@ -25,8 +25,8 @@ try{
  await a.waitForTimeout(70000);
  const after=await view(a);assert.equal(after.status,'connected');assert.equal((await view(b)).status,'connected');assert.equal(after.state.version,before.version);assert.equal(after.state.hostId,initial.selfId);assert.ok(after.state.allReady);
  await a.locator('#lobbyReadyBtn').tap();await b.waitForFunction(host=>!PanelinhaLobbyConnection.current.state.players.find(p=>p.id===host).ready,initial.selfId);
- assert.ok(await a.locator('#lobbyStartBtn').isDisabled());assert.equal(await a.evaluate(()=>CartasTest.getState()),null);
- console.log('PASS 70 segundos ociosos preservam conexões/host/Pronto, comando posterior chega ao outro cliente e partida online continua bloqueada');
+ assert.equal(await a.locator('#lobbyStartBtn').isDisabled(),false);assert.equal(await a.evaluate(()=>CartasTest.getState()),null);
+ console.log('PASS 70 segundos ociosos preservam conexões/host/Pronto, comando posterior chega ao outro cliente e partida não inicia automaticamente sem comando do anfitrião');
  if(out){await mkdir(out,{recursive:true});await a.screenshot({path:out+'/lobby-apos-repouso.png'});}
  await b.close();await a.waitForFunction(()=>PanelinhaLobbyConnection.current.state.players.filter(Boolean).length===3);
  const returned=await page(second);await returned.goto(base+'?sala='+code);await returned.locator('#profileContinueBtn').tap();await returned.locator('#joinLobbyBtn').tap();await connected(returned);

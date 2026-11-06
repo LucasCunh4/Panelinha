@@ -33,6 +33,7 @@
     $('lobbyConnectionStatus').textContent=connected?'Conectado':view.status==='reconnecting'?'Reconectando…':'Conectando…';
     $('lobbyReadyBtn').textContent=self?.ready?'Não estou pronto':'Pronto';$('lobbyReadyBtn').disabled=!connected||!self;
     $('lobbyCloseBtn').hidden=!host;$('lobbyCloseBtn').disabled=!connected;$('lobbyRulesBtn').disabled=!connected;$('lobbyProfileBtn').disabled=!connected;
+    $('lobbyStartBtn').disabled=!connected||!host||!state.canStart;
     $('shareRoomLink').disabled=!connection.invite();$('shareRoomLink').title=connection.invite()?'Compartilhar convite sem identificação privada':'Compartilhe o código; o link web precisa ser configurado.';
     cards.forEach((root,i)=>{
       const p=state.players[i],name=root.querySelector('.lobby-player-name'),avatar=root.querySelector('.lobby-player-avatar'),moderate=root.querySelector('.lobby-moderate');
@@ -50,7 +51,7 @@
     });
     if(dialogKind==='rules'&&!host)closeDialog();
   }
-  function serverStatus(){return connection.configError||(!connection.configured?'Servidor multiplayer ainda não configurado. Um jogador continua disponível offline.':'Lobby online disponível. Partidas de cartas: Fase 2.');}
+  function serverStatus(){return connection.configError||(!connection.configured?'Servidor multiplayer ainda não configurado. Um jogador continua disponível offline.':'Partidas online disponíveis. Um jogador continua funcionando offline.');}
   document.querySelectorAll('[data-mp-server-status]').forEach(e=>e.textContent=serverStatus());
   $('createLobbyBtn').disabled=!connection.configured;$('roomCode').disabled=!connection.configured;
   function joinEnabled(){$('joinLobbyBtn').disabled=busy||!connection.configured||!/^\d{6}$/.test($('roomCode').value);}
@@ -63,6 +64,8 @@
   $('createLobbyBtn').onclick=()=>enter(true);$('joinLobbyForm').onsubmit=event=>{event.preventDefault();enter(false);};
   $('lobbyReadyBtn').onclick=()=>{const me=view.state?.players.find(p=>p?.id===view.selfId);if(me)action('ready',{ready:!me.ready}).catch(()=>{});};
   $('lobbyCloseBtn').onclick=()=>confirmAction('Encerrar a sala?','Todos voltarão ao menu e este código deixará de funcionar.','close-room');
+  $('lobbyStartBtn').onclick=()=>action('start').catch(()=>{});
+  $('lobbyPhaseNotice').textContent='Preencha os quatro lugares e confirme Pronto. O anfitrião inicia a partida.';
   async function copy(text){
     if(navigator.clipboard?.writeText)try{await navigator.clipboard.writeText(text);return;}catch{}
     const input=document.createElement('textarea');input.value=text;input.style.cssText='position:fixed;left:0;top:0;opacity:0';document.body.append(input);input.select();const ok=document.execCommand('copy');input.remove();if(!ok)throw Error('Não foi possível copiar automaticamente. Anote o código mostrado na tela.');
@@ -93,15 +96,17 @@
     for(const {id,label}of PanelinhaProfile.avatars){const button=document.createElement('button');button.type='button';button.dataset.lobbyAvatar=id;button.setAttribute('aria-label',label);button.innerHTML=PanelinhaProfile.avatarHTML(id);const text=document.createElement('span');text.textContent=label;button.append(text);button.setAttribute('aria-pressed',String(id===selected));button.onclick=()=>{selected=id;gallery.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lobbyAvatar===id)));};gallery.append(button);}
   };
   function requestLeave(after=()=>PanelinhaNavigation.go('multiplayer')){
-    const body=openDialog('Sair da sala?','leave',async()=>{await connection.leave();after();},'Sair da sala');const p=document.createElement('p');p.textContent='Sua vaga será liberada. Se você for o último humano conectado, a sala será encerrada.';body.append(p);
+    const body=openDialog('Sair da sala?','leave',async()=>{await connection.leave();after();},'Sair da sala');const p=document.createElement('p');p.textContent=view.state?.game?'Um bot assume sua posição. Você pode retornar com a identificação deste aparelho enquanto a sala existir. Se todos os humanos saírem, a sala será encerrada.':'Sua vaga será liberada. Se você for o último humano conectado, a sala será encerrada.';body.append(p);
   }
-  window.PanelinhaMultiplayer={requestLeave,routeChanged(route){if(busy&&route!==entryRoute&&route!=='lobby')connection.cancelEntry();},handleBack(route){if(closeDialog())return true;if(route==='lobby'&&this.active){requestLeave();return true;}return false;},get active(){return !!view.state&&!['closed','idle'].includes(view.status);}};
+  window.PanelinhaMultiplayer={requestLeave,confirmClose(){confirmAction('Encerrar a sala?','Todos voltarão ao menu e este código deixará de funcionar.','close-room');},routeChanged(route){if(busy&&route!==entryRoute&&route!=='lobby'&&route!=='game')connection.cancelEntry();},handleBack(route){if(closeDialog())return true;if(route==='lobby'&&this.active){requestLeave();return true;}return false;},get active(){return !!view.state&&!['closed','idle'].includes(view.status);}};
   connection.subscribe(value=>{
     const before=view;view=value;
-    if(value.status==='connected'&&value.state){render();if(PanelinhaNavigation.current!=='lobby')PanelinhaNavigation.go('lobby');notice(value.message||value.state.notice||(value.state.allReady?'Mesa preparada. As partidas online chegam na Fase 2.':''));}
-    else if(value.state){render();notice(value.message);}
+    if(value.status==='connected'&&value.state){
+      render();if(value.state.game){closeDialog();PanelinhaOnline.receive(value);}else{if(PanelinhaOnline.active)PanelinhaOnline.receive(value);if(PanelinhaNavigation.current!=='lobby')PanelinhaNavigation.go('lobby');}
+      notice(value.message||value.state.notice||(value.state.allReady?'Mesa preparada. O anfitrião pode iniciar.':''));
+    }else if(value.state){render();if(value.state.game)PanelinhaOnline.receive(value);notice(value.message);}
     if(value.event?.type==='player-ready')PanelinhaSFX.event('player-ready');
-    if(value.status==='closed'&&(before.state||PanelinhaNavigation.current==='lobby')){closeDialog();entryNotice.textContent=value.message;view={...value,state:null};if(PanelinhaNavigation.current==='lobby')PanelinhaNavigation.go('multiplayer');}
+    if(value.status==='closed'&&(before.state||PanelinhaNavigation.current==='lobby')){closeDialog();entryNotice.textContent=value.message;view={...value,state:null};if(PanelinhaOnline.active)PanelinhaOnline.end();if(PanelinhaNavigation.current==='lobby')PanelinhaNavigation.go('multiplayer');}
   });
   const invited=new URL(location.href).searchParams.get('sala');
   if(invited&&/^\d{6}$/.test(invited)){ $('roomCode').value=invited;PanelinhaNavigation.openInvite(invited); }
