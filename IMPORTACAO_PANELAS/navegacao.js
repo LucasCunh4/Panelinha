@@ -24,6 +24,7 @@
   function writeHistory(route,replace=false){history[replace?'replaceState':'pushState']({panelinha:route,profileFor:profileDestination},'',`#${routes[route].hash}`);}
   function show(route,focus=true){
     window.PanelinhaSFX?.navigate(route);
+    window.PanelinhaMatchUI?.closeHelp(false);
     window.PanelinhaSelects?.close({restoreFocus:false,animate:false});
     if(route==='profile')PanelinhaProfile.open();
     current=route;document.body.dataset.screen=route;
@@ -59,6 +60,7 @@
     ask({title:'Sair da mesa?',text:'A partida atual será encerrada. Deseja voltar às configurações?',cancel:'Continuar jogando',confirm:'Encerrar partida',action:()=>hooks.leaveMatch()});
   }
   function back({native=false}={}){
+    if(window.PanelinhaMatchUI?.closeHelp())return true;
     if(window.PanelinhaSFX?.closeSettings())return true;
     if(window.PanelinhaSelects?.close())return true;
     if(window.PanelinhaMultiplayer?.handleBack(current))return true;
@@ -115,6 +117,7 @@
     }
   });
   addEventListener('popstate',event=>{
+    if(window.PanelinhaMatchUI?.consumeBack(event))return;
     if(window.PanelinhaSelects?.consumeBack(event))return;
     const target=routes[event.state?.panelinha]?event.state.panelinha:'home';
     if(target==='profile'&&['solo','multiplayer','join'].includes(event.state?.profileFor))profileDestination=event.state.profileFor;

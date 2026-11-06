@@ -90,9 +90,27 @@ function redistribute(extra=0,exclude=[],actor=null){
   log(`Panela de Pressão ALEATÓRIA (${text})${extra?` · punição: ${added.length}/${extra} cartas adicionadas`:''}.`);
 }
 
-function rotateHands(exclude=[]){let order=[];for(let i=0;i<4;i++)if(s.players[i].hand.length>0&&!exclude.includes(i))order.push(i);if(order.length<2)return;const next={};for(const id of order){let to=id;let count=0;do{to=(to+4+s.direction)%4;count++;}while(!order.includes(to)&&count<4);next[to]=s.players[id].hand;}for(let id of order){s.players[id].hand=next[id];if(s.preUnoById)delete s.preUnoById[id];}log(`Liquidificador: mãos transferidas no sentido ${s.direction===-1?'horário':'anti-horário'}.`);}
+function rotateHands(exclude=[],actor=null){
+  const order=[],beforeCounts=s.players.map(p=>p.hand.length),transfers=[];
+  for(let i=0;i<4;i++)if(s.players[i].hand.length>0&&!exclude.includes(i))order.push(i);
+  if(order.length<2)return;
+  const next={};
+  for(const id of order){
+    let to=id,count=0;
+    do{to=(to+4+s.direction)%4;count++;}while(!order.includes(to)&&count<4);
+    next[to]=s.players[id].hand;
+    transfers.push({from:id,to,count:s.players[id].hand.length});
+  }
+  for(const id of order){s.players[id].hand=next[id];if(s.preUnoById)delete s.preUnoById[id];}
+  // Não publicar identidades de cartas: a interface só precisa da rota e contagem.
+  if(actor!==null){
+    s.lastRotation={serial:(s.rotationSerial=(s.rotationSerial||0)+1),duration:2000,actor,direction:s.direction,active:order,transfers,beforeCounts,afterCounts:s.players.map(p=>p.hand.length)};
+    s.presentationUntil=now()+2000;
+  }
+  log(`Liquidificador: mãos transferidas no sentido ${s.direction===-1?'horário':'anti-horário'}.`);
+}
 
-function newRound(starter=0,direction=1){PanelinhaSFX.event('round-prepare');PanelinhaAnnouncements.round(s);clearJobs();s.token++;s.round++;s.players.forEach(p=>p.hand=[]);s.deck=buildDeck(s.o);s.discard=[];s.direction=direction;s.current=starter;s.penalty=0;s.highest=0;s.lastPenalty=null;s.finisher=null;s.drawn=null;s.preUno=false;s.unoWindow=null;s.cutOpen=false;s.unlockAt=0;s.lastActor=null;s.lastDistribution=null;s.presentationUntil=0;s.pendingAction=null;s.phase='playing';s.message='';for(let j=0;j<7;j++)for(const p of s.players)drawCard(p.id);let first=s.deck.pop();s.discard.push(first);s.activeColor=first.color||pick(COLORS);log(`Rodada ${s.round}: carta inicial ${description(first)}.`);
+function newRound(starter=0,direction=1){PanelinhaSFX.event('round-prepare');PanelinhaAnnouncements.round(s);clearJobs();s.token++;s.round++;s.players.forEach(p=>p.hand=[]);s.deck=buildDeck(s.o);s.discard=[];s.direction=direction;s.current=starter;s.penalty=0;s.highest=0;s.lastPenalty=null;s.finisher=null;s.drawn=null;s.preUno=false;s.unoWindow=null;s.cutOpen=false;s.unlockAt=0;s.lastActor=null;s.lastDistribution=null;s.lastRotation=null;s.roundScore=null;s.presentationUntil=0;s.pendingAction=null;s.phase='playing';s.message='';for(let j=0;j<7;j++)for(const p of s.players)drawCard(p.id);let first=s.deck.pop();s.discard.push(first);s.activeColor=first.color||pick(COLORS);log(`Rodada ${s.round}: carta inicial ${description(first)}.`);
 if(first.type==='skip'){s.current=(starter+s.direction+4)%4;log('Bloqueio inicial: primeiro jogador pulado.');}
 else if(first.type==='reverse'){s.direction*=-1;s.current=(starter+s.direction+4)%4;log('Inverter inicial: sentido invertido.');}
 else if(power(first)){s.penalty=power(first);s.highest=power(first);log(`Penalidade inicial de +${s.penalty}.`);}
@@ -147,7 +165,7 @@ function applyPlay(id,ids,isCut,color){
   closeUnoOnAction();
   p.hand=p.hand.filter(q=>q.id!==c.id);
   s.discard.push(c);if(c.type!=='rotate'&&c.type!=='dist')s.activeColor=c.color||color||s.activeColor;
-  s.drawn=null;s.pendingAction=null;s.lastActor=id;s.lastDistribution=null;
+  s.drawn=null;s.pendingAction=null;s.lastActor=id;s.lastDistribution=null;s.lastRotation=null;
   PanelinhaSFX.event('card-played',{cardType:c.type,cut:isCut});
   log(`${names(id)} ${isCut?'CORTOU com':'jogou'} ${description(c)}${COLOR_CHOOSERS.has(c.type)&&p.hand.length?' (cor: '+CN[s.activeColor]+')':''}.`);
   if(p.hand.length===1){const announced=preAnnounced(id)||(!human(id)&&(ctx.random?ctx.random():Math.random())<.75);if(announced){log(`${names(id)} anunciou ÚLTIMA CARTA.`);if(!human(id))PanelinhaAnnouncements.announce(s,id,names(id),'after-play');}else{s.unoWindow={id};log(`${names(id)} ficou com 1 carta sem anunciar!`);}}
@@ -161,7 +179,7 @@ function applyPlay(id,ids,isCut,color){
     else if(s.lastPenalty)s.lastPenalty.challengeable=p.hand.length>0;
     log(`Penalidade acumulada: +${s.penalty}${repeatedOwnCut?' (segunda cópia, sem novo efeito)':''}.`);
   }else if(c.type==='rotate'){
-    if(!repeatedOwnCut&&!(s.o.duo&&s.finisher!==null))rotateHands([s.finisher].filter(x=>x!==null));
+    if(!repeatedOwnCut&&!(s.o.duo&&s.finisher!==null))rotateHands([s.finisher].filter(x=>x!==null),id);
   }else{s.lastPenalty=null;}
   if(c.type==='reverse'&&!repeatedOwnCut)s.direction*=-1;
   if(s.finisher!==null&&(!s.penalty||s.players.every(q=>q.hand.length===0))){finishRound();return true;}
@@ -213,10 +231,11 @@ function numberCount(p){return p.hand.filter(c=>c.type==='num').length;}
 
 function rankPlayers(){let others=s.players.filter(p=>p.id!==s.finisher);others.sort((a,b)=>handPoints(a)-handPoints(b)||specialCount(a)-specialCount(b)||effectCount(a)-effectCount(b)||numberCount(a)-numberCount(b)||a.id-b.id);return [s.players[s.finisher],...others];}
 
-function finishRound(){PanelinhaAnnouncements.round(s);clearJobs();s.token++;s.phase='roundOver';s.unoWindow=null;const ranks=rankPlayers();s.summary=ranks.map((p,i)=>({id:p.id,place:i+1,remaining:p.hand.length,cost:handPoints(p)}));
+function finishRound(){const beforeScores=s.players.map(p=>p.score),beforeTeams=[...s.teams];PanelinhaAnnouncements.round(s);clearJobs();s.token++;s.phase='roundOver';s.unoWindow=null;const ranks=rankPlayers();s.summary=ranks.map((p,i)=>({id:p.id,place:i+1,remaining:p.hand.length,cost:handPoints(p)}));
 s.pastWinners.push(s.finisher);
 if(s.o.duo){let team=s.finisher%2;s.teams[team]++;log(`Rodada encerrada: equipe ${team===0?names(0)+' + '+names(2):names(1)+' + '+names(3)} ganhou 1 ponto.`);}
 else{ranks.forEach((p,i)=>p.score+=3-i);log(`Classificação: ${ranks.map((p,i)=>`${i+1}º ${names(p.id)} (${handPoints(p)} pontos na mão)`).join('; ')}.`);}
+s.roundScore={players:s.players.map(p=>({id:p.id,before:beforeScores[p.id],total:p.score,earned:p.score-beforeScores[p.id]})),teams:s.teams.map((total,id)=>({id,before:beforeTeams[id],total,earned:total-beforeTeams[id]}))};
 s.winnerId=null;s.winnerTeam=null;let victor=null;if(s.o.duo){const reached=s.teams.map((v,i)=>({v,i})).filter(x=>x.v>=s.o.goal);if(reached.length)victor=(s.winnerTeam=reached.sort((a,b)=>b.v-a.v)[0].i)===0?'Equipe '+names(0)+' + '+names(2):'Equipe '+names(1)+' + '+names(3);}
 else{const reached=s.players.filter(p=>p.score>=s.o.goal);if(reached.length){let ordered=[...reached].sort((a,b)=>b.score-a.score||victories(b.id)-victories(a.id));if(ordered.length>1&&ordered[0].score===ordered[1].score&&victories(ordered[0].id)===victories(ordered[1].id)){log('Empate em pontos e vitórias: rodada extra de desempate.');}else{s.winnerId=ordered[0].id;victor=names(ordered[0].id);}}}
 if(s.o.single||victor){s.phase='gameOver';s.winner=victor;}

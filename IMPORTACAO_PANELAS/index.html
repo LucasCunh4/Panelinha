@@ -39,6 +39,7 @@
 <link rel="stylesheet" href="multiplayer.css">
 <link rel="stylesheet" href="online.css">
 <link rel="stylesheet" href="efeitos-mesa.css">
+<link rel="stylesheet" href="partida-ui.css">
 </head>
 <body>
 <main class="container app-container">
@@ -111,8 +112,8 @@
   </section>
   <section id="menu" class="panel front-screen hide" aria-labelledby="settingsTitle"><button class="screen-back" data-nav-back aria-label="Voltar à identificação">‹ <span>Voltar</span></button><h2 id="settingsTitle">Sua partida</h2><p class="muted">Prepare a mesa para jogar com três bots.</p>
     <div class="grid settings-grid">
-      <fieldset class="settings-block match-settings"><legend><span aria-hidden="true">♨</span> Receita da partida</legend><div class="settings-choices"><label class="setting">Formato <select id="mode"><option value="solo">Individual</option><option value="duo">Duplas</option></select></label><label class="setting">Duração <select id="duration"><option value="points">Por pontos</option><option value="single">Rodada única</option></select></label><label class="setting">Pontuação-meta <select id="goal"></select></label><label class="setting">Tempo por turno <select id="timeout"><option value="0">Sem limite</option><option value="15">15 s</option><option value="30">30 s</option><option value="45">45 s</option><option value="60">60 s</option></select></label></div></fieldset>
-      <fieldset class="settings-block rule-settings"><legend><span aria-hidden="true">✦</span> Temperos do jogo</legend><div class="settings-toggles"><label class="setting">Compra infinita <input id="infinite" type="checkbox"></label><label class="setting">Cortes + cartas idênticas <input id="cut" type="checkbox" checked></label><label class="setting"><span id="challengeSettingLabel">Desafiar +4 e +6</span> <input id="challenge" type="checkbox" checked></label><label class="setting">+6 <input id="wild6" type="checkbox" checked aria-label="+6"></label><label class="setting">Panela de Pressão <input id="dist" type="checkbox" checked></label><label class="setting">Liquidificador <input id="rotate" type="checkbox" checked></label></div></fieldset>
+      <fieldset class="settings-block match-settings"><legend><span aria-hidden="true">♨</span> Receita da partida</legend><div class="settings-choices"><label class="setting">Formato <select id="mode"><option value="solo">Individual</option><option value="duo">Duplas</option></select></label><label class="setting">Duração <select id="duration"><option value="points">Por pontos</option><option value="single" selected>Partida única</option></select></label><label class="setting">Pontuação-meta <select id="goal"></select></label><label class="setting">Tempo por turno <select id="timeout"><option value="0">Sem limite</option><option value="15">15 s</option><option value="30">30 s</option><option value="45">45 s</option><option value="60">60 s</option></select></label></div></fieldset>
+      <fieldset class="settings-block rule-settings"><legend><span aria-hidden="true">✦</span> Temperos do jogo</legend><div class="settings-toggles"><label class="setting">Compra infinita <input id="infinite" type="checkbox" checked></label><label class="setting">Cortes + cartas idênticas <input id="cut" type="checkbox" checked></label><label class="setting"><span id="challengeSettingLabel">Desafiar +4 e +6</span> <input id="challenge" type="checkbox" checked></label><label class="setting">+6 <input id="wild6" type="checkbox" checked aria-label="+6"></label><label class="setting">Panela de Pressão <input id="dist" type="checkbox" checked></label><label class="setting">Liquidificador <input id="rotate" type="checkbox" checked></label></div></fieldset>
     </div>
     <div class="row menu-header"><button class="hero-button hero-gold" id="startBtn">Começar com 3 bots</button></div>
   </section>
@@ -180,6 +181,7 @@
 <script src="anuncios.js"></script>
 <script src="escolher-cor.js"></script>
 <script src="motor.js"></script>
+<script src="partida-ui.js"></script>
 <script src="efeitos-mesa.js"></script>
 <script src="mesa.js"></script>
 <script src="navegacao.js"></script>
@@ -347,7 +349,7 @@ function showColors(){
     cancel(){if(s!==state||s.pendingAction!==action)return;s.pendingAction=null;render();queueBots();}
   });
 }
-function finishControlHTML(){if(s?.online)return PanelinhaOnline.resultHTML();let ranks=s.summary.map(x=>`<div class="notice"><strong>${x.place}º — ${safeName(x.id)}</strong> · ${x.cost} pontos nas cartas restantes (${x.remaining} cartas)</div>`).join('');return `<div class="banner">${s.phase==='gameOver'?(s.winner?`🏆 ${PanelinhaProfile.escape(s.winner)} venceu a partida!`:'🏆 Rodada única concluída!'):'Rodada concluída.'}</div>${ranks}<div class="controls">${s.phase==='roundOver'?'<button id="nextRound" class="btn good">Próxima rodada</button>':'<button id="newMatch" class="btn good">Nova partida</button>'}<button id="backLobby" class="btn alt">Voltar às configurações</button></div>`;}
+function finishControlHTML(){if(s?.online)return PanelinhaOnline.resultHTML();let ranks=PanelinhaMatchUI.scoreHTML(s,names)+s.summary.map(x=>`<div class="notice"><strong>${x.place}º — ${safeName(x.id)}</strong> · ${x.cost} pontos nas cartas restantes (${x.remaining} cartas)</div>`).join('');return `<div class="banner">${s.phase==='gameOver'?(s.winner?`🏆 ${PanelinhaProfile.escape(s.winner)} venceu a partida!`:'🏆 Rodada única concluída!'):'Rodada concluída.'}</div>${ranks}<div class="controls">${s.phase==='roundOver'?'<button id="nextRound" class="btn good">Próxima rodada</button>':'<button id="newMatch" class="btn good">Nova partida</button>'}<button id="backLobby" class="btn alt">Voltar às configurações</button></div>`;}
 function render(){if(!s)return;PanelinhaTableEffects.paint(s,renderTable);}
 function renderTable(){if(!s)return;PanelasMesa.beforeRender(s);$('roundLabel').textContent=`Rodada ${s.round} · ${s.o.duo?'Duplas':'Individual'}`;$('status').textContent=s.phase==='playing'?`Vez de ${names(s.current)}`:s.phase==='roundOver'?'Fim da rodada':'Fim da partida';
 $('score').innerHTML=s.o.duo?`<span>${safeName(0)} + ${safeName(2)}: ${s.teams[0]}</span><span>${safeName(1)} + ${safeName(3)}: ${s.teams[1]}</span>`:s.players.map(p=>`<span>${safeName(p.id)}: ${p.score}</span>`).join('');
@@ -401,7 +403,7 @@ if(s.o.timeout&&s.deadline){let left=Math.max(0,Math.ceil((s.deadline-Date.now()
 if(left===0&&!s.pendingAction&&canActNow()){let id=s.current;clearJobs();s.token++;log(`Tempo de ${names(id)} esgotado.`);if(s.penalty){finishPenaltyDraw(id);}else{closeUnoOnAction();drawMany(id,1);s.current=nextActive(id);startTurn();}}}},250);
 // Ganchos de inspeção para testes automatizados pelo Codex.
 PanelinhaNavigation.attach({getState:()=>s,leaveMatch:backToMenu});
-window.PanelinhaTableBridge={getState:()=>s,render,cardHTML,canPlayDraw:id=>s?.drawn===id&&checkCards(0,[id],false),playDraw:id=>chooseCards(0,[id]),keepDraw:keepPass,setOnline(value){clearJobs();s=value;},clearOnline(){if(!s?.online)return;clearJobs();s=null;$('modalRoot').innerHTML='';PanelinhaAnnouncements.reset();PanelasMesa.reset();}};
+window.PanelinhaTableBridge={getState:()=>s,render,cardHTML,names,canPlayDraw:id=>s?.drawn===id&&checkCards(0,[id],false),playDraw:id=>chooseCards(0,[id]),keepDraw:keepPass,setOnline(value){clearJobs();s=value;},clearOnline(){if(!s?.online)return;clearJobs();s=null;$('modalRoot').innerHTML='';PanelinhaAnnouncements.reset();PanelasMesa.reset();}};
 window.CartasTest={getState:()=>s,createDeck:o=>buildDeck(o),newRound:()=>s&&newRound(),describe:description,assetFor:cardAssetPath};
 })();
 </script>

@@ -97,7 +97,7 @@ public class OfflineGameTest {
         js("window.__pngCheck=null;(async()=>{try{const colors=['vermelho','azul','amarelo','verde'];const faces=[...Array.from({length:10},(_,i)=>String(i)),'mais_2','bloqueio','inverter'];await Promise.all(colors.flatMap(c=>faces.map(async f=>{const im=new Image();im.src='assets/cartas/'+c+'/'+f+'.png';await im.decode();if(im.naturalWidth===0)throw Error('PNG');})));window.__pngCheck=52;}catch(e){window.__pngCheck=String(e);}})()");
         waitFor("window.__pngCheck===52", 120000);
         assertEquals("4", js("CartasTest.getState().players.length"));
-        assertEquals("3", js("[1,2,3].filter(i=>document.getElementById('player'+i).innerText.includes('bot')).length"));
+        assertEquals("3", js("CartasTest.getState().players.filter(p=>p.id>0).length"));
     }
     @Test public void b_touchCutAndBuy() throws Exception {
         startControlled();

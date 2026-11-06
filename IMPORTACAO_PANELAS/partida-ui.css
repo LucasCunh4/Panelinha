@@ -1,0 +1,24 @@
+/* Somente o avatar permanece visível junto às mãos. Nomes continuam no lobby,
+   acessibilidade, anúncios e resultados. Os leques mantêm seu próprio eixo. */
+.seat .name,.seat .sub{display:none!important}
+.seat .seat-identity,.seat.top .seat-identity,.seat.top .seat-identity.long-name{display:flex;align-items:center;justify-content:center;width:40px;max-width:40px;min-width:0;min-height:0;padding:5px;gap:0;border-radius:50%}
+.seat .seat-identity>.pan-avatar,.seat.top .seat-identity>.pan-avatar{width:26px;height:26px;flex:none}
+.seat.self{display:flex!important;align-items:center;justify-content:center;width:44px!important;min-width:0;min-height:0;padding:6px;gap:0;border-radius:50%}
+.seat.self>.pan-avatar{grid-column:auto;grid-row:auto;width:28px;height:28px}
+.seat.top .seat-identity{right:calc(50% + var(--top-fan-half,50%) + 12px)}
+label.setting.has-setting-info{display:grid!important;grid-template-columns:minmax(0,1fr) 25px 36px;gap:6px!important;align-items:center}
+.setting-copy{min-width:0;overflow-wrap:anywhere;line-height:1.25}
+.setting-info{display:grid;place-items:center;align-self:center;width:25px;height:28px;padding:0;cursor:pointer;border:1px solid #d9af69;border-radius:50%;background:linear-gradient(#5c326c,#301b42);color:#ffe6a2;font:bold italic 17px Georgia,serif;box-shadow:inset 0 1px #fff2,0 2px 4px #170a2633}
+.setting-info:hover,.setting-info:focus-visible{background:#704283;box-shadow:0 0 8px #edbf6a55}.setting-info:active{transform:scale(.94)}
+.setting-help{position:fixed;z-index:250;box-sizing:border-box;padding:16px 18px;border:1px solid #edc579;border-radius:16px;background:linear-gradient(130deg,#4b285d,#261332);color:#ffefd9;box-shadow:0 8px 30px #14082099,inset 0 0 0 2px #d3a45b18;overflow:auto;animation:setting-help-entry 130ms ease-out}
+.setting-help[hidden]{display:none}.setting-help h3{font:23px/1.1 PanelinhaDisplay,system-ui,sans-serif;padding-right:24px;margin:0 0 10px;color:#ffdc94}.setting-help p{font:14px/1.5 system-ui,sans-serif;margin:0}.setting-help-close{position:absolute;right:5px;top:5px;width:32px;height:32px;padding:0;border:0;border-radius:50%;background:transparent;color:#ffe5ab;font:26px system-ui;cursor:pointer}
+@keyframes setting-help-entry{from{opacity:0;translate:0 4px}to{opacity:1;translate:0 0}}
+.round-score{padding:14px;border:1px solid #aa784c;border-radius:16px;background:linear-gradient(145deg,#492453,#25132f);box-shadow:inset 0 0 0 2px #d8af6120;margin:10px 0 14px;color:#fbe9d1}
+.round-score h3{font:25px/1.1 PanelinhaDisplay,system-ui,sans-serif;color:#ffe099;margin:0 0 3px}.score-goal{font-size:12px;color:#d2bbda;margin:0 0 10px}
+.score-player+.score-player{margin-top:11px}.score-player-heading{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:12px;line-height:1.35;margin-bottom:5px}.score-player-heading strong{overflow-wrap:anywhere;min-width:0;flex:1}.score-player-heading span{text-align:right;flex-shrink:0;color:#ffe3aa}
+.score-track{height:15px;overflow:hidden;border:1px solid #b78c59;border-radius:99px;background:#1b0f2b;box-shadow:inset 0 2px 4px #080411aa}
+.score-fill{display:block;position:relative;width:100%;height:100%;border-radius:inherit;transform-origin:left;background:linear-gradient(90deg,hsl(var(--score-hue) 54% 42%),hsl(var(--score-hue) 80% 76%));box-shadow:inset 0 1px 2px #fff7,0 0 8px #e9b95866}
+.score-fill::after{content:'';position:absolute;inset:2px 0 50%;border-radius:inherit;background:#fff3}
+.table[data-phase=roundOver] .hand-panel>#controls,.table[data-phase=gameOver] .hand-panel>#controls{width:min(92%,620px);max-width:620px}
+@media(max-height:420px){.round-score{padding:10px}.round-score h3{font-size:22px}.score-player+.score-player{margin-top:8px}.score-track{height:12px}}
+@media(prefers-reduced-motion:reduce){.setting-help{animation:none}}

@@ -58,3 +58,9 @@ body[data-screen=game] .menu-art-plane{display:none}
 @media(orientation:portrait){#home .game-title{width:94vw}#home .home-actions{width:min(78vw,440px)}}
 @media(orientation:landscape) and (max-height:420px){#home.home-screen{gap:8px;padding-block:10px}#home .game-title{width:min(63vw,640px)}#home .home-actions{width:min(42vw,380px)}}
 #home .game-title{align-self:center}
+
+/* Título no primeiro quarto, com arco leve e tampa suspensa. */
+#home .game-title{position:absolute;left:50%;top:25%;transform:translate(-50%,-50%);--title-curve:clamp(7px,1.5vh,12px)}
+.title-letter{top:calc(var(--title-curve)*var(--arc-depth,0))}.title-letter-art{transform:rotate(var(--arc-angle,0deg))}
+.title-lid{left:5%;top:-31%;width:45%}
+#home .home-actions{position:absolute;left:50%;top:50%;transform:translateX(-50%)}

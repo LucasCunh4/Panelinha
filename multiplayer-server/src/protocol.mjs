@@ -2,7 +2,7 @@ export const VERSION = 1;
 export const MAX_BYTES = 4096;
 export const HANDSHAKE_MS = 15000;
 export const AVATARS = Object.freeze(['frigideira-chef','leiteira-bigode','panela-pressao','panela-dj','wok-monoculo','panela-aventureira','panela-gamer','panela-piloto','panela-escoteira']);
-export const DEFAULT_RULES = Object.freeze({duo:false,single:false,goal:10,timeout:0,infinite:false,cut:true,challenge:true,wild6:true,dist:true,rotate:true});
+export const DEFAULT_RULES = Object.freeze({duo:false,single:true,goal:10,timeout:0,infinite:true,cut:true,challenge:true,wild6:true,dist:true,rotate:true});
 export const MESSAGES = {
   BAD_PAYLOAD:'Dados inválidos.', AUTH_INVALID:'Identificação privada inválida. Entre novamente.',
   ROOM_NOT_FOUND:'Esta sala não existe ou já foi encerrada.', ROOM_CLOSED:'A sala foi encerrada.',

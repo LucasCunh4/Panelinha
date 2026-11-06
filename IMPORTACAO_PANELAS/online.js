@@ -65,7 +65,7 @@
       penalty:g.penalty,highest:g.highest,finisher:g.finisher===null?null:local(g.finisher),drawn:g.drawn,cutOpen:g.cutOpen,
       presentationUntil:deadline(g.presentationUntil),lastDistribution:g.lastDistribution?{...g.lastDistribution,active:g.lastDistribution.active.map(local),actor:local(g.lastDistribution.actor),beforeCounts:[0,1,2,3].map(i=>g.lastDistribution.beforeCounts[(i+g.self)%4]),afterCounts:[0,1,2,3].map(i=>g.lastDistribution.afterCounts[(i+g.self)%4])}:null,unlockAt:deadline(g.unlockAt),deadline:deadline(g.deadline),countdownAt:deadline(g.countdownAt),paused:!!g.paused,resumeAt:deadline(g.resumeAt),remaining:g.remaining,
       lastActor:g.lastActor===null?null:local(g.lastActor),preUno:g.preUno,unoWindow:g.unoWindow?{id:local(g.unoWindow.id)}:null,
-      teams:g.self%2?[g.teams[1],g.teams[0]]:g.teams,summary:g.summary.map(p=>({...p,id:local(p.id)})),winner:g.winner,token:g.token,
+      lastRotation:g.lastRotation?{...g.lastRotation,actor:local(g.lastRotation.actor),active:g.lastRotation.active.map(local),transfers:g.lastRotation.transfers.map(t=>({...t,from:local(t.from),to:local(t.to)})),beforeCounts:[0,1,2,3].map(i=>g.lastRotation.beforeCounts[(i+g.self)%4]),afterCounts:[0,1,2,3].map(i=>g.lastRotation.afterCounts[(i+g.self)%4])}:null,roundScore:g.roundScore?{players:g.roundScore.players.map(p=>({...p,id:local(p.id)})),teams:g.self%2?[g.roundScore.teams[1],g.roundScore.teams[0]]:g.roundScore.teams}:null,teams:g.self%2?[g.teams[1],g.teams[0]]:g.teams,summary:g.summary.map(p=>({...p,id:local(p.id)})),winner:g.winner,token:g.token,
       deck:Array(g.deckCount).fill(null),discard:g.discard,message:g.message,log:g.log,actions:g.actions});
     current.players=g.players.map(p=>({...p,id:local(p.id),hand:p.hand||Array.from({length:p.count},(_,i)=>({id:-((local(p.id)+1)*100000+i+1),hidden:true}))})).sort((a,b)=>a.id-b.id);
     current.identity={name:current.players[0].name,avatar:current.players[0].avatar};
@@ -90,7 +90,7 @@
   }
   function resultHTML(){
     const state=connection.current.state,me=state?.players.find(p=>p?.id===connection.current.selfId),host=state?.hostId===connection.current.selfId;
-    const rows=current.summary.map(p=>`<div class="notice"><strong>${p.place}º — ${PanelinhaProfile.escape(current.players[p.id].name)}</strong> · ${p.cost} pontos nas cartas restantes (${p.remaining} cartas)</div>`).join('');
+    const rows=PanelinhaMatchUI.scoreHTML(current,id=>current.players[id].name)+current.summary.map(p=>`<div class="notice"><strong>${p.place}º — ${PanelinhaProfile.escape(current.players[p.id].name)}</strong> · ${p.cost} pontos nas cartas restantes (${p.remaining} cartas)</div>`).join('');
     return `<div class="banner">${current.phase==='gameOver'?'Partida concluída':'Rodada concluída'}${current.winner?' · '+PanelinhaProfile.escape(current.winner):''}</div>${rows}<div class="controls"><button id="onlineReadyResult" class="btn good">${me?.ready?'Não estou pronto':current.phase==='gameOver'?'Voltar à sala':'Pronto para a próxima rodada'}</button>${host&&current.phase==='roundOver'?`<button id="onlineNextRound" class="btn good" ${state.allReady?'':'disabled'}>Iniciar próxima rodada</button>`:''}</div><p class="help">${current.phase==='gameOver'?'Todos confirmam para retornar ao lobby da mesma sala.':'Todos confirmam Pronto; o anfitrião inicia a próxima rodada.'}</p>`;
   }
   async function readyForResult(){

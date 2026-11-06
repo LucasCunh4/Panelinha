@@ -45,49 +45,113 @@
       const a=n.animate([{opacity:0,transform:'translate(-50%,-50%) scale(.8)'},{offset:.1,opacity:1},{opacity:1,transform:`translate(calc(-50% + ${end.x-middle.x}px),calc(-50% + ${end.y-middle.y}px)) rotate(${end.angle||0}deg) scale(${end.width/middle.width},${end.height/middle.height})`}],{duration,delay,easing:'cubic-bezier(.2,.7,.2,1)',fill:'both'});a.onfinish=()=>remove(n);
     }));
   }
+  function bundlePoint(p,actor){
+    const points=p.points[actor],fallback=point(actor,null),width=Math.max(28,Math.min(46,fallback.width)),height=width*850/400;
+    const x=points.length?points.reduce((n,v)=>n+v.x,0)/points.length:fallback.x;
+    const y=points.length?points.reduce((n,v)=>n+v.y,0)/points.length:fallback.y;
+    return {x:Math.max(width/2+10,Math.min(innerWidth-width/2-10,x)),y:Math.max(height/2+8,Math.min(innerHeight-height/2-8,y)),width,height};
+  }
+  function animateRotation(s,p,elapsed){
+    if(motion.matches)return;
+    if(elapsed>=690&&!p.collecting){
+      p.collecting=true;p.bundles=p.old.map((_,id)=>bundlePoint(p,id));
+      p.old.forEach((hand,actor)=>hand.forEach((card,i)=>{
+        const start=p.points[actor][i]||point(actor,card.id),end=p.bundles[actor],n=sprite(card,visible(s,actor),start,'rotation-collect');n.dataset.actor=actor;
+        const a=n.animate([{opacity:1,transform:`translate(-50%,-50%) rotate(${start.angle||0}deg)`},{opacity:1,transform:`translate(calc(-50% + ${end.x-start.x}px),calc(-50% + ${end.y-start.y}px)) rotate(${(i%3-1)*2}deg) scale(${end.width/start.width},${end.height/start.height})`}],{duration:Math.max(50,940-elapsed),easing:'cubic-bezier(.3,.1,.2,1)',fill:'forwards'});a.onfinish=()=>remove(n);
+      }));
+    }
+    if(elapsed>=940&&!p.moving){
+      p.moving=true;p.bundles=p.bundles||p.old.map((_,id)=>bundlePoint(p,id));
+      const centerPoint={x:innerWidth/2,y:innerHeight/2},rx=innerWidth*.39,ry=innerHeight*.34;
+      p.meta.transfers.forEach(transfer=>{
+        const from=p.bundles[transfer.from],to=p.bundles[transfer.to],n=document.createElement('div');n.className='rotation-pack table-flight';n.dataset.effect='rotation-move';n.dataset.from=transfer.from;n.dataset.to=transfer.to;
+        Object.assign(n.style,{left:from.x+'px',top:from.y+'px',width:from.width+'px',height:from.height+'px'});
+        for(let i=0;i<Math.min(6,transfer.count);i++){const image=new Image();image.src=back;image.alt='';image.style.transform=`translate(${i*1.5}px,${i*-1.5}px) rotate(${(i%3-1)*2}deg)`;n.append(image);}
+        $('playAnimations').append(n);nodes.add(n);
+        const angle=point=>Math.atan2((point.y-centerPoint.y)/ry,(point.x-centerPoint.x)/rx),radius=point=>Math.hypot((point.x-centerPoint.x)/rx,(point.y-centerPoint.y)/ry);
+        const a=angle(from),b=angle(to),clockwise=p.meta.direction===-1;let delta=b-a;
+        if(clockwise&&delta<=0)delta+=Math.PI*2;if(!clockwise&&delta>=0)delta-=Math.PI*2;
+        const r0=radius(from),r1=radius(to),frames=Array.from({length:13},(_,i)=>{
+          const t=i/12,theta=a+delta*t,r=r0+(r1-r0)*t,x=i===12?to.x:i===0?from.x:centerPoint.x+Math.cos(theta)*rx*r,y=i===12?to.y:i===0?from.y:centerPoint.y+Math.sin(theta)*ry*r;
+          return {offset:t,transform:`translate(calc(-50% + ${x-from.x}px),calc(-50% + ${y-from.y}px)) rotate(${Math.sin(t*Math.PI)*(clockwise?6:-6)}deg) scale(${1+(to.width/from.width-1)*t})`};
+        });
+        const animation=n.animate(frames,{duration:Math.max(80,1580-elapsed),easing:'cubic-bezier(.25,.1,.25,1)',fill:'forwards'});animation.onfinish=()=>remove(n);
+      });
+    }
+    if(elapsed>=1580&&!p.opening){
+      p.opening=true;
+      s.players.forEach(player=>{
+        if(!p.meta.active.includes(player.id))return;const start=p.bundles[player.id];
+        player.hand.forEach((card,i)=>{
+          const end=point(player.id,card.id),n=sprite(card,visible(s,player.id),start,'rotation-open');n.dataset.actor=player.id;
+          const a=n.animate([{transform:'translate(-50%,-50%)'},{transform:`translate(calc(-50% + ${end.x-start.x}px),calc(-50% + ${end.y-start.y}px)) rotate(${end.angle||0}deg) scale(${end.width/start.width},${end.height/start.height})`}],{duration:Math.max(80,1950-elapsed),easing:'cubic-bezier(.2,.75,.2,1)',fill:'forwards'});a.onfinish=()=>remove(n);
+        });
+      });
+    }
+  }
+  function showReceived(s,meta){
+    for(const actor of meta.active){
+      const avatar=$('player'+actor).querySelector('.pan-avatar'),r=(avatar||$('player'+actor)).getBoundingClientRect(),badge=document.createElement('span');badge.className='pressure-received';badge.dataset.actor=actor;badge.dataset.effect='received';badge.textContent='+'+meta.afterCounts[actor];badge.setAttribute('role','status');badge.setAttribute('aria-label',bridge().names(actor)+' recebeu '+meta.afterCounts[actor]+' cartas');
+      badge.style.left=Math.max(26,Math.min(innerWidth-26,r.x+r.width/2))+'px';badge.style.top=Math.max(22,Math.min(innerHeight-22,r.top-16))+'px';$('playAnimations').append(badge);nodes.add(badge);
+      const animation=badge.animate(motion.matches?[{opacity:1},{offset:.85,opacity:1},{opacity:0}]:[{opacity:0,transform:'translate(-50%,-35%) scale(.8)'},{offset:.1,opacity:1,transform:'translate(-50%,-50%) scale(1)'},{offset:.8,opacity:1},{opacity:0,transform:'translate(-50%,-70%)'}],{duration:2400,easing:'ease-out',fill:'both'});animation.onfinish=()=>remove(badge);
+    }
+  }
   function paint(s,render){
     if(owner!==s||round!==s.round){reset();owner=s;round=s.round;}
     if(decision&&(!bridge().canPlayDraw(decision.id)||s.pendingAction))closeDecision();
-    const actual=s.players.map(p=>p.hand),meta=s.lastDistribution;
-    if(meta?.serial&&(!pressure||pressure.serial!==meta.serial)&&((s.presentationUntil||0)>Date.now()||s.paused&&s.remaining?.presentation)){
+    const actual=s.players.map(p=>p.hand),kind=s.lastRotation?.serial?'rotation':'pressure',meta=kind==='rotation'?s.lastRotation:s.lastDistribution;
+    if(meta?.serial&&(!pressure||pressure.serial!==meta.serial||pressure.kind!==kind)&&((s.presentationUntil||0)>Date.now()||s.paused&&s.remaining?.presentation)){
       for(const entry of draws)remove(entry.node);draws.clear();masked.clear();
       // Nunca reaproveitar uma mão secreta de outro cliente. Reconexões usam versos.
       const old=previous||meta.beforeCounts.map((n,actor)=>Array.from({length:n},(_,i)=>({id:-1000000-actor*10000-i,hidden:true})));
       const top=s.discard.at(-1);
-      pressure={serial:meta.serial,duration:meta.duration,old:old.map(h=>h.filter(c=>c.id!==top.id)),points:old.map((h,actor)=>h.filter(c=>c.id!==top.id).map(c=>point(actor,c.id)))};
+      pressure={kind,meta,serial:meta.serial,duration:meta.duration,old:old.map(h=>h.filter(c=>c.id!==top.id)),points:old.map((h,actor)=>h.filter(c=>c.id!==top.id).map(c=>point(actor,c.id)))};
     }
     const elapsed=pressure?Math.max(0,clock(s)):Infinity,busy=!!pressure&&elapsed<pressure.duration;
     $('table').classList.toggle('pressure-transition',busy);
     $('table').classList.toggle('pressure-hands-hidden',busy&&elapsed>=690);
-    if(busy&&elapsed<1260)s.players.forEach((p,i)=>p.hand=pressure.old[i]);
+    if(busy&&elapsed<(pressure.kind==='rotation'?940:1260))s.players.forEach((p,i)=>p.hand=pressure.old[i]);
     try{render();lastOrigin=null;}finally{s.players.forEach((p,i)=>p.hand=actual[i]);}
     previous=actual.map(h=>h.map(c=>({...c})));
     if(!busy&&!decision&&!draws.size&&s.drawn!==null)showDecision(s);
     if(busy){
-      animatePressure(s,pressure,elapsed);dealPressure(s,pressure,elapsed);
-      for(const n of nodes)if(n.dataset.effect?.startsWith('pressure-'))for(const a of n.getAnimations())s.paused?a.pause():a.play();
-      clearTimeout(frame);if(!s.paused){const next=[690,1260,2000].find(t=>t>elapsed+1)||2000;frame=setTimeout(()=>{if(bridge().getState()===s)bridge().render();},Math.max(16,next-elapsed));}
-    }else if(pressure){for(const n of [...nodes])if(n.dataset.effect?.startsWith('pressure-'))remove(n);}
+      if(pressure.kind==='rotation')animateRotation(s,pressure,elapsed);else{animatePressure(s,pressure,elapsed);dealPressure(s,pressure,elapsed);}
+      for(const n of nodes)if(/^(pressure|rotation)-/.test(n.dataset.effect||''))for(const a of n.getAnimations())s.paused?a.pause():a.play();
+      clearTimeout(frame);if(!s.paused){const next=(pressure.kind==='rotation'?[690,940,1580,2000]:[690,1260,2000]).find(t=>t>elapsed+1)||2000;frame=setTimeout(()=>{if(bridge().getState()===s)bridge().render();},Math.max(16,next-elapsed));}
+    }else if(pressure){for(const n of [...nodes])if(/^(pressure|rotation)-/.test(n.dataset.effect||''))remove(n);if(pressure.kind==='pressure'&&!pressure.notified){pressure.notified=true;showReceived(s,pressure.meta);}}
+    window.PanelinhaMatchUI?.mountScore(s,!busy);
   }
   function animateDraws(events,s){
-    const ends=new Map();if(!events.length||s.lastDistribution&&Date.now()<(s.presentationUntil||0))return ends;
+    const ends=new Map();if(!events.length||Date.now()<(s.presentationUntil||0))return ends;
     if(motion.matches){showDecision(s);return ends;}
     let elapsed=0;
     events.forEach((event,i)=>{
-      const end=point(event.actor,event.id),eligible=event.actor===0&&s.drawn===event.id&&bridge().canPlayDraw(event.id);
-      const step=Math.max(12,Math.min(240,2400/events.length)*Math.pow(.98,i)),delay=elapsed;
-      const duration=events.length===1||eligible?820:Math.max(45,Math.min(620,step*2.5));
-      elapsed+=step;
-      const card=event.card,front=visible(s,event.actor),present=s.players[event.actor].hand.some(c=>c.id===event.id);
+      const end=point(event.actor,event.id),detailed=event.actor===0;
+      const eligible=detailed&&s.drawn===event.id&&bridge().canPlayDraw(event.id);
+      const step=Math.max(16,Math.min(310,3200/events.length)*Math.pow(.985,i)),delay=elapsed;
+      const duration=detailed?(events.length===1||eligible?1150:Math.max(65,Math.min(820,step*2.8))):540;
+      elapsed+=detailed?step:Math.min(step,140);
+      const card=event.card,present=s.players[event.actor].hand.some(c=>c.id===event.id);
       const start={x:event.x,y:event.y,width:event.width,height:event.height};
-      const n=sprite(card,front,start,'draw');Object.assign(n.dataset,{actor:event.actor,cardId:event.id});
+      const n=sprite(card,detailed,start,'draw');Object.assign(n.dataset,{actor:event.actor,cardId:event.id,presentation:detailed?'preview':'direct',duration});
       const height=Math.min(innerHeight*.5,300),width=height*400/850,cx=innerWidth/2,cy=innerHeight*.46;
-      const transform=(x,y,w,h)=>`translate(calc(-50% + ${x-start.x}px),calc(-50% + ${y-start.y}px)) scale(${w/start.width},${h/start.height})`;
-      const preview=transform(cx,cy,width,height),destination=transform(end.x,end.y,end.width,end.height);
-      const frames=[{opacity:0,transform:'translate(-50%,-50%) scale(.96)'},{offset:.08,opacity:1},{offset:.35,opacity:1,transform:preview},{offset:.69,opacity:1,transform:preview},{opacity:1,transform:eligible?preview:destination}];
-      const a=n.animate(frames,{duration,delay,easing:'cubic-bezier(.2,.7,.25,1)',fill:'both'});
+      const transform=(x,y,w,h,angle=0)=>`translate(calc(-50% + ${x-start.x}px),calc(-50% + ${y-start.y}px)) rotate(${angle}deg) scale(${w/start.width},${h/start.height})`;
+      const preview=transform(cx,cy,width,height),destination=transform(end.x,end.y,end.width,end.height,end.angle||0);
+      const frames=detailed?[
+        {opacity:0,transform:transform(start.x,start.y,start.width*.96,start.height*.96,-5)},
+        {offset:.08,opacity:1},
+        {offset:.22,opacity:1,transform:transform(start.x+(cx-start.x)*.4,start.y+(cy-start.y)*.4-18,start.width*1.45,start.height*1.45,-3)},
+        {offset:.4,opacity:1,transform:preview},{offset:.74,opacity:1,transform:preview},
+        {opacity:1,transform:eligible?preview:destination}
+      ]:[
+        {opacity:0,transform:transform(start.x,start.y,start.width,start.height)},
+        {offset:.08,opacity:1},
+        {offset:.45,opacity:1,transform:transform((start.x+end.x)/2,(start.y+end.y)/2-18,(start.width+end.width)/2,(start.height+end.height)/2,(end.angle||0)*.5)},
+        {opacity:1,transform:destination}
+      ];
+      const animation=n.animate(frames,{duration,delay,easing:'cubic-bezier(.25,.5,.25,1)',fill:'both'});
       if(present)masked.add(event.id);const entry={id:event.id,node:n};draws.add(entry);ends.set(event.id,delay+duration);
-      a.onfinish=()=>{draws.delete(entry);if(eligible&&bridge().getState()===s&&bridge().canPlayDraw(event.id)&&!s.pendingAction){remove(n);showDecision(s,card);}else{masked.delete(event.id);remove(n);PanelasMesa.maskCards();}};
+      animation.onfinish=()=>{draws.delete(entry);if(eligible&&bridge().getState()===s&&bridge().canPlayDraw(event.id)&&!s.pendingAction){remove(n);showDecision(s,card);}else{masked.delete(event.id);remove(n);PanelasMesa.maskCards();}};
     });return ends;
   }
   function showDecision(s,card=s.players[0].hand.find(c=>c.id===s.drawn)){

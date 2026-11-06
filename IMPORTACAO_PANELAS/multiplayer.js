@@ -9,7 +9,7 @@
   const entryNotice=document.createElement('p');entryNotice.className='mp-server-status';entryNotice.setAttribute('role','status');$('multiplayer').append(entryNotice);
   function notice(text){$('lobbyNotice').textContent=text;}
   function isHost(){return view.state?.hostId===view.selfId;}
-  function closeDialog(){if(dialog.hidden)return false;PanelinhaSelects.close({animate:false});dialog.hidden=true;dialogKind=null;content.textContent='';if(returnFocus?.isConnected)returnFocus.focus({preventScroll:true});return true;}
+  function closeDialog(){if(dialog.hidden)return false;PanelinhaMatchUI.closeHelp(false);PanelinhaSelects.close({animate:false});dialog.hidden=true;dialogKind=null;content.textContent='';if(returnFocus?.isConnected)returnFocus.focus({preventScroll:true});return true;}
   function openDialog(title,kind,confirm,label='Confirmar'){
     closeDialog();returnFocus=document.activeElement;dialogKind=kind;$('lobbyDialogTitle').textContent=title;$('lobbyDialogError').textContent='';$('lobbyDialogConfirm').textContent=label;$('lobbyDialogConfirm').hidden=!confirm;$('lobbyDialogConfirm').disabled=false;dialog.hidden=false;
     $('lobbyDialogConfirm').onclick=async()=>{const button=$('lobbyDialogConfirm');button.disabled=true;try{await confirm();closeDialog();}catch(e){$('lobbyDialogError').textContent=e.message;}finally{button.disabled=false;}};

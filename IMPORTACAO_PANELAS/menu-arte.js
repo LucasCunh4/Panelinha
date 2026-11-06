@@ -33,7 +33,7 @@
   const label=document.createElement('span');label.className='sr-only';label.textContent='PANELINHA';title.append(label);
   const letters=document.createElement('span');letters.className='title-letters';letters.setAttribute('aria-hidden','true');title.append(letters);
   Array.from('PANELINHA').forEach((letter,i)=>{
-    const wrap=document.createElement('span');wrap.className='title-letter';wrap.dataset.letter=letter;wrap.style.setProperty('--entry-delay',i*35+'ms');
+    const wrap=document.createElement('span');wrap.className='title-letter';wrap.dataset.letter=letter;wrap.style.setProperty('--entry-delay',i*35+'ms');wrap.style.setProperty('--arc-depth',String(1-Math.pow((i-4)/4,2)));wrap.style.setProperty('--arc-angle',((i-4)*1.1)+'deg');
     img(titleRoot+String(i+1).padStart(2,'0')+'_'+letter+'.png','title-letter-art',wrap);letters.append(wrap);
     if(i===0)img(fxRoot+'tampa/tampa_sobre_letra_P.png','title-lid',wrap);
   });
