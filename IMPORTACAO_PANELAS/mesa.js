@@ -39,7 +39,8 @@
   }
 
   // Elementos persistentes por assento/cartas: turnos não recriam mãos.
-  const seatRecords=new WeakMap(),opponentLayouts=new WeakMap();
+  const seatRecords=new WeakMap(),opponentLayouts=new WeakMap(),opponentNames=new Map();
+  let namesLayoutFrame=null;
   function attr(node,name,value){if(node.getAttribute(name)!==String(value))node.setAttribute(name,String(value));}
   function renderSeat(state,id,name,format){
     const seat=$(`player${id}`),player=state.players[id];let record=seatRecords.get(seat);
@@ -55,6 +56,12 @@
     }
     if(record.text.parentNode!==record.label||record.team.parentNode!==record.label){record.label.textContent='';record.label.append(record.text,record.team);}
     const active=state.phase==='playing'&&state.current===id;seat.classList.toggle('active',active);
+    if(id!==0){
+      let nameplate=opponentNames.get(id);
+      if(!nameplate){nameplate=document.createElement('span');nameplate.className='opponent-name';nameplate.dataset.player=String(id);nameplate.setAttribute('aria-hidden','true');$('table').append(nameplate);opponentNames.set(id,nameplate);}
+      if(nameplate.textContent!==name)nameplate.textContent=name;
+      nameplate.classList.toggle('is-active',active);
+    }
     const label=name+(active?' ⏳':'')+(state.o.duo?' ':'');if(record.text.data!==label)record.text.data=label;
     attr(record.label,'title',name);record.team.hidden=!state.o.duo;
     const team=state.online?String(player.team):id%2?'B':'A';if(record.team.textContent!==team)record.team.textContent=team;
@@ -319,13 +326,13 @@
     if(!badge){badge=document.createElement('span');badge.id='turnClock';badge.className='turn-clock';badge.setAttribute('role','timer');$('table').append(badge);}
     const visible=state.phase==='playing'&&state.o.timeout&&state.deadline&&remaining>0&&remaining<=5000;
     badge.hidden=!visible;
-    if(!visible){badge.textContent='';badge.removeAttribute('data-actor');clockKey=null;return;}
+    if(!visible){const changed=clockKey!==null;badge.textContent='';badge.removeAttribute('data-actor');clockKey=null;if(changed)layoutOpponentNames();return;}
     const value=Math.ceil(remaining/1000);
     badge.dataset.actor=String(state.current);
     badge.textContent=String(value);badge.setAttribute('aria-label',`${value} segundos restantes no turno`);
     const key=`${state.token}:${state.current}:${value}`;
     if(key!==clockKey&&!reducedMotion.matches)badge.animate([{transform:'translateY(-50%) scale(1.12)'},{transform:'translateY(-50%) scale(1)'}],{duration:180,easing:'ease-out'});
-    clockKey=key;
+    const changed=clockKey!==key;clockKey=key;if(changed)layoutOpponentNames();
   }
 
   function animateBlock(play,delay) {
@@ -428,6 +435,48 @@
       if(a&&p)a.currentTime=Math.floor(p.elapsed/p.duration)*p.duration+p.duration-p.elapsed%p.duration;
     });
   }
+
+  // Rótulos independentes dos leques/avatares: não alteram o eixo das cartas.
+  function layoutOpponentNames(){
+    if(!opponentNames.size)return;
+    const table=$('table').getBoundingClientRect(),gap=8,pad=8;
+    const rect=node=>{const r=node.getBoundingClientRect();return{x:r.left,y:r.top,w:r.width,h:r.height,right:r.right,bottom:r.bottom};};
+    const union=nodes=>{const rs=[...nodes].map(rect).filter(r=>r.w&&r.h);if(!rs.length)return null;const x=Math.min(...rs.map(r=>r.x)),y=Math.min(...rs.map(r=>r.y)),right=Math.max(...rs.map(r=>r.right)),bottom=Math.max(...rs.map(r=>r.bottom));return{x,y,right,bottom,w:right-x,h:bottom-y};};
+    const hands=[0,1,2,3].map(id=>union((id===0?$('hand'):$('player'+id)).querySelectorAll('.card,.hidden-card')));
+    const avatars=[0,1,2,3].map(id=>rect($('player'+id).querySelector('.pan-avatar')));
+    const occupied=[...hands.filter(Boolean),...avatars];
+    for(const id of ['buyBtn','discard','tableMenuBtn','turnClock','onlineConnectionNotice']){const node=$(id);if(node&&!node.hidden&&node.getClientRects().length){const r=rect(node);if(r.w&&r.h)occupied.push(r);}}
+    const overlap=(a,b)=>Math.max(0,Math.min(a.right,b.right+4)-Math.max(a.x,b.x-4))*Math.max(0,Math.min(a.bottom,b.bottom+4)-Math.max(a.y,b.y-4));
+    for(const id of [2,3,1]){
+      const label=opponentNames.get(id);if(!label)continue;
+      const avatar=avatars[id],hand=hands[id]||avatar,cx=avatar.x+avatar.w/2,cy=avatar.y+avatar.h/2;
+      const below={max:Math.min(240,innerWidth*.25),place:(w,h)=>({x:cx-w/2,y:avatar.bottom+gap})};
+      const above={max:Math.min(240,innerWidth*.25),place:(w,h)=>({x:cx-w/2,y:hand.y-h-gap})};
+      const candidates=id===2?[
+        {max:Math.min(240,avatar.x-pad-gap),place:(w,h)=>({x:avatar.x-w-gap,y:cy-h/2})},
+        below,above
+      ]:[below,above,{max:Math.min(220,innerWidth*.25),place:(w,h)=>({x:id===3?hand.right+gap:hand.x-w-gap,y:hand.y+hand.h/2-h/2})}];
+      let best=null;
+      for(const font of [20,18,16]){
+        for(const candidate of candidates){
+          label.style.fontSize=font+'px';label.style.maxWidth=Math.max(70,candidate.max)+'px';
+          const w=label.offsetWidth,h=label.offsetHeight,p=candidate.place(w,h);
+          const x=Math.max(pad,Math.min(innerWidth-pad-w,p.x)),y=Math.max(pad,Math.min(innerHeight-pad-h,p.y));
+          const r={x,y,w,h,right:x+w,bottom:y+h},cost=occupied.reduce((sum,other)=>sum+overlap(r,other),0);
+          if(!best||cost<best.cost)best={...r,cost,font,max:Math.max(70,candidate.max)};
+          if(cost===0)break;
+        }
+        if(best.cost===0)break;
+      }
+      label.style.fontSize=best.font+'px';label.style.maxWidth=best.max+'px';
+      label.style.left=(best.x-table.x)+'px';label.style.top=(best.y-table.y)+'px';occupied.push(best);
+    }
+  }
+
+  $('table').addEventListener('transitionend',event=>{
+    if(!event.target.matches('.card,.hidden-card,#hand'))return;
+    cancelAnimationFrame(namesLayoutFrame);namesLayoutFrame=requestAnimationFrame(layoutOpponentNames);
+  });
 
   function fitTopIdentity(){
     const identity=$('player2').querySelector('.seat-identity');
@@ -557,7 +606,8 @@
     const draws=pendingDraws;pendingDraws=[];
     const ends=animateDraws(draws,state);
     if(play&&play.id===displayedTop)animatePlay(play,ends.get(play.id)||0);
-    maskCards();updateClock(state);
+    maskCards();updateClock(state);layoutOpponentNames();
+    cancelAnimationFrame(namesLayoutFrame);namesLayoutFrame=requestAnimationFrame(layoutOpponentNames);
   }
   function followTurnCue(animated){
     cancelAnimationFrame(cueLayoutFrame);const until=performance.now()+(animated&&!reducedMotion.matches?260:0);
@@ -578,8 +628,8 @@
     fan($('hand'), innerWidth < 360 ? 7 : 9);
     document.querySelectorAll('.subhand,.back').forEach(hand => fan(hand,Infinity));
     layoutPileAura();
-    positionTurnCue();
+    positionTurnCue();layoutOpponentNames();
   });
   nativeTable(false);
-  window.PanelasMesa = { handPoint,maskCards,render, renderSeat, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {PanelinhaTableEffects.reset();cancelAnimationFrame(cueLayoutFrame);cueAnimation?.cancel();cueAnimation=null;cueOwner=null;cueRound=null;wasHumanTurn=false;$('turnCue').hidden=true;$('hand').classList.remove('human-turn');$('hand').dataset.turnScale='1';$('buyBtn').classList.remove('mandatory-buy');clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
+  window.PanelasMesa = { handPoint,maskCards,render, renderSeat, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {cancelAnimationFrame(namesLayoutFrame);for(const nameplate of opponentNames.values())nameplate.remove();opponentNames.clear();PanelinhaTableEffects.reset();cancelAnimationFrame(cueLayoutFrame);cueAnimation?.cancel();cueAnimation=null;cueOwner=null;cueRound=null;wasHumanTurn=false;$('turnCue').hidden=true;$('hand').classList.remove('human-turn');$('hand').dataset.turnScale='1';$('buyBtn').classList.remove('mandatory-buy');clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
 })();

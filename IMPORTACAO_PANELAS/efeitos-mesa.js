@@ -132,13 +132,16 @@
   function animateDraws(events,s){
     const ends=new Map();if(!events.length||Date.now()<(s.presentationUntil||0))return ends;
     if(motion.matches){showDecision(s);return ends;}
-    let elapsed=0;
-    events.forEach((event,i)=>{
+    let elapsed=0,ownIndex=0;
+    const ownCount=events.filter(event=>event.actor===0).length;
+    const ownSteps=Array.from({length:ownCount},(_,i)=>Math.max(500,1100*Math.pow(.96,i)));
+    const sequenceScale=Math.min(1,14000/(ownSteps.reduce((sum,step)=>sum+step,0)||1));
+    events.forEach(event=>{
       const end=point(event.actor,event.id),detailed=event.actor===0;
       const eligible=detailed&&s.drawn===event.id&&bridge().canPlayDraw(event.id);
-      const step=Math.max(20,Math.min(390,4000/events.length)*Math.pow(.985,i)),delay=elapsed;
-      const duration=detailed?(events.length===1||eligible?1450:Math.max(85,Math.min(1000,step*2.8))):540;
-      elapsed+=detailed?step:Math.min(step,140);
+      const step=detailed?ownSteps[ownIndex++]*sequenceScale:240,delay=elapsed;
+      const duration=detailed?(ownCount===1||eligible?2400:Math.max(420,step*1.65)):850;
+      elapsed+=step;
       const card=event.card,present=s.players[event.actor].hand.some(c=>c.id===event.id);
       const start={x:event.x,y:event.y,width:event.width,height:event.height};
       const n=sprite(card,detailed,start,'draw');Object.assign(n.dataset,{actor:event.actor,cardId:event.id,presentation:detailed?'preview':'direct',duration});
@@ -146,10 +149,10 @@
       const transform=(x,y,w,h,angle=0)=>`translate(calc(-50% + ${x-start.x}px),calc(-50% + ${y-start.y}px)) rotate(${angle}deg) scale(${w/start.width},${h/start.height})`;
       const preview=transform(cx,cy,width,height),destination=transform(end.x,end.y,end.width,end.height,end.angle||0);
       const frames=detailed?[
-        {opacity:0,transform:transform(start.x,start.y,start.width*.96,start.height*.96,-5)},
-        {offset:.08,opacity:1},
-        {offset:.22,opacity:1,transform:transform(start.x+(cx-start.x)*.4,start.y+(cy-start.y)*.4-18,start.width*1.45,start.height*1.45,-3)},
-        {offset:.4,opacity:1,transform:preview},{offset:.77,opacity:1,transform:preview},
+        {opacity:0,transform:transform(start.x,start.y,start.width*.96,start.height*.96,-5),easing:'ease-out'},
+        {offset:.06,opacity:1,transform:transform(start.x,start.y-8,start.width*1.02,start.height*1.02,-4),easing:'cubic-bezier(.4,0,.3,1)'},
+        {offset:.2,opacity:1,transform:transform(start.x+(cx-start.x)*.4,start.y+(cy-start.y)*.4-18,start.width*1.45,start.height*1.45,-3),easing:'cubic-bezier(.2,.65,.3,1)'},
+        {offset:.4,opacity:1,transform:preview},{offset:.8,opacity:1,transform:preview,easing:'cubic-bezier(.4,0,.2,1)'},
         {opacity:1,transform:eligible?preview:destination}
       ]:[
         {opacity:0,transform:transform(start.x,start.y,start.width,start.height)},
@@ -157,7 +160,7 @@
         {offset:.45,opacity:1,transform:transform((start.x+end.x)/2,(start.y+end.y)/2-18,(start.width+end.width)/2,(start.height+end.height)/2,(end.angle||0)*.5)},
         {opacity:1,transform:destination}
       ];
-      const animation=n.animate(frames,{duration,delay,easing:'cubic-bezier(.25,.5,.25,1)',fill:'both'});
+      const animation=n.animate(frames,{duration,delay,easing:detailed?'linear':'cubic-bezier(.25,.5,.25,1)',fill:'both'});
       if(present)masked.add(event.id);const entry={id:event.id,node:n};draws.add(entry);ends.set(event.id,delay+duration);
       animation.onfinish=()=>{draws.delete(entry);if(eligible&&bridge().getState()===s&&bridge().canPlayDraw(event.id)&&!s.pendingAction){remove(n);showDecision(s,card);}else{masked.delete(event.id);remove(n);PanelasMesa.maskCards();}};
     });return ends;
