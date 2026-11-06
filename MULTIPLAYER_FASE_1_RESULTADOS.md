@@ -105,3 +105,11 @@ Depois disso, em uma etapa de deploy **explicitamente autorizada**, o Codex exec
 8. Depois do lobby público validado, preparar o APK com a configuração pública, `npm run sync:android` e workflow Android existente, assinatura de geração 2 e versionCode crescente. Verificar certificado/pacote e atualização preservando dados. Partidas online só serão habilitadas após a Fase 2.
 
 Esses passos são preparação documentada. **Nenhum login, deploy, publicação web, alteração de conta Cloudflare ou compilação Android de distribuição foi executado por esta tarefa.**
+
+## Preparação da conta — 06/11/2026
+
+O proprietário forneceu o Account ID público `29f97cde80537cc4691142d5b86d115f`, registrado em `multiplayer-server/wrangler.jsonc`. O dry-run foi executado novamente e aprovado. O identificador sozinho não autentica o ambiente e a associação à conta ainda precisa ser verificada após login; `wrangler whoami --json` informou `loggedIn: false`.
+
+A versão fixada do Wrangler suporta `login --device --browser=false`, fluxo oficial adequado à autorização pelo navegador do celular, sem callback localhost. Para conferir conta e associação, basta solicitar `--scopes account:read user:read`, sem conceder publicação de Workers. Não colocar credenciais ou códigos temporários no Git. Uma futura publicação continuará dependendo de autorização explícita e das permissões adicionais necessárias. Referência: [login por dispositivo](https://developers.cloudflare.com/workers/wrangler/commands/general/#use-wrangler-login-without-a-local-callback-server).
+
+Esta preparação não publicou o lobby, não alterou a conta Cloudflare, não gerou APK e não mudou o jogo ou sua identidade Android.

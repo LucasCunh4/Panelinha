@@ -50,6 +50,8 @@ Para testar pela rede local em aparelhos separados, o desenvolvedor pode iniciar
 
 Uma URL vazia desabilita claramente Criar/Entrar; Um jogador permanece offline. Depois de configurar, execute build e sync antes de uma futura compilação Android. A origem `https://localhost` do APK continua autorizada em `ALLOWED_ORIGINS`. O próprio domínio do Worker é aceito para a versão web; acrescente outras origens web explicitamente se forem usadas. CORS não substitui autenticação.
 
+O `account_id` público fornecido pelo proprietário já consta no Wrangler; isso seleciona a conta, mas não autentica nem publica recursos. Para verificação inicial por celular, o Wrangler fixado oferece `login --device --browser=false --scopes account:read user:read`. A aprovação ocorre no site oficial Cloudflare; tokens e códigos temporários nunca devem ser colocados no Git. A publicação continua separada, dependente de autorização e permissões de escrita apropriadas.
+
 O Worker está preparado para hospedar os arquivos web e a API no mesmo endereço. `assets.run_worker_first` encaminha `/v1/*` e `/health` ao código do Worker; os demais arquivos vêm de `dist`. Não existe hospedagem publicada por esta tarefa.
 
 ## HTTP v1

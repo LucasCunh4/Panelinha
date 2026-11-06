@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "panelinha-lobby",
+  "account_id": "29f97cde80537cc4691142d5b86d115f",
   "main": "src/worker.mjs",
   "compatibility_date": "2026-07-01",
   "workers_dev": true,
