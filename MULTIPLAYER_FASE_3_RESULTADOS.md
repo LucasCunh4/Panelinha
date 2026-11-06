@@ -41,7 +41,7 @@ Pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`, assinatura 
 
 A falha de uma partida aleatória sob carga foi atingir o orçamento de 150 segundos, sem conclusão; a reexecução focada completou a partida mantendo o mesmo limite e todas as exigências. Foram acrescentados registros de progresso/estado para distinguir partida em andamento de travamento. O aviso de retomada foi compactado e validado em 568×320 e 844×390 sem cobrir cartas, parceiro ou descarte.
 
-O teste de perda de conexão revelou duas falhas corrigidas: o painel de pausa interceptava Reconectar por estar em outro contexto de empilhamento; agora compartilha a camada da mesa, sem interceptar eventos fora dos botões. E o timeout de uma intenção aguardava o fechamento completo do WebSocket; agora bloqueia ações e inicia recuperação imediatamente, sem repetir a intenção. Cancelar uma reconexão HTTP pendente também não pode reabrir a sala após sair.
+O teste de perda de conexão revelou duas falhas corrigidas: o painel de pausa interceptava Reconectar por estar em outro contexto de empilhamento; agora compartilha a camada da mesa, sem interceptar eventos fora dos botões. E o timeout de uma intenção aguardava o fechamento completo do WebSocket; agora bloqueia ações e inicia recuperação imediatamente, sem repetir a intenção. Cancelar uma reconexão HTTP pendente também não pode reabrir a sala após sair. Um teste adicional confirmou que o último snapshot indicando bot por inatividade não pode consumir o toque em Reconectar enquanto offline; o gesto de reassumir só é capturado com conexão ativa.
 
 Evidências compactas: [testes/evidencias-multiplayer-fase3](testes/evidencias-multiplayer-fase3/). O script Android ganhou somente monitor de memória/processos do AVD no CI, sem argumentos/ambiente/Secrets, para diagnosticar a queda recorrente; os testes e critérios não foram reduzidos.
 
@@ -53,7 +53,7 @@ Referências consultadas: [WebSocket Hibernation](https://developers.cloudflare.
 
 ## Publicação e APK
 
-Pendentes nesta revisão. Serão registrados URL, versão publicada, testes públicos, versão/certificado do APK real e link direto. Uma falha de AVD será identificada separadamente de falhas funcionais, sem remover testes nem declarar execução nativa a partir de Chromium.
+A primeira publicação da Fase 3 foi validada em HTTPS/WSS, incluindo quatro clientes, pausa por 70 segundos, sucessão definitiva de anfitrião e retorno à mesma mão. A compilação #37 gerou 0.2.37/c5702, mas o AVD ficou offline no primeiro caso (0/13 concluídos). O monitor registra o processo QEMU ainda presente, sem estabelecer a causa raiz da perda do ADB. Antes da entrega houve a correção adicional do botão Reconectar com snapshot de bot; a compilação final incluirá essa correção, com código maior. Os resultados definitivos e o link serão registrados abaixo, sem omitir a falha da execução anterior.
 
 ## Limitações de validação
 

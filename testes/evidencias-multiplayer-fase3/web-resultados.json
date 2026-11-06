@@ -104,8 +104,7 @@
   {
     "suite": "multiplayer_robustez",
     "exitCode": 0,
-    "seconds": 51.71,
-    "source": "transporte-final/multiplayer_robustez/suite.log"
+    "source": "toque-offline-final/suite.log"
   },
   {
     "suite": "padrao_400x850",

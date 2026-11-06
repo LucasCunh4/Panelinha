@@ -48,7 +48,10 @@ const base=process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/',out=process.en
     blackout=true;const transport=transports.at(-1);transport.route.close({code:1012,reason:'Perda de transporte de teste'});transport.upstream.close({code:1012});
     await guest.waitForFunction(()=>PanelinhaLobbyConnection.current.status!=='connected');assert.ok(await guest.locator('#buyBtn').isDisabled());
     await guest.waitForFunction(()=>PanelinhaLobbyConnection.current.status==='disconnected');assert.equal(await guest.evaluate(()=>JSON.parse(localStorage.getItem('panelinha.multiplayer.room.v1')).code),code);
-    assert.ok(await guest.locator('#onlineReconnectBtn').isEnabled());blackout=false;await guest.locator('#onlineReconnectBtn').tap();
+    assert.ok(await guest.locator('#onlineReconnectBtn').isEnabled());
+    // O último snapshot pode indicar bot por inatividade quando a rede cai.
+    // Essa indicação local não deve consumir o toque no botão Reconectar.
+    await guest.evaluate(()=>{CartasTest.getState().actions.reclaim=true;});blackout=false;await guest.locator('#onlineReconnectBtn').tap();
     await guest.waitForFunction(()=>PanelinhaLobbyConnection.current.status==='connected');assert.equal((await view(guest)).selfId,identity);assert.deepEqual((await table(guest)).players[0].hand,ownBefore);assert.equal((await table(guest)).paused,true);
     assert.equal((await view(guest)).state.hostId,(await view(a)).selfId);
     console.log('PASS perda real do transporte, quatro tentativas e Reconectar mantêm código, identidade, assento, mão e pausa; mesa sem comandos durante desconexão');

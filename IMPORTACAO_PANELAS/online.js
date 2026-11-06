@@ -25,6 +25,7 @@
     finally{reclaiming=false;}
   }
   function captureIntent(event){
+    if(!connected()){consumeClick=false;return;}
     if(event.type==='pointerdown')consumeClick=false;
     if(event.type==='click'&&consumeClick){consumeClick=false;event.preventDefault();event.stopImmediatePropagation();return;}
     if(!current?.actions.reclaim&&!reclaiming)return;
