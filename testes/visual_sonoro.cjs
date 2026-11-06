@@ -16,7 +16,7 @@ const out=process.env.PANELAS_SCREENSHOTS||'/workspace/work/integracao-visual-so
   assert.equal(await p.locator('#frontScene .kitchen-art').count(),0);assert.equal(await p.locator('#home button').count(),2);
   assert.deepEqual(await p.locator('.title-letter').evaluateAll(es=>es.map(e=>e.dataset.letter)),Array.from('PANELINHA'));
   assert.deepEqual(await p.locator('.title-letter-art').evaluateAll(es=>es.map(e=>e.src.split('/').at(-1))),Array.from('PANELINHA',(l,i)=>String(i+1).padStart(2,'0')+'_'+l+'.png'));
-  assert.equal(await p.locator('.title-lid').count(),1);assert.equal(await p.locator('.title-sparkle').count(),5);assert.equal(await p.locator('.menu-vapor').count(),6);
+  assert.equal(await p.locator('.title-lid').count(),0);assert.equal(await p.locator('.title-sparkle').count(),5);assert.equal(await p.locator('.menu-vapor').count(),6);
   for(const [width,height] of [[568,320],[667,375],[844,390],[915,412],[1280,800],[1920,1080]]){
    await p.setViewportSize({width,height});await p.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));await settle();
    const geometry=await p.evaluate(()=>{

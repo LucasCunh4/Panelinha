@@ -395,3 +395,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 #buyBtn.mandatory-buy .pile-aura {display:block;opacity:1;animation:pile-aura-pulse 1.1s ease-in-out infinite}
 @keyframes pile-aura-pulse {0%,100%{opacity:.55}50%{opacity:1}}
 @media(prefers-reduced-motion:reduce){#buyBtn.mandatory-buy .pile-aura {animation:none;opacity:1}}
+
+.turn-cue-label{display:inline-block;transform-origin:center;animation:turn-cue-pulse 1.85s 1.4s ease-in-out infinite}
+@keyframes turn-cue-pulse{0%,100%{transform:scale(1);opacity:.9;filter:brightness(1)}50%{transform:scale(1.045);opacity:1;filter:brightness(1.12)}}
+@media(prefers-reduced-motion:reduce){.turn-cue-label{animation:none;transform:none;opacity:1;filter:none}}

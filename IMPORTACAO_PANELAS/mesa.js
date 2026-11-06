@@ -494,7 +494,7 @@
     $('buyBtn').setAttribute('data-mandatory',String(mustBuy));
     const cue=$('turnCue'),newTurn=cueOwner!==state||cueRound!==state.round||!wasHumanTurn;
     cue.hidden=!humanTurn;
-    if(humanTurn&&newTurn){cueAnimation?.cancel();cue.innerHTML='<span>SUA VEZ!</span>';if(!reducedMotion.matches)cueAnimation=cue.firstElementChild.animate([{opacity:0,transform:'translateY(6px) scale(.82)'},{offset:.15,opacity:1,transform:'scale(1.08)'},{offset:.65,opacity:1,transform:'scale(1)'},{opacity:.85,transform:'scale(.82)'}],{duration:1400,easing:'ease-out',fill:'forwards'});}
+    if(humanTurn&&newTurn){cueAnimation?.cancel();cue.innerHTML='<span><span class="turn-cue-label">SUA VEZ!</span></span>';if(!reducedMotion.matches)cueAnimation=cue.firstElementChild.animate([{opacity:0,transform:'translateY(6px) scale(.82)'},{offset:.15,opacity:1,transform:'scale(1.08)'},{offset:.65,opacity:1,transform:'scale(1)'},{opacity:.85,transform:'scale(.82)'}],{duration:1400,easing:'ease-out',fill:'forwards'});}
     if(!humanTurn){cueAnimation?.cancel();cueAnimation=null;}
     cueOwner=state;cueRound=state.round;wasHumanTurn=humanTurn;
     const center = document.querySelector('.center');

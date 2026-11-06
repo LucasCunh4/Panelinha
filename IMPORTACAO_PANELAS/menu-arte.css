@@ -16,9 +16,7 @@
 .title-letters{position:relative;display:flex;align-items:center;width:100%;gap:0;filter:drop-shadow(0 5px 6px #210c3599)}
 .title-letter{position:relative;display:block;flex:1;min-width:0;aspect-ratio:1;animation:official-letter-entry 520ms var(--entry-delay) cubic-bezier(.2,.8,.2,1) both}
 .title-letter-art{display:block;width:100%;height:auto;object-fit:contain}
-.title-lid{position:absolute;width:115%;height:auto;left:-12%;top:-39%;transform-origin:50% 85%;animation:official-lid 4.2s ease-in-out infinite;z-index:2}
 @keyframes official-letter-entry{from{opacity:0;transform:translateY(8px) scale(.92)}to{opacity:1;transform:none}}
-@keyframes official-lid{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-3px) rotate(1deg)}}
 .title-sparkle{position:absolute;width:7%;height:auto;object-fit:contain;pointer-events:none;animation:official-sparkle var(--period) var(--phase) ease-in-out infinite}
 .sparkle-0{left:6%;top:90%;width:5%}.sparkle-1{left:29%;top:-23%;width:7%}.sparkle-2{left:63%;top:87%;width:5%}.sparkle-3{left:83%;top:-30%;width:5%}.sparkle-4{left:96%;top:27%;width:7%}
 @keyframes official-sparkle{0%,100%{opacity:.15;transform:scale(.78) rotate(-8deg)}50%{opacity:.85;transform:scale(1.04) rotate(8deg)}}
@@ -42,14 +40,13 @@
 }
 body:not([data-screen=home]) .menu-art-plane::after{content:'';position:absolute;inset:0;background:#20112f91}
 body[data-screen=game] .menu-art-plane{display:none}
-@media(prefers-reduced-motion:reduce){.menu-utensil,.menu-vapor,.title-letter,.title-lid,.title-sparkle{animation:none!important}.menu-vapor{opacity:.13}.menu-vapor:not(:first-child){display:none}.title-sparkle{opacity:.45}}
+@media(prefers-reduced-motion:reduce){.menu-utensil,.menu-vapor,.title-letter,.title-letter-art,.title-sparkle{animation:none!important}.menu-vapor{opacity:.13}.menu-vapor:not(:first-child){display:none}.title-sparkle{opacity:.45}}
 
 /* Conteúdo no viewport; cenário e pontos de suspensão usam o mesmo cover. */
 #home.home-screen{inset:0;width:100%;height:100%;transform:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,3vh,32px);padding:24px max(24px,env(safe-area-inset-left))}
 #home .game-title{position:relative;inset:auto;width:min(76vw,850px);flex:none;margin:0}
 .title-letters{justify-content:center}
 .title-letter{flex:0 0 14%;margin-left:-3.6%}.title-letter:first-child{margin-left:0}
-.title-lid{width:45%;left:25%;top:1%}
 #home .home-actions{position:relative;inset:auto;width:min(46vw,440px);gap:clamp(10px,2.5vh,20px)}
 #home .hero-button{min-height:clamp(48px,10vh,78px)}
 .player-avatar.official-avatar{overflow:hidden;border-radius:50%}
@@ -59,8 +56,12 @@ body[data-screen=game] .menu-art-plane{display:none}
 @media(orientation:landscape) and (max-height:420px){#home.home-screen{gap:8px;padding-block:10px}#home .game-title{width:min(63vw,640px)}#home .home-actions{width:min(42vw,380px)}}
 #home .game-title{align-self:center}
 
-/* Título no primeiro quarto, com arco leve e tampa suspensa. */
+/* Título no primeiro quarto, com arco leve preservado. */
 #home .game-title{position:absolute;left:50%;top:25%;transform:translate(-50%,-50%);--title-curve:clamp(7px,1.5vh,12px)}
 .title-letter{top:calc(var(--title-curve)*var(--arc-depth,0))}.title-letter-art{transform:rotate(var(--arc-angle,0deg))}
-.title-lid{left:5%;top:-31%;width:45%}
 #home .home-actions{position:absolute;left:50%;top:50%;transform:translateX(-50%)}
+
+/* Uma passada leve da esquerda para a direita, sem modificar PNGs ou o arco. */
+.title-letter-art{--piano-lift:clamp(4px,.9vh,7px);animation:title-piano 6.4s var(--piano-delay,900ms) ease-in-out infinite}
+@keyframes title-piano{0%,10%,100%{transform:translateY(0) rotate(var(--arc-angle,0deg))}4.5%{transform:translateY(calc(-1 * var(--piano-lift))) rotate(var(--arc-angle,0deg))}}
+body:not([data-screen=home]) .title-letter-art{animation-play-state:paused}

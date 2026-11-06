@@ -20,11 +20,10 @@
   try{const stored=JSON.parse(localStorage.getItem(key));saved=normalize(stored);if(stored&&stored.avatar!==saved.avatar)localStorage.setItem(key,JSON.stringify({...stored,avatar:saved.avatar}));}catch{}
   function avatarHTML(id){const a=avatars.find(a=>a[0]===(legacy[id]||id))||avatars[0];return `<span class="pan-avatar player-avatar official-avatar" data-avatar="${a[0]}" aria-hidden="true"><img src="assets/avatares/${a[2]}" alt="" width="1254" height="1254" decoding="async" draggable="false"></span>`;}
   function preview(){
-    $('profilePreviewName').textContent=normalize({name:$('playerName').value}).name;
     $('profilePreviewAvatar').innerHTML=avatarHTML(selected);
     $('avatarGallery').querySelectorAll('[data-avatar-choice]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.avatarChoice===selected)));
   }
-  $('avatarGallery').innerHTML=avatars.map(([id,label])=>`<button type="button" data-avatar-choice="${id}" aria-label="Avatar ${label}" aria-pressed="false">${avatarHTML(id)}<span>${label}</span></button>`).join('');
+  $('avatarGallery').innerHTML=avatars.map(([id,label])=>`<button type="button" data-avatar-choice="${id}" aria-label="Avatar ${label}" aria-pressed="false">${avatarHTML(id)}</button>`).join('');
   $('avatarGallery').querySelectorAll('button').forEach(b=>b.onclick=()=>{selected=b.dataset.avatarChoice;preview()});
   $('playerName').addEventListener('input',preview);
   function open(){selected=saved.avatar;$('playerName').value=saved.name;preview();}

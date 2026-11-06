@@ -90,10 +90,17 @@
     }
   }
   function showReceived(s,meta){
+    for(const n of [...nodes])if(n.dataset.effect==='received')remove(n);
     for(const actor of meta.active){
       const avatar=$('player'+actor).querySelector('.pan-avatar'),r=(avatar||$('player'+actor)).getBoundingClientRect(),badge=document.createElement('span');badge.className='pressure-received';badge.dataset.actor=actor;badge.dataset.effect='received';badge.textContent='+'+meta.afterCounts[actor];badge.setAttribute('role','status');badge.setAttribute('aria-label',bridge().names(actor)+' recebeu '+meta.afterCounts[actor]+' cartas');
-      badge.style.left=Math.max(26,Math.min(innerWidth-26,r.x+r.width/2))+'px';badge.style.top=Math.max(22,Math.min(innerHeight-22,r.top-16))+'px';$('playAnimations').append(badge);nodes.add(badge);
-      const animation=badge.animate(motion.matches?[{opacity:1},{offset:.85,opacity:1},{opacity:0}]:[{opacity:0,transform:'translate(-50%,-35%) scale(.8)'},{offset:.1,opacity:1,transform:'translate(-50%,-50%) scale(1)'},{offset:.8,opacity:1},{opacity:0,transform:'translate(-50%,-70%)'}],{duration:2400,easing:'ease-out',fill:'both'});animation.onfinish=()=>remove(badge);
+      $('playAnimations').append(badge);nodes.add(badge);
+      const w=badge.offsetWidth,h=badge.offsetHeight;
+      let x=r.x+r.width/2,y=r.top-h/2-8;
+      // Se não houver espaço acima (avatar superior), prefere o lado livre.
+      if(r.top<h+16){if(r.left>w+16){x=r.left-w/2-8;y=r.y+r.height/2;}else y=r.bottom+h/2+8;}
+      badge.style.left=Math.max(w/2+8,Math.min(innerWidth-w/2-8,x))+'px';
+      badge.style.top=Math.max(h/2+8,Math.min(innerHeight-h/2-8,y))+'px';
+      const animation=badge.animate(motion.matches?[{opacity:1},{offset:.84,opacity:1},{opacity:0}]:[{opacity:0,transform:'translate(-50%,-35%) scale(.8)'},{offset:.06,opacity:1,transform:'translate(-50%,-50%) scale(1)'},{offset:.84,opacity:1},{opacity:0,transform:'translate(-50%,-70%)'}],{duration:4200,easing:'ease-out',fill:'both'});animation.onfinish=()=>remove(badge);
     }
   }
   function paint(s,render){
@@ -102,6 +109,7 @@
     const actual=s.players.map(p=>p.hand),kind=s.lastRotation?.serial?'rotation':'pressure',meta=kind==='rotation'?s.lastRotation:s.lastDistribution;
     if(meta?.serial&&(!pressure||pressure.serial!==meta.serial||pressure.kind!==kind)&&((s.presentationUntil||0)>Date.now()||s.paused&&s.remaining?.presentation)){
       for(const entry of draws)remove(entry.node);draws.clear();masked.clear();
+      for(const n of [...nodes])if(n.dataset.effect==='received')remove(n);
       // Nunca reaproveitar uma mão secreta de outro cliente. Reconexões usam versos.
       const old=previous||meta.beforeCounts.map((n,actor)=>Array.from({length:n},(_,i)=>({id:-1000000-actor*10000-i,hidden:true})));
       const top=s.discard.at(-1);
@@ -128,8 +136,8 @@
     events.forEach((event,i)=>{
       const end=point(event.actor,event.id),detailed=event.actor===0;
       const eligible=detailed&&s.drawn===event.id&&bridge().canPlayDraw(event.id);
-      const step=Math.max(16,Math.min(310,3200/events.length)*Math.pow(.985,i)),delay=elapsed;
-      const duration=detailed?(events.length===1||eligible?1150:Math.max(65,Math.min(820,step*2.8))):540;
+      const step=Math.max(20,Math.min(390,4000/events.length)*Math.pow(.985,i)),delay=elapsed;
+      const duration=detailed?(events.length===1||eligible?1450:Math.max(85,Math.min(1000,step*2.8))):540;
       elapsed+=detailed?step:Math.min(step,140);
       const card=event.card,present=s.players[event.actor].hand.some(c=>c.id===event.id);
       const start={x:event.x,y:event.y,width:event.width,height:event.height};
@@ -141,7 +149,7 @@
         {opacity:0,transform:transform(start.x,start.y,start.width*.96,start.height*.96,-5)},
         {offset:.08,opacity:1},
         {offset:.22,opacity:1,transform:transform(start.x+(cx-start.x)*.4,start.y+(cy-start.y)*.4-18,start.width*1.45,start.height*1.45,-3)},
-        {offset:.4,opacity:1,transform:preview},{offset:.74,opacity:1,transform:preview},
+        {offset:.4,opacity:1,transform:preview},{offset:.77,opacity:1,transform:preview},
         {opacity:1,transform:eligible?preview:destination}
       ]:[
         {opacity:0,transform:transform(start.x,start.y,start.width,start.height)},

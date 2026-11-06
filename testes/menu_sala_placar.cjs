@@ -21,16 +21,12 @@ const out='/workspace/work/menu-sala-placar';
       const menu=await page.evaluate(()=>{
         const title=document.querySelector('.game-title').getBoundingClientRect(),plane=document.querySelector('.menu-art-plane').getBoundingClientRect();
         const letters=[...document.querySelectorAll('.title-letter')].map(n=>n.getBoundingClientRect());
-        const alphaBounds=node=>{
-          const image=node,canvas=document.createElement('canvas');canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0);const data=ctx.getImageData(0,0,canvas.width,canvas.height).data;let yMin=canvas.height,yMax=0;for(let y=0;y<canvas.height;y++)for(let x=0;x<canvas.width;x++)if(data[(y*canvas.width+x)*4+3]>100){yMin=Math.min(yMin,y);yMax=Math.max(yMax,y);}const r=image.getBoundingClientRect();return{top:r.y+r.height*yMin/canvas.height,bottom:r.y+r.height*yMax/canvas.height};
-        };
-        const lid=alphaBounds(document.querySelector('.title-lid')),p=alphaBounds(document.querySelector('.title-letter-art'));
-        return{centerX:title.x+title.width/2,centerY:title.y+title.height/2,covered:plane.left<=0&&plane.top<=0&&plane.right>=innerWidth&&plane.bottom>=innerHeight,curve:letters[4].top-letters[0].top,lidGap:p.top-lid.bottom};
+        return{centerX:title.x+title.width/2,centerY:title.y+title.height/2,covered:plane.left<=0&&plane.top<=0&&plane.right>=innerWidth&&plane.bottom>=innerHeight,curve:letters[4].top-letters[0].top,noLid:!document.querySelector('.title-lid')};
       });
-      assert.ok(Math.abs(menu.centerX-width/2)<1&&Math.abs(menu.centerY-height*.25)<2&&menu.covered&&menu.curve>5);assert.ok(menu.lidGap>0,JSON.stringify(menu));
+      assert.ok(Math.abs(menu.centerX-width/2)<1&&Math.abs(menu.centerY-height*.25)<2&&menu.covered&&menu.curve>5);assert.ok(menu.noLid);
       await page.screenshot({path:out+'/menu-'+width+'.png'});
     }
-    console.log('PASS menu celular/tablet: cover, título no quarto superior, arco e tampa separada');
+    console.log('PASS menu celular/tablet: cover, título no quarto superior, arco e título sem tampa');
     await page.setViewportSize({width:844,height:390});await page.locator('#singlePlayerBtn').tap();await page.locator('#profileContinueBtn').tap();
     assert.equal(await page.locator('#duration').inputValue(),'single');
     for(const id of ['infinite','cut','challenge','wild6','dist','rotate'])assert.ok(await page.locator('#'+id).isChecked());
@@ -57,8 +53,8 @@ const out='/workspace/work/menu-sala-placar';
     for(let actor=0;actor<4;actor++)assert.equal(await page.locator(`.pressure-received[data-actor="${actor}"]`).textContent(),'+'+counts[actor]);
     await page.screenshot({path:out+'/panela-quantidades.png'});console.log('PASS Panela mostra quatro quantidades autoritativas após redistribuir');
     await fixture('num');await page.evaluate(()=>CartasTest.getState().deck.push({id:40001,type:'wild',color:null}));await page.locator('#buyBtn').tap();
-    const draw=page.locator('[data-effect=draw][data-card-id="40001"]');assert.equal(await draw.getAttribute('data-presentation'),'preview');assert.equal(await draw.getAttribute('data-duration'),'1150');
-    await page.waitForTimeout(1200);assert.ok(await page.locator('.draw-choice').isVisible());await page.locator('.draw-choice button').filter({hasText:'Guardar'}).tap();
+    const draw=page.locator('[data-effect=draw][data-card-id="40001"]');assert.equal(await draw.getAttribute('data-presentation'),'preview');assert.equal(await draw.getAttribute('data-duration'),'1450');
+    await page.waitForTimeout(1500);assert.ok(await page.locator('.draw-choice').isVisible());await page.locator('.draw-choice button').filter({hasText:'Guardar'}).tap();
     await fixture('num');await page.evaluate(()=>{const s=CartasTest.getState(),c={id:40002,type:'wild',color:null};s.players[1].hand.push(c);PanelasMesa.recordDraw(s,1,c);PanelinhaTableBridge.render();});
     assert.equal(await page.locator('[data-card-id="40002"][data-effect=draw]').getAttribute('data-presentation'),'direct');assert.equal(await page.locator('[data-card-id="40002"][data-effect=draw] .card-image').count(),0);
     console.log('PASS compra própria mais lenta com decisão e compra alheia direta, sem prévia/frente');
