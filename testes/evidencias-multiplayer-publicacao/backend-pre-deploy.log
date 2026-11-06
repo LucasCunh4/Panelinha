@@ -1,0 +1,25 @@
+> panelinha-multiplayer-server@1.0.0 test
+> node --test --test-concurrency=1 tests/*.test.mjs
+
+✔ alocação SQLite: zeros, colisões e unicidade, sem sorteio isolado (7.107456ms)
+✔ criação simultânea no workerd real, idempotência HTTP e códigos exclusivos (434.094016ms)
+✔ quatro clientes, quinto rejeitado, nomes iguais e snapshots sem credenciais (253.057715ms)
+✔ bots prontos, humano substitui bot, configurações e resets seletivos de Pronto (438.671287ms)
+✔ autoridade do anfitrião, equipes no máximo dois humanos e início online proibido (410.200412ms)
+✔ token privado, troca de controladora, desconexão libera e host antigo não recupera cargo (274.668595ms)
+✔ expulsão bloqueia a identidade pela vida da sala; nome/código não recuperam vaga (187.033746ms)
+✔ mesmo token possui uma só controladora inclusive entre salas diferentes (213.030183ms)
+✔ saída/encerramento invalidam código e nenhum bot mantém sala sozinho (216.040262ms)
+✔ ordem/versão/idempotência e limite de mensagens recuperável (117.160889ms)
+✔ origens, dados inválidos, segredo ausente, tamanho e limite HTTP (99.964874ms)
+✔ campos e versão inválidos não alteram sala; limite WebSocket usa bytes UTF-8; silêncio não desconecta (668.18789ms)
+✔ SQLite guarda estado e tokens só como hash; restart sem conexões não cria sala fantasma (152.073025ms)
+✔ reserva abandonada e socket sem autenticação expiram; humano autenticado ocioso continua conectado (16105.854035ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 20000.686147

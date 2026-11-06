@@ -1,0 +1,5 @@
+PASS quatro sessões independentes no mesmo Worker local, criação/convite/código, nomes repetidos, quatro IDs/tokens e nenhum token privado nos snapshots
+PASS quinto humano rejeitado, Pronto dos quatro, perfil/nome/avatar atualizados sem desmarcar, início online indisponível e motor offline não iniciado
+PASS regras com selects próprios do jogo e reset de todos os humanos, opções offline intactas, expulsão/bloqueio, bot pronto e substituição automática por humano
+PASS convite sem token, três landscapes, retorno/confirmar/cancelar, saída libera vaga, sucessor entre humanos, retorno por token sem recuperar cargo e encerramento para todos
+PASS modo offline sem servidor, três bots/laboratório disponíveis, falha de conexão explícita sem lobby falso, retorno durante conexão cancela entrada e nenhum erro JS ou dependência externa inesperada

@@ -1,0 +1,29 @@
+> panelinha-multiplayer-server@1.0.0 deploy:manual
+> wrangler deploy
+
+▲ [WARNING] Proxy environment variables detected. We'll use your proxy for fetch requests.
+
+
+
+ ⛅️ wrangler 4.158.0
+────────────────────
+🌀 Building list of assets...
+✨ Read 210 files from the assets directory /workspace/Panelinha/dist
+🌀 Starting asset upload...
+🌀 Found 1 new or modified static asset to upload. Proceeding with upload...
++ /multiplayer-config.js
+Uploaded 1 of 1 asset
+✨ Success! Uploaded 1 file (186 already uploaded) (0.84 sec)
+
+Total Upload: 31.92 KiB / gzip: 8.66 KiB
+Your Worker has access to the following bindings:
+Binding                                                               Resource
+env.REGISTRY (RoomRegistry)                                           Durable Object
+env.ROOMS (LobbyRoom)                                                 Durable Object
+env.ASSETS                                                            Assets
+env.ALLOWED_ORIGINS ("https://localhost,http://127.0.0.1:80...")      Environment Variable
+
+Uploaded panelinha-lobby (4.83 sec)
+Deployed panelinha-lobby triggers (0.71 sec)
+  https://panelinha-lobby.lucas260802.workers.dev
+Current Version ID: 1954da26-323d-440d-b9e8-017f19e55a02

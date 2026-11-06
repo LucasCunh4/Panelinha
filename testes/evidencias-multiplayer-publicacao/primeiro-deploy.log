@@ -1,0 +1,131 @@
+> panelinha-multiplayer-server@1.0.0 deploy:manual
+> wrangler deploy
+
+▲ [WARNING] Proxy environment variables detected. We'll use your proxy for fetch requests.
+
+
+
+ ⛅️ wrangler 4.158.0
+────────────────────
+🌀 Building list of assets...
+✨ Read 210 files from the assets directory /workspace/Panelinha/dist
+🌀 Starting asset upload...
+🌀 Found 187 new or modified static assets to upload. Proceeding with upload...
++ /multiplayer-config.js
++ /sons.css
++ /perfil.js
++ /menu-arte.js
++ /escolher-cor.css
++ /multiplayer.css
++ /assets/menu-oficial/audio/18_menu_abrir.mp3
++ /multiplayer-connection.js
++ /seletores.js
++ /multiplayer.js
++ /assets/cartas_mais4_mais6/carta_mais4_mirtilos_sprite.png
++ /assets/menu-oficial/audio/11_corte.mp3
++ /assets/menu-oficial/audio/07_mais4.mp3
++ /assets/fonts/LilitaOne-Regular.ttf
++ /assets/cartas_mais4_mais6/carta_mais4_tomates_sprite.png
++ /assets/menu-oficial/audio/20_inicio_rodada.mp3
++ /assets/menu-oficial/audio/14_demo_5_segundos.mp3
++ /assets/cartas_mais4_mais6/carta_mais6_queijos_sprite.png
++ /assets/menu-oficial/audio/10_coringa_escolher_cor.mp3
++ /mesa.js
++ /assets/menu-oficial/utensilios/01_concha.png
++ /assets/menu-oficial/audio/04_panela_de_pressao.mp3
++ /assets/menu-oficial/utensilios/05_batedor_arame.png
++ /assets/especiais/escolher_cor_alfaces_overlay_full.png
++ /assets/menu-oficial/fumaca/07_vapor_redemoinho.png
++ /assets/cartas/amarelo/inverter.png
++ /assets/cartas/amarelo/7.png
++ /assets/cartas/amarelo/mais_2.png
++ /assets/cartas/amarelo/5.png
++ /assets/cartas/amarelo/8.png
++ /assets/cartas/azul/bloqueio.png
++ /assets/cartas/azul/4.png
++ /assets/cartas/azul/0.png
++ /assets/cartas/azul/mais_2.png
++ /assets/cartas/vermelho/2.png
++ /assets/cartas/azul/5.png
++ /assets/cartas/azul/8.png
++ /assets/cartas/vermelho/3.png
++ /assets/cartas/verde/inverter.png
++ /assets/cartas/verde/4.png
++ /assets/cartas/verde/8.png
++ /assets/cartas_mais4_mais6/carta_mais4_base_sem_ingredientes.png
++ /assets/cartas/verde/9.png
++ /assets/cartas_mais4_mais6/carta_mais4_mirtilos_overlay_full.png
++ /assets/cartas_mais4_mais6/carta_mais4_completa.png
++ /assets/padronizadas/liquidificador_oficial_400x850.png
++ /assets/cartas_mais4_mais6/carta_mais6_mirtilos_overlay_full.png
++ /assets/cartas_mais4_mais6/carta_mais6_queijos_overlay_full.png
++ /assets/menu-oficial/fumaca/04_vapor_espiral_alternativo.png
++ /assets/titulo-efeitos/brilhos/04_brilho_alongado.png
++ /assets/titulo/letras/06_I.png
++ /assets/menu-oficial/fumaca/08_vapor_redemoinho_brilhante.png
++ /assets/menu-oficial/fumaca/03_vapor_espiral.png
++ /assets/mesa/corte_faca_balao.png
++ /assets/titulo/letras/09_A.png
++ /assets/mesa/chama_azul.png
++ /assets/titulo/letras/02_A.png
++ /assets/titulo/letras/07_N.png
++ /assets/especiais/escolher_cor_base.png
++ /assets/especiais/carta_escolher_cor_montada_preview.png
++ /assets/avatares/08_panela_piloto.png
++ /assets/avatares/05_wok_monoculo.png
++ /assets/mesa/fogao_fundo.png
++ /anuncios.css
++ /anuncios.js
++ /seletores.css
++ /assets/fonts/OFL.txt
++ /assets/menu-oficial/audio/14_tick_final.mp3
++ /escolher-cor.js
++ /navegacao.js
++ /assets/menu-oficial/audio/21_escolher_cor.mp3
++ /assets/menu-oficial/audio/22_jogador_pronto.mp3
++ /menu.css
++ /assets/menu-oficial/audio/13_punicao_2.mp3
++ /assets/menu-oficial/audio/13_punicao_4.mp3
++ /assets/cartas_mais4_mais6/carta_mais6_mirtilos_sprite.png
++ /assets/menu-oficial/audio/12_ultima_carta.mp3
++ /assets/menu-oficial/audio/09_inverter.mp3
++ /assets/menu-oficial/audio/03_mais6.mp3
++ /assets/cartas_mais4_mais6/carta_mais6_alfaces_sprite.png
++ /assets/menu-oficial/audio/19_embaralhar.mp3
++ /mesa.css
++ /assets/menu-oficial/audio/15_vitoria.mp3
++ /assets/menu-oficial/utensilios/04_pegador_massas.png
++ /assets/menu-oficial/audio/05_liquidificador.mp3
++ /assets/menu-oficial/utensilios/06_escumadeira.png
++ /assets/especiais/escolher_cor_tomates_overlay_full.png
++ /assets/titulo-efeitos/brilhos/02_cluster_tres_estrelas.png
++ /assets/cartas/amarelo/4.png
++ /assets/cartas/vermelho/inverter.png
++ /assets/cartas/amarelo/bloqueio.png
++ /assets/cartas/amarelo/9.png
++ /assets/cartas/azul/1.png
++ /assets/cartas/vermelho/1.png
++ /assets/cartas/amarelo/3.png
++ /assets/cartas/azul/7.png
++ /assets/cartas/vermelho/0.png
++ /assets/cartas/vermelho/9.png
++ /assets/cartas/vermelho/6.png
++ /assets/cartas/azul/9.png
+   (truncating changed assets log, set `WRANGLER_LOG=debug` environment variable to see full diff)
+Uploaded 62 of 187 assets
+Uploaded 125 of 187 assets
+Uploaded 187 of 187 assets
+✨ Success! Uploaded 187 files (9.42 sec)
+
+Total Upload: 31.92 KiB / gzip: 8.66 KiB
+Your Worker has access to the following bindings:
+Binding                                                               Resource
+env.REGISTRY (RoomRegistry)                                           Durable Object
+env.ROOMS (LobbyRoom)                                                 Durable Object
+env.ASSETS                                                            Assets
+env.ALLOWED_ORIGINS ("https://localhost,http://127.0.0.1:80...")      Environment Variable
+
+Uploaded panelinha-lobby (12.35 sec)
+Deployed panelinha-lobby triggers (0.67 sec)
+  https://panelinha-lobby.lucas260802.workers.dev
+Current Version ID: 8c3030dc-561e-4e80-8f47-61c68c33d820

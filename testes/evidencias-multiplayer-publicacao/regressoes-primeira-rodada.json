@@ -1,0 +1,47 @@
+[
+  {
+    "suite": "sync-android",
+    "exitCode": 0,
+    "seconds": 0.97
+  },
+  {
+    "suite": "android-compat",
+    "exitCode": 0,
+    "seconds": 7.48
+  },
+  {
+    "suite": "horizontal_identidade",
+    "exitCode": 1,
+    "seconds": 14.22
+  },
+  {
+    "suite": "preparacao_menu",
+    "exitCode": 0,
+    "seconds": 4.76
+  },
+  {
+    "suite": "navegacao",
+    "exitCode": 0,
+    "seconds": 23.7
+  },
+  {
+    "suite": "dry-run",
+    "exitCode": 0,
+    "seconds": 4.51
+  },
+  {
+    "suite": "versao-android",
+    "exitCode": 0,
+    "seconds": 0.19
+  },
+  {
+    "suite": "multiplayer_lobby",
+    "exitCode": 0,
+    "seconds": 36.28
+  },
+  {
+    "suite": "visual_sonoro",
+    "exitCode": 0,
+    "seconds": 24.9
+  }
+]

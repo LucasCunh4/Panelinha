@@ -1,0 +1,21 @@
+{
+  "url": "https://panelinha-lobby.lucas260802.workers.dev/",
+  "workerVersion": "1954da26-323d-440d-b9e8-017f19e55a02",
+  "configMatchesSource": true,
+  "configSha256": "ed13440622af54332ca0fa3127855550101aa7c1a6c21c175918c48d1c3111e3",
+  "health": {
+    "v": 1,
+    "phase": 1,
+    "gameplay": false
+  },
+  "origins": [
+    {
+      "origin": "https://localhost",
+      "status": 200
+    },
+    {
+      "origin": "https://origem-nao-autorizada.example",
+      "status": 403
+    }
+  ]
+}

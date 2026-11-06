@@ -4,6 +4,8 @@ Cloudflare Worker com um registrador de códigos e um Durable Object SQLite por 
 
 Fonte funcional: [MULTIPLAYER_ESPECIFICACAO.md](../MULTIPLAYER_ESPECIFICACAO.md). Entrega, evidências e preparação da conta: [MULTIPLAYER_FASE_1_RESULTADOS.md](../MULTIPLAYER_FASE_1_RESULTADOS.md).
 
+Publicado com autorização em 06/11/2026: **https://panelinha-lobby.lucas260802.workers.dev/**. A versão web e a API usam esse endereço; `multiplayer-config.js` já aponta para ele. O APK anteriormente instalado não recebe essa configuração automaticamente.
+
 ## Desenvolvimento local
 
 Os comandos são para o ambiente de desenvolvimento/Codex. O proprietário não precisa instalar ferramentas no celular. Use Node 24 LTS; o teste de persistência utiliza `node:sqlite`.
@@ -19,7 +21,7 @@ npm --prefix multiplayer-server run check
 npm run sync:android
 ```
 
-`check` executa **somente** `wrangler deploy --dry-run`: valida bindings, migração, bundle e assets sem publicar. `deploy:manual` fica reservado para autorização posterior.
+`check` executa **somente** `wrangler deploy --dry-run`: valida bindings, migração, bundle e assets sem publicar. `deploy:manual` publica de fato e deve ser usado somente no escopo autorizado pelo proprietário.
 
 Para servir a versão web e a API juntas:
 
@@ -36,7 +38,16 @@ Com os dois serviços acima ativos:
 node testes/multiplayer_lobby.cjs
 ```
 
-O teste precisa de Playwright e Chromium, como as suítes web existentes. Aceita `CHROMIUM_PATH`, `PANELAS_TEST_URL`, `PANELINHA_TEST_SERVER` e `PANELAS_SCREENSHOTS`. Abre dois processos Chromium, com quatro contextos simultâneos e identidades independentes, além dos contextos de teste de rejeição/erro. As comunicações passam pelo Worker e pelos Durable Objects reais do workerd local.
+O teste precisa de Playwright e Chromium, como as suítes web existentes. Aceita `CHROMIUM_PATH`, `PANELAS_TEST_URL`, `PANELINHA_TEST_SERVER`, `PANELAS_SCREENSHOTS` e, quando necessário no ambiente, `PANELAS_BROWSER_PROXY`. Abre dois processos Chromium, com quatro contextos simultâneos e identidades independentes, além dos contextos de teste de rejeição/erro. As comunicações passam pelo Worker informado, local ou público. A configuração de teste também ajusta o endereço dos convites para o mesmo ambiente; a verificação offline desabilita explicitamente o servidor.
+
+Para repetir a verificação pública, em ambiente autorizado a criar salas temporárias:
+
+```bash
+PANELAS_TEST_URL=https://panelinha-lobby.lucas260802.workers.dev/ PANELINHA_TEST_SERVER=https://panelinha-lobby.lucas260802.workers.dev node testes/multiplayer_lobby.cjs
+PANELINHA_PUBLIC_TEST_URL=https://panelinha-lobby.lucas260802.workers.dev/ node testes/multiplayer_publico.mjs
+```
+
+O segundo comando não injeta configuração no jogo: verifica a URL realmente distribuída, dois humanos e dois bots, 70 segundos sem comandos, sincronização posterior, retorno da mesma identidade e encerramento. Requer uma URL HTTPS explícita e não faz parte do glob de testes locais. Se o ambiente exige proxy, informe `PANELAS_BROWSER_PROXY` sem desabilitar a validação TLS. O repouso valida o comportamento observado, sem demonstrar diretamente que o objeto foi hibernado pelo provedor.
 
 Para testar pela rede local em aparelhos separados, o desenvolvedor pode iniciar `wrangler dev --local --ip 0.0.0.0 --port 8787`, usar a origem LAN da máquina nos dois campos de configuração e habilitar temporariamente `allowInsecureDevelopment`. Essa exceção aceita apenas HTTP em IP privado com página também HTTP. Não resolve acesso entre redes diferentes e não substitui HTTPS/WSS de produção. Esses testes físicos ainda não foram executados nesta entrega.
 
@@ -52,7 +63,7 @@ Uma URL vazia desabilita claramente Criar/Entrar; Um jogador permanece offline. 
 
 O `account_id` público fornecido pelo proprietário já consta no Wrangler; isso seleciona a conta, mas não autentica nem publica recursos. Para verificação inicial por celular, o Wrangler fixado oferece `login --device --browser=false --scopes account:read user:read`. A aprovação ocorre no site oficial Cloudflare; tokens e códigos temporários nunca devem ser colocados no Git. A publicação continua separada, dependente de autorização e permissões de escrita apropriadas.
 
-O Worker está preparado para hospedar os arquivos web e a API no mesmo endereço. `assets.run_worker_first` encaminha `/v1/*` e `/health` ao código do Worker; os demais arquivos vêm de `dist`. Não existe hospedagem publicada por esta tarefa.
+O Worker hospeda os arquivos web e a API no mesmo endereço. `assets.run_worker_first` encaminha `/v1/*` e `/health` ao código do Worker; os demais arquivos vêm de `dist`.
 
 ## HTTP v1
 
@@ -109,6 +120,6 @@ Corpo HTTP e mensagem WebSocket: até 4096 bytes UTF-8. Por IP: 10 novas identid
 
 Campos desconhecidos, perfis/avatares/regras inválidos e comandos sem permissão são rejeitados no servidor. Códigos não autenticam participantes e não existem dados secretos em convites. Excluir dados locais permite criar outra identidade: **sem contas, o bloqueio por identidade não é antifraude absoluto**. Não envie tokens em relatórios, logs, URLs ou mensagens ao proprietário.
 
-SQLite Durable Objects e os recursos utilizados são compatíveis com Workers Free, sujeitos às quotas oficiais. Não há garantia de operação gratuita ilimitada. Hibernação real na infraestrutura Cloudflare, WSS público, falhas de rede móvel e APK físico exigem validação posterior; os testes locais não substituem esses cenários.
+SQLite Durable Objects e os recursos utilizados são compatíveis com Workers Free, sujeitos às quotas oficiais. Não há garantia de operação gratuita ilimitada. HTTPS/WSS público e o funcionamento após repouso foram testados após a publicação. Hibernação efetiva não foi instrumentada; falhas de rede móvel e APK físico ainda exigem validação posterior.
 
 Referências: [Hibernation/WebSockets](https://developers.cloudflare.com/durable-objects/best-practices/websockets/), [SQLite](https://developers.cloudflare.com/durable-objects/api/sqlite-storage-api/), [preços/quotas](https://developers.cloudflare.com/workers/platform/pricing/).
