@@ -1,0 +1,12 @@
+[
+  {
+    "suite": "partida-publica-duo",
+    "exitCode": 0,
+    "seconds": 48.91
+  },
+  {
+    "suite": "partida-publica-solo",
+    "exitCode": 0,
+    "seconds": 81.29
+  }
+]

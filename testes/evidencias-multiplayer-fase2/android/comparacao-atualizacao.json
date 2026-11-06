@@ -1,0 +1,16 @@
+{
+  "previousVersion": "0.2.35",
+  "previousCode": 5502,
+  "newVersion": "0.2.36",
+  "newCode": 5602,
+  "sameFields": [
+    "applicationId",
+    "certificateSha256",
+    "origin",
+    "signingGeneration",
+    "orientation"
+  ],
+  "sameApplicationId": "com.lucascunha.panelinha.teste",
+  "sameCertificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+  "runtimeUpgradeTest": "pending-emulator-offline"
+}

@@ -61,7 +61,29 @@ PANELINHA_TEST_SERVER=http://127.0.0.1:8788 PANELAS_TEST_MODE=solo node testes/m
 
 ## Publicação e Android
 
-Endereço de testes: https://panelinha-lobby.lucas260802.workers.dev/. Publicação da Fase 2, verificações públicas e APK estão sendo finalizados nesta revisão; esta seção será atualizada com os resultados reais e links, sem confundir testes locais com execução na Cloudflare/Android.
+A Fase 2 está publicada em **https://panelinha-lobby.lucas260802.workers.dev/**, Worker versão `f7776fbf-39ea-4d49-acfe-31de61715ccb`, código-fonte `00c0e169273527cec6494e17f43c654ec0407d33`. Os mesmos bindings/classes SQLite da Fase 1 foram preservados. `GET /health` responde fase 2 e `gameplay: true`; cinco arquivos publicados foram comparados byte a byte com o checkout.
+
+Partidas públicas HTTPS/WSS, em dois processos Chromium/quatro contextos independentes, **aprovadas**:
+
+- **Duplas**: 29 descartes, 7 compras; parceiro aberto e adversários ocultos.
+- **Individual**: 59 descartes, 16 compras; somente a própria mão aberta.
+- Nos dois modos: contagem 3–2–1, identidade própria embaixo, seletor interativo, anúncio, animação de descarte, placar, confirmação e retorno ao mesmo código para revanche. Payloads sem baralho, mãos adversárias ou marcador privado de desafio; nenhum erro JavaScript.
+
+O lobby também passou em HTTPS/WSS sem injeção de configuração, com dois humanos/dois bots, **70 segundos sem comandos**, comando posterior sincronizado, retorno da mesma identidade e encerramento/código 404. O início depende do comando do anfitrião e é desabilitado ao desmarcar Pronto. O teste público foi atualizado para verificar os dois estados desse botão na Fase 2.
+
+São testes de navegadores no servidor real, não testes em quatro celulares. Evidências em [testes/evidencias-multiplayer-fase2](testes/evidencias-multiplayer-fase2/).
+
+**APK 0.2.36 / código 5602**, compilado e assinado pelo workflow existente [#36](https://github.com/LucasCunh4/Panelinha/actions/runs/42213703802):
+
+[**Baixar Panelinha-Teste-v0.2.36-c5602.apk diretamente, sem ZIP**](https://github.com/LucasCunh4/Panelinha/actions/runs/42213703802/artifacts/13500452776).
+
+O download do artefato exige sessão no GitHub e tem retenção até 04/02/2027. O arquivo foi baixado integralmente e conferido: **96.051.221 bytes**, SHA-256 `cba6e5a52a31791363d10ebd67580e230c8802d880fdf526fe1920d08976d54c`. É o APK bruto, com `AndroidManifest.xml` na raiz, sem ZIP de transporte. Metadados e resultados Android são artefatos separados. A Release automática foi pulada por falha da instrumentação, sem ocultar o resultado vermelho do workflow.
+
+**Verificação independente do APK aprovada** por `ferramentas/verificar_apk.py`: certificado geração 2, assinatura v2, applicationId, versão, origem local, `sensorLandscape`, categoria game, código web exato (incluindo o motor/online), compatibilidade WebView e recursos offline. Confere 52 cartas, seis PNGs da mesa, 69 recursos visuais/sonoros e os manifestos das cartas/fontes/interações anteriores. O JSON gerado localmente coincide com os metadados do Actions.
+
+**Instrumentação Android interrompida**: o AVD iniciou `a_imagesAndThreeBotsOffline`, ficou `offline` e a porta de controle 5554 recusou conexão. Não há conclusão do primeiro caso: **0/13 testes offline concluídos**, teste de atualização/retenção de dados **não executado**. Os diagnósticos capturados não mostram uma asserção funcional reprovada nem estabelecem a causa raiz da queda do emulador. Trata-se de execução indisponível no AVD, não de aprovação do aplicativo. Nenhuma verificação foi removida/desativada para produzir verde. Logs/estado do dispositivo estão nas evidências e no artefato `resultados-android-36-1`.
+
+A comparação com o APK 0.2.35/c5502 confirma pacote, origem e certificado idênticos, com código maior. Assim, o novo APK é compatível com atualização direta sobre a geração 2, **sem desinstalar nem limpar dados**. A retenção real de dados após instalação continua pendente da instrumentação/aparelho físico; a aplicação não troca chaves nem apaga armazenamento local.
 
 Identidade preservada: `com.lucascunha.panelinha.teste`, origem `https://localhost`, certificado geração 2 `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`. Os Secrets e o workflow de assinatura não foram modificados. Perfil/som/identidade multiplayer mantêm suas chaves de armazenamento. O modo Um jogador não depende do servidor; não há migração nem limpeza de dados locais.
 
@@ -69,4 +91,4 @@ Identidade preservada: `com.lucascunha.panelinha.teste`, origem `https://localho
 
 Pausa/retomada com congelamento de todos os deadlines, substituição por inatividade (dois turnos expirados ou dois minutos sem limite), retomada por primeiro toque intencional após inatividade, testes de perdas/oscilações de rede móvel, hibernação instrumentada, disputas temporais sob latência e testes reais em quatro aparelhos/Android. A continuidade básica desta fase não equivale a essa bateria de robustez. Não foram adicionados controles falsos de pausa ou bot voluntário.
 
-Não há chat, espectadores, reações, backend de contas, alteração de artes ou regras extras. O APK anterior não se atualiza sozinho; a nova compilação usará o mesmo workflow, versionCode crescente e assinatura permanente, com verificação antes da entrega.
+Não há chat, espectadores, reações, backend de contas, alteração de artes ou regras extras. O APK anterior não se atualiza sozinho: instale o novo arquivo por cima e escolha Atualizar. A compilação usa o mesmo workflow, código crescente e assinatura permanente já verificada.

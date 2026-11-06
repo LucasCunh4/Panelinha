@@ -1,0 +1,15 @@
+{
+  "health": {
+    "v": 1,
+    "phase": 2,
+    "gameplay": true
+  },
+  "assetsSha256": {
+    "motor.js": "d3692c92777a04fe44f50247770897364f4811dcdbbf5e7a22db207474fe2d2d",
+    "online.js": "42c58fd82284ba249fd1dc621eac613e22b8b377da540febc99b12b085e8f798",
+    "online.css": "85d8007863b8a6576168dc00842e7495fd4c4af4cd3dc813ab03ec3f7867f44c",
+    "multiplayer-connection.js": "bf1adcd1f2626b986264d4fecfe1a4b6d752306439e613615d0feae826a1aea6",
+    "multiplayer.js": "719115e28316cc5bc4c84ecc05c5b889af45e9bb2cbd5ff100df90746945aa3f"
+  },
+  "workerVersion": "f7776fbf-39ea-4d49-acfe-31de61715ccb"
+}

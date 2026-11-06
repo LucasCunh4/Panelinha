@@ -1,0 +1,4 @@
+PASS URL pública configurada sem injeção de teste, saúde HTTPS, duas conexões WSS e dois bots prontos; aguardando 70 segundos sem comandos
+PASS 70 segundos ociosos preservam conexões/host/Pronto, comando posterior chega ao outro cliente e partida não inicia automaticamente sem comando do anfitrião
+PASS fechamento confirmado libera vaga; retorno na mesma origem/contexto conserva identidade, sem recuperar Pronto
+PASS encerramento público invalida código (404), nenhum erro JS e todos os transportes observados usam WSS

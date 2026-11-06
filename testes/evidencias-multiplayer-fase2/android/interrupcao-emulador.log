@@ -1,0 +1,23 @@
+2026-11-06T11:58:23.6905992Z INSTRUMENTATION_STATUS: class=com.lucascunha.panelinha.teste.OfflineGameTest
+2026-11-06T11:58:23.6907050Z INSTRUMENTATION_STATUS: current=1
+2026-11-06T11:58:23.6907714Z INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+2026-11-06T11:58:23.6908170Z INSTRUMENTATION_STATUS: numtests=13
+2026-11-06T11:58:23.6908509Z INSTRUMENTATION_STATUS: stream=
+2026-11-06T11:58:23.6908893Z com.lucascunha.panelinha.teste.OfflineGameTest:
+2026-11-06T11:58:23.6909418Z INSTRUMENTATION_STATUS: test=a_imagesAndThreeBotsOffline
+2026-11-06T11:58:23.6909803Z INSTRUMENTATION_STATUS_CODE: 1
+2026-11-06T11:59:03.4552706Z adb: error: failed to get feature set: device offline
+2026-11-06T11:59:03.4574476Z adb: error: failed to get feature set: device offline
+2026-11-06T11:59:03.4592898Z adb: error: failed to get feature set: device offline
+2026-11-06T11:59:03.4611138Z adb: error: failed to get feature set: device offline
+2026-11-06T11:59:03.4635916Z adb: error: failed to get feature set: device offline
+2026-11-06T11:59:03.4652379Z adb: error: failed to get feature set: device offline
+2026-11-06T11:59:03.4677859Z adb: device offline
+2026-11-06T11:59:03.4859626Z ##[error]The process '/usr/bin/sh' failed with exit code 1
+2026-11-06T11:59:03.4861073Z ##[group]Terminate Emulator
+2026-11-06T11:59:03.4861719Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 emu kill
+2026-11-06T11:59:03.4887503Z error: could not connect to TCP port 5554: Connection refused
+2026-11-06T11:59:03.4892117Z The process '/usr/local/lib/android/sdk/platform-tools/adb' failed with exit code 1
+2026-11-06T11:59:03.4892688Z ##[endgroup]
+2026-11-06T11:59:03.5023801Z ##[group]Run mkdir -p artifacts/testes-android
+2026-11-06T11:59:03.5024056Z [36;1mmkdir -p artifacts/testes-android[0m

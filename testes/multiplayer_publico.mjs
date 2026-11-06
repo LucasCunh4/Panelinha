@@ -24,8 +24,9 @@ try{
  console.log('PASS URL pública configurada sem injeção de teste, saúde HTTPS, duas conexões WSS e dois bots prontos; aguardando 70 segundos sem comandos');
  await a.waitForTimeout(70000);
  const after=await view(a);assert.equal(after.status,'connected');assert.equal((await view(b)).status,'connected');assert.equal(after.state.version,before.version);assert.equal(after.state.hostId,initial.selfId);assert.ok(after.state.allReady);
+ assert.equal(await a.locator('#lobbyStartBtn').isDisabled(),false);
  await a.locator('#lobbyReadyBtn').tap();await b.waitForFunction(host=>!PanelinhaLobbyConnection.current.state.players.find(p=>p.id===host).ready,initial.selfId);
- assert.equal(await a.locator('#lobbyStartBtn').isDisabled(),false);assert.equal(await a.evaluate(()=>CartasTest.getState()),null);
+ assert.equal(await a.locator('#lobbyStartBtn').isDisabled(),true);assert.equal(await a.evaluate(()=>CartasTest.getState()),null);
  console.log('PASS 70 segundos ociosos preservam conexões/host/Pronto, comando posterior chega ao outro cliente e partida não inicia automaticamente sem comando do anfitrião');
  if(out){await mkdir(out,{recursive:true});await a.screenshot({path:out+'/lobby-apos-repouso.png'});}
  await b.close();await a.waitForFunction(()=>PanelinhaLobbyConnection.current.state.players.filter(Boolean).length===3);
