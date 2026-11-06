@@ -4,4 +4,5 @@ PASS retomada 3–2–1 sincronizada sem compra/jogada durante a contagem
 PASS relógio visual deriva do prazo real apesar de +1 hora no relógio do cliente e 300 ms de RTT
 PASS bot mantém nome/avatar e cartas; primeiro toque somente reassume; segundo toque executa a ação normal, inclusive seleção de cor
 PASS compra aplicada com ACK perdido não é reenviada; reconexão recupera exatamente uma carta adicional
+PASS quatro confirmações concorrentes de resultado retornam ao lobby; repetição só de Pronto explicitamente rejeitado e no mesmo resultado
 PASS nenhuma exceção JS; sala encerrada pelo host

@@ -93,6 +93,20 @@
     const rows=current.summary.map(p=>`<div class="notice"><strong>${p.place}º — ${PanelinhaProfile.escape(current.players[p.id].name)}</strong> · ${p.cost} pontos nas cartas restantes (${p.remaining} cartas)</div>`).join('');
     return `<div class="banner">${current.phase==='gameOver'?'Partida concluída':'Rodada concluída'}${current.winner?' · '+PanelinhaProfile.escape(current.winner):''}</div>${rows}<div class="controls"><button id="onlineReadyResult" class="btn good">${me?.ready?'Não estou pronto':current.phase==='gameOver'?'Voltar à sala':'Pronto para a próxima rodada'}</button>${host&&current.phase==='roundOver'?`<button id="onlineNextRound" class="btn good" ${state.allReady?'':'disabled'}>Iniciar próxima rodada</button>`:''}</div><p class="help">${current.phase==='gameOver'?'Todos confirmam para retornar ao lobby da mesma sala.':'Todos confirmam Pronto; o anfitrião inicia a próxima rodada.'}</p>`;
   }
+  async function readyForResult(){
+    if(!current||!connected())return;
+    const scope={match:matchId,round:current.round,phase:current.phase},me=view.state.players.find(p=>p?.id===view.selfId),ready=!me.ready;
+    // STALE_STATE confirma que esta intenção NÃO foi aplicada. Só o Pronto,
+    // dentro do mesmo resultado, pode ser reenviado com a versão atual. Timeout
+    // ou qualquer outra resposta ambígua nunca provoca reenvio de ações.
+    for(let attempt=0;attempt<4;attempt++){
+      if(!current||!connected()||matchId!==scope.match||current.round!==scope.round||current.phase!==scope.phase)return;
+      if(view.state.players.find(p=>p?.id===view.selfId)?.ready===ready)return;
+      try{await connection.command('ready',{ready});return;}
+      catch(error){if(error.code!=='STALE_STATE'){message(error.message);return;}}
+    }
+    message('A sala mudou. Confirme Pronto novamente.');
+  }
   function bindResults(){
     const host=view.state.hostId===view.selfId,live=connected();
     $('onlinePauseToggle').hidden=!host||current.phase!=='playing';$('onlinePauseToggle').textContent=current.paused?'Retomar partida':'Pausar partida';$('onlinePauseToggle').disabled=!live||!!current.resumeAt;
@@ -106,7 +120,7 @@
     for(const [id,action] of [['passBtn','pass'],['challengeBtn','challenge'],['unoBtn','announce'],['reportBtn','report']])if($(id))$(id).disabled=!live||!current.actions[action];
     if($('onlineReadyResult'))$('onlineReadyResult').disabled=!live||current.actions.reclaim;
     if($('onlineNextRound'))$('onlineNextRound').disabled=!live||!view.state.allReady;
-    $('onlineReadyResult')?.addEventListener('click',()=>{const me=connection.current.state.players.find(p=>p?.id===connection.current.selfId);command('ready',{ready:!me.ready});});
+    $('onlineReadyResult')?.addEventListener('click',readyForResult);
     $('onlineNextRound')?.addEventListener('click',()=>command('next-round'));
   }
   function tick(){

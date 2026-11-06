@@ -88,11 +88,19 @@ const base=process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/',out=process.en
     const count=s.players[seat].hand.length;dropIncoming=true;await guest.locator('#buyBtn').tap();
     const until=Date.now()+5000;while((await read()).game.players[seat].hand.length!==count+1){assert.ok(Date.now()<until);await new Promise(r=>setTimeout(r,25));}
     // Isola a entrega da compra de uma jogada legítima do bot substituto.
+    await a.evaluate(()=>PanelinhaLobbyConnection.command('sync'));
     await a.evaluate(()=>PanelinhaLobbyConnection.command('pause'));
     await guest.waitForFunction(()=>PanelinhaLobbyConnection.current.status!=='connected',{},{timeout:15000});dropIncoming=false;
     await guest.waitForFunction(()=>PanelinhaLobbyConnection.current.status==='connected');assert.equal((await table(guest)).players[0].hand.length,count+1);
     assert.equal((await read()).game.players[seat].hand.length,count+1);
     console.log('PASS compra aplicada com ACK perdido não é reenviada; reconexão recupera exatamente uma carta adicional');
+    // Fixture terminal conserva todas as cartas e usa a classificação do motor;
+    // as partidas completas validam o caminho real de encerramento separadamente.
+    saved=await read();s=saved.game;Object.assign(s,{phase:'playing',paused:false,resumeAt:0,frozen:null,penalty:0,finisher:0});s.o.single=true;s.discard.push(...s.players[0].hand);s.players[0].hand=[];
+    const {engine}=await import('../multiplayer-server/src/game.mjs');engine(saved).core.finishRound();for(const p of saved.players)p.ready=false;await write(saved);
+    await Promise.all(pages.map(p=>p.evaluate(()=>PanelinhaLobbyConnection.command('sync'))));await waitAll(()=>CartasTest.getState()?.phase==='gameOver');
+    await Promise.all(pages.map(p=>p.evaluate(()=>document.getElementById('onlineReadyResult').click())));await waitAll(()=>PanelinhaNavigation.current==='lobby');
+    assert.equal((await view(a)).state.code,code);assert.ok((await view(a)).state.players.every(p=>!p.ready));console.log('PASS quatro confirmações concorrentes de resultado retornam ao lobby; repetição só de Pronto explicitamente rejeitado e no mesmo resultado');
     assert.deepEqual(errors,[]);await a.evaluate(()=>PanelinhaLobbyConnection.command('close-room'));console.log('PASS nenhuma exceção JS; sala encerrada pelo host');
   }finally{await Promise.all(browsers.map(b=>b.close()));await mf.dispose();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
