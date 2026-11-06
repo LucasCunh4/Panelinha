@@ -4,7 +4,9 @@ import {requireValue,exact,randomInt} from './protocol.mjs';
 const Rules=globalThis.PanelinhaRules;
 const random=()=>randomInt(0x100000000)/0x100000000;
 const member=(room,seat)=>room.players.find(p=>p?.id===room.game.seats[seat]);
-const automated=p=>!!p&&(p.bot||p.connected===false);
+export const automated=p=>!!p&&(p.bot||p.connected===false||p.idleBot===true);
+const TIMERS=['unlockAt','deadline','countdownAt','botAt','botCutAt','reportAt','idleAt'];
+const idleDelay=120000;
 function emit(game,type,data={}){
   game.events.push({id:++game.eventSerial,type,...data});
   game.events=game.events.slice(-384);
@@ -18,6 +20,7 @@ export function engine(room,now=Date.now()){
     s.countdownAt=s.starting?now+3000:0;s.starting=false;
     s.unlockAt=now+wait;s.cutOpen=!!(s.o.cut&&pause>0&&s.finisher===null);
     s.deadline=s.o.timeout?s.unlockAt+s.o.timeout*1000:0;
+    s.idleAt=!s.o.timeout&&!automated(member(room,s.current))?s.unlockAt+idleDelay:0;
     s.botAt=automated(member(room,s.current))?Math.max(now+700,s.unlockAt+20):0;
     s.botCutAt=s.cutOpen&&automated(member(room,s.current))?Math.min(now+700,s.unlockAt-1):0;
     s.reportAt=s.unoWindow&&!automated(member(room,s.unoWindow.id))&&room.players.some(automated)?now+850:0;
@@ -35,7 +38,7 @@ function completed(room,before){
   const s=room.game;
   if(before==='playing'&&s.phase!=='playing'){
     for(const p of room.players)p.ready=automated(p);
-    s.botAt=0;s.botCutAt=0;s.reportAt=0;s.cutOpen=false;s.unlockAt=0;s.deadline=0;s.countdownAt=0;
+    s.botAt=0;s.botCutAt=0;s.reportAt=0;s.cutOpen=false;s.unlockAt=0;s.deadline=0;s.countdownAt=0;s.idleAt=0;
   }
   if(!s.unoWindow)s.reportAt=0;
   conserve(s);
@@ -56,8 +59,8 @@ export function createMatch(room,now=Date.now()){
     uid:0,teams:[0,0],deck:[],discard:[],activeColor:null,direction:-1,current:0,penalty:0,highest:0,lastPenalty:null,finisher:null,
     round:0,phase:'playing',drawn:null,cutOpen:false,unlockAt:0,lastActor:null,lastDistribution:null,preUno:false,preUnoById:{},
     unoWindow:null,log:[],message:'',deadline:0,pendingAction:null,token:0,reveal:false,summary:[],pastWinners:[],events:[],eventSerial:0,
-    botAt:0,botCutAt:0,starting:true,countdownAt:0,cardCount:112+(room.rules.wild6?2:0)+(room.rules.dist?2:0)+(room.rules.rotate?2:0)};
-  room.status='match';for(const p of room.players)p.ready=automated(p);
+    botAt:0,botCutAt:0,starting:true,countdownAt:0,idleAt:0,paused:false,resumeAt:0,frozen:null,cardCount:112+(room.rules.wild6?2:0)+(room.rules.dist?2:0)+(room.rules.rotate?2:0)};
+  room.status='match';for(const p of room.players){p.idleBot=false;p.missedTurns=0;p.ready=automated(p);}
   engine(room,now).core.newRound(randomInt(4),-1);conserve(room.game);
 }
 export function nextRound(room,now=Date.now()){
@@ -70,13 +73,15 @@ export function returnLobby(room){
   requireValue(room.game?.phase==='gameOver'&&room.players.every(p=>p.ready),'NOT_READY',409);
   room.status='lobby';delete room.game;
   room.players=room.players.map(p=>p&&!p.bot&&p.connected===false?null:p);
-  for(const p of room.players.filter(Boolean))p.ready=p.bot;
+  for(const p of room.players.filter(Boolean)){p.ready=p.bot;delete p.idleBot;delete p.missedTurns;}
 }
 export function settleReady(room){
   if(room.game?.phase==='gameOver'&&room.players.every(p=>p.ready)){returnLobby(room);return true;}return false;
 }
 export function perform(room,actor,type,data,now=Date.now()){
   const s=room.game,seat=s.seats.indexOf(actor.id);requireValue(seat>=0&&s.phase==='playing','ILLEGAL_MOVE',409);
+  requireValue(!s.paused,'GAME_PAUSED',409);requireValue(!automated(member(room,seat)),'CONTROL_REQUIRED',409);
+  const wasCurrent=seat===s.current;
   const {core}=engine(room,now),before=s.phase;
   requireValue(now>=s.countdownAt,'ILLEGAL_MOVE',409);
   if(type==='play'||type==='cut'){
@@ -98,16 +103,44 @@ export function perform(room,actor,type,data,now=Date.now()){
   }else if(type==='report'){
     exact(data,[]);requireValue(s.unoWindow&&s.unoWindow.id!==seat,'ILLEGAL_MOVE',409);core.reportUno(seat);
   }else requireValue(false);
+  if(wasCurrent){member(room,seat).missedTurns=0;if(!s.o.timeout&&s.current===seat)s.idleAt=now+idleDelay;}
   completed(room,before);
+}
+export function pauseMatch(room,now=Date.now()){
+  const s=room.game;requireValue(s?.phase==='playing'&&!s.paused,'ILLEGAL_MOVE',409);
+  // A contagem de entrada é reapresentada integralmente na retomada. Prazos de
+  // jogo ainda não abertos não perdem parte do turno por pausar nesse intervalo.
+  const origin=Math.max(now,s.countdownAt||0);
+  s.frozen=Object.fromEntries(TIMERS.map(key=>[key,s[key]>0?Math.max(1,s[key]-origin):0]));
+  if(s.countdownAt){s.frozen.unlockAt=0;s.frozen.countdownAt=0;}
+  for(const key of TIMERS)s[key]=0;
+  s.paused=true;s.resumeAt=0;
+}
+export function resumeMatch(room,now=Date.now()){
+  const s=room.game;requireValue(s?.phase==='playing'&&s.paused&&!s.resumeAt,'ILLEGAL_MOVE',409);
+  s.resumeAt=now+3000;
+}
+export function reclaim(room,actor,now=Date.now()){
+  const s=room.game,p=room.players.find(p=>p?.id===actor.id);
+  requireValue(s&&p&&!p.bot&&p.connected!==false&&p.idleBot,'ILLEGAL_MOVE',409);
+  p.idleBot=false;p.missedTurns=0;if(s.phase!=='playing')p.ready=false;
+  refreshAutomation(room,now);
 }
 export function refreshAutomation(room,now=Date.now()){
   const s=room.game;if(!s||s.phase!=='playing')return;
-  if(automated(member(room,s.current))&&!s.botAt)s.botAt=Math.max(now+700,s.unlockAt+20);
-  if(!automated(member(room,s.current)))s.botAt=0;
+  const timers=s.paused?s.frozen:s,origin=s.paused?0:now,bot=automated(member(room,s.current));
+  if(bot){if(!timers.botAt)timers.botAt=Math.max(origin+700,(timers.unlockAt||0)+20);timers.idleAt=0;}
+  else{timers.botAt=0;timers.botCutAt=0;if(!s.o.timeout&&!timers.idleAt)timers.idleAt=Math.max(origin,timers.unlockAt||0)+idleDelay;}
 }
 export function advance(room,now=Date.now()){
   const s=room.game;if(!s||s.phase!=='playing')return false;
   const {core,startTurn}=engine(room,now),before=JSON.stringify(s),phase=s.phase;
+  if(s.paused){
+    if(!s.resumeAt||now<s.resumeAt)return false;
+    const release=s.resumeAt;
+    for(const key of TIMERS)s[key]=s.frozen[key]>0?release+s.frozen[key]:0;
+    s.paused=false;s.resumeAt=0;s.frozen=null;emit(s,'sound',{name:'round-start'});
+  }
   if(s.reportAt&&now>=s.reportAt){s.reportAt=0;const reporters=s.players.filter(p=>automated(member(room,p.id))&&p.id!==s.unoWindow?.id);if(s.unoWindow&&reporters.length&&random()<.36)core.reportUno(reporters[randomInt(reporters.length)].id);}
   if(s.botCutAt&&now>=s.botCutAt){
     s.botCutAt=0;
@@ -121,29 +154,34 @@ export function advance(room,now=Date.now()){
     if(s.countdownAt){s.countdownAt=0;emit(s,'sound',{name:'round-start'});}
   }
   if(s.deadline&&now>=s.deadline){
-    const id=s.current;core.log('Tempo de '+member(room,id).name+' esgotado.');
+    const id=s.current,p=member(room,id),wasHuman=!automated(p);core.log('Tempo de '+p.name+' esgotado.');
     if(s.penalty)core.finishPenaltyDraw(id);
     else{core.closeUnoOnAction();core.drawMany(id,1);s.current=core.nextActive(id);startTurn();}
+    if(wasHuman){p.missedTurns=(p.missedTurns||0)+1;if(p.missedTurns>=2){p.idleBot=true;core.log(p.name+' passou ao bot por inatividade.');}}
+  }else if(s.idleAt&&now>=s.idleAt){
+    const p=member(room,s.current);s.idleAt=0;if(!automated(p)){p.idleBot=true;core.log(p.name+' passou ao bot após dois minutos sem ação válida.');}
   }else if(s.botAt&&now>=s.botAt){s.botAt=0;core.botTurn();}
   completed(room,phase);refreshAutomation(room,now);return JSON.stringify(s)!==before;
 }
 export function nextWake(room,now=Date.now()){
   const s=room.game;if(!s||s.phase!=='playing')return Infinity;
-  return Math.min(...[s.unlockAt,s.deadline,s.botAt,s.botCutAt,s.reportAt].filter(t=>t>0).map(t=>Math.max(now+1,t)),Infinity);
+  if(s.paused)return s.resumeAt?Math.max(now+1,s.resumeAt):Infinity;
+  return Math.min(...[s.unlockAt,s.deadline,s.botAt,s.botCutAt,s.reportAt,s.idleAt].filter(t=>t>0).map(t=>Math.max(now+1,t)),Infinity);
 }
 export function gameView(room,viewerId,now=Date.now()){
   const s=room.game;if(!s)return null;
   const self=s.seats.indexOf(viewerId);requireValue(self>=0,'AUTH_INVALID',401);
   const {core}=engine(room,now),own=s.players[self];
-  const legal=own.hand.filter(c=>core.checkCards(self,[c.id],false)).map(c=>c.id),cuts=own.hand.filter(c=>core.checkCards(self,[c.id],true)).map(c=>c.id);
-  const draw=s.phase==='playing'&&s.current===self&&core.canActNow()&&s.drawn===null;
+  const enabled=!s.paused&&!automated(member(room,self));
+  const legal=enabled?own.hand.filter(c=>core.checkCards(self,[c.id],false)).map(c=>c.id):[],cuts=enabled?own.hand.filter(c=>core.checkCards(self,[c.id],true)).map(c=>c.id):[];
+  const draw=enabled&&s.phase==='playing'&&s.current===self&&core.canActNow()&&s.drawn===null;
   const visible=seat=>seat===self||(s.o.duo&&seat%2===self%2);
   return {matchId:s.matchId,self,serverNow:now,o:{...s.o},round:s.round,phase:s.phase,activeColor:s.activeColor,direction:s.direction,current:s.current,
     penalty:s.penalty,highest:s.highest,finisher:s.finisher,drawn:s.current===self?s.drawn:null,cutOpen:s.cutOpen,unlockAt:s.unlockAt,deadline:s.deadline,
-    countdownAt:s.countdownAt,lastActor:s.lastActor,preUno:!!s.preUnoById[self],unoWindow:s.unoWindow,teams:[...s.teams],
+    countdownAt:s.countdownAt,paused:!!s.paused,resumeAt:s.resumeAt||0,remaining:s.paused?{turn:s.frozen.deadline,cut:s.frozen.unlockAt}:null,lastActor:s.lastActor,preUno:!!s.preUnoById[self],unoWindow:s.unoWindow,teams:[...s.teams],
     summary:s.summary,winner:s.winner||null,winnerId:s.winnerId??null,winnerTeam:s.winnerTeam??null,token:s.token,deckCount:s.deck.length,discard:s.discard.slice(-3),message:s.current!==self&&s.message.startsWith('Você')?'':s.message,log:s.log.slice(0,40),
-    players:s.players.map(p=>{const m=member(room,p.id);return {id:p.id,memberId:m.id,name:m.name,avatar:m.avatar,team:m.team,bot:m.bot,substituted:!m.bot&&m.connected===false,connected:m.connected!==false,score:p.score,count:p.hand.length,...(visible(p.id)?{hand:p.hand.map(c=>({...c}))}:{})};}),
-    actions:{legal,cuts,draw,distributePossible:own.hand.filter(c=>c.type==='dist'&&core.canDistribute(c)).map(c=>c.id),pass:s.phase==='playing'&&s.current===self&&core.canActNow()&&s.drawn!==null,challenge:!!core.canChallenge(self)&&core.canActNow(),
-      announce:s.phase==='playing'&&(own.hand.length===2||(own.hand.length===1&&s.unoWindow?.id===self))&&!s.preUnoById[self],report:s.phase==='playing'&&!!s.unoWindow&&s.unoWindow.id!==self,mustBuy:draw&&!legal.length},
+    players:s.players.map(p=>{const m=member(room,p.id);return {id:p.id,memberId:m.id,name:m.name,avatar:m.avatar,team:m.team,bot:m.bot,substituted:!m.bot&&automated(m),idleBot:!!m.idleBot,connected:m.connected!==false,score:p.score,count:p.hand.length,...(visible(p.id)?{hand:p.hand.map(c=>({...c}))}:{})};}),
+    actions:{legal,cuts,draw,reclaim:!!member(room,self).idleBot,distributePossible:own.hand.filter(c=>c.type==='dist'&&core.canDistribute(c)).map(c=>c.id),pass:enabled&&s.phase==='playing'&&s.current===self&&core.canActNow()&&s.drawn!==null,challenge:enabled&&!!core.canChallenge(self)&&core.canActNow(),
+      announce:enabled&&s.phase==='playing'&&(own.hand.length===2||(own.hand.length===1&&s.unoWindow?.id===self))&&!s.preUnoById[self],report:enabled&&s.phase==='playing'&&!!s.unoWindow&&s.unoWindow.id!==self,mustBuy:draw&&!legal.length},
     events:s.events.map(event=>{if(event.type!=='draw')return event;return {id:event.id,type:'draw',actor:event.actor,...(visible(event.actor)?{card:{...event.card}}:{})};})};
 }

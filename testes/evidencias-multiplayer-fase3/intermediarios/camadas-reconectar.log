@@ -1,0 +1,59 @@
+PASS quatro clientes, pausa no menu, mãos/relógios congelados, controles bloqueados, retomada só do host, landscape 568x320/844x390 e evicção mantendo WebSockets
+locator.tap: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator('#onlineReconnectBtn')
+    - locator resolved to <button class="btn alt" id="onlineReconnectBtn">Reconectar</button>
+  - attempting tap action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <section id="onlinePause" aria-labelledby="onlinePauseTitle">…</section> intercepts pointer events
+    - retrying tap action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <section id="onlinePause" aria-labelledby="onlinePauseTitle">…</section> intercepts pointer events
+    - retrying tap action
+      - waiting 100ms
+    45 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <section id="onlinePause" aria-labelledby="onlinePauseTitle">…</section> intercepts pointer events
+     - retrying tap action
+       - waiting 500ms
+    - waiting for element to be visible, enabled and stable
+
+    at /workspace/Panelinha/testes/multiplayer_robustez.cjs:51:129 {
+  log: [
+    "  - waiting for locator('#onlineReconnectBtn')",
+    '    - locator resolved to <button class="btn alt" id="onlineReconnectBtn">Reconectar</button>',
+    '  - attempting tap action',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is visible, enabled and stable',
+    '      - scrolling into view if needed',
+    '      - done scrolling',
+    '      - <section id="onlinePause" aria-labelledby="onlinePauseTitle">…</section> intercepts pointer events',
+    '    - retrying tap action',
+    '    - waiting 20ms',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is visible, enabled and stable',
+    '      - scrolling into view if needed',
+    '      - done scrolling',
+    '      - <section id="onlinePause" aria-labelledby="onlinePauseTitle">…</section> intercepts pointer events',
+    '    - retrying tap action',
+    '      - waiting 100ms',
+    '    45 × waiting for element to be visible, enabled and stable',
+    '       - element is visible, enabled and stable',
+    '       - scrolling into view if needed',
+    '       - done scrolling',
+    '       - <section id="onlinePause" aria-labelledby="onlinePauseTitle">…</section> intercepts pointer events',
+    '     - retrying tap action',
+    '       - waiting 500ms',
+    '    - waiting for element to be visible, enabled and stable'
+  ],
+  name: 'TimeoutError'
+}

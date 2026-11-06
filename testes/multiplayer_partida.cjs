@@ -19,7 +19,7 @@ const base=process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/',server=process
   assert.ok(await a.locator('#onlineCountdown').isVisible());assert.ok(['3','2','1'].includes(await a.locator('#onlineCountdown').textContent()));
   for(let i=0;i<4;i++){const s=await table(pages[i]),raw=(await data(pages[i])).state.game;assert.equal(s.players[0].name,'Chef '+i);assert.ok(s.players[0].hand.every(c=>!c.hidden));assert.ok(s.players[2].hand.every(c=>duo?!c.hidden:c.hidden));assert.ok(s.players[1].hand.every(c=>c.hidden)&&s.players[3].hand.every(c=>c.hidden));assert.equal(raw.players.filter(p=>p.hand).length,duo?2:1);assert.equal(await pages[i].locator('#player2 .subhand .card').count(),duo?s.players[2].hand.length:0);}
   await a.screenshot({path:path.join(out,'inicio-'+(duo?'duplas':'individual')+'.png')});console.log('PASS quatro navegadores/contextos na Mesa V1, identidade própria embaixo, parceiro/oponentes com visibilidade correta e contagem 3–2–1');
-  const deadline=Date.now()+150000;let plays=0,bought=0,announced=false,flight=false;
+  const deadline=Date.now()+150000;let plays=0,bought=0,announced=false,flight=false,logged=0;
   while(Date.now()<deadline){
    const views=await Promise.all(pages.map(data));if(views[0].state.game.phase!=='playing')break;
    if(!announced){const caller=views.findIndex(v=>v.state.game.actions.announce&&v.state.game.players[v.state.game.self].count===2&&!v.state.game.countdownAt);if(caller>=0){await pages[caller].locator('#unoBtn').tap();await pages[caller].waitForFunction(()=>CartasTest.getState().preUno);announced=true;continue;}}
@@ -35,7 +35,9 @@ const base=process.env.PANELAS_TEST_URL||'http://127.0.0.1:8000/',server=process
    }else if(g.actions.draw){const glow=await p.locator('#buyBtn').getAttribute('data-mandatory');if((await data(p)).state.version!==views[index].state.version)continue;assert.equal(glow,'true');await p.locator('#buyBtn').tap();await p.waitForFunction(({token,version})=>{const v=PanelinhaLobbyConnection.current;return v.state.game.token!==token||v.state.version!==version;},{token,version:views[index].state.version});bought++;}
    else if(g.actions.pass){await p.locator('#passBtn').tap();await p.waitForFunction(token=>PanelinhaLobbyConnection.current.state.game.token!==token,token);}
    else await delay(50);
+   if(plays+bought>=logged+20){logged=plays+bought;console.log('PROGRESS partida: '+plays+' descartes, '+bought+' compras; mãos '+(await data(pages[0])).state.game.players.map(p=>p.count).join('/'));}
   }
+  const final=(await data(a)).state.game;assert.equal(final.phase,'gameOver',JSON.stringify({reason:'partida ainda em curso ao atingir o orçamento de 150s',plays,bought,current:final.current,counts:final.players.map(p=>p.count),penalty:final.penalty,actions:final.actions}));
   for(const p of pages)await p.waitForFunction(()=>CartasTest.getState()?.phase==='gameOver');assert.ok(plays>0);assert.ok(flight);assert.ok(announced);await a.screenshot({path:path.join(out,'resultado-'+(duo?'duplas':'individual')+'.png')});
   const before=(await data(a)).state.game;assert.equal(before.summary.length,4);if(duo)assert.equal(before.teams.reduce((a,b)=>a+b,0),1);else assert.equal(before.players.reduce((sum,p)=>sum+p.score,0),6);
   console.log('PASS partida completa autoritativa em '+(duo?'Duplas':'Individual')+', '+plays+' descartes animados, '+bought+' compras, seletor de ingredientes, anúncio real e pontuação');

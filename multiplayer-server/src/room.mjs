@@ -2,7 +2,7 @@ import {DurableObject} from 'cloudflare:workers';
 import {VERSION,HANDSHAKE_MS,DEFAULT_RULES,LobbyError,requireValue,exact,envelope,profile,rules,hash,randomInt,errorMessage} from './protocol.mjs';
 
 import {balanceTeams,chooseHost} from './lobby-model.mjs';
-import {createMatch,nextRound,settleReady,perform,refreshAutomation,advance,nextWake,gameView} from './game.mjs';
+import {createMatch,nextRound,settleReady,perform,pauseMatch,resumeMatch,reclaim,refreshAutomation,advance,nextWake,gameView} from './game.mjs';
 
 export class LobbyRoom extends DurableObject {
   constructor(ctx,env){
@@ -33,8 +33,8 @@ export class LobbyRoom extends DurableObject {
   }
   snapshot(viewer=null){
     const r=this.room,players=r.players.map(p=>p?{id:p.id,name:p.name,avatar:p.avatar,bot:p.bot,team:p.team,ready:p.ready,connected:p.connected!==false}:null),allReady=players.every(p=>p&&p.ready);
-    const upgradeRequired=r.players.some(p=>p&&!p.bot&&(p.clientPhase||1)<2);
-    return {v:VERSION,code:r.code,version:r.version,phase:r.status,hostId:r.hostId,rules:{...r.rules},players,notice:upgradeRequired?'Atualize a página em todos os aparelhos para iniciar partidas online.':r.notice,allReady,canStart:r.status==='lobby'&&allReady&&!upgradeRequired,capabilities:{phase:2},upgradeRequired,...(viewer&&r.game?{game:gameView(r,viewer.id)}:{})};
+    const upgradeRequired=r.players.some(p=>p&&!p.bot&&(p.clientPhase||1)<3);
+    return {v:VERSION,code:r.code,version:r.version,serverNow:Date.now(),phase:r.status,hostId:r.hostId,rules:{...r.rules},players,notice:upgradeRequired?'Atualize a página em todos os aparelhos para iniciar partidas online.':r.notice,allReady,canStart:r.status==='lobby'&&allReady&&!upgradeRequired,capabilities:{phase:3},upgradeRequired,...(viewer&&r.game?{game:gameView(r,viewer.id)}:{})};
   }
   send(ws,value){try{if(ws.readyState===1)ws.send(JSON.stringify(value));}catch{}}
   broadcast(event=null){for(const ws of this.ctx.getWebSockets()){const actor=this.controller(ws);if(actor)this.send(ws,{v:VERSION,type:'state',state:this.snapshot(actor),event});}}
@@ -57,10 +57,10 @@ export class LobbyRoom extends DurableObject {
     if(Number.isFinite(next))await this.ctx.storage.setAlarm(Math.max(Date.now()+1,next));else await this.ctx.storage.deleteAlarm();
   }
   async auth(ws,message){
-    exact(message.data,['token','profile','clientPhase']);const clientPhase=message.data.clientPhase??1;requireValue([1,2].includes(clientPhase));const identity=await this.registry().identity(message.data.token);
+    exact(message.data,['token','profile','clientPhase']);const clientPhase=message.data.clientPhase??1;requireValue([1,2,3].includes(clientPhase));const identity=await this.registry().identity(message.data.token);
     requireValue(identity,'AUTH_INVALID',401);const info=profile(message.data.profile),r=this.room;
     requireValue(r&&r.status!=='closed','ROOM_CLOSED',410);requireValue(!r.bans.includes(identity),'BANNED',403);
-    if(r.status==='match')requireValue(clientPhase>=2,'UPGRADE_REQUIRED',409);
+    if(r.status==='match')requireValue(clientPhase>=3,'UPGRADE_REQUIRED',409);
     if(r.status==='pending'){
       requireValue(r.creator===identity,'ROOM_NOT_READY',409);
       requireValue(await this.registry().activate(r.code,r.roomId),'ROOM_CLOSED',410);r.status='lobby';r.expires=null;
@@ -77,7 +77,7 @@ export class LobbyRoom extends DurableObject {
       p={id:publicId,identity,...info,team:priorTeam,bot:false,ready:false,connectionId:null};r.players[index]=p;
       balanceTeams(r.players,r.rules.duo);r.notice=info.name+' entrou na sala.';
     }else{if(r.status==='lobby')Object.assign(p,info);if(p.connected===false)p.ready=false;}
-    p.connected=true;p.clientPhase=clientPhase;
+    p.connected=true;p.clientPhase=clientPhase;if(r.status==='match'){p.idleBot=false;p.missedTurns=0;}
     a.playerId=p.id;p.connectionId=a.connectionId;ws.serializeAttachment(a);
     if(!r.hostId)r.hostId=p.id;
     r.version++;this.persist();
@@ -109,11 +109,12 @@ export class LobbyRoom extends DurableObject {
     const current=this.room,key=actor.identity+':'+message.id,fingerprint=JSON.stringify([message.type,message.data]);
     const previous=current.requests[key];
     if(previous){requireValue(previous.fingerprint===fingerprint,'REQUEST_REUSED');this.send(ws,{v:VERSION,type:'ack',id:message.id,duplicate:true,version:previous.version,state:this.snapshot(actor)});return;}
-    requireValue(message.version===current.version,'STALE_STATE',409);
+    requireValue(message.type==='sync'||message.version===current.version,'STALE_STATE',409);
     const data=message.data,next=structuredClone(current),self=next.players.find(p=>p?.id===actor.id);
     let closeTarget=null,leaving=false,closing=false;
-    if(['rules','add-bot','remove-bot','kick','close-room','start','next-round'].includes(message.type))requireValue(actor.id===current.hostId,'NOT_HOST',403);
-    if(current.status==='match')requireValue(['ready','leave','close-room','next-round','play','cut','draw','pass','challenge','announce','report'].includes(message.type),'MATCH_STARTED',409);
+    if(['rules','add-bot','remove-bot','kick','close-room','start','next-round','pause','resume'].includes(message.type))requireValue(actor.id===current.hostId,'NOT_HOST',403);
+    if(current.status==='match')requireValue(['ready','leave','close-room','next-round','play','cut','draw','pass','challenge','announce','report','pause','resume','reclaim','sync'].includes(message.type),'MATCH_STARTED',409);
+    if(current.status==='match'&&!['leave','close-room','sync'].includes(message.type))requireValue((actor.clientPhase||1)>=3,'UPGRADE_REQUIRED',409);
     switch(message.type){
       case 'ready':exact(data,['ready']);requireValue(typeof data.ready==='boolean');requireValue(!next.game||next.game.phase!=='playing','ILLEGAL_MOVE',409);self.ready=data.ready;break;
       case 'profile':Object.assign(self,profile(data));break;
@@ -145,7 +146,11 @@ export class LobbyRoom extends DurableObject {
         if(next.hostId===actor.id)next.hostId=this.successor(next.players);if(next.status==='lobby')balanceTeams(next.players,next.rules.duo);next.notice=actor.name+' saiu da sala.';break;
       }
       case 'close-room':exact(data,[]);closing=true;break;
-      case 'start':exact(data,[]);requireValue(next.status==='lobby');requireValue(next.players.every(p=>!p||p.bot||(p.clientPhase||1)>=2),'UPGRADE_REQUIRED',409);createMatch(next,receivedAt);break;
+      case 'sync':exact(data,[]);break;
+      case 'pause':exact(data,[]);pauseMatch(next,receivedAt);break;
+      case 'resume':exact(data,[]);resumeMatch(next,receivedAt);break;
+      case 'reclaim':exact(data,[]);reclaim(next,self,receivedAt);break;
+      case 'start':exact(data,[]);requireValue(next.status==='lobby');requireValue(next.players.every(p=>!p||p.bot||(p.clientPhase||1)>=3),'UPGRADE_REQUIRED',409);createMatch(next,receivedAt);break;
       case 'next-round':exact(data,[]);requireValue(next.status==='match');nextRound(next,receivedAt);break;
       case 'play':case 'cut':case 'draw':case 'pass':case 'challenge':case 'announce':case 'report':requireValue(next.status==='match');perform(next,actor,message.type,data,receivedAt);break;
       default:throw new LobbyError('BAD_PAYLOAD');

@@ -510,7 +510,7 @@
     nativeTable(true);
     if(handOwner!==state||handRound!==state.round){cancelHandTimers();expandedColor=null;handPinned=false;handLayout=null;handOwner=state;handRound=state.round;}
     document.body.classList.add('playing');
-    const humanTurn=state.phase==='playing'&&state.current===0&&Date.now()>=state.unlockAt;
+    const humanTurn=state.phase==='playing'&&state.current===0&&Date.now()>=state.unlockAt&&(!state.online||!state.paused&&!state.players[0].substituted&&window.PanelinhaOnline?.connected);
     $('hand').dataset.turnScale=humanTurn?'1.06':'1';
     $('hand').classList.toggle('human-turn',humanTurn);
     $('buyBtn').classList.toggle('mandatory-buy',mustBuy);

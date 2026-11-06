@@ -1,0 +1,20 @@
+
+> panelinha-multiplayer-server@1.0.0 check
+> WRANGLER_SEND_METRICS=false wrangler deploy --dry-run --outdir .wrangler/dry-run
+
+▲ [WARNING] Proxy environment variables detected. We'll use your proxy for fetch requests.
+
+
+
+ ⛅️ wrangler 4.158.0
+────────────────────
+✨ Read 213 files from the assets directory /workspace/Panelinha/dist
+Total Upload: 78.80 KiB / gzip: 21.02 KiB
+Your Worker has access to the following bindings:
+Binding                                                               Resource
+env.REGISTRY (RoomRegistry)                                           Durable Object
+env.ROOMS (LobbyRoom)                                                 Durable Object
+env.ASSETS                                                            Assets
+env.ALLOWED_ORIGINS ("https://localhost,http://127.0.0.1:80...")      Environment Variable
+
+--dry-run: exiting now.

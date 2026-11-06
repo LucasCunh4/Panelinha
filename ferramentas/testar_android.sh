@@ -8,11 +8,13 @@ app='com.lucascunha.panelinha.teste'
 output='artifacts/testes-android'
 mkdir -p "$output"
 logcat_pid=''
+host_monitor_pid=''
 collect_diagnostics() {
   local status=$?
   trap - EXIT
   printf '%s\n' "$status" > "$output/test-exit-status.txt"
   if [[ -n "$logcat_pid" ]]; then kill "$logcat_pid" 2>/dev/null || true; fi
+  if [[ -n "$host_monitor_pid" ]]; then kill "$host_monitor_pid" 2>/dev/null || true; fi
   if [[ "$status" != 0 ]]; then
     timeout 10s adb devices -l > "$output/adb-devices.txt" 2>&1 || true
     timeout 10s adb shell dumpsys activity processes > "$output/android-processes.txt" 2>&1 || true
@@ -24,6 +26,22 @@ collect_diagnostics() {
   exit "$status"
 }
 trap collect_diagnostics EXIT
+# Diagnóstico do AVD no CI: registra recursos/processos antes da eventual queda,
+# sem argumentos de processos, ambiente ou conteúdo dos Secrets. Não altera o
+# emulador nem os critérios de aprovação dos 13 testes e da atualização.
+if [[ "${GITHUB_ACTIONS:-}" == true ]]; then
+  (
+    while kill -0 "$$" 2>/dev/null; do
+      date -u '+%Y-%m-%dT%H:%M:%SZ'
+      ps -eo pid,ppid,comm,rss | awk 'NR==1 || $3 ~ /qemu|emulator|adb|java/'
+      for metric in /sys/fs/cgroup/memory.events /sys/fs/cgroup/memory.current /sys/fs/cgroup/memory.max; do
+        if [[ -r "$metric" ]]; then printf '%s\n' "$metric"; cat "$metric"; fi
+      done
+      sleep 2
+    done
+  ) > "$output/host-emulator-monitor.txt" 2>&1 &
+  host_monitor_pid=$!
+fi
 run_tests() {
   local class_name="$1" expected_count="$2" result_file="$3"
   adb shell am instrument -w -r -e class "$app.$class_name" "$app.test/androidx.test.runner.AndroidJUnitRunner" | tee "$result_file" || return $?

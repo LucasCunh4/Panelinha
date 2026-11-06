@@ -249,7 +249,7 @@ function startTurn(pauseMs=0){
   s.deadline=s.o.timeout?s.unlockAt+s.o.timeout*1000:0;
   render();queueBots();
 }
-function canActNow(){if(s?.online)return Date.now()>=s.unlockAt;return rules.canActNow();}
+function canActNow(){if(s?.online)return PanelinhaOnline.connected&&!s.paused&&!s.players[0].substituted&&Date.now()>=s.unlockAt;return rules.canActNow();}
 function findHumanCut(){
   if(s?.online)return PanelinhaOnline.connected&&Date.now()<s.unlockAt?s.players[0].hand.find(c=>s.actions.cuts.includes(c.id))||null:null;
   if(!s||s.phase!=='playing'||!s.o.cut||!s.cutOpen||Date.now()>=s.unlockAt||s.finisher!==null||s.current===0||s.pendingAction)return null;

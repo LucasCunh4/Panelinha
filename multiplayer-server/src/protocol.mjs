@@ -14,6 +14,7 @@ export const MESSAGES = {
   NOT_READY:'Preencha as quatro posições e confirme Pronto de todos os humanos.',
   ILLEGAL_MOVE:'Esta ação não é válida neste momento da partida.', MATCH_STARTED:'A partida já começou; somente participantes originais podem retornar.',
   UPGRADE_REQUIRED:'Atualize a página em todos os aparelhos para iniciar partidas online.',
+  GAME_PAUSED:'A partida está pausada. Aguarde a retomada pelo anfitrião.', CONTROL_REQUIRED:'Toque na mesa para retomar o controle da sua mão.',
   MESSAGE_TOO_LARGE:'A mensagem excede o tamanho permitido.', INTERNAL_ERROR:'Não foi possível concluir agora. Tente novamente.',
   ORIGIN_DENIED:'Esta origem não está autorizada para o multiplayer.', NO_CAPACITY:'Não há códigos disponíveis agora.'
 };

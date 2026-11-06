@@ -1,0 +1,158 @@
+[
+  {
+    "suite": "android-compat",
+    "exitCode": 0,
+    "seconds": 6.45,
+    "source": "regressao-completa/android-compat/suite.log"
+  },
+  {
+    "suite": "artes_aviso_halo",
+    "exitCode": 0,
+    "seconds": 13.85,
+    "source": "regressao-completa/artes_aviso_halo/suite.log"
+  },
+  {
+    "suite": "ajustes_opcoes",
+    "exitCode": 0,
+    "seconds": 44.05,
+    "source": "regressao-completa/ajustes_opcoes/suite.log"
+  },
+  {
+    "suite": "atualizacao_mesa",
+    "exitCode": 0,
+    "seconds": 56.0,
+    "source": "regressao-completa/atualizacao_mesa/suite.log"
+  },
+  {
+    "suite": "atualizacao_regras",
+    "exitCode": 0,
+    "seconds": 36.6,
+    "source": "regressao-completa/atualizacao_regras/suite.log"
+  },
+  {
+    "suite": "artes_penalidades",
+    "exitCode": 0,
+    "seconds": 80.1,
+    "source": "regressao-completa/artes_penalidades/suite.log"
+  },
+  {
+    "suite": "correcoes_estabilidade",
+    "exitCode": 0,
+    "seconds": 48.95,
+    "source": "regressao-completa/correcoes_estabilidade/suite.log"
+  },
+  {
+    "suite": "horizontal_identidade",
+    "exitCode": 0,
+    "seconds": 37.5,
+    "source": "regressao-completa/horizontal_identidade/suite.log"
+  },
+  {
+    "suite": "escolher_cor",
+    "exitCode": 0,
+    "seconds": 47.84,
+    "source": "regressao-completa/escolher_cor/suite.log"
+  },
+  {
+    "suite": "integracao",
+    "exitCode": 0,
+    "seconds": 14.25,
+    "source": "regressao-completa/integracao/suite.log"
+  },
+  {
+    "suite": "liquidificador",
+    "exitCode": 0,
+    "seconds": 20.55,
+    "source": "regressao-completa/liquidificador/suite.log"
+  },
+  {
+    "suite": "mesa",
+    "exitCode": 0,
+    "seconds": 25.1,
+    "source": "regressao-completa/mesa/suite.log"
+  },
+  {
+    "suite": "leque_continuo",
+    "exitCode": 0,
+    "seconds": 42.4,
+    "source": "regressao-completa/leque_continuo/suite.log"
+  },
+  {
+    "suite": "mesa_fina",
+    "exitCode": 0,
+    "seconds": 17.6,
+    "source": "regressao-completa/mesa_fina/suite.log"
+  },
+  {
+    "suite": "mesa_atual",
+    "exitCode": 0,
+    "seconds": 50.96,
+    "source": "regressao-completa/mesa_atual/suite.log"
+  },
+  {
+    "suite": "multiplayer_lobby",
+    "exitCode": 0,
+    "seconds": 43.14,
+    "source": "regressao-completa/multiplayer_lobby/suite.log"
+  },
+  {
+    "suite": "navegacao",
+    "exitCode": 0,
+    "seconds": 43.55,
+    "source": "regressao-completa/navegacao/suite.log"
+  },
+  {
+    "suite": "multiplayer_robustez",
+    "exitCode": 0,
+    "seconds": 51.71,
+    "source": "transporte-final/multiplayer_robustez/suite.log"
+  },
+  {
+    "suite": "padrao_400x850",
+    "exitCode": 0,
+    "seconds": 19.4,
+    "source": "regressao-completa/padrao_400x850/suite.log"
+  },
+  {
+    "suite": "preparacao_menu",
+    "exitCode": 0,
+    "seconds": 6.89,
+    "source": "regressao-completa/preparacao_menu/suite.log"
+  },
+  {
+    "suite": "penalidades_padrao",
+    "exitCode": 0,
+    "seconds": 39.21,
+    "source": "regressao-completa/penalidades_padrao/suite.log"
+  },
+  {
+    "suite": "refinamentos_mesa",
+    "exitCode": 0,
+    "seconds": 28.0,
+    "source": "regressao-completa/refinamentos_mesa/suite.log"
+  },
+  {
+    "suite": "rastro_halo",
+    "exitCode": 0,
+    "seconds": 91.75,
+    "source": "regressao-completa/rastro_halo/suite.log"
+  },
+  {
+    "suite": "multiplayer_partida",
+    "exitCode": 0,
+    "seconds": 132.14,
+    "source": "validacao-final/multiplayer_partida/suite.log"
+  },
+  {
+    "suite": "seletores_halo",
+    "exitCode": 0,
+    "seconds": 55.66,
+    "source": "regressao-completa/seletores_halo/suite.log"
+  },
+  {
+    "suite": "visual_sonoro",
+    "exitCode": 0,
+    "seconds": 22.19,
+    "source": "regressao-completa/visual_sonoro/suite.log"
+  }
+]

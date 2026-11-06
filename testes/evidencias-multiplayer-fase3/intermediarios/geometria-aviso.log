@@ -1,0 +1,13 @@
+PASS quatro clientes, pausa no menu, mãos/relógios congelados, controles bloqueados, retomada só do host, landscape 568x320/844x390 e evicção mantendo WebSockets
+PASS perda real do transporte, quatro tentativas e Reconectar mantêm código, identidade, assento, mão e pausa; mesa sem comandos durante desconexão
+PASS retomada 3–2–1 sincronizada sem compra/jogada durante a contagem
+PASS relógio visual deriva do prazo real apesar de +1 hora no relógio do cliente e 300 ms de RTT
+AssertionError [ERR_ASSERTION]: aviso de retomada não cobre mão, parceiro ou descarte
+    at /workspace/Panelinha/testes/multiplayer_robustez.cjs:73:457 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

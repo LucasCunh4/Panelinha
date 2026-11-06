@@ -7,7 +7,7 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
  const settle=()=>p.evaluate(()=>Promise.all(document.getAnimations().filter(a=>a.effect?.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{}))));
  const nativeBack=async()=>{await p.evaluate(()=>PanelinhaNavigation.back({native:true}));};
  try{
-  await p.clock.install();await p.clock.pauseAt(new Date());await p.goto('http://127.0.0.1:8000/');await p.evaluate(()=>document.fonts.ready);await settle();
+  const clockStart=new Date('2026-11-06T00:00:00Z');await p.clock.install({time:clockStart});await p.clock.pauseAt(new Date(clockStart.getTime()+60000));await p.goto('http://127.0.0.1:8000/');await p.evaluate(()=>document.fonts.ready);await settle();
   assert.equal(await p.evaluate(()=>PanelinhaNavigation.current),'home');assert.equal(await p.evaluate(()=>CartasTest.getState()),null);assert.equal(await p.locator('#home button').count(),2);assert.equal(await p.locator('#homeTitle').textContent(),'PANELINHA');
   assert.ok(await p.evaluate(()=>[...document.fonts].some(f=>f.family==='PanelinhaDisplay'&&f.status==='loaded')));assert.equal(await p.locator('#frontScene img').count(),13);assert.equal(await p.locator('#homeTitle .title-letter-art').count(),9);assert.ok(await p.locator('#game').isHidden());
   for(const [width,height] of [[320,568],[390,844],[412,915],[568,320],[844,390],[1280,800]]){

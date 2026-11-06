@@ -22,7 +22,7 @@ export default {
     try{
       if(request.method==='OPTIONS')return cors(new Response(null,{status:204}),origin);
       const url=new URL(request.url),registry=env.REGISTRY.getByName('codes');
-      if(url.pathname==='/health'&&request.method==='GET')return cors(Response.json({v:VERSION,phase:2,gameplay:true}),origin);
+      if(url.pathname==='/health'&&request.method==='GET')return cors(Response.json({v:VERSION,phase:3,gameplay:true}),origin);
       const ip=await hash(request.headers.get('CF-Connecting-IP')||'local-development');
       if(url.pathname==='/v1/sessions'&&request.method==='POST'){
         requireValue(await registry.rate('session:'+ip,10,60000),'RATE_LIMIT',429);exact(await body(request),[]);
