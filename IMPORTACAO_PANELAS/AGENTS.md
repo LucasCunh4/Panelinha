@@ -19,3 +19,5 @@
 - Panela de Pressão (`dist`) nunca abre seletor nem escolhe cor; conserva a cor ativa e resolve redistribuição própria. Somente Coringa/+4/+6 usam `COLOR_CHOOSERS` e o seletor de ingredientes. A classificação de incolores é separada da escolha de cor.
 
 - Atualização autorizada: Bloqueio impede corte do jogador pulado até a próxima ação válida; Panela é proibida durante qualquer penalidade de compra. Compras punitivas usam `drawSequence` e `presentationUntil` compartilhados, com prazo autoritativo limitado, sem ACK de cliente. Pódio só em `gameOver`, a partir de `finalStandings` oficial; por pontos, ordenar total e vitórias, exibindo empates sem desempate adicional.
+
+- Compras: `handCards` filtra somente a apresentação das cartas em voo; nunca remover cartas reais do motor para animar. Ritmos fixos em `DRAW_PACES` (normal/punição), sem aceleração por quantidade. O anúncio cobre também cortes legais com duas cartas; após corte que deixe uma, proteção de 300 ms controlada pelo servidor (`cutAnnounceUntil`, congelada na pausa), sem alterar o restante das denúncias.

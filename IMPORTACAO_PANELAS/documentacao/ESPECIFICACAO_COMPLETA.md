@@ -82,7 +82,8 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 
 ## 7. Última carta / botão equivalente a UNO
 
-- Quando o jogador estiver prestes a reduzir a mão a **uma carta**, pode anunciar preventivamente antes do descarte. Se não anunciou, pode apertar após jogar, **até o próximo jogador executar sua jogada**.
+- Com exatamente duas cartas, o jogador pode anunciar antes de um descarte ou corte legal que realmente o deixe com uma carta. A elegibilidade usa a mesma validação de jogadas, incluindo penalidades, Bloqueio, carta comprada e a mão recebida pelo Liquidificador.
+- Após corte bem-sucedido que deixe uma carta sem anúncio, há **300 ms** para anunciar. Denúncias ficam impedidas somente nesse prazo específico; depois voltam às regras existentes. O servidor usa seu próprio relógio e ordem dos comandos; pausa congela o restante. Se houver apresentação de troca/redistribuição bloqueando interações, os 300 ms começam ao terminar essa apresentação. Outra ação válida continua encerrando a janela normalmente, sem imunidade geral.
 - Qualquer outro participante pode denunciá-lo na janela. Se denúncia chegar antes do anúncio, o infrator **compra +2 cartas**. Se anunciar antes, fica protegido. Primeira ação recebida pelo servidor vence.
 - A janela fecha quando o próximo jogador **realiza a jogada**, não apenas no começo da animação. Tratar situações com cortes/penalidades sem criar burla.
 - Não confundir ficar com uma carta com zerar a mão.
@@ -178,3 +179,10 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 
 - Bloqueio pula integralmente o jogador: ele não joga nem corta esse Bloqueio para escapar. A restrição termina na próxima ação válida; cortes legais posteriores permanecem.
 - Compras de punição, desafio, denúncia e tempo esgotado conservam a lógica imediata, mas suspendem ações até terminar o cronograma compartilhado das cartas individuais. O comprador vê as frentes; demais clientes veem versos. O servidor libera pelo prazo limitado, sem depender de ACK de cliente; pausa e reconexão preservam o tempo restante.
+
+### Apresentação das compras e mesa
+
+- A lógica registra todas as cartas imediatamente. A apresentação mantém cartas em voo fora do layout e inclui cada carta ao chegar, sem espaços antecipados. Compras normais usam 2400 ms por carta e intervalo fixo de 1300 ms; nenhuma aceleração depende da quantidade. Carta jogável oferece a decisão ao alcançar o destaque (960 ms), mantendo-se ali até Jogar/Guardar. Guardar incorpora visualmente a carta à mão; mantém o efeito de passagem existente.
+- Punições usam 1000 ms por carta e intervalo fixo de 480 ms, sem aceleração progressiva. O prazo autoritativo é o tempo real da sequência mais 200 ms, limitado pela quantidade efetivamente comprada, sem ACK de cliente. Demais jogadores veem versos e deslocamento direto; o comprador vê as frentes.
+- Na decisão de compra ficam somente Jogar, Guardar e Última Carta quando elegível. Sem Guardar e passar separado nem anúncio duplicado fora do preview.
+- A mesa mostra somente os três avatares alheios, circulares e maiores, com nomes e contadores públicos; o próprio avatar continua no perfil/pódio. A chama recebe mais 3 px CSS à esquerda (além do deslocamento anterior), e a órbita inteira mais 2 px CSS para baixo; raios, correção inferior, direção, velocidade e intensidade são preservados.

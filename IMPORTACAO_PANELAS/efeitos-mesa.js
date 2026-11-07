@@ -3,7 +3,10 @@
   const $=id=>document.getElementById(id),motion=matchMedia('(prefers-reduced-motion: reduce)');
   const back='assets/padronizadas/verso_oficial_400x850.png';
   let owner=null,round=null,previous=null,pressure=null,frame=0,decision=null,lastOrigin=null,seenPurchase=0;
-  const draws=new Set(),masked=new Set(),nodes=new Set();
+  const draws=new Set(),masked=new Set(),nodes=new Set(),incoming=new Map();
+  let prepared=[],arrivalLayout=false;
+  const drawKey=(actor,id)=>actor+':'+id;
+  function handCards(s,actor){return s.players[actor].hand.filter(c=>!incoming.has(drawKey(actor,c.id)));}
   const bridge=()=>window.PanelinhaTableBridge;
   function cardNode(card,visible){
     const wrap=document.createElement('div');wrap.className='table-effect-card';
@@ -20,8 +23,14 @@
   function visible(s,id){return id===0||s.reveal||(s.o.duo&&id===2);}
   function point(actor,id){return PanelasMesa.handPoint(actor,id,true);}
   function center(){const r=$('discard').getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2,width:r.width,height:r.height};}
-  function closeDecision(){if(!decision)return;lastOrigin={id:decision.id,...decision.point,node:decision.node.querySelector('.card'),angle:0};masked.delete(decision.id);remove(decision.node);decision=null;}
-  function reset(){clearTimeout(frame);pressure=null;previous=null;owner=null;round=null;seenPurchase=0;closeDecision();lastOrigin=null;draws.clear();masked.clear();for(const n of [...nodes])remove(n);$('table').classList.remove('pressure-transition','pressure-hands-hidden','penalty-purchase-transition');}
+  function closeDecision(deliver=false){
+    if(!decision)return;
+    const previousDecision=decision;decision=null;
+    lastOrigin={id:previousDecision.id,...previousDecision.point,node:previousDecision.node.querySelector('.card'),angle:0};
+    remove(previousDecision.node);
+    if(deliver)placeDecision(previousDecision);else masked.delete(previousDecision.id);
+  }
+  function reset(){clearTimeout(frame);pressure=null;previous=null;owner=null;round=null;seenPurchase=0;closeDecision();lastOrigin=null;draws.clear();masked.clear();incoming.clear();prepared=[];arrivalLayout=false;for(const n of [...nodes])remove(n);$('table').classList.remove('pressure-transition','pressure-hands-hidden','penalty-purchase-transition');}
   function clock(s){return pressure.duration-(s.paused?s.remaining?.presentation||0:Math.max(0,(s.presentationUntil||0)-Date.now()));}
   function animatePressure(s,p,elapsed){
     if(motion.matches)return;
@@ -92,7 +101,7 @@
   function showReceived(s,meta){
     for(const n of [...nodes])if(n.dataset.effect==='received')remove(n);
     for(const actor of meta.active){
-      const avatar=$('player'+actor).querySelector('.pan-avatar'),r=(avatar||$('player'+actor)).getBoundingClientRect(),badge=document.createElement('span');badge.className='pressure-received';badge.dataset.actor=actor;badge.dataset.effect='received';badge.textContent='+'+meta.afterCounts[actor];badge.setAttribute('role','status');badge.setAttribute('aria-label',bridge().names(actor)+' recebeu '+meta.afterCounts[actor]+' cartas');
+      const avatar=$('player'+actor).querySelector('.pan-avatar'),r=(actor===0?$('hand'):avatar||$('player'+actor)).getBoundingClientRect(),badge=document.createElement('span');badge.className='pressure-received';badge.dataset.actor=actor;badge.dataset.effect='received';badge.textContent='+'+meta.afterCounts[actor];badge.setAttribute('role','status');badge.setAttribute('aria-label',bridge().names(actor)+' recebeu '+meta.afterCounts[actor]+' cartas');
       $('playAnimations').append(badge);nodes.add(badge);
       const w=badge.offsetWidth,h=badge.offsetHeight;
       let x=r.x+r.width/2,y=r.top-h/2-8;
@@ -105,10 +114,11 @@
   }
   function paint(s,render){
     if(owner!==s||round!==s.round){reset();owner=s;round=s.round;}
-    if(decision&&(!bridge().canPlayDraw(decision.id)||s.pendingAction))closeDecision();
+    if(decision&&(!s.players[0].hand.some(c=>c.id===decision.id)||s.pendingAction||s.drawn!==decision.id)){const keep=s.players[0].hand.find(c=>c.id===decision.id);closeDecision(!!keep&&!s.pendingAction);}
+    for(const [key,item]of incoming)if(!s.players[item.actor].hand.some(c=>c.id===item.id)){incoming.delete(key);masked.delete(item.id);}
     const actual=s.players.map(p=>p.hand),kind=s.lastRotation?.serial?'rotation':'pressure',meta=kind==='rotation'?s.lastRotation:s.lastDistribution;
     if(meta?.serial&&(!pressure||pressure.serial!==meta.serial||pressure.kind!==kind)&&((s.presentationUntil||0)>Date.now()||s.paused&&s.remaining?.presentation)){
-      for(const entry of draws)remove(entry.node);draws.clear();masked.clear();
+      for(const entry of draws)remove(entry.node);draws.clear();masked.clear();incoming.clear();prepared=[];
       for(const n of [...nodes])if(n.dataset.effect==='received')remove(n);
       // Nunca reaproveitar uma mão secreta de outro cliente. Reconexões usam versos.
       const old=previous||meta.beforeCounts.map((n,actor)=>Array.from({length:n},(_,i)=>({id:-1000000-actor*10000-i,hidden:true})));
@@ -121,8 +131,11 @@
     $('table').classList.toggle('penalty-purchase-transition',purchaseBusy);
     $('table').classList.toggle('pressure-transition',busy);
     $('table').classList.toggle('pressure-hands-hidden',busy&&elapsed>=690);
+    prepareDraws(PanelasMesa.takeDraws(),s,busy);
+    const oldPositions=arrivalLayout?new Map([...$('hand').children].map(n=>{const r=n.getBoundingClientRect();return[n.dataset.card,{x:r.x+r.width/2,y:r.y+r.height/2}]})):null;arrivalLayout=false;
     if(busy&&elapsed<(pressure.kind==='rotation'?940:1260))s.players.forEach((p,i)=>p.hand=pressure.old[i]);
-    try{render();lastOrigin=null;}finally{s.players.forEach((p,i)=>p.hand=actual[i]);}
+    try{render();if(lastOrigin&&!s.players[0].hand.some(c=>c.id===lastOrigin.id))lastOrigin=null;}finally{s.players.forEach((p,i)=>p.hand=actual[i]);}
+    if(oldPositions&&!motion.matches)for(const n of $('hand').children){const old=oldPositions.get(n.dataset.card);if(!old)continue;const r=n.getBoundingClientRect(),dx=old.x-r.x-r.width/2,dy=old.y-r.y-r.height/2;if(Math.hypot(dx,dy)>.5){const end=getComputedStyle(n).transform;n.animate([{transform:`translate(${dx}px,${dy}px) ${end}`},{transform:end}],{duration:220,easing:'cubic-bezier(.2,.7,.2,1)'});}}
     previous=actual.map(h=>h.map(c=>({...c})));
     if(!busy&&!decision&&!draws.size&&s.drawn!==null)showDecision(s);
     if(busy){
@@ -135,64 +148,108 @@
       for(const entry of draws)if(entry.purchase===purchase.serial){entry.animation.currentTime=progress;s.paused?entry.animation.pause():entry.animation.play();}
       clearTimeout(frame);if(!s.paused)frame=setTimeout(()=>{if(bridge().getState()===s)bridge().render();},Math.max(1,s.presentationUntil-Date.now()));
     }
+    for(const entry of draws)if(!entry.purchase)s.paused?entry.animation.pause():entry.animation.play();
+    refreshDecision(s);
     window.PanelinhaMatchUI?.mountScore(s,!busy&&!purchaseBusy);
     window.PanelinhaMatchUI?.mountPodium?.(s,!busy&&!purchaseBusy);
   }
   function penaltyProgress(s){return Math.max(0,s.lastPenaltyPurchase.duration-(s.paused?(s.remaining?.presentation||0):Math.max(0,(s.presentationUntil||0)-Date.now())));}
-  function animateDraws(events,s){
-    const ends=new Map(),purchase=s.lastPenaltyPurchase;
-    const forced=!!purchase&&(s.paused?(s.remaining?.presentation||0)>0:Date.now()<(s.presentationUntil||0));
+  function prepareDraws(events,s,busy){
+    prepared=[];if(busy||motion.matches)return;
+    const purchase=s.lastPenaltyPurchase,forced=!!purchase&&(s.paused?(s.remaining?.presentation||0)>0:Date.now()<(s.presentationUntil||0));
     if(forced){
-      if(seenPurchase===purchase.serial)return ends;
-      seenPurchase=purchase.serial;
+      if(seenPurchase===purchase.serial)return;seenPurchase=purchase.serial;
       const actor=purchase.actor,player=s.players[actor],r=$('pile').getBoundingClientRect();
       const cards=actor===0&&purchase.cardIds?purchase.cardIds.map(id=>player.hand.find(c=>c.id===id)).filter(Boolean):player.hand.slice(-purchase.count);
       events=cards.map(card=>({actor,id:card.id,card,x:r.x+r.width/2,y:r.y+r.height/2,width:r.width,height:r.height}));
+    }else if(Date.now()<(s.presentationUntil||0))return;
+    const groups=new Map();for(const event of events){if(!groups.has(event.actor))groups.set(event.actor,[]);groups.get(event.actor).push(event);}
+    for(const [actor,group]of groups){
+      const plan=PanelinhaRules.drawSequence(group.length,forced?'penalty':'normal'),tail=s.players[actor].hand.slice(-group.length),progress=forced?penaltyProgress(s):0;
+      group.forEach((original,i)=>{
+        // Snapshots ocultos têm IDs locais estáveis; eventos públicos não contêm IDs secretos.
+        const card=actor!==0&&original.id<0&&!s.players[actor].hand.some(c=>c.id===original.id)?tail[i]||original.card:original.card;
+        const event={...original,card,id:card?.id??original.id},eligible=!forced&&actor===0&&s.drawn===event.id&&bridge().canPlayDraw(event.id);
+        const duration=actor===0?(eligible?plan.approach:plan.items[i].duration):(forced?650:850),delay=plan.items[i].delay;
+        if(forced&&progress>=delay+duration)return;
+        const item={...event,eligible,duration,delay,progress,purchase:forced?purchase.serial:null};
+        if(s.players[actor].hand.some(c=>c.id===item.id))incoming.set(drawKey(actor,item.id),item);
+        prepared.push(item);
+      });
     }
-    if(!events.length||Date.now()<(s.presentationUntil||0)&&!forced)return ends;
-    if(motion.matches){if(!forced)showDecision(s);return ends;}
-    let ownIndex=0;
-    const ownCount=events.filter(event=>event.actor===0).length,schedule=PanelinhaRules.drawSequence(ownCount);
-    const progress=forced?penaltyProgress(s):0;
-    events.forEach((event,i)=>{
-      const end=point(event.actor,event.id),detailed=event.actor===0;
-      const eligible=!forced&&detailed&&s.drawn===event.id&&bridge().canPlayDraw(event.id);
-      const plan=detailed?schedule.items[ownIndex++]:{delay:i*240,duration:850},delay=plan.delay;
-      const duration=eligible?2400:plan.duration;
-      if(forced&&progress>=delay+duration)return;
-      const card=event.card,present=s.players[event.actor].hand.some(c=>c.id===event.id);
-      const start={x:event.x,y:event.y,width:event.width,height:event.height};
-      if(detailed&&card?.type==='wild'){start.height=start.width*850/400;end.height=end.width*850/400;}
-      const n=sprite(card,detailed,start,'draw');Object.assign(n.dataset,{actor:event.actor,cardId:event.id,presentation:detailed?'preview':'direct',duration});
+  }
+  function arrive(item,s){
+    incoming.delete(drawKey(item.actor,item.id));masked.delete(item.id);arrivalLayout=true;
+    if(bridge().getState()===s)bridge().render();
+  }
+  function animateDraws(_events,s){
+    const ends=new Map(),batch=prepared;prepared=[];
+    if(motion.matches){showDecision(s);return ends;}
+    for(const item of batch){
+      const {actor,id,card,eligible,duration,delay,progress,purchase}=item,detailed=actor===0;
+      const start={x:item.x,y:item.y,width:item.width,height:item.height};
+      if(detailed&&card?.type==='wild')start.height=start.width*850/400;
+      const end=PanelasMesa.incomingPoint(actor,card),n=sprite(card,detailed,start,'draw');
+      Object.assign(n.dataset,{actor,cardId:id,presentation:detailed?'preview':'direct',duration,delay});
       const height=Math.min(innerHeight*.5,300),width=height*400/850,cx=innerWidth/2,cy=innerHeight*.46;
       const transform=(x,y,w,h,angle=0)=>`translate(calc(-50% + ${x-start.x}px),calc(-50% + ${y-start.y}px)) rotate(${angle}deg) scale(${w/start.width},${h/start.height})`;
       const preview=transform(cx,cy,width,height),destination=transform(end.x,end.y,end.width,end.height,end.angle||0);
-      const frames=detailed?[
+      const frames=detailed?(eligible?[
+        {opacity:0,transform:transform(start.x,start.y,start.width*.96,start.height*.96,-5),easing:'ease-out'},
+        {offset:.15,opacity:1,transform:transform(start.x,start.y-8,start.width*1.02,start.height*1.02,-4),easing:'cubic-bezier(.4,0,.3,1)'},
+        {offset:.5,opacity:1,transform:transform(start.x+(cx-start.x)*.4,start.y+(cy-start.y)*.4-18,start.width*1.45,start.height*1.45,-3),easing:'cubic-bezier(.2,.65,.3,1)'},
+        {opacity:1,transform:preview}
+      ]:[
         {opacity:0,transform:transform(start.x,start.y,start.width*.96,start.height*.96,-5),easing:'ease-out'},
         {offset:.06,opacity:1,transform:transform(start.x,start.y-8,start.width*1.02,start.height*1.02,-4),easing:'cubic-bezier(.4,0,.3,1)'},
         {offset:.2,opacity:1,transform:transform(start.x+(cx-start.x)*.4,start.y+(cy-start.y)*.4-18,start.width*1.45,start.height*1.45,-3),easing:'cubic-bezier(.2,.65,.3,1)'},
         {offset:.4,opacity:1,transform:preview},{offset:.8,opacity:1,transform:preview,easing:'cubic-bezier(.4,0,.2,1)'},
-        {opacity:1,transform:eligible?preview:destination}
-      ]:[
+        {opacity:1,transform:destination}
+      ]):[
         {opacity:0,transform:transform(start.x,start.y,start.width,start.height)},
         {offset:.08,opacity:1},
         {offset:.45,opacity:1,transform:transform((start.x+end.x)/2,(start.y+end.y)/2-18,(start.width+end.width)/2,(start.height+end.height)/2,(end.angle||0)*.5)},
         {opacity:1,transform:destination}
       ];
       const animation=n.animate(frames,{duration,delay,easing:detailed?'linear':'cubic-bezier(.25,.5,.25,1)',fill:'both'});
-      if(present)masked.add(event.id);const entry={id:event.id,node:n,animation,purchase:forced?purchase.serial:null};draws.add(entry);ends.set(event.id,delay+duration);
-      if(forced){animation.currentTime=progress;if(s.paused)animation.pause();}
-      animation.onfinish=()=>{draws.delete(entry);if(eligible&&bridge().getState()===s&&bridge().canPlayDraw(event.id)&&!s.pendingAction){remove(n);showDecision(s,card);}else{masked.delete(event.id);remove(n);PanelasMesa.maskCards();}};
-    });return ends;
+      masked.add(id);const entry={id,node:n,animation,purchase};draws.add(entry);ends.set(id,delay+duration);
+      if(purchase){animation.currentTime=progress;if(s.paused)animation.pause();}
+      animation.onfinish=()=>{
+        draws.delete(entry);remove(n);
+        if(eligible&&bridge().getState()===s&&bridge().canPlayDraw(id)&&!s.pendingAction){showDecision(s,card);bridge().render();}
+        else arrive(item,s);
+      };
+    }return ends;
+  }
+  function placeDecision(old){
+    const s=bridge().getState(),card=s?.players[0].hand.find(c=>c.id===old.id);if(!card)return;
+    const item={actor:0,id:old.id};
+    if(motion.matches){incoming.delete(drawKey(0,old.id));masked.delete(old.id);arrivalLayout=true;return;}
+    const start=old.point,end=PanelasMesa.incomingPoint(0,card),n=sprite(card,true,start,'draw-keep');
+    const animation=n.animate([{transform:'translate(-50%,-50%)'},{transform:`translate(calc(-50% + ${end.x-start.x}px),calc(-50% + ${end.y-start.y}px)) rotate(${end.angle||0}deg) scale(${end.width/start.width},${end.height/start.height})`}],{duration:500,easing:'cubic-bezier(.3,0,.2,1)',fill:'both'});
+    masked.add(old.id);const entry={id:old.id,node:n,animation,purchase:null};draws.add(entry);
+    animation.onfinish=()=>{draws.delete(entry);remove(n);arrive(item,s);};
+  }
+  function refreshDecision(s){
+    if(!decision)return;
+    const controls=decision.node.querySelector('.draw-choice-actions'),eligible=bridge().canAnnounce();
+    let uno=controls.querySelector('.draw-uno');
+    if(eligible&&!uno){uno=document.createElement('button');uno.type='button';uno.id='drawUnoBtn';uno.className='btn warn draw-uno';uno.textContent='Última Carta';uno.onclick=()=>bridge().announce();controls.append(uno);}
+    if(!eligible)uno?.remove();
+    for(const button of controls.children)button.disabled=!!decision.busy||!!s.paused||!!s.pendingAction;
   }
   function showDecision(s,card=s.players[0].hand.find(c=>c.id===s.drawn)){
     if(decision||!card||!bridge().canPlayDraw(card.id)||s.pendingAction)return;
     const height=Math.min(innerHeight*.5,300),width=height*400/850,p={x:innerWidth/2,y:innerHeight*.46,width,height};
     const n=sprite(card,true,p,'draw-choice');n.classList.add('draw-choice');
     const controls=document.createElement('div');controls.className='draw-choice-actions';
-    for(const [label,run] of [['Jogar',()=>bridge().playDraw(card.id)],['Guardar',()=>bridge().keepDraw()]]){const b=document.createElement('button');b.type='button';b.className='btn '+(label==='Jogar'?'good':'alt');b.textContent=label;b.onclick=run;controls.append(b);}
-    n.append(controls);n.setAttribute('role','group');n.setAttribute('aria-label','Carta comprada: jogar ou guardar');decision={node:n,id:card.id,point:p};masked.add(card.id);PanelasMesa.maskCards();
+    for(const [label,run]of[['Jogar',()=>bridge().playDraw(card.id)],['Guardar',()=>bridge().keepDraw()]]){
+      const b=document.createElement('button');b.type='button';b.className='btn '+(label==='Jogar'?'good':'alt');b.textContent=label;
+      b.onclick=async()=>{const current=decision;if(!current||current.busy)return;current.busy=true;refreshDecision(s);try{await run();}finally{if(decision===current){current.busy=false;refreshDecision(s);}}};controls.append(b);
+    }
+    n.append(controls);n.setAttribute('role','group');n.setAttribute('aria-label','Carta comprada: jogar ou guardar');decision={node:n,id:card.id,card,point:p,busy:false};
+    incoming.set(drawKey(0,card.id),{actor:0,id:card.id,card});masked.add(card.id);PanelasMesa.maskCards();refreshDecision(s);
   }
-  motion.addEventListener('change',()=>{for(const n of [...nodes])if(n.dataset.effect!=='draw-choice')remove(n);draws.clear();masked.clear();});
-  window.PanelinhaTableEffects={paint,reset,animateDraws,drawing:id=>masked.has(id),playOrigin:id=>decision?.id===id?{...decision.point,node:decision.node.querySelector('.card'),angle:0}:lastOrigin?.id===id?lastOrigin:null};
+  motion.addEventListener('change',()=>{for(const n of [...nodes])if(n.dataset.effect!=='draw-choice')remove(n);draws.clear();masked.clear();incoming.clear();if(decision){incoming.set(drawKey(0,decision.id),{actor:0,id:decision.id});masked.add(decision.id);}bridge()?.render();});
+  window.PanelinhaTableEffects={paint,reset,animateDraws,handCards,drawing:id=>masked.has(id),playOrigin:id=>decision?.id===id?{...decision.point,node:decision.node.querySelector('.card'),angle:0}:lastOrigin?.id===id?lastOrigin:null};
 })();

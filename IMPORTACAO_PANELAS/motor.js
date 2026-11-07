@@ -10,11 +10,13 @@ const SPECIAL=new Set(['draw2','wild4','wild6','wild','dist','rotate']);
 const VALUE={num:2,draw2:4,skip:4,reverse:4,wild4:6,wild6:8,wild:10,dist:10,rotate:10};
 const CUT_PAUSE_MS=2200; // tempo mínimo antes de o próximo jogador agir; corte aparece imediatamente
 
-function drawSequence(count){
-  const steps=Array.from({length:count},(_,i)=>Math.max(500,1100*Math.pow(.96,i)));
-  const scale=Math.min(1,14000/(steps.reduce((sum,n)=>sum+n,0)||1));let elapsed=0;
-  const items=steps.map(step=>{const interval=step*scale,item={delay:elapsed,duration:count===1?2400:Math.max(420,interval*1.65)};elapsed+=interval;return item;});
-  return {items,duration:Math.ceil(Math.max(0,...items.map(item=>item.delay+item.duration)))};
+const CUT_UNO_GRACE_MS=300;
+// Ritmos fixos: o tamanho da sequência nunca altera duração ou intervalo.
+const DRAW_PACES=Object.freeze({normal:Object.freeze({interval:1300,duration:2400,approach:960}),penalty:Object.freeze({interval:480,duration:1000,approach:400})});
+function drawSequence(count,kind='normal'){
+  const pace=DRAW_PACES[kind]||DRAW_PACES.normal;
+  const items=Array.from({length:count},(_,i)=>({delay:i*pace.interval,duration:pace.duration}));
+  return {...pace,items,duration:count?(count-1)*pace.interval+pace.duration:0};
 }
 
 function create(ctx){
@@ -117,7 +119,7 @@ function rotateHands(exclude=[],actor=null){
   log(`Liquidificador: mãos transferidas no sentido ${s.direction===-1?'horário':'anti-horário'}.`);
 }
 
-function newRound(starter=0,direction=1){PanelinhaSFX.event('round-prepare');PanelinhaAnnouncements.round(s);clearJobs();s.token++;s.round++;s.players.forEach(p=>p.hand=[]);s.deck=buildDeck(s.o);s.discard=[];s.direction=direction;s.current=starter;s.penalty=0;s.highest=0;s.lastPenalty=null;s.finisher=null;s.drawn=null;s.preUno=false;s.unoWindow=null;s.cutOpen=false;s.unlockAt=0;s.lastActor=null;s.lastDistribution=null;s.lastRotation=null;s.roundScore=null;s.finalStandings=null;s.blockedPlayer=null;s.lastPenaltyPurchase=null;s.presentationUntil=0;s.pendingAction=null;s.phase='playing';s.message='';for(let j=0;j<7;j++)for(const p of s.players)drawCard(p.id);let first=s.deck.pop();s.discard.push(first);s.activeColor=first.color||pick(COLORS);log(`Rodada ${s.round}: carta inicial ${description(first)}.`);
+function newRound(starter=0,direction=1){PanelinhaSFX.event('round-prepare');PanelinhaAnnouncements.round(s);clearJobs();s.token++;s.round++;s.players.forEach(p=>p.hand=[]);s.deck=buildDeck(s.o);s.discard=[];s.direction=direction;s.current=starter;s.penalty=0;s.highest=0;s.lastPenalty=null;s.finisher=null;s.drawn=null;s.preUno=false;s.unoWindow=null;s.cutOpen=false;s.unlockAt=0;s.lastActor=null;s.lastDistribution=null;s.lastRotation=null;s.roundScore=null;s.finalStandings=null;s.cutAnnounceUntil=0;s.blockedPlayer=null;s.lastPenaltyPurchase=null;s.presentationUntil=0;s.pendingAction=null;s.phase='playing';s.message='';for(let j=0;j<7;j++)for(const p of s.players)drawCard(p.id);let first=s.deck.pop();s.discard.push(first);s.activeColor=first.color||pick(COLORS);log(`Rodada ${s.round}: carta inicial ${description(first)}.`);
 if(first.type==='skip'){s.blockedPlayer=starter;s.current=(starter+s.direction+4)%4;log('Bloqueio inicial: primeiro jogador pulado.');}
 else if(first.type==='reverse'){s.direction*=-1;s.current=(starter+s.direction+4)%4;log('Inverter inicial: sentido invertido.');}
 else if(power(first)){s.penalty=power(first);s.highest=power(first);log(`Penalidade inicial de +${s.penalty}.`);}
@@ -127,7 +129,7 @@ if(s.finisher!==null){finishRound();return;}PanelinhaSFX.event('round-start');st
 
 function canActNow(){return !!s&&!s.paused&&now()>=Math.max(s.unlockAt||0,s.presentationUntil||0);}
 
-function closeUnoOnAction(){if(s.unoWindow)s.unoWindow=null;s.blockedPlayer=null;}
+function closeUnoOnAction(){s.unoWindow=null;s.cutAnnounceUntil=0;s.blockedPlayer=null;}
 
 function canDistribute(c){
   if(s.penalty>0)return false;
@@ -190,6 +192,7 @@ function applyPlay(id,ids,isCut,color){
   }else if(c.type==='rotate'){
     if(!repeatedOwnCut&&!(s.o.duo&&s.finisher!==null))rotateHands([s.finisher].filter(x=>x!==null),id);
   }else{s.lastPenalty=null;}
+  if(isCut&&s.unoWindow?.id===id){if(p.hand.length===1){s.unoWindow.afterCut=true;s.cutAnnounceUntil=Math.max(now(),s.presentationUntil||0)+CUT_UNO_GRACE_MS;}else{s.unoWindow=null;}}
   if(c.type==='skip')s.blockedPlayer=nextActive(id);
   if(c.type==='reverse'&&!repeatedOwnCut)s.direction*=-1;
   if(s.finisher!==null&&(!s.penalty||s.players.every(q=>q.hand.length===0))){finishRound();return true;}
@@ -201,7 +204,7 @@ function applyPlay(id,ids,isCut,color){
 
 function holdPenaltyPurchase(actor,count,reason){
   if(!count)return;
-  const duration=drawSequence(count).duration+200;
+  const duration=drawSequence(count,'penalty').duration+200;
   s.lastPenaltyPurchase={serial:(s.purchaseSerial=(s.purchaseSerial||0)+1),actor,count,reason,duration,cardIds:s.players[actor].hand.slice(-count).map(c=>c.id)};
   const started=now();s.presentationUntil=started+duration;
   // Denúncia não consome o turno atual: congela seus prazos e a decisão de compra.
@@ -222,26 +225,36 @@ else{s.message='Nenhuma carta válida comprada. Turno encerrado.';s.current=next
 
 function keepPass(id=0){if(s.phase!=='playing'||s.current!==id||s.drawn===null||!canActNow())return;clearJobs();log(`${names(id)} guardou a carta comprada e passou.`);s.drawn=null;s.current=nextActive(id);startTurn();}
 
-// O anúncio preventivo usa a mesma validação do descarte, incluindo mão comprada.
+// A mesma validação do descarte cobre turno normal, carta comprada e corte.
 function canAnnounceUNO(id=0){
-  if(!s||s.phase!=='playing'||s.current!==id||!canActNow()||preAnnounced(id)||s.players[id].hand.length!==2)return false;
-  return s.players[id].hand.some(c=>{
-    if(!checkCards(id,[c.id],false))return false;
-    if(c.type!=='rotate')return true; // Panela após descarte de duas conserva mínimo 1.
-    // Liquidificador entrega ao autor a mão anterior na direção vigente.
+  if(!s||s.phase!=='playing'||s.paused||now()<(s.presentationUntil||0)||preAnnounced(id))return false;
+  const hand=s.players[id].hand;
+  if(hand.length===1)return s.unoWindow?.id===id&&s.unoWindow.afterCut===true&&now()<(s.cutAnnounceUntil||0);
+  if(hand.length!==2)return false;
+  return hand.some(c=>{
+    const cut=checkCards(id,[c.id],true);
+    if(!checkCards(id,[c.id],false)&&!cut)return false;
+    if(c.type!=='rotate'||cut&&s.lastActor===id&&equals(c,top()))return true;
     let from=id;for(let n=0;n<4;n++){from=(from+4-s.direction)%4;if(s.players[from].hand.length)return s.players[from].hand.length===1;}
     return false;
   });
 }
 function announceUNO(id=0){
   if(!canAnnounceUNO(id))return false;
-  PanelinhaAnnouncements.announce(s,id,names(id),'preemptive');
-  s.preUno=true;if(s.preUnoById)s.preUnoById[id]=true;
-  s.message='Última carta anunciada preventivamente; agora descarte para ficar com uma.';
-  log(`${names(id)} anunciou a última carta preventivamente.`);render();return true;
+  if(s.players[id].hand.length===1){
+    s.unoWindow=null;s.cutAnnounceUntil=0;s.reportAt=0;
+    PanelinhaAnnouncements.announce(s,id,names(id),'after-cut');
+    s.message='Última carta anunciada após o corte.';log(`${names(id)} anunciou ÚLTIMA CARTA após cortar.`);
+  }else{
+    PanelinhaAnnouncements.announce(s,id,names(id),'preemptive');
+    s.preUno=true;if(s.preUnoById)s.preUnoById[id]=true;
+    s.message='Última carta anunciada preventivamente; agora descarte para ficar com uma.';
+    log(`${names(id)} anunciou a última carta preventivamente.`);
+  }
+  render();return true;
 }
-
-function reportUno(by=0){if(!s||!s.unoWindow||s.phase!=='playing'||now()<(s.presentationUntil||0))return;let id=s.unoWindow.id;if(id===by)return;s.unoWindow=null;let got=drawMany(id,2);holdPenaltyPurchase(id,got,'uno');PanelinhaSFX.event('penalty-resolved',{amount:2});log(`${names(by)} denunciou ${names(id)} por esquecer ÚLTIMA CARTA (+${got}).`);render();queueBots();}
+function canReportUNO(by=0){return !!s&&s.phase==='playing'&&!s.paused&&now()>=(s.presentationUntil||0)&&!!s.unoWindow&&s.unoWindow.id!==by&&now()>=(s.cutAnnounceUntil||0);}
+function reportUno(by=0){if(!canReportUNO(by))return false;let id=s.unoWindow.id;s.unoWindow=null;s.cutAnnounceUntil=0;let got=drawMany(id,2);holdPenaltyPurchase(id,got,'uno');PanelinhaSFX.event('penalty-resolved',{amount:2});log(`${names(by)} denunciou ${names(id)} por esquecer ÚLTIMA CARTA (+${got}).`);render();queueBots();return true;}
 
 function handPoints(p){return p.hand.reduce((a,c)=>a+VALUE[c.type],0);}
 
@@ -297,8 +310,8 @@ s.current=nextActive(id);startTurn();}
 function colorForPlay(card,hand){return card.color||(COLOR_CHOOSERS.has(card.type)?bestColor(hand):s.activeColor);}
 
 function bestColor(cards){let counts=COLORS.map(color=>({color,n:cards.filter(c=>c.color===color).length})).sort((a,b)=>b.n-a.n);return counts[0].n?counts[0].color:pick(COLORS);}
-const functions={make,shuffle,descriptor,description,isColorless,equals,power,buildDeck,log,top,nextActive,refill,drawCard,drawMany,redistribute,rotateHands,newRound,holdPenaltyPurchase,canActNow,closeUnoOnAction,canDistribute,canPlay,checkCards,resolvePressurePlay,applyPlay,finishPenaltyDraw,challenge,buy,keepPass,canAnnounceUNO,announceUNO,reportUno,handPoints,specialCount,effectCount,numberCount,rankPlayers,finishRound,finalStandings,victories,botTurn,colorForPlay,bestColor,canChallenge};
+const functions={make,shuffle,descriptor,description,isColorless,equals,power,buildDeck,log,top,nextActive,refill,drawCard,drawMany,redistribute,rotateHands,newRound,holdPenaltyPurchase,canActNow,closeUnoOnAction,canDistribute,canPlay,checkCards,resolvePressurePlay,applyPlay,finishPenaltyDraw,challenge,buy,keepPass,canAnnounceUNO,announceUNO,canReportUNO,reportUno,handPoints,specialCount,effectCount,numberCount,rankPlayers,finishRound,finalStandings,victories,botTurn,colorForPlay,bestColor,canChallenge};
 return Object.fromEntries(Object.entries(functions).map(([name,fn])=>[name,(...args)=>{s=ctx.getState();return fn(...args)}]));
 }
-globalThis.PanelinhaRules=Object.freeze({create,COLORS,CN,TYPES,SHORT,COLORLESS,COLOR_CHOOSERS,SPECIAL,VALUE,CUT_PAUSE_MS,drawSequence});
+globalThis.PanelinhaRules=Object.freeze({create,COLORS,CN,TYPES,SHORT,COLORLESS,COLOR_CHOOSERS,SPECIAL,VALUE,CUT_PAUSE_MS,CUT_UNO_GRACE_MS,DRAW_PACES,drawSequence});
 })();

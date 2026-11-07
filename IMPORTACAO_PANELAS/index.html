@@ -199,7 +199,7 @@ const COLOR_CHOOSERS=new Set(['wild','wild4','wild6']);
 const SPECIAL=new Set(['draw2','wild4','wild6','wild','dist','rotate']);
 const VALUE={num:2,draw2:4,skip:4,reverse:4,wild4:6,wild6:8,wild:10,dist:10,rotate:10};
 const CUT_PAUSE_MS=2200; // tempo mínimo antes de o próximo jogador agir; corte aparece imediatamente
-let uid=0,s=null,botTimer=null,cutTimer=null,ticker=null;
+let uid=0,s=null,botTimer=null,cutTimer=null,ticker=null,cutUnoTimer=null;
 const rnd=n=>Math.floor(Math.random()*n),pick=a=>a[rnd(a.length)];
 const rules=PanelinhaRules.create({getState:()=>s,name:names,clearJobs,render,queueBots,startTurn,draw:(...args)=>PanelasMesa.recordDraw(...args),sound:(...args)=>PanelinhaSFX.event(...args),round:(...args)=>PanelinhaAnnouncements.round(...args),announce:(...args)=>PanelinhaAnnouncements.announce(...args)});
 function make(type,color=null,num=null){return rules.make(type,color,num);}
@@ -303,6 +303,7 @@ function challenge(){if(s?.online)return PanelinhaOnline.command('challenge');re
 function canChallenge(id){if(s?.online)return id===0&&PanelinhaOnline.connected&&s.actions.challenge;return s.phase==='playing'&&s.o.challenge&&s.penalty>0&&s.current===id&&s.lastPenalty&&s.lastPenalty.challengeable&&(['wild4','wild6'].includes(s.lastPenalty.type));}
 function buyHuman(){if(s?.online)return PanelinhaOnline.command('draw');return rules.buy();}
 function keepPass(){if(s?.online)return PanelinhaOnline.command('pass');return rules.keepPass();}
+function canAnnounceHuman(){return s?.online?PanelinhaOnline.connected&&!s.paused&&s.actions.announce:rules.canAnnounceUNO(0);}
 function callUno(){if(s?.online)return PanelinhaOnline.command('announce');return rules.announceUNO();}
 function reportUno(by=0){if(s?.online)return PanelinhaOnline.command('report');return rules.reportUno(by);}
 function handPoints(p){return rules.handPoints(p);}
@@ -352,14 +353,14 @@ function showColors(){
   });
 }
 function finishControlHTML(){if(s?.online)return PanelinhaOnline.resultHTML();let ranks=PanelinhaMatchUI.scoreHTML(s,names)+s.summary.map(x=>`<div class="notice"><strong>${x.place}º — ${safeName(x.id)}</strong> · ${x.cost} pontos nas cartas restantes (${x.remaining} cartas)</div>`).join('');return `${PanelinhaPodium.html(s,names)}<div class="banner" ${s.phase==='gameOver'?'hidden':''}>${s.phase==='gameOver'?(s.winner?`🏆 ${PanelinhaProfile.escape(s.winner)} venceu a partida!`:'🏆 Rodada única concluída!'):'Rodada concluída.'}</div>${s.phase==='gameOver'?'<details class="final-details"><summary>Placar e última rodada</summary>':''}${ranks}${s.phase==='gameOver'?'</details>':''}<div class="controls">${s.phase==='roundOver'?'<button id="nextRound" class="btn good">Próxima rodada</button>':'<button id="newMatch" class="btn good">Nova partida</button>'}<button id="backLobby" class="btn alt">Voltar às configurações</button></div>`;}
-function render(){if(!s)return;PanelinhaTableEffects.paint(s,renderTable);}
+function render(){if(!s)return;PanelinhaTableEffects.paint(s,renderTable);clearTimeout(cutUnoTimer);if(!s.online&&s.cutAnnounceUntil>Date.now())cutUnoTimer=setTimeout(()=>{if(s)render()},s.cutAnnounceUntil-Date.now()+1);}
 function renderTable(){if(!s)return;PanelasMesa.beforeRender(s);$('roundLabel').textContent=`Rodada ${s.round} · ${s.o.duo?'Duplas':'Individual'}`;$('status').textContent=s.phase==='playing'?`Vez de ${names(s.current)}`:s.phase==='roundOver'?'Fim da rodada':'Fim da partida';
 $('score').innerHTML=s.o.duo?`<span>${safeName(0)} + ${safeName(2)}: ${s.teams[0]}</span><span>${safeName(1)} + ${safeName(3)}: ${s.teams[1]}</span>`:s.players.map(p=>`<span>${safeName(p.id)}: ${p.score}</span>`).join('');
 $('stateText').textContent=s.phase==='playing'?`Sentido: ${s.direction===-1?'horário':'anti-horário'} · Cor: ${CN[s.activeColor]} · Monte: ${s.deck.length} · ${s.penalty?'PENALIDADE OBRIGATÓRIA +'+s.penalty:'Sem penalidade'}${s.o.timeout&&s.deadline?' · Tempo: '+Math.max(0,Math.ceil((s.deadline-Date.now())/1000))+'s':''}`:s.message;
 for(let i=0;i<4;i++)PanelasMesa.renderSeat(s,i,names(i),cardHTML);
 $('discard').innerHTML=PanelasMesa.discardHTML(s.discard,cardHTML,s);$('centerMsg').innerHTML=`Cor: <strong>${CN[s.activeColor]}</strong><div>${s.penalty?'⚠️ OBRIGATÓRIO +'+s.penalty:'Carta central'}</div>`;
 $('handCount').textContent=s.players[0].hand.length+' cartas';
-const cards=[...s.players[0].hand].sort((a,b)=>(COLORS.indexOf(a.color)+1||9)-(COLORS.indexOf(b.color)+1||9)||a.type.localeCompare(b.type)||(a.num??0)-(b.num??0));
+const cards=[...PanelinhaTableEffects.handCards(s,0)].sort((a,b)=>(COLORS.indexOf(a.color)+1||9)-(COLORS.indexOf(b.color)+1||9)||a.type.localeCompare(b.type)||(a.num??0)-(b.num??0));
 const locked=s.phase==='playing'&&s.current===0&&!canActNow();
 const cutCard=findHumanCut(), handScroll=$('hand').scrollLeft;
 $('hand').innerHTML=cards.map(c=>{
@@ -374,15 +375,14 @@ if(s.phase!=='playing'){
   $('nextRound')?.addEventListener('click',newRound);$('newMatch')?.addEventListener('click',startMatch);$('backLobby')?.addEventListener('click',backToMenu);
 }else{
   const mine=s.current===0;
-  const canCall=s.online?s.actions.announce&&canActNow():rules.canAnnounceUNO(0);
-  const canReport=s.unoWindow&&s.unoWindow.id!==0;
+  const canCall=s.drawn===null&&canAnnounceHuman();
+  const canReport=s.online?s.actions.report&&PanelinhaOnline.connected:rules.canReportUNO(0);
   const penaltyBanner=mine&&s.penalty?`<div class="penalty-alert">⚠️ ${penaltyText()}</div>`:'';
 
-  $('controls').innerHTML=`${penaltyBanner}${mine&&s.drawn!==null?'<button id="passBtn" class="btn alt">Guardar e passar</button>':''}${mine&&canChallenge(0)?`<button id="challengeBtn" class="btn warn" ${locked?'disabled':''}>Desafiar +4${s.o.wild6===false?'':'/+6'}</button>`:''}${canCall?`<button id="unoBtn" class="btn good" ${s.preUno?'disabled':''}>ÚLTIMA CARTA!</button>`:''}${canReport?'<button id="reportBtn" class="btn warn">Denunciar última carta</button>':''}`;
+  $('controls').innerHTML=`${penaltyBanner}${mine&&canChallenge(0)?`<button id="challengeBtn" class="btn warn" ${locked?'disabled':''}>Desafiar +4${s.o.wild6===false?'':'/+6'}</button>`:''}${canCall?`<button id="unoBtn" class="btn good" ${s.preUno?'disabled':''}>ÚLTIMA CARTA!</button>`:''}${canReport?'<button id="reportBtn" class="btn warn">Denunciar última carta</button>':''}`;
   $('buyBtn').disabled=!mine||s.drawn!==null||locked||!!s.pendingAction;
   $('buyBtn').setAttribute('aria-label',s.penalty?'Comprar penalidade de '+s.penalty+' cartas':'Comprar carta');
   $('buyBtn').onclick=buyHuman;
-  $('passBtn')?.addEventListener('click',keepPass);
   $('challengeBtn')?.addEventListener('click',challenge);
   $('unoBtn')?.addEventListener('click',callUno);
   $('reportBtn')?.addEventListener('click',()=>reportUno(0));
@@ -405,7 +405,7 @@ if(s.o.timeout&&s.deadline){let left=Math.max(0,Math.ceil((s.deadline-Date.now()
 if(left===0&&!s.pendingAction&&canActNow()){let id=s.current;clearJobs();s.token++;log(`Tempo de ${names(id)} esgotado.`);if(s.penalty){finishPenaltyDraw(id);}else{closeUnoOnAction();const got=drawMany(id,1);rules.holdPenaltyPurchase(id,got,'timeout');s.current=nextActive(id);startTurn();}}}},250);
 // Ganchos de inspeção para testes automatizados pelo Codex.
 PanelinhaNavigation.attach({getState:()=>s,leaveMatch:backToMenu});
-window.PanelinhaTableBridge={getState:()=>s,render,cardHTML,names,canPlayDraw:id=>s?.drawn===id&&checkCards(0,[id],false),playDraw:id=>chooseCards(0,[id]),keepDraw:keepPass,setOnline(value){clearJobs();s=value;},clearOnline(){if(!s?.online)return;clearJobs();s=null;$('modalRoot').innerHTML='';PanelinhaAnnouncements.reset();PanelasMesa.reset();}};
+window.PanelinhaTableBridge={getState:()=>s,render,cardHTML,names,canPlayDraw:id=>s?.drawn===id&&checkCards(0,[id],false),playDraw:id=>chooseCards(0,[id]),keepDraw:keepPass,canAnnounce:canAnnounceHuman,announce:callUno,setOnline(value){clearJobs();s=value;},clearOnline(){if(!s?.online)return;clearJobs();s=null;$('modalRoot').innerHTML='';PanelinhaAnnouncements.reset();PanelasMesa.reset();}};
 window.CartasTest={getState:()=>s,createDeck:o=>buildDeck(o),newRound:()=>s&&newRound(),describe:description,assetFor:cardAssetPath};
 })();
 </script>

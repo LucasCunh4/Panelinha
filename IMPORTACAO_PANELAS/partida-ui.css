@@ -1,7 +1,7 @@
 /* Avatares e leques conservam seu eixo. Os nomes alheios usam rótulos independentes. */
 .seat .name,.seat .sub{display:none!important}
-.seat .seat-identity,.seat.top .seat-identity,.seat.top .seat-identity.long-name{display:flex;align-items:center;justify-content:center;width:40px;max-width:40px;min-width:0;min-height:0;padding:5px;gap:0;border-radius:50%}
-.seat .seat-identity>.pan-avatar,.seat.top .seat-identity>.pan-avatar{width:26px;height:26px;flex:none}
+.seat .seat-identity,.seat.top .seat-identity,.seat.top .seat-identity.long-name{display:flex;align-items:center;justify-content:center;position:relative;width:calc(var(--table-avatar) + 10px);max-width:none;min-width:0;min-height:0;padding:5px;gap:0;border-radius:50%}
+.seat .seat-identity>.pan-avatar,.seat.top .seat-identity>.pan-avatar{width:var(--table-avatar);height:var(--table-avatar);flex:none}
 .seat.self{display:flex!important;align-items:center;justify-content:center;width:44px!important;min-width:0;min-height:0;padding:6px;gap:0;border-radius:50%}
 .seat.self>.pan-avatar{grid-column:auto;grid-row:auto;width:28px;height:28px}
 .seat.top .seat-identity{right:calc(50% + var(--top-fan-half,50%) + 12px)}
@@ -24,3 +24,10 @@ label.setting.has-setting-info{display:grid!important;grid-template-columns:minm
 
 .opponent-name{position:absolute;z-index:7;width:max-content;max-width:240px;box-sizing:border-box;padding:4px 8px;border:1px solid #b28c6266;border-radius:10px;background:#28172de8;color:#fff0d8;font:700 20px/1.16 system-ui,sans-serif;text-align:center;white-space:normal;overflow-wrap:anywhere;text-shadow:0 1px 3px #100815;pointer-events:none}
 .opponent-name.is-active{color:#ffe29b;border-color:#e6be78aa}
+
+/* Só os três participantes alheios têm avatar na mesa; o próprio mantém o leque. */
+.table{--table-avatar:clamp(36px,9.5vh,52px)}
+.seat.self{display:none!important}
+.opponent-count{position:absolute;right:-8px;bottom:-7px;z-index:2;display:grid;place-items:center;min-width:26px;height:23px;box-sizing:border-box;padding:2px 5px;border:1px solid #f3d390;border-radius:99px;background:linear-gradient(#694275,#301d40);color:#fff0b9;font:700 13px/1 system-ui,sans-serif;box-shadow:0 2px 5px #160b2699;white-space:nowrap}
+.table .seat .seat-identity>.pan-avatar{width:var(--table-avatar);height:var(--table-avatar);transform:none;aspect-ratio:1}
+.seat.top .seat-identity{position:absolute}

@@ -47,10 +47,10 @@
     if(!record||record.owner!==state){
       seat.textContent='';
       const identity=id===0?seat:document.createElement('div');if(id!==0){identity.className='seat-identity';seat.append(identity);}
-      const avatar=document.createElement('div');avatar.innerHTML=(state.online||player.avatar)?PanelinhaProfile.avatarHTML(player.avatar):id===0?PanelinhaProfile.avatarHTML(state.identity?.avatar):panAvatar(id);identity.append(avatar.firstElementChild);
+      if(id!==0){const avatar=document.createElement('div');avatar.innerHTML=(state.online||player.avatar)?PanelinhaProfile.avatarHTML(player.avatar):panAvatar(id);identity.append(avatar.firstElementChild);}
       const label=document.createElement('div');label.className='name';const text=document.createTextNode('');label.append(text);
       const team=document.createElement('span');team.className='tag';label.append(team);identity.append(label);
-      const count=document.createElement('div');count.className='sub';identity.append(count);
+      const count=document.createElement('span');count.className=id===0?'sub':'opponent-count';count.setAttribute('role','status');identity.append(count);
       const area=id===0?null:document.createElement('div');if(area)seat.append(area);
       record={owner:state,text,label,team,count,area,cards:new Map()};seatRecords.set(seat,record);
     }
@@ -65,15 +65,16 @@
     const label=name+(active?' ⏳':'')+(state.o.duo?' ':'');if(record.text.data!==label)record.text.data=label;
     attr(record.label,'title',name);record.team.hidden=!state.o.duo;
     const team=state.online?String(player.team):id%2?'B':'A';if(record.team.textContent!==team)record.team.textContent=team;
-    const count=`${player.hand.length} cartas${state.online?(player.bot||player.substituted?' · bot':''):(id===0?'':' · bot')}`;if(record.count.textContent!==count)record.count.textContent=count;
+    const count=id===0?`${player.hand.length} cartas`:String(player.hand.length);if(record.count.textContent!==count)record.count.textContent=count;attr(record.count,'aria-label',`${name}: ${player.hand.length} cartas`);attr(record.count,'title',`${player.hand.length} cartas${player.substituted?' · bot temporário':''}`);
     if(!record.area)return;
     const show=state.reveal||(state.o.duo&&id===2),area=record.area;
     let changed=false;
     area.classList.toggle('subhand',!!show);area.classList.toggle('back',!show);
     if(!show)attr(area,'aria-hidden','true');else if(area.hasAttribute('aria-hidden'))area.removeAttribute('aria-hidden');
-    const ids=new Set(player.hand.map(c=>c.id));
+    const displayed=PanelinhaTableEffects.handCards(state,id);
+    const ids=new Set(displayed.map(c=>c.id));
     for(const [key,node] of record.cards)if(!ids.has(key)){node.remove();record.cards.delete(key);changed=true;}
-    player.hand.forEach((card,i)=>{
+    displayed.forEach((card,i)=>{
       const view=show?format(card,true):'back';let node=record.cards.get(card.id);
       if(!node||node._cardView!==view){
         const holder=document.createElement('div');holder.innerHTML=show?view:'<span class="hidden-card"></span>';
@@ -312,6 +313,13 @@
     const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
     return {x:clamp(centerX,Math.max(0,clip.left),Math.min(innerWidth,clip.right)),y:clamp(centerY,Math.max(0,clip.top),Math.min(innerHeight,clip.bottom)),width:(node.offsetWidth||r.width)*scale,height:(node.offsetHeight||r.height)*scale,angle,node};
   }
+  function incomingPoint(actor,card){
+    if(actor!==0)return handPoint(actor,card?.id,true);
+    const candidates=[...$('hand').children],color=card?.color||'wild';
+    const neighbor=candidates.filter(n=>n.dataset.handColor===color).at(-1)||candidates.at(-1);
+    return handPoint(actor,neighbor?Number(neighbor.dataset.card):null,true);
+  }
+  function takeDraws(){const events=pendingDraws;pendingDraws=[];return events;}
   function recordDraw(state,actor,card) {
     if(!snapshot||snapshot.state!==state||snapshot.round!==state.round||reducedMotion.matches)return;
     const r=$('pile').getBoundingClientRect();
@@ -337,7 +345,7 @@
 
   function animateBlock(play,delay) {
     if(play.blocked===null||reducedMotion.matches)return;
-    const seat=$(`player${play.blocked}`),r=seat.getBoundingClientRect(),cx=innerWidth/2,cy=parseFloat($('table').style.getPropertyValue('--burner-y'));
+    const seat=play.blocked===0?$('hand'):$(`player${play.blocked}`),r=seat.getBoundingClientRect(),cx=innerWidth/2,cy=parseFloat($('table').style.getPropertyValue('--burner-y'));
     const tx=r.x+r.width/2,ty=r.y+r.height/2;
     const effect=document.createElement('div');effect.className='block-effect';effect.dataset.blocked=String(play.blocked);
     effect.innerHTML=`<svg viewBox="0 0 ${innerWidth} ${innerHeight}" width="100%" height="100%"><defs><marker id="blockArrow-${play.id}" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="#ffe4a0"/></marker></defs><line x1="${cx}" y1="${cy}" x2="${tx}" y2="${ty}" stroke="#ffe4a0" stroke-width="3" stroke-dasharray="7 4" marker-end="url(#blockArrow-${play.id})"/></svg><span style="left:${cx}px;top:${cy}px">⊘</span>`;
@@ -441,11 +449,11 @@
   function layoutOpponentNames(){
     if(!opponentNames.size)return;
     const table=$('table').getBoundingClientRect(),gap=8,pad=8;
-    const rect=node=>{const r=node.getBoundingClientRect();return{x:r.left,y:r.top,w:r.width,h:r.height,right:r.right,bottom:r.bottom};};
+    const rect=node=>{const r=node?.getBoundingClientRect();return r?{x:r.left,y:r.top,w:r.width,h:r.height,right:r.right,bottom:r.bottom}:{x:0,y:0,w:0,h:0,right:0,bottom:0};};
     const union=nodes=>{const rs=[...nodes].map(rect).filter(r=>r.w&&r.h);if(!rs.length)return null;const x=Math.min(...rs.map(r=>r.x)),y=Math.min(...rs.map(r=>r.y)),right=Math.max(...rs.map(r=>r.right)),bottom=Math.max(...rs.map(r=>r.bottom));return{x,y,right,bottom,w:right-x,h:bottom-y};};
     const hands=[0,1,2,3].map(id=>union((id===0?$('hand'):$('player'+id)).querySelectorAll('.card,.hidden-card')));
     const avatars=[0,1,2,3].map(id=>rect($('player'+id).querySelector('.pan-avatar')));
-    const occupied=[...hands.filter(Boolean),...avatars];
+    const occupied=[...hands.filter(Boolean),...avatars.filter(r=>r.w&&r.h),...[...document.querySelectorAll('.opponent-count')].map(rect)];
     for(const id of ['buyBtn','discard','tableMenuBtn','turnClock','onlineConnectionNotice']){const node=$(id);if(node&&!node.hidden&&node.getClientRects().length){const r=rect(node);if(r.w&&r.h)occupied.push(r);}}
     const overlap=(a,b)=>Math.max(0,Math.min(a.right,b.right+4)-Math.max(a.x,b.x-4))*Math.max(0,Math.min(a.bottom,b.bottom+4)-Math.max(a.y,b.y-4));
     for(const id of [2,3,1]){
@@ -495,6 +503,8 @@
     table.style.setProperty('--scene-scale', scale);
     // Deslocamento em pixels CSS, compensando a escala uniforme do cenário.
     table.style.setProperty('--orbit-left', `${836-4/scale}px`);
+    table.style.setProperty('--orbit-top', `${451+2/scale}px`);
+    table.style.setProperty('--flame-offset', `${-3-3/scale}px`);
     layoutOrbit(scale);
     table.style.setProperty('--scene-x', `${x}px`);
     table.style.setProperty('--scene-y', `${y}px`);
@@ -632,5 +642,5 @@
     positionTurnCue();layoutOpponentNames();
   });
   nativeTable(false);
-  window.PanelasMesa = { handPoint,maskCards,render, renderSeat, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {cancelAnimationFrame(namesLayoutFrame);for(const nameplate of opponentNames.values())nameplate.remove();opponentNames.clear();PanelinhaTableEffects.reset();cancelAnimationFrame(cueLayoutFrame);cueAnimation?.cancel();cueAnimation=null;cueOwner=null;cueRound=null;wasHumanTurn=false;$('turnCue').hidden=true;$('hand').classList.remove('human-turn');$('hand').dataset.turnScale='1';$('buyBtn').classList.remove('mandatory-buy');clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
+  window.PanelasMesa = { handPoint,incomingPoint,takeDraws,maskCards,render, renderSeat, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {cancelAnimationFrame(namesLayoutFrame);for(const nameplate of opponentNames.values())nameplate.remove();opponentNames.clear();PanelinhaTableEffects.reset();cancelAnimationFrame(cueLayoutFrame);cueAnimation?.cancel();cueAnimation=null;cueOwner=null;cueRound=null;wasHumanTurn=false;$('turnCue').hidden=true;$('hand').classList.remove('human-turn');$('hand').dataset.turnScale='1';$('buyBtn').classList.remove('mandatory-buy');clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
 })();

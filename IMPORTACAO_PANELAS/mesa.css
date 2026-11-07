@@ -369,7 +369,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 #turnCue {right:auto;bottom:auto;line-height:1;max-width:calc(100% - 40px);transform:translateX(-50%);font-size:clamp(17px,2.8vw,28px)}
 
 /* SVG quadrado e elipses horizontais, no mesmo plano e centro nativo das chamas. */
-.stove-direction {inset:auto;left:var(--orbit-left,836px);top:451px;width:490px;height:490px;transform:translate(-50%,-50%);aspect-ratio:1 / 1}
+.stove-direction {inset:auto;left:var(--orbit-left,836px);top:var(--orbit-top,451px);width:490px;height:490px;transform:translate(-50%,-50%);aspect-ratio:1 / 1}
 .stove-flow {stroke-width:5;fill:none}
 
 /* O filtro considera a silhueta de TODAS as seis camadas, sem pintar sobre a arte. */
