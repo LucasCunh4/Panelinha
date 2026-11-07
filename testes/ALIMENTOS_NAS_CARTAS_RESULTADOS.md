@@ -48,4 +48,14 @@ Build e verificador de APK atualizados para conferir a pasta compartilhada e rej
 - Comparação isolada do HTML das 52 normais, Panela, Liquidificador e verso com o renderizador anterior: idêntico. `geometry` e `symbolLayout` inalterados. Scripts de mesa/efeitos/motor e CSS da mesa comparados intactos.
 - `npm run build`, `npx cap copy android`, sintaxe JS/Python e `git diff --check`: aprovados. Pasta nova incluída em dist/Capacitor, antiga ausente.
 
-Publicação/APK finais serão conferidos após salvar. Emulador e Android físico não executados; instalação/atualização/persistência real e desempenho em hardware não são declarados aprovados.
+## Publicação e APK final
+
+- Código salvo na branch `android/apk-testes`, commit `cc33a2f9464515a9a927e9dd28da0c9a2d0c7ae3`.
+- [GitHub Actions 42425171178](https://github.com/LucasCunh4/Panelinha/actions/runs/42425171178): compilação, assinatura, verificações e publicação aprovadas. Etapas de emulador não executadas pela opção existente; nenhum teste removido ou marcado falsamente como aprovado.
+- [APK direto 0.2.56/c7602, sem ZIP](https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.56/Panelinha-Teste-v0.2.56-c7602.apk), 62.657.987 bytes. Código anterior: 7502.
+- APK baixado e validado localmente por `ferramentas/verificar_apk.py`: assinatura v2, certificado da geração 2, pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`, `sensorLandscape`, 23 artes-base, quatro ingredientes e demais recursos/código esperados. Metadados regenerados idênticos aos produzidos pelo CI. Configuração e identidade permitem atualização direta da versão anterior sem desinstalar; instalação/persistência em dispositivo não foram executadas.
+- Certificado SHA-256: `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`.
+- SHA-256 do APK: `c4e58ee0d8ef0f8d62a3cfabc4336e36ab2fd2736a288249d3f60cf3936af902`.
+- Web publicada em `https://panelinha-lobby.lucas260802.workers.dev`, versão Worker `45158150-88eb-4fbe-b747-b244eab15b4c`. Os quatro scripts/estilos alterados e quatro PNGs publicados conferidos byte a byte com o build; `/health` retornou `v:1`, `phase:3`, `gameplay:true`. Servidor, credenciais e regras preservados.
+
+Emulador e Android físico não executados; instalação/atualização/persistência real e desempenho em hardware não são declarados aprovados. Verificações visuais feitas no navegador, incluindo viewport de celular/tablet e toque simulado. Sem pendências funcionais observadas nos escopos executados.
