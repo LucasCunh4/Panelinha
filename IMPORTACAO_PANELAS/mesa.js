@@ -15,6 +15,7 @@
   function nativeTable(playing) {
     if (nativePlaying === playing) return;
     nativePlaying = playing;
+    if(!playing)stopComet();
     window.PanelinhaWindow?.setPlaying({playing}).catch(() => {});
   }
   // WebViews antigos ignoram overflow:clip. Foco/toque não deve deslocar a mesa;
@@ -25,7 +26,8 @@
   });
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const stopDirectionAnimation = () => $('directionGlyph').getAnimations().forEach(animation => animation.cancel());
-  reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) {stopDirectionAnimation();clearFlights();} });
+  reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) {stopDirectionAnimation();clearFlights();}syncCometMotion(); });
+  document.addEventListener('visibilitychange',syncCometMotion);
 
   // Avatar provisório de panela sem rosto, independente das artes oficiais das cartas.
   function panAvatar(id = 0) {
@@ -272,7 +274,10 @@
     }
     // A metade superior continua sendo o arco original, sem alteração.
     d+=' A220 194 0 0 1 245 51 A220 194 0 0 1 465 245 Z';
-    $('stoveDirection').querySelectorAll('.stove-flow').forEach(path=>path.setAttribute('d',d));
+    const orbit=$('stoveOrbit');orbit.setAttribute('d',d);
+    const length=orbit.getTotalLength();
+    cometPoints=Array.from({length:COMET_SAMPLES},(_,i)=>orbit.getPointAtLength(length*i/COMET_SAMPLES));
+    paintComet();
   }
 
   function discardPose(id) {
@@ -433,16 +438,41 @@
     animateBlock(play,delay+duration*.7);
   }
 
-  function tableDirection(direction) {
-    const table=$('table'),flows=[...document.querySelectorAll('.stove-flow')];
-    const changed=table.dataset.direction&&table.dataset.direction!==String(direction);
-    const phases=flows.map(el=>{const a=el.getAnimations().find(a=>a.effect.getTiming().iterations===Infinity);return a?{elapsed:Number(a.currentTime)||0,duration:Number(a.effect.getTiming().duration)||7500}:null});
-    table.dataset.direction=String(direction);
-    // A mesma direção do motor orienta todas as camadas; espelha a fase ao inverter.
-    if(changed&&!reducedMotion.matches)flows.forEach((el,i)=>{
-      const a=el.getAnimations().find(a=>a.effect.getTiming().iterations===Infinity),p=phases[i];
-      if(a&&p)a.currentTime=Math.floor(p.elapsed/p.duration)*p.duration+p.duration-p.elapsed%p.duration;
-    });
+  // Um único relógio visual, independente dos timers do jogo. A direção vem do motor.
+  const COMET_PERIOD=3000,COMET_SPAN=.225,COMET_SAMPLES=512;
+  let cometPoints=[],cometPhase=0,cometTravel=1,cometLastTime=null,cometFrame=null,cometActive=false;
+  function cometPoint(phase){
+    const position=((phase%1+1)%1)*COMET_SAMPLES,index=Math.floor(position),fraction=position-index;
+    const a=cometPoints[index],b=cometPoints[(index+1)%COMET_SAMPLES];
+    return{x:a.x+(b.x-a.x)*fraction,y:a.y+(b.y-a.y)*fraction};
+  }
+  function advanceComet(time){
+    if(cometLastTime!==null&&!reducedMotion.matches&&!document.hidden)cometPhase=((cometPhase+(time-cometLastTime)/COMET_PERIOD*cometTravel)%1+1)%1;
+    cometLastTime=time;
+  }
+  function paintComet(){
+    if(!cometPoints.length)return;
+    const head=cometPoint(cometPhase),tail=cometPoint(cometPhase-cometTravel*COMET_SPAN),near=cometPoint(cometPhase-cometTravel*.002);
+    // Uma só cauda contínua: gradiente da extremidade transparente até a ponta.
+    const d=Array.from({length:25},(_,i)=>{const p=cometPoint(cometPhase-cometTravel*COMET_SPAN*(1-i/24));return(i?'L':'M')+p.x.toFixed(2)+' '+p.y.toFixed(2)}).join(' ');
+    $('cometTrail').setAttribute('d',d);$('cometTailGlow').setAttribute('d',d);
+    const gradient=$('cometGold');for(const [key,value]of Object.entries({x1:tail.x,y1:tail.y,x2:head.x,y2:head.y}))gradient.setAttribute(key,value.toFixed(2));
+    const angle=Math.atan2(head.y-near.y,head.x-near.x)*180/Math.PI;
+    $('cometHead').setAttribute('transform',`translate(${head.x.toFixed(3)} ${head.y.toFixed(3)}) rotate(${angle.toFixed(2)})`);
+  }
+  function cometTick(){
+    cometFrame=null;if(!cometActive||reducedMotion.matches||document.hidden){cometLastTime=null;return;}
+    advanceComet(performance.now());paintComet();cometFrame=requestAnimationFrame(cometTick);
+  }
+  function syncCometMotion(){
+    if(!cometActive||reducedMotion.matches||document.hidden){cancelAnimationFrame(cometFrame);cometFrame=null;cometLastTime=null;paintComet();return;}
+    if(cometFrame===null){cometLastTime=performance.now();cometFrame=requestAnimationFrame(cometTick);}
+  }
+  function stopComet(){cometActive=false;syncCometMotion();}
+  function tableDirection(direction){
+    // Avança até o instante da inversão antes de trocar o sinal: a ponta não salta.
+    advanceComet(performance.now());cometTravel=direction===-1?1:-1;
+    $('table').dataset.direction=String(direction);cometActive=true;paintComet();syncCometMotion();
   }
 
   // Rótulos independentes dos leques/avatares: não alteram o eixo das cartas.
