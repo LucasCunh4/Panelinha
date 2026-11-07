@@ -390,5 +390,5 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 @media(prefers-reduced-motion:reduce){.hand>button>.card{transition:none}}
 
 /* Escala única: leques, montes e animações usam as dimensões externas reais. */
-.table {--card-display-scale:1.05;--card-width:calc(var(--card-base-width) * var(--card-display-scale))}
-@media(orientation:landscape) and (max-height:340px){.table {--card-display-scale:1.02}}
+.table {--card-growth:1.08;--card-display-scale:calc(1.05 * var(--card-growth));--card-width:calc(var(--card-base-width) * var(--card-display-scale))}
+@media(orientation:landscape) and (max-height:340px){.table {--card-display-scale:calc(1.02 * var(--card-growth))}}

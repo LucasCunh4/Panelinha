@@ -11,95 +11,108 @@
   "normalCombinations": 52,
   "assets": [
     {
-      "path": "assets/cartas/elementos/bloqueio_unitario.png",
-      "width": 314,
-      "height": 313,
-      "bytes": 83367,
-      "sha256": "fed51dd2b0570922aaaa2b92d1bdb51c946d29116cf28c0700ba943c938e4668"
+      "path": "assets/cartas/elementos/bloqueio_refeito.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 785382,
+      "sha256": "4cff198a033ad49bb5cc7f56bee674ef8c025a16b8a9c8a44f621c1c090eefd9",
+      "source": "ícone_de_proibição_branco_brilhante.png"
     },
     {
-      "path": "assets/cartas/elementos/inverter_unitario.png",
-      "width": 314,
-      "height": 314,
-      "bytes": 72788,
-      "sha256": "240333d2269042afb4adec16fcfb26618382c568d62df974704aed11f1b0d4f9"
+      "path": "assets/cartas/elementos/inverter_refeito.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 646502,
+      "sha256": "3f84b0c4b64dd5be200d6fb9c93ec8702a170427acbea065eec2b1fb89622f04",
+      "source": "ícone_de_setas_invertidas_brilhantes.png"
     },
     {
-      "path": "assets/cartas/elementos/mais2_unitario.png",
-      "width": 313,
-      "height": 313,
-      "bytes": 78408,
-      "sha256": "d7282b4af7dbdb06b155c5d4e90f18a486aafd769ddb2e744e4acdaeea7246f3"
+      "path": "assets/cartas/elementos/mais2_refeito.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 614054,
+      "sha256": "f46b23288c974c77bd3158417d347eb3519e637a1e57b4d995c04957493b6163",
+      "source": "ícone_cartunesco_brilhante_2.png"
     },
     {
-      "path": "assets/cartas/elementos/numero_0_unitario.png",
-      "width": 314,
-      "height": 314,
-      "bytes": 69990,
-      "sha256": "4ff4d68077a05ead35c8e0991a3db0da2ff87cd0f61f3ff86113c85773a7f6ec"
+      "path": "assets/cartas/elementos/numero_0_refeito.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 520677,
+      "sha256": "7e72e1cd4a5c1190dc04b891d56797ed9fa267d27cbb236c0576bd70bcc1ff07",
+      "source": "zero_brilhante_estilo_game.png"
     },
     {
-      "path": "assets/cartas/elementos/numero_1_unitario.png",
-      "width": 313,
-      "height": 314,
-      "bytes": 53634,
-      "sha256": "a193c1c6a77fe9efab711dc3647fcbecc57f16cdadcbae4ae6c83c5537990caa"
+      "path": "assets/cartas/elementos/numero_1_refeito.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 487128,
+      "sha256": "d0453a09236c3adb8fdb4401316e0936da2ecbf62956a9f538054ff52137198c",
+      "source": "número_1_branco_brilhante_em_estilo_jogo.png"
     },
     {
-      "path": "assets/cartas/elementos/numero_2_unitario.png",
-      "width": 313,
-      "height": 314,
-      "bytes": 70986,
-      "sha256": "96940662221a11652d073ea650fe5badd0e08ed255e60afb175d7020c59840e8"
+      "path": "assets/cartas/elementos/numero_2_refeito.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 587769,
+      "sha256": "f95d30565cfbd7a53c88fa7a8d47c95ab700cd7188245a1970e4cc68215845b8",
+      "source": "número_2_brilhante_em_estilo_cartoon.png"
     },
     {
-      "path": "assets/cartas/elementos/numero_3_unitario.png",
-      "width": 314,
-      "height": 314,
-      "bytes": 70972,
-      "sha256": "f93f496b04c3be128411868487bef29276c8e9797a25722645b216c061956871"
+      "path": "assets/cartas/elementos/numero_3_refeito.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 550087,
+      "sha256": "e22975bd11449b55f113c2f82bd68779066ab2ff975efc4ba9f87900e6b9cc11",
+      "source": "número_3_brilhante_em_estilo_cartum.png"
     },
     {
-      "path": "assets/cartas/elementos/numero_4_unitario.png",
-      "width": 314,
-      "height": 313,
-      "bytes": 69905,
-      "sha256": "c27ddfa36fb5f098b8df91e0bd7588b715af3e1c80dd074aff89f86449e30aff"
+      "path": "assets/cartas/elementos/numero_4_refeito.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 585586,
+      "sha256": "1b332e662415d2459678a7dff59966af6e078733aa1572b85016ad73e5ddaa80",
+      "source": "número_4_branco_glossy_estilizado.png"
     },
     {
-      "path": "assets/cartas/elementos/numero_5_unitario.png",
-      "width": 313,
-      "height": 313,
-      "bytes": 72638,
-      "sha256": "9bcb5722e840abfc6ab6f50a3e0f1da848e85be55c2af95c4e48cdebc6adf306"
+      "path": "assets/cartas/elementos/numero_5_refeito.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 599944,
+      "sha256": "a4d5a37d6bf046bcf91c501b2e63385bc2e0707a96c5bb41bae5c493c9a10208",
+      "source": "número_5_brilhante_em_estilo_adesivo.png"
     },
     {
-      "path": "assets/cartas/elementos/numero_6_unitario.png",
-      "width": 313,
-      "height": 313,
-      "bytes": 74169,
-      "sha256": "ee0c979dbf6f77762a22b0fc7f373f2f5eddaab1156b902fa59408d21121235a"
+      "path": "assets/cartas/elementos/numero_6_refeito.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 539206,
+      "sha256": "583f158a47ddf8795611b2a7118e719b628d0f70099e622309f7da33b7bf6a99",
+      "source": "seis_branco_brilhante_em_estilo_cartoon.png"
     },
     {
-      "path": "assets/cartas/elementos/numero_7_unitario.png",
-      "width": 314,
-      "height": 313,
-      "bytes": 66854,
-      "sha256": "381ad0ed9ac9672bc90f46bcb57c1b8b682ba308614a61d1510146d745d60376"
+      "path": "assets/cartas/elementos/numero_7_refeito.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 536667,
+      "sha256": "9ed799d3b4a66fd95b13ce8e8ef04c5bbd61dad4e27193661e9661d1c8b7bdda",
+      "source": "número_7_branco_brilhante_em_estilo_cartoon.png"
     },
     {
-      "path": "assets/cartas/elementos/numero_8_unitario.png",
-      "width": 314,
-      "height": 313,
-      "bytes": 72058,
-      "sha256": "6a22e62682303de7557b478d86308ab9bd3df21fc15c9add403e34586e4c0c5d"
+      "path": "assets/cartas/elementos/numero_8_refeito.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 615993,
+      "sha256": "3d7d1f630e2be3952a048a859718f71fd140af0088c180db72ee008dd35b40bd",
+      "source": "número_8_brilhante_em_estilo_cartum.png"
     },
     {
-      "path": "assets/cartas/elementos/numero_9_unitario.png",
-      "width": 313,
-      "height": 313,
-      "bytes": 75651,
-      "sha256": "41789efc15c79b7635e1bd47bccac5cb55888bfc82a00d09329a1c18adc37959"
+      "path": "assets/cartas/elementos/numero_9_refeito.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 1789762,
+      "sha256": "c35b7e5ac65422e9738c20bd37f52738496b6e1d534a09321e0e9f3a83b8e7df",
+      "source": "nove_branco_glossy_em_estilo_cartoon.png"
     },
     {
       "path": "assets/cartas/especiais/carta_curinga.png",
@@ -182,8 +195,8 @@
       "sha256": "c440399e1ad8ad26d80b39e3d7070a92d240cb0a544e031f7a1cd0b1c6d43c79"
     },
     {
-      "path": "panelinha_numeros_unitarios_png.zip",
-      "sha256": "2cf8e2d3d4bccd0ac3eeac8388fdd92443592063f028ed474c5afe22746c7a43"
+      "path": "panelinha_numeros_refeitos_separados.zip",
+      "sha256": "2b3bd011a1a9679a39c3324eff928eca766a8891cdeb18a85f8c6cd17bd8127c"
     }
   ],
   "removedRepositoryFiles": [
@@ -304,7 +317,21 @@
     "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_7_retrabalhado_470x800.png",
     "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_8_retrabalhado_470x800.png",
     "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_9_retrabalhado_470x800.png",
-    "panelinha_numeros_retrabalhados_470x800.zip"
+    "panelinha_numeros_retrabalhados_470x800.zip",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/bloqueio_unitario.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/inverter_unitario.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/mais2_unitario.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_0_unitario.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_1_unitario.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_2_unitario.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_3_unitario.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_4_unitario.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_5_unitario.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_6_unitario.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_7_unitario.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_8_unitario.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_9_unitario.png",
+    "panelinha_numeros_unitarios_png.zip"
   ],
   "symbolComposition": "background + center + top-left + bottom-right; three instances of one unit PNG"
 }

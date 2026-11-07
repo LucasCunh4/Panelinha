@@ -14,10 +14,9 @@
 
 /* Um PNG unitário reutilizado três vezes; parâmetros vêm de symbolLayout. */
 .card.art-card .card-symbol{inset:auto;aspect-ratio:auto;object-fit:contain;pointer-events:none}
-.card.art-card .card-symbol-center{left:var(--symbol-center-x);top:var(--symbol-center-y);width:var(--symbol-center-width);height:var(--symbol-center-height);transform:translate(-50%,-50%)}
-.card.art-card .card-symbol-top,.card.art-card .card-symbol-bottom{width:var(--symbol-corner-width);height:var(--symbol-corner-height)}
-.card.art-card .card-symbol-top{left:var(--symbol-inset-x);top:var(--symbol-inset-y)}
-.card.art-card .card-symbol-bottom{right:var(--symbol-inset-x);bottom:var(--symbol-inset-y)}
+.card.art-card .card-symbol-center{left:var(--symbol-center-x);top:var(--symbol-center-y);width:var(--symbol-center-width);height:var(--symbol-center-height)}
+.card.art-card .card-symbol-top{left:var(--symbol-top-x);top:var(--symbol-top-y);width:var(--symbol-top-width);height:var(--symbol-top-height)}
+.card.art-card .card-symbol-bottom{left:var(--symbol-bottom-x);top:var(--symbol-bottom-y);width:var(--symbol-bottom-width);height:var(--symbol-bottom-height)}
 #hand>button,#hand>button *,.card,.card *,.table-flight{ -webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none }
 .card::selection,.card *::selection{background:transparent;color:inherit}
 .card img{-webkit-user-drag:none}

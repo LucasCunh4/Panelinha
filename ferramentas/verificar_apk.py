@@ -49,8 +49,8 @@ with zipfile.ZipFile(apk) as archive:
         assert len(data) == entry['bytes'] and hashlib.sha256(data).hexdigest() == entry['sha256'], entry['path']
         assert data[:8] == b'\x89PNG\r\n\x1a\n' and struct.unpack('>II', data[16:24]) == (entry['width'],entry['height']) and data[25] == 6, 'Dimensões/RGBA divergentes: '+entry['path']
         unit = entry['path'].startswith('assets/cartas/elementos/')
-        assert (entry['path'].endswith('_unitario.png') and entry['width'] > 0 and entry['height'] > 0) if unit else (entry['width'],entry['height']) == (470,800), 'Formato de arte inesperado: '+entry['path']
-    assert sum(a['path'].startswith('assets/cartas/elementos/') and a['path'].endswith('_unitario.png') for a in manifest['assets']) == 13
+        assert (entry['path'].endswith('_refeito.png') and entry['width'] > 0 and entry['height'] > 0) if unit else (entry['width'],entry['height']) == (470,800), 'Formato de arte inesperado: '+entry['path']
+    assert sum(a['path'].startswith('assets/cartas/elementos/') and a['path'].endswith('_refeito.png') for a in manifest['assets']) == 13
     for retired in ['assets/especiais/', 'assets/padronizadas/', 'assets/cartas_mais4_mais6/']:
         assert not any(n.startswith(prefix+retired) for n in archive.namelist()), 'Artes substituídas no APK: '+retired
     mesa = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_MESA_V1.json').read_text())

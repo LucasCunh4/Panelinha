@@ -1,3 +1,5 @@
+> Números refeitos: os 13 PNGs de 1254×1254 substituem os unitários anteriores; montagem continua fundo + três instâncias, com enquadramento recalculado. Cartas 8% maiores em relação à 0.2.51; identidade Android, bordas e regras preservadas.
+
 > Atualização de números unitários: normais usam fundo + três instâncias do mesmo PNG. Os 13 símbolos têm dimensões próprias verificadas no manifesto; fundos/especiais/verso seguem 470×800. As regras, identidade Android e bordas não mudam. O ZIP dos antigos símbolos triplos foi removido junto dos 13 PNGs.
 
 > Migração visual 470×800: os 52 PNGs completos antigos e todas as artes especiais/versos anteriores foram retirados. O build/APK agora exigem os 23 PNGs de `MANIFESTO_CARTAS_470X800.json`, 52 combinações em camadas e moldura externa 520×850. Pacote, assinatura e origem permanecem os mesmos. Emulador continua opcional, desligado por padrão. Registros de versões abaixo são históricos.
