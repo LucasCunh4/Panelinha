@@ -66,4 +66,12 @@ Sem cópia/fallback dos símbolos antigos. As referências no registro de exclus
 
 Não executado: emulador, aparelho Android físico, instalação/atualização/persistência real de dados e desempenho em hardware Android. Nenhuma bateria extensa ou suite de regras completa foi reexecutada.
 
-APK/publicação: workflow existente será acompanhado após registrar o código, com a mesma assinatura de geração 2, sem emulador e sem APKs intermediários.
+## APK e versão web publicados
+
+[APK direto 0.2.52/c7202](https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.52/Panelinha-Teste-v0.2.52-c7202.apk), 68.930.653 bytes, link HTTP 200.
+
+[Workflow 42414604631](https://github.com/LucasCunh4/Panelinha/actions/runs/42414604631): aprovado, execução 52. Um único APK compilado/assinado; etapa de emulador marcada `skipped`, sem testes Android declarados aprovados. Fonte `a5db835137dba6c600cfaa6eb40794f454714ffd`.
+
+`ferramentas/verificar_apk.py` também executado sobre o APK real baixado da Release: aprovado. SHA-256 `b5bde82d67092a332b89e6a7c3872f8a699e7577152442d8bc4074fc99d05d3c`. Metadados regenerados idênticos ao CI. Conferidos assinatura v2/geração 2, certificado de `android-identity.json`, pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`, `sensorLandscape`, bytes do código web, 23 PNGs (13 refeitos), 52 combinações e demais recursos aprovados. Símbolos substituídos ausentes do APK. Código 7202 > 7102 e identidade igual à versão anterior: compatível com atualização direta, sem gerar chave ou alterar Secrets; instalação e retenção efetiva em dispositivo continuam não executadas.
+
+Worker existente atualizado para `2fb94e3b-3ffb-4deb-a100-3ae27f875297`. Os 16 recursos modificados publicados foram conferidos byte a byte com o build; símbolo anterior não é servido. `/health` confirmou Fase 3 ativa. Nenhuma regra, código do servidor, configuração/binding ou sala pública foi alterada/criada.
