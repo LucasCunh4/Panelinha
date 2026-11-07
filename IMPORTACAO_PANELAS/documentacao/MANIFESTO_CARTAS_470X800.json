@@ -11,108 +11,95 @@
   "normalCombinations": 52,
   "assets": [
     {
-      "path": "assets/cartas/elementos/bloqueio_refeito.png",
-      "width": 1254,
-      "height": 1254,
-      "bytes": 785382,
-      "sha256": "4cff198a033ad49bb5cc7f56bee674ef8c025a16b8a9c8a44f621c1c090eefd9",
-      "source": "ícone_de_proibição_branco_brilhante.png"
+      "path": "assets/cartas/elementos/bloqueio.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 188527,
+      "sha256": "fc551884e0408177ad719cdd6e3dc9ce548527d22ff1bdb35a62320732296689"
     },
     {
-      "path": "assets/cartas/elementos/inverter_refeito.png",
-      "width": 1254,
-      "height": 1254,
-      "bytes": 646502,
-      "sha256": "3f84b0c4b64dd5be200d6fb9c93ec8702a170427acbea065eec2b1fb89622f04",
-      "source": "ícone_de_setas_invertidas_brilhantes.png"
+      "path": "assets/cartas/elementos/inverter.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 181784,
+      "sha256": "f27e75bb7a229eca6c8da0cb04384ca8fa40ad39706b0c4196b4ea5aa846c0b7"
     },
     {
-      "path": "assets/cartas/elementos/mais2_refeito.png",
-      "width": 1254,
-      "height": 1254,
-      "bytes": 614054,
-      "sha256": "f46b23288c974c77bd3158417d347eb3519e637a1e57b4d995c04957493b6163",
-      "source": "ícone_cartunesco_brilhante_2.png"
+      "path": "assets/cartas/elementos/mais2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 145804,
+      "sha256": "60b1c24c26a16798f6253f364c430ffa8453ac6869df73330337d16fee0067aa"
     },
     {
-      "path": "assets/cartas/elementos/numero_0_refeito.png",
-      "width": 1254,
-      "height": 1254,
-      "bytes": 520677,
-      "sha256": "7e72e1cd4a5c1190dc04b891d56797ed9fa267d27cbb236c0576bd70bcc1ff07",
-      "source": "zero_brilhante_estilo_game.png"
+      "path": "assets/cartas/elementos/numero_0.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 146412,
+      "sha256": "c1e23726a35f80b3f85da803c4a72dd7d9c0176d409634ed088d4a929037f479"
     },
     {
-      "path": "assets/cartas/elementos/numero_1_refeito.png",
-      "width": 1254,
-      "height": 1254,
-      "bytes": 487128,
-      "sha256": "d0453a09236c3adb8fdb4401316e0936da2ecbf62956a9f538054ff52137198c",
-      "source": "número_1_branco_brilhante_em_estilo_jogo.png"
+      "path": "assets/cartas/elementos/numero_1.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 118333,
+      "sha256": "bfa8b310653a9c65bf27427869f0931dd3257fa19df65e061217d6d5726f5260"
     },
     {
-      "path": "assets/cartas/elementos/numero_2_refeito.png",
-      "width": 1254,
-      "height": 1254,
-      "bytes": 587769,
-      "sha256": "f95d30565cfbd7a53c88fa7a8d47c95ab700cd7188245a1970e4cc68215845b8",
-      "source": "número_2_brilhante_em_estilo_cartoon.png"
+      "path": "assets/cartas/elementos/numero_2.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 145522,
+      "sha256": "33bc1d48465a98142215b8ee1d1eda29a1c3a8e82b4b40c13fb7513942b2e8ec"
     },
     {
-      "path": "assets/cartas/elementos/numero_3_refeito.png",
-      "width": 1254,
-      "height": 1254,
-      "bytes": 550087,
-      "sha256": "e22975bd11449b55f113c2f82bd68779066ab2ff975efc4ba9f87900e6b9cc11",
-      "source": "número_3_brilhante_em_estilo_cartum.png"
+      "path": "assets/cartas/elementos/numero_3.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 144731,
+      "sha256": "2783855287a6a1dd3338f9e0d4e28db882b747d6f797bd1403a58c42dbad5bb9"
     },
     {
-      "path": "assets/cartas/elementos/numero_4_refeito.png",
-      "width": 1254,
-      "height": 1254,
-      "bytes": 585586,
-      "sha256": "1b332e662415d2459678a7dff59966af6e078733aa1572b85016ad73e5ddaa80",
-      "source": "número_4_branco_glossy_estilizado.png"
+      "path": "assets/cartas/elementos/numero_4.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 135020,
+      "sha256": "3f643cdf9a0c5a2e352d72356eb4e1a8cdf8d3280f71c1997bdb4e26fb6f3027"
     },
     {
-      "path": "assets/cartas/elementos/numero_5_refeito.png",
-      "width": 1254,
-      "height": 1254,
-      "bytes": 599944,
-      "sha256": "a4d5a37d6bf046bcf91c501b2e63385bc2e0707a96c5bb41bae5c493c9a10208",
-      "source": "número_5_brilhante_em_estilo_adesivo.png"
+      "path": "assets/cartas/elementos/numero_5.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 148476,
+      "sha256": "ec46de82ea539be97c6fa352256879eab69cce71b97357f4269cec5ec527a32d"
     },
     {
-      "path": "assets/cartas/elementos/numero_6_refeito.png",
-      "width": 1254,
-      "height": 1254,
-      "bytes": 539206,
-      "sha256": "583f158a47ddf8795611b2a7118e719b628d0f70099e622309f7da33b7bf6a99",
-      "source": "seis_branco_brilhante_em_estilo_cartoon.png"
+      "path": "assets/cartas/elementos/numero_6.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 145576,
+      "sha256": "2408c48af4fa02e43626c1d80b266145b36f81b643074700ef2dd7a1ef657f4d"
     },
     {
-      "path": "assets/cartas/elementos/numero_7_refeito.png",
-      "width": 1254,
-      "height": 1254,
-      "bytes": 536667,
-      "sha256": "9ed799d3b4a66fd95b13ce8e8ef04c5bbd61dad4e27193661e9661d1c8b7bdda",
-      "source": "número_7_branco_brilhante_em_estilo_cartoon.png"
+      "path": "assets/cartas/elementos/numero_7.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 128573,
+      "sha256": "d20d96798b00ae51d9b6b9fb89c8003604d834ce52b93f009b6ae25005f22397"
     },
     {
-      "path": "assets/cartas/elementos/numero_8_refeito.png",
-      "width": 1254,
-      "height": 1254,
-      "bytes": 615993,
-      "sha256": "3d7d1f630e2be3952a048a859718f71fd140af0088c180db72ee008dd35b40bd",
-      "source": "número_8_brilhante_em_estilo_cartum.png"
+      "path": "assets/cartas/elementos/numero_8.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 152353,
+      "sha256": "d1f9f99ec15c67be62095871715711ccf901c7b334c3665939152b1f9b614643"
     },
     {
-      "path": "assets/cartas/elementos/numero_9_refeito.png",
-      "width": 1254,
-      "height": 1254,
-      "bytes": 1789762,
-      "sha256": "c35b7e5ac65422e9738c20bd37f52738496b6e1d534a09321e0e9f3a83b8e7df",
-      "source": "nove_branco_glossy_em_estilo_cartoon.png"
+      "path": "assets/cartas/elementos/numero_9.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 146182,
+      "sha256": "0a3f18b670e158d329e17964b0cd0510be1e5ed118ec8b9c857e26e2efefa89e"
     },
     {
       "path": "assets/cartas/especiais/carta_curinga.png",
@@ -195,12 +182,12 @@
       "sha256": "c440399e1ad8ad26d80b39e3d7070a92d240cb0a544e031f7a1cd0b1c6d43c79"
     },
     {
-      "path": "panelinha_numeros_refeitos_separados.zip",
-      "sha256": "2b3bd011a1a9679a39c3324eff928eca766a8891cdeb18a85f8c6cd17bd8127c"
-    },
-    {
       "path": "panelinha_fundos_normais_novos_470x800.zip",
       "sha256": "203442471e7f50b21a9f186b56d8a67f300d35fb8696b26f2c646c1c6ad271c7"
+    },
+    {
+      "path": "panelinha_numeros_simbolos_sombra_aprovados_v3.zip",
+      "sha256": "e4dcda424e8dad5db407ce6dda4b45fea0a77411d7b50e0d0ed93bc88297c1be"
     }
   ],
   "removedRepositoryFiles": [
@@ -340,7 +327,21 @@
     "IMPORTACAO_PANELAS/assets/cartas/fundos/fundo_azul_retrabalhado_470x800.png",
     "IMPORTACAO_PANELAS/assets/cartas/fundos/fundo_verde_retrabalhado_470x800.png",
     "IMPORTACAO_PANELAS/assets/cartas/fundos/fundo_vermelho_retrabalhado_470x800.png",
-    "panelinha_fundos_retrabalhados_470x800.zip"
+    "panelinha_fundos_retrabalhados_470x800.zip",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/bloqueio_refeito.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/inverter_refeito.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/mais2_refeito.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_0_refeito.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_1_refeito.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_2_refeito.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_3_refeito.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_4_refeito.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_5_refeito.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_6_refeito.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_7_refeito.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_8_refeito.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_9_refeito.png",
+    "panelinha_numeros_refeitos_separados.zip"
   ],
   "symbolComposition": "background + center + top-left + bottom-right; three instances of one unit PNG"
 }

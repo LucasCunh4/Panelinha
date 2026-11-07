@@ -1,12 +1,12 @@
 // Composição real no navegador: o PNG unitário não recebe deformação nem recorte novo.
 const {chromium}=require('playwright'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
-const root=path.join(__dirname,'../IMPORTACAO_PANELAS'),out=process.env.PANELINHA_TEST_OUTPUT||'/workspace/work/numeros-refeitos';
+const root=path.join(__dirname,'../IMPORTACAO_PANELAS'),out=process.env.PANELINHA_TEST_OUTPUT||'/workspace/work/simbolos-v3';
 (async()=>{
  fs.mkdirSync(out,{recursive:true});
  const manifest=JSON.parse(fs.readFileSync(path.join(root,'documentacao/MANIFESTO_CARTAS_470X800.json')));
  const units=manifest.assets.filter(a=>a.path.includes('/elementos/'));assert.equal(units.length,13);
- for(const a of units){assert.match(a.path,/_refeito\.png$/);assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,a.path))).digest('hex'),a.sha256);}
+ for(const a of units){assert.match(a.path,/\/(numero_[0-9]|mais2|bloqueio|inverter)\.png$/);assert.equal(a.width,512);assert.equal(a.height,512);assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,a.path))).digest('hex'),a.sha256);}
  const b=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
  try{
   const p=await b.newPage({viewport:{width:1280,height:900},hasTouch:true}),errors=[];p.on('pageerror',e=>errors.push(e.message));
@@ -19,7 +19,7 @@ const root=path.join(__dirname,'../IMPORTACAO_PANELAS'),out=process.env.PANELINH
   await p.waitForFunction(()=>[...document.querySelectorAll('#unitGallery img')].every(im=>im.complete&&im.naturalWidth));
   const cards=await p.locator('#unitGallery>.card').evaluateAll(ns=>ns.map(n=>{
    const f=n.querySelector('.card-face'),r=f.getBoundingClientRect(),relative=im=>{const b=im.getBoundingClientRect(),s=getComputedStyle(im);return{x:(b.x-r.x)/r.width,y:(b.y-r.y)/r.height,w:b.width/r.width,h:b.height/r.height,fit:s.objectFit,events:s.pointerEvents,src:im.getAttribute('src'),drag:im.draggable};};
-   return{type:n.dataset.cardType,key:n.querySelector('.card-symbol').getAttribute('src').split('/').at(-1).replace('_refeito.png',''),images:[...f.querySelectorAll('img')].map(relative),text:n.textContent.trim()};
+   return{type:n.dataset.cardType,key:n.querySelector('.card-symbol').getAttribute('src').split('/').at(-1).replace('.png',''),images:[...f.querySelectorAll('img')].map(relative),text:n.textContent.trim()};
   }));
   assert.equal(cards.length,52);
   for(const c of cards){

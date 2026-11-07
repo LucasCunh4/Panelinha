@@ -3,14 +3,14 @@
   const geometry=Object.freeze({contentWidth:470,contentHeight:800,border:25,width:520,height:850,radius:70,innerRadius:45});
   // Enquadramento óptico dos novos PNGs: margens transparentes não viram offsets antigos.
   // Os limites visíveis foram medidos em alfa >64, sem recortar ou editar a imagem.
-  const symbolArt=Object.freeze({width:1254,height:1254,bounds:Object.freeze({
-    numero_0:Object.freeze([276,245,954,1113]),numero_1:Object.freeze([322,186,940,1101]),
-    numero_2:Object.freeze([263,193,992,1092]),numero_3:Object.freeze([289,208,931,1111]),
-    numero_4:Object.freeze([207,163,1013,1148]),numero_5:Object.freeze([287,192,949,1116]),
-    numero_6:Object.freeze([273,213,935,1122]),numero_7:Object.freeze([228,180,1013,1134]),
-    numero_8:Object.freeze([257,179,969,1132]),numero_9:Object.freeze([288,221,950,1082]),
-    mais2:Object.freeze([119,281,1129,1023]),bloqueio:Object.freeze([123,148,1111,1165]),
-    inverter:Object.freeze([189,179,1064,1089])
+  const symbolArt=Object.freeze({width:512,height:512,bounds:Object.freeze({
+    numero_0:Object.freeze([63,35,446,476]),numero_1:Object.freeze([96,34,413,475]),
+    numero_2:Object.freeze([75,35,433,476]),numero_3:Object.freeze([80,35,429,475]),
+    numero_4:Object.freeze([55,35,452,476]),numero_5:Object.freeze([75,34,436,476]),
+    numero_6:Object.freeze([67,34,443,477]),numero_7:Object.freeze([70,35,438,476]),
+    numero_8:Object.freeze([70,35,440,475]),numero_9:Object.freeze([75,34,434,476]),
+    mais2:Object.freeze([36,76,473,433]),bloqueio:Object.freeze([41,34,466,477]),
+    inverter:Object.freeze([37,36,473,472])
   })});
   // Coordenadas independentes no conteúdo 470×800; escala isotrópica, PNG integral.
   const symbolLayout=Object.freeze({
@@ -34,7 +34,7 @@
     if(specials[card.type])return [root+'especiais/'+specials[card.type]+'.png'];
     const face=symbolKey(card);
     if(!colors[card.color]||!face)throw Error('Carta visual desconhecida: '+card.type);
-    const symbol=root+'elementos/'+face+'_refeito.png';
+    const symbol=root+'elementos/'+face+'.png';
     return [root+'fundos/fundo_'+colors[card.color]+'_novo_470x800.png',symbol,symbol,symbol];
   }
   const cache=new Map();

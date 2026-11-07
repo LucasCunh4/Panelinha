@@ -14,9 +14,9 @@ for(const entry of manifest.assets){
   const colorType=entry.path.startsWith('assets/cartas/fundos/')?2:6; // novos fundos RGB; demais RGBA
   if(bytes.readUInt32BE(16)!==entry.width||bytes.readUInt32BE(20)!==entry.height||bytes[25]!==colorType)throw Error(`Dimensões/formato PNG divergentes: ${entry.path}`);
   if(!unit&&(entry.width!==470||entry.height!==800))throw Error(`Fundo/especial precisa ser 470x800: ${entry.path}`);
-  if(unit&&(!entry.path.endsWith('_refeito.png')||entry.width<=0||entry.height<=0))throw Error(`Símbolo unitário inválido: ${entry.path}`);
+  if(unit&&(!/^(numero_[0-9]|mais2|bloqueio|inverter)\.png$/.test(path.basename(entry.path))||entry.width!==512||entry.height!==512))throw Error(`Símbolo V3 inválido: ${entry.path}`);
 }
-if(manifest.assets.filter(a=>a.path.startsWith('assets/cartas/elementos/')&&a.path.endsWith('_refeito.png')).length!==13)throw Error('São 13 PNGs unitários para três instâncias por carta normal');
+if(manifest.assets.filter(a=>a.path.startsWith('assets/cartas/elementos/')).length!==13)throw Error('São 13 PNGs V3 para três instâncias por carta normal');
 const cardFiles=fs.readdirSync(path.join(source,'assets/cartas'),{recursive:true}).filter(n=>n.endsWith('.png')).map(n=>'assets/cartas/'+n).sort();
 if(JSON.stringify(cardFiles)!==JSON.stringify(manifest.assets.map(a=>a.path).sort()))throw Error('Arquivo de carta ausente ou excedente');
 for(const name of manifest.removedRepositoryFiles||[])if(fs.existsSync(path.join(root,name)))throw Error(`Arte/arquivo substituído ainda no repositório: ${name}`);
