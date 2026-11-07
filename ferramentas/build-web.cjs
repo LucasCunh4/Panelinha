@@ -11,8 +11,9 @@ for(const entry of manifest.assets){
   const bytes=fs.readFileSync(path.join(source,entry.path));
   if(bytes.length!==entry.bytes||crypto.createHash('sha256').update(bytes).digest('hex')!==entry.sha256)throw Error(`Arte divergente: ${entry.path}`);
   const unit=entry.path.startsWith('assets/cartas/elementos/');
-  if(bytes.readUInt32BE(16)!==entry.width||bytes.readUInt32BE(20)!==entry.height||bytes[25]!==6)throw Error(`Dimensões/RGBA divergentes: ${entry.path}`);
-  if(!unit&&(entry.width!==470||entry.height!==800))throw Error(`Fundo/especial precisa ser RGBA 470x800: ${entry.path}`);
+  const colorType=entry.path.startsWith('assets/cartas/fundos/')?2:6; // novos fundos RGB; demais RGBA
+  if(bytes.readUInt32BE(16)!==entry.width||bytes.readUInt32BE(20)!==entry.height||bytes[25]!==colorType)throw Error(`Dimensões/formato PNG divergentes: ${entry.path}`);
+  if(!unit&&(entry.width!==470||entry.height!==800))throw Error(`Fundo/especial precisa ser 470x800: ${entry.path}`);
   if(unit&&(!entry.path.endsWith('_refeito.png')||entry.width<=0||entry.height<=0))throw Error(`Símbolo unitário inválido: ${entry.path}`);
 }
 if(manifest.assets.filter(a=>a.path.startsWith('assets/cartas/elementos/')&&a.path.endsWith('_refeito.png')).length!==13)throw Error('São 13 PNGs unitários para três instâncias por carta normal');

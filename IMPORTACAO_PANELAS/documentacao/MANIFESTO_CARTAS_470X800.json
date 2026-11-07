@@ -157,39 +157,39 @@
       "sha256": "7a400f667d1659840326e3687754b7dc1f6f9c60500b99e8f938212d60365565"
     },
     {
-      "path": "assets/cartas/fundos/fundo_amarelo_retrabalhado_470x800.png",
+      "path": "assets/cartas/fundos/fundo_amarelo_novo_470x800.png",
       "width": 470,
       "height": 800,
-      "bytes": 455337,
-      "sha256": "31e89873e9addc056a018adc192308068b7e4b81ca819b98277c7e8319de45f8"
+      "bytes": 401762,
+      "sha256": "f56eeb3c94ba7643a392602cb34ad7c8ff145efe9f91d98be4b2f529706b7ff7",
+      "mode": "RGB"
     },
     {
-      "path": "assets/cartas/fundos/fundo_azul_retrabalhado_470x800.png",
+      "path": "assets/cartas/fundos/fundo_azul_novo_470x800.png",
       "width": 470,
       "height": 800,
-      "bytes": 464816,
-      "sha256": "d60e07c341f25fe25f8daa5766ef546d410dba222f41bf6295a3905507e6d710"
+      "bytes": 461513,
+      "sha256": "a7ac8da049a9e1bd319fe7b098a29b8a4dc0deaa3123127e8d734903a6f2fef4",
+      "mode": "RGB"
     },
     {
-      "path": "assets/cartas/fundos/fundo_verde_retrabalhado_470x800.png",
+      "path": "assets/cartas/fundos/fundo_verde_novo_470x800.png",
       "width": 470,
       "height": 800,
-      "bytes": 490262,
-      "sha256": "11048c3bd393b6def3e29719ac42fe676000745ae24e48c817f291f29ae5f560"
+      "bytes": 455461,
+      "sha256": "20dbb6b5d8a129e3cb892afc45e96924aaff4f0268993c90ab5f209cc7feae20",
+      "mode": "RGB"
     },
     {
-      "path": "assets/cartas/fundos/fundo_vermelho_retrabalhado_470x800.png",
+      "path": "assets/cartas/fundos/fundo_vermelho_novo_470x800.png",
       "width": 470,
       "height": 800,
-      "bytes": 451045,
-      "sha256": "5a4931468c959c7969f0015c513ecf08b6aa1dc40d54092cf58196231e218024"
+      "bytes": 406601,
+      "sha256": "128c61949e6603aac7a45e88ce3e184ed7762bd57550becd94e9ddf29c4277b1",
+      "mode": "RGB"
     }
   ],
   "packages": [
-    {
-      "path": "panelinha_fundos_retrabalhados_470x800.zip",
-      "sha256": "7059137ceeddaa62407609703c86c0a15aa997836c58500a0c132cdcdaaaca78"
-    },
     {
       "path": "panelinha_especiais_e_verso_aprovados_470x800.zip",
       "sha256": "c440399e1ad8ad26d80b39e3d7070a92d240cb0a544e031f7a1cd0b1c6d43c79"
@@ -197,6 +197,10 @@
     {
       "path": "panelinha_numeros_refeitos_separados.zip",
       "sha256": "2b3bd011a1a9679a39c3324eff928eca766a8891cdeb18a85f8c6cd17bd8127c"
+    },
+    {
+      "path": "panelinha_fundos_normais_novos_470x800.zip",
+      "sha256": "203442471e7f50b21a9f186b56d8a67f300d35fb8696b26f2c646c1c6ad271c7"
     }
   ],
   "removedRepositoryFiles": [
@@ -331,7 +335,12 @@
     "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_7_unitario.png",
     "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_8_unitario.png",
     "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_9_unitario.png",
-    "panelinha_numeros_unitarios_png.zip"
+    "panelinha_numeros_unitarios_png.zip",
+    "IMPORTACAO_PANELAS/assets/cartas/fundos/fundo_amarelo_retrabalhado_470x800.png",
+    "IMPORTACAO_PANELAS/assets/cartas/fundos/fundo_azul_retrabalhado_470x800.png",
+    "IMPORTACAO_PANELAS/assets/cartas/fundos/fundo_verde_retrabalhado_470x800.png",
+    "IMPORTACAO_PANELAS/assets/cartas/fundos/fundo_vermelho_retrabalhado_470x800.png",
+    "panelinha_fundos_retrabalhados_470x800.zip"
   ],
   "symbolComposition": "background + center + top-left + bottom-right; three instances of one unit PNG"
 }

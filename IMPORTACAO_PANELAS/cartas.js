@@ -35,7 +35,7 @@
     const face=symbolKey(card);
     if(!colors[card.color]||!face)throw Error('Carta visual desconhecida: '+card.type);
     const symbol=root+'elementos/'+face+'_refeito.png';
-    return [root+'fundos/fundo_'+colors[card.color]+'_retrabalhado_470x800.png',symbol,symbol,symbol];
+    return [root+'fundos/fundo_'+colors[card.color]+'_novo_470x800.png',symbol,symbol,symbol];
   }
   const cache=new Map();
   function preload(path){

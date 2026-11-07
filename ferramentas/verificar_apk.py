@@ -47,7 +47,8 @@ with zipfile.ZipFile(apk) as archive:
     for entry in manifest['assets']:
         data = archive.read(prefix + entry['path'])
         assert len(data) == entry['bytes'] and hashlib.sha256(data).hexdigest() == entry['sha256'], entry['path']
-        assert data[:8] == b'\x89PNG\r\n\x1a\n' and struct.unpack('>II', data[16:24]) == (entry['width'],entry['height']) and data[25] == 6, 'Dimensões/RGBA divergentes: '+entry['path']
+        color_type = 2 if entry['path'].startswith('assets/cartas/fundos/') else 6  # fundos RGB; demais RGBA
+        assert data[:8] == b'\x89PNG\r\n\x1a\n' and struct.unpack('>II', data[16:24]) == (entry['width'],entry['height']) and data[25] == color_type, 'Dimensões/formato PNG divergentes: '+entry['path']
         unit = entry['path'].startswith('assets/cartas/elementos/')
         assert (entry['path'].endswith('_refeito.png') and entry['width'] > 0 and entry['height'] > 0) if unit else (entry['width'],entry['height']) == (470,800), 'Formato de arte inesperado: '+entry['path']
     assert sum(a['path'].startswith('assets/cartas/elementos/') and a['path'].endswith('_refeito.png') for a in manifest['assets']) == 13
