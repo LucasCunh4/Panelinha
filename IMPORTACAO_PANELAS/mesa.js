@@ -504,7 +504,7 @@
     // Deslocamento em pixels CSS, compensando a escala uniforme do cenário.
     table.style.setProperty('--orbit-left', `${836-4/scale}px`);
     table.style.setProperty('--orbit-top', `${451+2/scale}px`);
-    table.style.setProperty('--flame-offset', `${-3-3/scale}px`);
+    table.style.setProperty('--flame-offset', `${-3-1.5/scale}px`);
     layoutOrbit(scale);
     table.style.setProperty('--scene-x', `${x}px`);
     table.style.setProperty('--scene-y', `${y}px`);

@@ -31,3 +31,19 @@ label.setting.has-setting-info{display:grid!important;grid-template-columns:minm
 .opponent-count{position:absolute;right:-8px;bottom:-7px;z-index:2;display:grid;place-items:center;min-width:26px;height:23px;box-sizing:border-box;padding:2px 5px;border:1px solid #f3d390;border-radius:99px;background:linear-gradient(#694275,#301d40);color:#fff0b9;font:700 13px/1 system-ui,sans-serif;box-shadow:0 2px 5px #160b2699;white-space:nowrap}
 .table .seat .seat-identity>.pan-avatar{width:var(--table-avatar);height:var(--table-avatar);transform:none;aspect-ratio:1}
 .seat.top .seat-identity{position:absolute}
+
+/* O fundo lateral também é circular. O contador é irmão do avatar e não é recortado. */
+.table .seat.left .seat-identity,.table .seat.right .seat-identity{
+ box-sizing:border-box;width:calc(var(--table-avatar) + 10px);height:calc(var(--table-avatar) + 10px);
+ bottom:calc((var(--identity-height) - var(--table-avatar) - 10px)/2);padding:5px;
+ aspect-ratio:1 / 1;border-radius:50%;background-clip:padding-box;
+}
+.table .seat.left .seat-identity>.pan-avatar,.table .seat.right .seat-identity>.pan-avatar{overflow:hidden;border-radius:50%;clip-path:circle(50%)}
+.table .seat.left .seat-identity>.pan-avatar>img,.table .seat.right .seat-identity>.pan-avatar>img{aspect-ratio:1 / 1;border-radius:50%;object-fit:cover}
+/* Conserva os pontos anteriores dos contadores ao corrigir apenas o fundo. */
+.table .seat.left,.table .seat.right{--counter-anchor-width:82px}
+@media(orientation:landscape) and (max-height:600px){.table .seat.left,.table .seat.right{--counter-anchor-width:76px}}
+.table .seat.left .seat-identity>.opponent-count,.table .seat.right .seat-identity>.opponent-count{
+ right:calc((var(--table-avatar) + 10px - var(--counter-anchor-width))/2 - 8px);
+ bottom:calc((var(--table-avatar) + 10px - var(--identity-height))/2 - 7px);
+}

@@ -9,8 +9,8 @@
 .draw-choice{pointer-events:auto;z-index:4}
 .draw-choice-actions{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);display:flex;gap:12px;white-space:nowrap}
 .draw-choice-actions .btn{min-width:98px;min-height:44px;border:1px solid #efc87d;box-shadow:0 4px 14px #15071bb0}
-/* Somente a chama: conserva -3px nativos e acrescenta -3px CSS em qualquer cover. */
-.flame{translate:var(--flame-offset,-6px) 0}
+/* Somente a chama: conserva -3px nativos e mantém metade do último deslocamento (-1,5px CSS). */
+.flame{translate:var(--flame-offset,-4.5px) 0}
 @keyframes flame-flicker{0%,100%{filter:saturate(1.12) brightness(.98)}19%{filter:saturate(1.16) brightness(1.04)}48%{filter:saturate(1.1) brightness(1)}76%{filter:saturate(1.14) brightness(1.02)}}
 @media(prefers-reduced-motion:reduce){.table-flight{will-change:auto}.flame{filter:saturate(1.12) brightness(1)}}
 .rotation-pack>img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
