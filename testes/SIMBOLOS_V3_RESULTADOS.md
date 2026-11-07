@@ -59,4 +59,14 @@ Intactos por comparação com a base: os quatro fundos novos, cinco especiais e 
 
 Caminhos novos eliminam a reutilização dos PNGs substituídos pelo cache de imagens em memória. Não há service worker/precache do cliente. Nenhuma limpeza de dados locais.
 
-APK/publicação serão conferidos após salvar o código. Nenhum emulador/aparelho físico utilizado; instalação/atualização/persistência real e desempenho Android não são declarados aprovados.
+## Publicação e APK final
+
+Versão web publicada no Worker existente (`3c32d89a-5f4f-431c-a354-c981ff10ca1f`). Os 14 recursos modificados (renderizador + 13 PNGs) foram baixados e conferidos byte a byte com o build; o caminho de amostra do símbolo substituído não serve PNG antigo. Saúde Fase 3 confirmada. Nenhuma configuração, binding, regra do servidor ou sala pública alterada/criada.
+
+[APK direto 0.2.54/c7402](https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.54/Panelinha-Teste-v0.2.54-c7402.apk), 61.862.717 bytes, HTTP 200.
+
+[Workflow 42420578986](https://github.com/LucasCunh4/Panelinha/actions/runs/42420578986): aprovado, execução 54, fonte `05b2d797f4e1c24e49db89156adfdeee8ca8f24c`. Uma compilação de APK, emulador ignorado por opção.
+
+Verificador real `ferramentas/verificar_apk.py` executado também sobre o APK baixado da Release: aprovado. SHA-256 `8ef68eca8256a72e99b4f039a20b55d59c1be8b0d34d143e243cf3a08f1b5098`. Metadados regenerados idênticos ao CI; 23 PNGs (13 V3 512×512), 52 combinações, bytes do código e demais recursos conferidos; símbolos anteriores ausentes. Mesma geometria, pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`, assinatura v2 e certificado da geração 2 de `android-identity.json`. sensorLandscape preservado. Código 7402 > 7302 permite atualização direta da mesma família, sem criação de chave ou alteração de Secrets.
+
+Nenhum emulador/aparelho físico utilizado; instalação/atualização/persistência real e desempenho Android não foram executados e não são declarados aprovados.
