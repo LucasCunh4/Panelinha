@@ -16,6 +16,12 @@ Verificações realizadas:
 - Análise dos 13 PNGs transparentes: nenhum pixel dos símbolos com alfa >64 fora da nova máscara após subir 20 px. PNGs não editados; SHA-256 dos 23 recursos confere com o manifesto.
 - Capturas inspecionadas, sem exceções JavaScript. `npm run build`, sintaxe JS e `git diff --check` aprovados. Expectativas antigas de tempo atualizadas, sem excluir testes ou executar baterias completas.
 
+- `node testes/mao_dois_toques.cjs`: aprovado, incluindo arraste em mãos grandes, troca/cancelamento da seleção, corte, teclado e mouse híbrido. Corrigida somente a comparação literal da matriz para tolerar 0,02 px: o teste encontrou -11,9993 px em vez de -12 px durante a interpolação; nenhuma alteração adicional no aplicativo.
+
 Nenhum emulador ou Android físico executado. Desempenho/gestos nativos e instalação/atualização no aparelho físico aguardam teste do usuário.
 
-APK final e publicação: a registrar após o workflow único, com a assinatura permanente de geração 2.
+[Workflow 42402361596](https://github.com/LucasCunh4/Panelinha/actions/runs/42402361596): aprovado, compilação única; emulador ignorado por opção.
+
+[APK direto 0.2.50/c7002](https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.50/Panelinha-Teste-v0.2.50-c7002.apk). Verificador executado sobre o APK baixado da Release: assinatura v2/geração 2, certificado registrado em `android-identity.json`, pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`, landscape, 23 PNGs aprovados e bytes do código web preservados. Hash/tamanho/metadados locais idênticos à Release e artefato. Código 7002 > 6902, mesma identidade para atualização direta; instalação e retenção efetiva de dados no aparelho não executadas.
+
+Web/Worker existentes atualizados (`11730b53-4f07-4ddb-bf98-34b23b358e2b`), sem mudar configurações. Quatro arquivos publicados conferidos por SHA-256 contra o build; saúde Fase 3 ativa. Recursos também copiados para Android sem reconstrução adicional.
