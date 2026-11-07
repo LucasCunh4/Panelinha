@@ -165,4 +165,14 @@ Tamanho dos arquivos retirados: 87,864,499 bytes; novos PNGs de execução: 8,68
 
 Nenhum emulador/instrumentação Android executado. O código dos testes nativos foi atualizado para os novos assets, mas sua execução e instalação/atualização/retenção no aparelho físico permanecem não realizadas.
 
-APK final e publicação: a registrar após a compilação única no GitHub Actions.
+## Publicação e APK final
+
+[GitHub Actions 42397314525](https://github.com/LucasCunh4/Panelinha/actions/runs/42397314525): **sucesso**, uma compilação assinada. KVM/emulador/instrumentação/atualização ignorados por opção; artefato `status.json`: `not-run`, `emulatorStarted: false`.
+
+APK **0.2.49 / código 6902**, acima do anterior 6802, 62.890.790 bytes. [Download direto, sem ZIP](https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.49/Panelinha-Teste-v0.2.49-c6902.apk).
+
+Verificador executado sobre o APK realmente baixado da Release: assinatura v2, certificado geração 2 `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`, pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`, landscape e recursos aprovados. Contém exatamente os 23 PNGs novos de cartas e nenhum diretório das artes substituídas. HTML/JS/CSS empacotados conferem byte a byte com o código da entrega; SHA-256, tamanho e metadados conferem com Release e artefato bruto.
+
+Mesmo pacote/certificado/origem e código crescente permitem atualizar sem desinstalar. Nenhuma chave ou dado local alterado; instalação/atualização/retenção real no Android físico não executadas.
+
+Web publicada no Worker existente `165c3566-c63a-407e-89a9-30b9b3fc38eb`: 32 recursos (23 PNGs + 9 arquivos de apresentação) conferidos por SHA-256 contra o build local; saúde Fase 3 ativa. Motor/servidor e configurações não alterados. A prévia web foi exportada e os recursos também copiados para Android sem reconstrução adicional ou testes de emulador.
