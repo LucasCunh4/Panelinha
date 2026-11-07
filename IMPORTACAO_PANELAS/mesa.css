@@ -66,7 +66,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 .table-menu-overlay{position:fixed;inset:0;z-index:20;background:#100b20be;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));display:flex;align-items:center;justify-content:center}
 .table-menu-panel{width:min(100%,680px);max-height:100%;overflow:auto;overscroll-behavior:contain;background:#281b32;border:1px solid #b28d9d;border-radius:20px;padding:16px;box-shadow:0 16px 80px #0009}.table-menu-panel h2{font-size:20px;margin:0}.table-menu-panel .debug{margin-top:10px}.table-menu-panel .controls{justify-content:flex-start;padding:8px 0}.table-menu-panel .panel{margin:10px 0}.table-menu-panel .help{margin:8px 0;color:#d0bdce}.table-menu-panel #status{margin-left:8px}.table-menu-panel .history{max-height:230px}
 .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
-.modal-wrap{z-index:30}.modal{max-height:calc(100vh - 24px);overflow:auto}.colorbtn{width:60px;height:60px;min-width:60px}
+.modal-wrap{z-index:30}.modal{max-height:calc(100vh - 24px);overflow:auto}
 @media(orientation:landscape) and (max-height:600px){
  .table{--card-base-width:clamp(39px,11.3vh,56px);--seat-width:clamp(80px,13vw,125px)}
  .seat.top{top:max(8px,env(safe-area-inset-top));width:min(36%,290px);padding:3px 8px}.seat.top .pan-avatar{width:24px;height:22px}.seat.top .name{font-size:10px}.seat.top .sub{font-size:9px}.seat.top .subhand{padding:5px 5px 2px}.subhand .card.mini{width:19px;min-width:19px;height:39px}

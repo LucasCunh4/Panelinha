@@ -1,0 +1,37 @@
+{
+  "assets": [
+    {
+      "path": "assets/selecao-cor/alface_panelinha_512.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 211853,
+      "sha256": "2ebe0ad7a1c28f640534949cd468d29591ddedc50bf4c3a2329f531625af3474"
+    },
+    {
+      "path": "assets/selecao-cor/mirtilos_panelinha_512.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 223003,
+      "sha256": "9a7f82c69107b77e7d594d8ef6b0ea3e0809245cc225f205f66cb3798a378a73"
+    },
+    {
+      "path": "assets/selecao-cor/queijo_panelinha_512.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 177921,
+      "sha256": "0405eb7331fad3221a51a5673fbd06c97a6fe121d26e97cec1671311a53725bd"
+    },
+    {
+      "path": "assets/selecao-cor/tomate_panelinha_512.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 181146,
+      "sha256": "29b8e3501df1031a3f8e29cda199d7139aea92435a755cf4a146469ea0b3e50c"
+    }
+  ],
+  "package": {
+    "path": "panelinha_elementos_cores_selecao_especiais.zip",
+    "sha256": "a4206a7f4b99cda0a6896a4201d5b932bd9c072558b89ad415bd635f8d31f9fd"
+  },
+  "removedRepositoryFiles": []
+}

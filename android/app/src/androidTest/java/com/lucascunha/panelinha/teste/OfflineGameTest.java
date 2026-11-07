@@ -314,7 +314,7 @@ public class OfflineGameTest {
             js("(()=>{const s=CartasTest.getState();s.players[0].hand=[{id:89800,type:'wild',color:null},{id:89801,type:'num',color:'blue',num:7}];document.getElementById('useCardArt').onchange()})()");
             tap("[data-card='89800']");waitFor("!!document.querySelector('.color-picker')",15000);
             assertEquals("4",js("document.querySelectorAll('.ingredient-hit').length"));
-            assertEquals("true",js("document.querySelectorAll('.color-picker-card .card-image').length===1&&document.querySelectorAll('.ingredient-layer img').length===0"));
+            assertEquals("true",js("document.querySelectorAll('.color-picker-card .card-image').length===1&&document.querySelectorAll('.ingredient-image').length===4"));
             assertEquals("true",js("[...document.querySelectorAll('[data-color]')].every(e=>{const r=e.getBoundingClientRect();return r.width>=44&&r.height>=44})"));
             tap("[data-color='"+color+"']");
             waitFor("!document.querySelector('.color-picker')",15000);
@@ -335,7 +335,7 @@ public class OfflineGameTest {
             assertEquals("true",js("document.querySelector('.color-picker-card .card-image').src.endsWith('carta_mais"+number+".png')"));
             assertEquals("true",js("!document.querySelector('.color-picker-clean,.ingredient-art')&&Math.abs(document.querySelector('.color-picker-card').getBoundingClientRect().width/document.querySelector('.color-picker-card').getBoundingClientRect().height-520/850)<.001"));
             assertEquals("4",js("document.querySelectorAll('.ingredient-hit').length"));
-            assertEquals("true",js("document.querySelectorAll('.color-picker-card .card-image').length===1&&document.querySelectorAll('.ingredient-layer img').length===0"));
+            assertEquals("true",js("document.querySelectorAll('.color-picker-card .card-image').length===1&&document.querySelectorAll('.ingredient-image').length===4"));
             assertEquals("true",js("[...document.querySelectorAll('[data-color]')].every(e=>{const r=e.getBoundingClientRect();return r.width>=44&&r.height>=44})"));
             tap("[data-color='"+color+"']");waitFor("!document.querySelector('.color-picker')",15000);
             assertEquals(org.json.JSONObject.quote(color),js("CartasTest.getState().activeColor"));

@@ -23,6 +23,14 @@ for(const name of manifest.removedRepositoryFiles||[])if(fs.existsSync(path.join
 for(const name of ['index.html',...fs.readdirSync(source).filter(n=>/\.(js|css)$/.test(n))]){
   if(/assets\/(especiais|padronizadas|cartas_mais4_mais6|cartas\/(vermelho|azul|verde|amarelo))\/|elementos\/[^'"\s]*retrabalhado_470x800/.test(fs.readFileSync(path.join(source,name),'utf8')))throw Error(`Referência antiga em ${name}`);
 }
+const selection=JSON.parse(fs.readFileSync(path.join(source,'documentacao/MANIFESTO_SELECAO_COR.json')));
+if(selection.assets.length!==4)throw Error('São quatro ingredientes oficiais para escolha de cor');
+for(const entry of selection.assets){
+  const bytes=fs.readFileSync(path.join(source,entry.path));
+  if(bytes.length!==entry.bytes||crypto.createHash('sha256').update(bytes).digest('hex')!==entry.sha256||bytes.readUInt32BE(16)!==512||bytes.readUInt32BE(20)!==512||bytes[25]!==6)throw Error(`Ingrediente divergente: ${entry.path}`);
+}
+const selectionFiles=fs.readdirSync(path.join(source,'assets/selecao-cor')).map(n=>'assets/selecao-cor/'+n).sort();
+if(JSON.stringify(selectionFiles)!==JSON.stringify(selection.assets.map(a=>a.path).sort()))throw Error('Ingrediente ausente ou excedente');
 const mesa = JSON.parse(fs.readFileSync(path.join(source, 'documentacao/MANIFESTO_MESA_V1.json')));
 for (const entry of mesa.asset_files) {
   if (crypto.createHash('sha256').update(fs.readFileSync(path.join(source, entry.path))).digest('hex') !== entry.sha256) throw Error(`Asset oficial da mesa divergente: ${entry.path}`);

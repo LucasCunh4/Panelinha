@@ -1,13 +1,13 @@
 /* Seletor de apresentação: o motor continua sendo o único responsável pela jogada. */
 (() => {
   'use strict';
-  // Regiões das quatro cores na ilustração completa aprovada (canvas 470×800).
-  // A arte é renderizada uma única vez; somente o feedback de interação é sobreposto.
-  const regions=[['red','Vermelho',35,140,170,180],['yellow','Amarelo',260,130,190,190],['blue','Azul',20,345,175,170],['green','Verde',275,340,175,190]];
+  // Uma única lista compartilhada por Coringa/+4/+6; a prévia da carta fica intacta.
+  const ingredients=[['red','Vermelho','Tomate','tomate_panelinha_512.png'],['blue','Azul','Mirtilos','mirtilos_panelinha_512.png'],['yellow','Amarelo','Queijo','queijo_panelinha_512.png'],['green','Verde','Alface','alface_panelinha_512.png']];
+  const asset=file=>'assets/selecao-cor/'+file;
+  const images=ingredients.map(([, , ,file])=>{const image=new Image();image.src=asset(file);image.decode?.().catch(()=>{});return image;});
   function choicesHTML(){
-    return regions.map(([color,label,x,y,w,h])=>{
-      const style=`left:${x/470*100}%;top:${y/800*100}%;width:${w/470*100}%;height:${h/800*100}%`;
-      return `<div class="ingredient-layer color-zone" data-ingredient="${color}" style="${style};--zone-color:var(--choice-${color})"></div><button type="button" class="colorbtn ingredient-hit" data-color="${color}" aria-label="${label}" style="${style}"></button>`;
+    return ingredients.map(([color,label,food,file])=>{
+      return `<button type="button" class="colorbtn ingredient-hit" data-color="${color}" aria-label="${label} — ${food}" style="--ingredient-glow:var(--choice-${color})"><img class="ingredient-image" data-ingredient="${color}" src="${asset(file)}" alt="" width="512" height="512" draggable="false"><span class="ingredient-name">${label}</span></button>`;
     }).join('');
   }
   let closeCurrent=null;
@@ -16,14 +16,15 @@
     if(!['wild','wild4','wild6'].includes(cardType))return false;
     const type=cardType;
     const title=type==='wild4'?'+4 — Escolher cor':type==='wild6'?'+6 — Escolher cor':'Escolher cor';
-    const hint='Toque na cor desejada na carta';
+    const hint='Escolha um ingrediente para definir a próxima cor';
     closeCurrent?.();
     const previous=document.activeElement;
     const overlay=document.createElement('div');overlay.className='modal-wrap color-picker';overlay.dataset.cardType=type;overlay.classList.toggle('penalty-picker',type!=='wild');
     overlay.innerHTML=`<section class="color-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="colorPickerTitle" aria-describedby="colorPickerHint">
       <h2 id="colorPickerTitle">${title}</h2><p id="colorPickerHint">${hint}</p>
-      <div class="color-picker-card">${PanelinhaCards.html({type},{label:title})}<div class="color-picker-content">${choicesHTML()}</div>
-      </div><button type="button" class="btn alt" id="cancelColor">Cancelar</button>
+      <div class="color-picker-card">${PanelinhaCards.html({type},{label:title})}</div>
+      <div class="color-picker-choices" role="group" aria-label="Escolha da cor">${choicesHTML()}</div>
+      <button type="button" class="btn alt" id="cancelColor">Cancelar</button>
       <span class="sr-only" role="status" aria-live="polite"></span>
     </section>`;
     let accepted=false,closed=false,animation=null;
@@ -42,7 +43,7 @@
       }
     }
     overlay.querySelectorAll('[data-color]').forEach(button=>{
-      const layer=overlay.querySelector(`[data-ingredient="${button.dataset.color}"]`);
+      const layer=button.querySelector('.ingredient-image');
       const highlight=()=>layer.classList.add('ingredient-hover');
       button.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')highlight();});
       button.addEventListener('pointerleave',()=>layer.classList.remove('ingredient-hover','ingredient-pressed'));
