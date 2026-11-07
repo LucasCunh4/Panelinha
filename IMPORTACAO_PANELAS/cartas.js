@@ -1,6 +1,6 @@
 /* Componente visual único. Nunca decide jogadas, tipos lógicos ou visibilidade. */
 (() => {'use strict';
-  const geometry=Object.freeze({contentWidth:470,contentHeight:800,border:25,width:520,height:850,radius:25});
+  const geometry=Object.freeze({contentWidth:470,contentHeight:800,border:25,width:520,height:850,radius:70,innerRadius:45,symbolOffsetY:-20});
   const root='assets/cartas/',colors={red:'vermelho',blue:'azul',yellow:'amarelo',green:'verde'};
   const actions={draw2:'mais2',skip:'bloqueio',reverse:'inverter'};
   const specials={wild4:'carta_mais4',wild6:'carta_mais6',wild:'carta_curinga',rotate:'carta_liquidificador',dist:'carta_panela_de_pressao'};
@@ -27,6 +27,8 @@
   }
   const ratio=geometry.width/geometry.height,aspect=1/ratio;
   const style=document.documentElement.style;
-  for(const [name,value]of Object.entries({'--card-aspect':aspect,'--card-ratio':`${geometry.width} / ${geometry.height}`,'--card-inset-x':geometry.border/geometry.width*100+'%','--card-inset-y':geometry.border/geometry.height*100+'%','--card-face-width':geometry.contentWidth/geometry.width*100+'%','--card-face-height':geometry.contentHeight/geometry.height*100+'%','--card-radius-x':geometry.radius/geometry.width*100+'%','--card-radius-y':geometry.radius/geometry.height*100+'%'}))style.setProperty(name,String(value));
+  for(const [name,value]of Object.entries({'--card-aspect':aspect,'--card-ratio':`${geometry.width} / ${geometry.height}`,'--card-inset-x':geometry.border/geometry.width*100+'%','--card-inset-y':geometry.border/geometry.height*100+'%','--card-face-width':geometry.contentWidth/geometry.width*100+'%','--card-face-height':geometry.contentHeight/geometry.height*100+'%','--card-radius-x':geometry.radius/geometry.width*100+'%','--card-radius-y':geometry.radius/geometry.height*100+'%','--card-inner-radius-x':geometry.innerRadius/geometry.contentWidth*100+'%','--card-inner-radius-y':geometry.innerRadius/geometry.contentHeight*100+'%','--card-symbol-shift':geometry.symbolOffsetY/geometry.contentHeight*100+'%'}))style.setProperty(name,String(value));
+  // Só bloqueia gestos nativos nas cartas; os eventos de toque/pan do jogo seguem intactos.
+  for(const event of ['dragstart','selectstart','contextmenu'])document.addEventListener(event,e=>{if(e.target.closest?.('.card'))e.preventDefault();});
   window.PanelinhaCards=Object.freeze({geometry,ratio,aspect,back,layers,html});
 })();

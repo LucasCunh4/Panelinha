@@ -12,7 +12,7 @@ const CUT_PAUSE_MS=2200; // tempo mínimo antes de o próximo jogador agir; cort
 
 const CUT_UNO_GRACE_MS=300;
 // Ritmos fixos: o tamanho da sequência nunca altera duração ou intervalo.
-const DRAW_PACES=Object.freeze({normal:Object.freeze({interval:2460,duration:2400,approach:960,hold:840,landing:120}),penalty:Object.freeze({interval:1060,duration:1000,approach:320,hold:320,landing:100})});
+const DRAW_PACES=Object.freeze({normal:Object.freeze({interval:2460,duration:2400,approach:960,hold:840,landing:120}),penalty:Object.freeze({interval:80,duration:120,approach:0,hold:0,landing:20,settle:40})});
 function drawSequence(count,kind='normal'){
   const pace=DRAW_PACES[kind]||DRAW_PACES.normal;
   const items=Array.from({length:count},(_,i)=>({delay:i*pace.interval,duration:pace.duration}));
@@ -204,7 +204,7 @@ function applyPlay(id,ids,isCut,color){
 
 function holdPenaltyPurchase(actor,count,reason){
   if(!count)return;
-  const duration=drawSequence(count,'penalty').duration+200;
+  const duration=drawSequence(count,'penalty').duration+DRAW_PACES.penalty.settle;
   s.lastPenaltyPurchase={serial:(s.purchaseSerial=(s.purchaseSerial||0)+1),actor,count,reason,duration,cardIds:s.players[actor].hand.slice(-count).map(c=>c.id)};
   const started=now();s.presentationUntil=started+duration;
   // Denúncia não consome o turno atual: congela seus prazos e a decisão de compra.

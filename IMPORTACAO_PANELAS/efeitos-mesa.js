@@ -171,7 +171,7 @@
         // Snapshots ocultos têm IDs locais estáveis; eventos públicos não contêm IDs secretos.
         const card=actor!==0&&original.id<0&&!s.players[actor].hand.some(c=>c.id===original.id)?tail[i]||original.card:original.card;
         const event={...original,card,id:card?.id??original.id},eligible=!forced&&actor===0&&s.drawn===event.id&&bridge().canPlayDraw(event.id);
-        const duration=actor===0?(eligible?plan.approach:plan.items[i].duration):(forced?650:850),delay=plan.items[i].delay;
+        const duration=forced?plan.items[i].duration:actor===0?(eligible?plan.approach:plan.items[i].duration):850,delay=plan.items[i].delay;
         if(forced&&progress>=delay+duration)return;
         const item={...event,eligible,duration,delay,progress,pace:PanelinhaRules.DRAW_PACES[forced?'penalty':'normal'],purchase:forced?purchase.serial:null};
         if(s.players[actor].hand.some(c=>c.id===item.id))incoming.set(drawKey(actor,item.id),item);
@@ -221,7 +221,7 @@
     for(const item of [...queued]){
       const time=elapsed(item,s);
       if(item.purchase&&time>=item.delay+item.duration){queued.splice(queued.indexOf(item),1);incoming.delete(drawKey(item.actor,item.id));masked.delete(item.id);changed=true;continue;}
-      if((item.actor===0&&decision)||[...draws].some(entry=>entry.actor===item.actor))continue;
+      if(!item.purchase&&((item.actor===0&&decision)||[...draws].some(entry=>entry.actor===item.actor)))continue;
       const due=item.delay-time;
       if(due>1){next=Math.min(next,due);continue;}
       queued.splice(queued.indexOf(item),1);
@@ -248,14 +248,14 @@
     animation.onfinish=()=>finishArrival(entry,s);
   }
   function startFlight(item,s,progress=0){
-    const {actor,id,card,eligible,duration,purchase}=item,detailed=actor===0;
+    const {actor,id,card,eligible,duration,purchase}=item,detailed=actor===0,previewed=detailed&&!purchase;
     const start={x:item.x,y:item.y,width:item.width,height:item.height,angle:0};
     start.height=start.width*PanelinhaCards.aspect;
     const destination=PanelasMesa.incomingPoint(actor,card),preview=previewPoint(card);
-    const landing=eligible?0:detailed?item.pace.landing:80,mainDuration=duration-landing;
-    const n=sprite(card,detailed,start,'draw');Object.assign(n.dataset,{actor,cardId:id,presentation:detailed?'preview':'direct',duration,delay:item.delay,stage:'flight'});
+    const landing=eligible?0:purchase?item.pace.landing:detailed?item.pace.landing:80,mainDuration=duration-landing;
+    const n=sprite(card,detailed,start,'draw');Object.assign(n.dataset,{actor,cardId:id,presentation:previewed?'preview':'direct',duration,delay:item.delay,stage:'flight'});
     let frames;
-    if(detailed){
+    if(previewed){
       const approach=eligible?duration:item.pace.approach;
       frames=curvedFrames(start,mainDuration,{...start,angle:-4},preview,0,approach,true);
       if(!eligible){const leave=approach+item.pace.hold;frames.push({offset:leave/mainDuration,opacity:1,transform:transform(start,preview)});frames.push(...curvedFrames(start,mainDuration,preview,destination,leave,mainDuration-leave).slice(1));}
@@ -293,7 +293,7 @@
     let uno=controls.querySelector('.draw-uno');
     if(eligible&&!uno){uno=document.createElement('button');uno.type='button';uno.id='drawUnoBtn';uno.className='btn warn draw-uno';uno.textContent='Última Carta';uno.onclick=()=>bridge().announce();controls.append(uno);}
     if(!eligible)uno?.remove();
-    for(const button of controls.children)button.disabled=!!decision.busy||!!s.paused||!!s.pendingAction;
+    for(const button of controls.children)button.disabled=!!decision.busy||!!s.paused||!!s.pendingAction||Date.now()<(s.presentationUntil||0);
   }
   function showDecision(s,card=s.players[0].hand.find(c=>c.id===s.drawn)){
     if(decision||!card||!bridge().canPlayDraw(card.id)||s.pendingAction)return;

@@ -5,7 +5,9 @@
     "border": 25,
     "width": 520,
     "height": 850,
-    "outerRadius": 25
+    "outerRadius": 70,
+    "innerRadius": 45,
+    "symbolOffsetY": -20
   },
   "normalCombinations": 52,
   "assets": [
