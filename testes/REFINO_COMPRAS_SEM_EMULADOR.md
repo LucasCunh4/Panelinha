@@ -19,4 +19,14 @@ Base recuperada: `fe33316`, APK anterior 0.2.46/c6602. Nenhuma alteração anter
 
 Nenhum emulador, instrumentação, instalação/atualização ou teste de retenção de dados Android executado nesta entrega, conforme pedido. Desempenho e sensação no aparelho físico aguardam os testes do usuário.
 
-APK, certificado e publicação: a registrar após a execução única do GitHub Actions.
+## APK final verificado
+
+GitHub Actions [42386294678](https://github.com/LucasCunh4/Panelinha/actions/runs/42386294678): **sucesso**, uma compilação release, KVM/emulador/instrumentação/atualização ignorados por opção (artefato `status.json`: `not-run`, `emulatorStarted: false`). Nenhuma falha de infraestrutura nesta entrega.
+
+APK **0.2.47/c6702**, superior a 0.2.46/c6602, pacote `com.lucascunha.panelinha.teste`, origem `https://localhost` e certificado geração 2 `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`. Verificador real `ferramentas/verificar_apk.py` aprovado sobre o APK baixado da Release: assinatura v2, identidade, landscape, 52 PNGs, recursos aprovados e bytes do código web. SHA-256 e tamanho conferem com o artefato bruto e a Release; metadados locais idênticos aos do CI.
+
+[Baixar APK diretamente, sem ZIP](https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.47/Panelinha-Teste-v0.2.47-c6702.apk).
+
+Mesma identidade e código crescente permitem atualizar a família geração 2 sem desinstalar; instalação/atualização e retenção efetiva de dados no Android não foram executadas. Nenhum código de armazenamento local alterado.
+
+Worker existente atualizado (`9a20530c-3e1f-406b-a310-41bfcc6212d2`), bindings/configurações preservados, health Fase 3 ativo; seis arquivos publicados conferidos por SHA-256 contra o build. Nenhuma nova sala pública criada na verificação. Reflexos do cometa conferidos no navegador após separar o posicionamento orbital da animação local das partículas.
