@@ -22,6 +22,21 @@ Base preservada: HEAD `496f1966f7a0b02c098db90f9a629239e0f51994` da branch `andr
 
 ## APK e limitações
 
-A compilação final assinada será executada pelo workflow existente, com os quatro Secrets atuais. APK real, versão, certificado e resultado de Android serão registrados após a execução. Nenhuma chave nova, alteração de applicationId, limpeza de dados, mudança de orientação ou alteração de artes/sons.
+[Baixar APK 0.2.44 / código 6402 diretamente, sem ZIP](https://github.com/LucasCunh4/Panelinha/actions/runs/42320244504/artifacts/13553295186). Requer sessão no GitHub; retenção até 05/02/2027.
+
+[Workflow #44](https://github.com/LucasCunh4/Panelinha/actions/runs/42320244504), fonte `4a7de7f042e344f85c0ab23978562dd6889cdd0a`: compilação e assinatura **aprovadas**. Uma única execução final solicitada; o mecanismo anterior de APK auxiliar para o teste de atualização foi mantido. Somente o APK final é disponibilizado para uso.
+
+O arquivo baixado do Actions foi novamente verificado com `ferramentas/verificar_apk.py`: assinatura APK v2, certificado fixo, pacote, origem, orientação, todos os recursos e módulos/HTML exatamente iguais ao fonte preparado. Metadados locais idênticos aos do Actions e SHA-256 igual ao digest do artefato.
+
+- Pacote: `com.lucascunha.panelinha.teste`; origem `https://localhost`.
+- Certificado geração 2: `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`.
+- Versão `0.2.44`, código **6402 > 6302** da anterior 0.2.43.
+- SHA-256 APK: `a4bfa9cfbe2653607a3c785c1038348cc276251fd853446ecf65a6a7414daf10`.
+- Release sem debug; `sensorLandscape`, origem local e recursos offline preservados. Mesmo certificado/pacote/origem permitem atualização da geração 2 sem desinstalar. Nenhuma chave nova, alteração de Secrets ou limpeza de dados.
+
+**Instrumentação Android não aprovada:** o emulador/ADB ficou `offline` durante `a_imagesAndThreeBotsOffline`. Só há registro de início do primeiro teste (`INSTRUMENTATION_STATUS_CODE: 1`), sem conclusão: **0/13 testes Android concluídos**. Nenhuma falha de asserção do aplicativo foi registrada nesses resultados; a causa raiz da perda do emulador não foi determinada. O teste real de instalação por cima com retenção de dados **não foi executado**. Release corretamente pulada pelo gate anterior; artefato APK direto disponibilizado. Nenhum teste removido/desativado e nenhuma execução pendente declarada aprovada.
 
 As verificações de toque no navegador não substituem Android físico. Testes de servidor desta atualização usam diretamente o motor/validador autoritativo e projeções por cliente; não foi repetida a bateria extensa de rede. Atualização real com retenção de dados depende da instrumentação Android. Partida local em memória não passa a ser um salvamento persistente.
+
+
+Pós-publicação: `/health` respondeu fase 3 ativa; hashes públicos de `motor.js`, `efeitos-mesa.js` e `online.js` coincidem com o código testado.
