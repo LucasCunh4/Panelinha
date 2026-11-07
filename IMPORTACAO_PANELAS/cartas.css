@@ -20,3 +20,11 @@
 #hand>button,#hand>button *,.card,.card *,.table-flight{ -webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none }
 .card::selection,.card *::selection{background:transparent;color:inherit}
 .card img{-webkit-user-drag:none}
+
+/* Camadas permanentes dos três incolores: porcentagens acompanham toda escala/rotação. */
+.card-food{position:absolute;display:block;pointer-events:none;overflow:visible}
+.card-food-image{display:block;width:100%;height:100%;max-width:none;aspect-ratio:1;object-fit:contain;pointer-events:none;opacity:1;border:0;border-radius:0;transform:translateY(0) scale(1);transform-origin:center;transition:transform 180ms ease-out,filter 180ms ease-out;-webkit-user-drag:none;user-select:none}
+.hand[data-pointer=mouse]>button:not(:disabled):hover .card-food-image,.hand>button:focus-visible .card-food-image,.card-food-image.food-highlight,.card-food-image.food-pressed{transform:translateY(-10%) scale(1.06);filter:brightness(1.06)}
+.card-food-image.food-confirmed{animation:card-food-confirm 180ms ease-out both}
+@keyframes card-food-confirm{0%{transform:translateY(-10%) scale(1.06)}60%{transform:translateY(-12%) scale(1.1)}100%{transform:translateY(-10%) scale(1.06)}}
+@media(prefers-reduced-motion:reduce){.card-food-image,.card-food-image.food-confirmed{animation:none;transition:none}.hand[data-pointer=mouse]>button:not(:disabled):hover .card-food-image,.hand>button:focus-visible .card-food-image,.card-food-image.food-highlight,.card-food-image.food-pressed{transform:none}}

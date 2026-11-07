@@ -98,8 +98,8 @@ public class OfflineGameTest {
         assertEquals("\"function\"", js("typeof String.prototype.replaceAll"));
         assertEquals("\"function\"", js("typeof Element.prototype.getAnimations"));
         tap("#singlePlayerBtn");tap("#profileContinueBtn");tap("#startBtn");
-        js("window.__pngCheck=null;(async()=>{try{const cards=['red','blue','yellow','green'].flatMap(color=>[...Array.from({length:10},(_,num)=>({type:'num',color,num})),...['draw2','skip','reverse'].map(type=>({type,color}))]);cards.push(...['wild','wild4','wild6','dist','rotate'].map(type=>({type})),{hidden:true});const paths=[...new Set(cards.flatMap(c=>PanelinhaCards.layers(c)))];if(paths.length!==23)throw Error('Inventário');await Promise.all(paths.map(async path=>{const im=new Image();im.src=path;await im.decode();if(path.includes('/elementos/')?(!path.endsWith('.png')||im.naturalWidth!==512||im.naturalHeight!==512):(im.naturalWidth!==470||im.naturalHeight!==800))throw Error(path)}));window.__pngCheck=23}catch(e){window.__pngCheck=String(e)}})()");
-        waitFor("window.__pngCheck===23", 120000);
+        js("window.__pngCheck=null;(async()=>{try{const cards=['red','blue','yellow','green'].flatMap(color=>[...Array.from({length:10},(_,num)=>({type:'num',color,num})),...['draw2','skip','reverse'].map(type=>({type,color}))]);cards.push(...['wild','wild4','wild6','dist','rotate'].map(type=>({type})),{hidden:true});const paths=[...new Set(cards.flatMap(c=>PanelinhaCards.layers(c)))];if(paths.length!==27)throw Error('Inventário');await Promise.all(paths.map(async path=>{const im=new Image();im.src=path;await im.decode();if((path.includes('/elementos/')||path.includes('/ingredientes-especiais/'))?(!path.endsWith('.png')||im.naturalWidth!==512||im.naturalHeight!==512):(im.naturalWidth!==470||im.naturalHeight!==800))throw Error(path)}));window.__pngCheck=27}catch(e){window.__pngCheck=String(e)}})()");
+        waitFor("window.__pngCheck===27", 120000);
         assertEquals("4", js("CartasTest.getState().players.length"));
         assertEquals("3", js("CartasTest.getState().players.filter(p=>p.id>0).length"));
     }
@@ -306,7 +306,7 @@ public class OfflineGameTest {
     }
     @Test public void i_officialArtAndIngredientColorPickerOffline() throws Exception {
         startControlled();
-        js("window.__specialCheck=null;(async()=>{try{const cards=['wild','wild4','wild6','dist','rotate'].map(type=>({type}));cards.push({hidden:true});await Promise.all(cards.flatMap(c=>PanelinhaCards.layers(c)).map(async path=>{const im=new Image();im.src=path;await im.decode();if(im.naturalWidth!==470||im.naturalHeight!==800)throw Error(path)}));window.__specialCheck=6}catch(e){window.__specialCheck=String(e)}})()");
+        js("window.__specialCheck=null;(async()=>{try{const cards=['wild','wild4','wild6','dist','rotate'].map(type=>({type}));cards.push({hidden:true});await Promise.all(cards.flatMap(c=>PanelinhaCards.layers(c)).map(async path=>{const im=new Image();im.src=path;await im.decode();if(path.includes('/ingredientes-especiais/')?(im.naturalWidth!==512||im.naturalHeight!==512):(im.naturalWidth!==470||im.naturalHeight!==800))throw Error(path)}));window.__specialCheck=6}catch(e){window.__specialCheck=String(e)}})()");
         waitFor("window.__specialCheck===6",60000);
         assertEquals("true",js("[...document.querySelectorAll('.hidden-card,.deck-back')].every(e=>e.querySelector('img').src.endsWith('verso_roxo.png')&&!e.classList.contains('gold-card'))"));
         for(String color:new String[]{"red","yellow","blue","green"}){
@@ -314,7 +314,7 @@ public class OfflineGameTest {
             js("(()=>{const s=CartasTest.getState();s.players[0].hand=[{id:89800,type:'wild',color:null},{id:89801,type:'num',color:'blue',num:7}];document.getElementById('useCardArt').onchange()})()");
             tap("[data-card='89800']");waitFor("!!document.querySelector('.color-picker')",15000);
             assertEquals("4",js("document.querySelectorAll('.ingredient-hit').length"));
-            assertEquals("true",js("document.querySelectorAll('.color-picker-card .card-image').length===1&&document.querySelectorAll('.ingredient-image').length===4"));
+            assertEquals("true",js("document.querySelectorAll('.color-picker-card .card-image').length===1&&document.querySelectorAll('.color-picker-card .card-food-image').length===4"));
             assertEquals("true",js("[...document.querySelectorAll('[data-color]')].every(e=>{const r=e.getBoundingClientRect();return r.width>=44&&r.height>=44})"));
             tap("[data-color='"+color+"']");
             waitFor("!document.querySelector('.color-picker')",15000);
@@ -335,7 +335,7 @@ public class OfflineGameTest {
             assertEquals("true",js("document.querySelector('.color-picker-card .card-image').src.endsWith('carta_mais"+number+".png')"));
             assertEquals("true",js("!document.querySelector('.color-picker-clean,.ingredient-art')&&Math.abs(document.querySelector('.color-picker-card').getBoundingClientRect().width/document.querySelector('.color-picker-card').getBoundingClientRect().height-520/850)<.001"));
             assertEquals("4",js("document.querySelectorAll('.ingredient-hit').length"));
-            assertEquals("true",js("document.querySelectorAll('.color-picker-card .card-image').length===1&&document.querySelectorAll('.ingredient-image').length===4"));
+            assertEquals("true",js("document.querySelectorAll('.color-picker-card .card-image').length===1&&document.querySelectorAll('.color-picker-card .card-food-image').length===4"));
             assertEquals("true",js("[...document.querySelectorAll('[data-color]')].every(e=>{const r=e.getBoundingClientRect();return r.width>=44&&r.height>=44})"));
             tap("[data-color='"+color+"']");waitFor("!document.querySelector('.color-picker')",15000);
             assertEquals(org.json.JSONObject.quote(color),js("CartasTest.getState().activeColor"));

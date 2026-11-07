@@ -26,12 +26,22 @@
   const root='assets/cartas/',colors={red:'vermelho',blue:'azul',yellow:'amarelo',green:'verde'};
   const actions={draw2:'mais2',skip:'bloqueio',reverse:'inverter'};
   const specials={wild4:'carta_mais4',wild6:'carta_mais6',wild:'carta_curinga',rotate:'carta_liquidificador',dist:'carta_panela_de_pressao'};
+  // Coordenadas no conteúdo 470×800, sem deslocar a arte, a moldura ou o símbolo central.
+  const foodAssets={red:['Vermelho','Tomate','tomate_panelinha_512.png'],yellow:['Amarelo','Queijo','queijo_panelinha_512.png'],blue:['Azul','Mirtilos','mirtilos_panelinha_512.png'],green:['Verde','Alface','alface_panelinha_512.png']};
+  const foodLayout=Object.freeze(Object.fromEntries(Object.entries({
+    wild4:[['red',35,140,100],['yellow',338,145,106],['blue',30,352,106],['green',340,355,102]],
+    wild6:[['red',30,122,96],['yellow',338,110,102],['blue',16,326,96],['green',366,326,88]],
+    wild:[['red',17,150,90],['yellow',330,115,108],['blue',16,358,90],['green',368,365,86]]
+  }).map(([type,regions])=>[type,Object.freeze(regions.map(([color,x,y,size])=>{
+    const [label,food,file]=foodAssets[color];return Object.freeze({color,label,food,x,y,size,path:'assets/ingredientes-especiais/'+file});
+  }))])));
+  const foodRegions=type=>foodLayout[type]||[];
   const symbolKey=card=>card.type==='num'&&Number.isInteger(card.num)&&card.num>=0&&card.num<=9?'numero_'+card.num:actions[card.type];
   const back=root+'especiais/verso_roxo.png';
   const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function layers(card){
     if(!card||card.hidden)return [back];
-    if(specials[card.type])return [root+'especiais/'+specials[card.type]+'.png'];
+    if(specials[card.type])return [root+'especiais/'+specials[card.type]+'.png',...foodRegions(card.type).map(f=>f.path)];
     const face=symbolKey(card);
     if(!colors[card.color]||!face)throw Error('Carta visual desconhecida: '+card.type);
     const symbol=root+'elementos/'+face+'.png';
@@ -42,7 +52,7 @@
     if(!cache.has(path)){const image=new Image();image.src=path;cache.set(path,image);if(image.decode)image.decode().catch(()=>{});}
     return path;
   }
-  // Mantém somente 23 imagens decodificadas para reutilizar nas mãos e animações.
+  // Cache único de 23 artes + quatro ingredientes, reutilizados nas mãos e animações.
   for(const color of Object.keys(colors))for(const type of [...Array.from({length:10},(_,num)=>({type:'num',num})),...Object.keys(actions).map(type=>({type}))])layers({...type,color}).forEach(preload);
   for(const type of Object.keys(specials))layers({type}).forEach(preload);preload(back);
   function symbolVariables(key){
@@ -65,12 +75,18 @@
     const hidden=closed||!card||card.hidden,images=hidden?[back]:layers(card),gold=!hidden&&!!specials[card.type];
     const style=[depth?'--depth:'+(Number(depth)||0):'',!hidden&&!gold?symbolStyles.get(symbolKey(card)):''].filter(Boolean).join(';');
     const positions=['','center','top','bottom'];
-    return `<span class="card art-card${small?' mini':''}${selected?' selected':''}${invalid?' is-invalid':''}${gold?' gold-card':''} ${classes}" ${style?`style="${style}"`:""} data-card-type="${hidden?'back':escape(card.type)}" title="${escape(label)}"><span class="card-frame" aria-hidden="true"></span><span class="card-face">${images.map((path,i)=>`<img class="card-image${i?' card-symbol card-symbol-'+positions[i]:''}" src="${preload(path)}" alt="${i?'':escape(label)}" draggable="false" decoding="sync">`).join('')}</span></span>`;
+    const foods=hidden?[]:foodRegions(card.type);
+    const content=images.map((path,i)=>{
+      const f=i?foods[i-1]:null;
+      if(f)return `<span class="card-food" data-food="${f.color}" style="left:${f.x/geometry.contentWidth*100}%;top:${f.y/geometry.contentHeight*100}%;width:${f.size/geometry.contentWidth*100}%;height:${f.size/geometry.contentHeight*100}%"><img class="card-food-image" src="${preload(path)}" alt="" draggable="false" decoding="sync"></span>`;
+      return `<img class="card-image${i?' card-symbol card-symbol-'+positions[i]:''}" src="${preload(path)}" alt="${i?'':escape(label)}" draggable="false" decoding="sync">`;
+    }).join('');
+    return `<span class="card art-card${small?' mini':''}${selected?' selected':''}${invalid?' is-invalid':''}${gold?' gold-card':''} ${classes}" ${style?`style="${style}"`:""} data-card-type="${hidden?'back':escape(card.type)}" title="${escape(label)}"><span class="card-frame" aria-hidden="true"></span><span class="card-face">${content}</span></span>`;
   }
   const ratio=geometry.width/geometry.height,aspect=1/ratio;
   const style=document.documentElement.style;
   for(const [name,value]of Object.entries({'--card-aspect':aspect,'--card-ratio':`${geometry.width} / ${geometry.height}`,'--card-inset-x':geometry.border/geometry.width*100+'%','--card-inset-y':geometry.border/geometry.height*100+'%','--card-face-width':geometry.contentWidth/geometry.width*100+'%','--card-face-height':geometry.contentHeight/geometry.height*100+'%','--card-radius-x':geometry.radius/geometry.width*100+'%','--card-radius-y':geometry.radius/geometry.height*100+'%','--card-inner-radius-x':geometry.innerRadius/geometry.contentWidth*100+'%','--card-inner-radius-y':geometry.innerRadius/geometry.contentHeight*100+'%'}))style.setProperty(name,String(value));
   // Só bloqueia gestos nativos nas cartas; os eventos de toque/pan do jogo seguem intactos.
   for(const event of ['dragstart','selectstart','contextmenu'])document.addEventListener(event,e=>{if(e.target.closest?.('.card'))e.preventDefault();});
-  window.PanelinhaCards=Object.freeze({geometry,symbolLayout,symbolArt,ratio,aspect,back,layers,html});
+  window.PanelinhaCards=Object.freeze({geometry,symbolLayout,symbolArt,foodRegions,ratio,aspect,back,layers,html});
 })();

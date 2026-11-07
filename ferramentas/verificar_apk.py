@@ -52,13 +52,13 @@ with zipfile.ZipFile(apk) as archive:
         unit = entry['path'].startswith('assets/cartas/elementos/')
         assert (re.fullmatch(r'assets/cartas/elementos/(numero_[0-9]|mais2|bloqueio|inverter)\.png',entry['path']) and (entry['width'],entry['height']) == (512,512)) if unit else (entry['width'],entry['height']) == (470,800), 'Formato de arte inesperado: '+entry['path']
     assert sum(a['path'].startswith('assets/cartas/elementos/') for a in manifest['assets']) == 13
-    for retired in ['assets/especiais/', 'assets/padronizadas/', 'assets/cartas_mais4_mais6/']:
+    for retired in ['assets/especiais/', 'assets/padronizadas/', 'assets/cartas_mais4_mais6/', 'assets/selecao-cor/']:
         assert not any(n.startswith(prefix+retired) for n in archive.namelist()), 'Artes substituídas no APK: '+retired
-    selection = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_SELECAO_COR.json').read_text())
-    assert len(selection['assets']) == 4
-    selection_files = [n for n in archive.namelist() if n.startswith(prefix+'assets/selecao-cor/') and not n.endswith('/')]
-    assert sorted(selection_files) == sorted(prefix+a['path'] for a in selection['assets']), 'Inventário do seletor divergente'
-    for entry in selection['assets']:
+    ingredients = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_INGREDIENTES_ESPECIAIS.json').read_text())
+    assert len(ingredients['assets']) == 4
+    ingredient_files = [n for n in archive.namelist() if n.startswith(prefix+'assets/ingredientes-especiais/') and not n.endswith('/')]
+    assert sorted(ingredient_files) == sorted(prefix+a['path'] for a in ingredients['assets']), 'Inventário de ingredientes divergente'
+    for entry in ingredients['assets']:
         data = archive.read(prefix+entry['path'])
         assert len(data) == entry['bytes'] and hashlib.sha256(data).hexdigest() == entry['sha256'], entry['path']
         assert data[:8] == b'\x89PNG\r\n\x1a\n' and struct.unpack('>II',data[16:24]) == (512,512) and data[25] == 6, entry['path']
@@ -90,7 +90,7 @@ with zipfile.ZipFile(apk) as archive:
     assert config['server']['hostname'] == 'localhost' and config['server']['androidScheme'] == 'https'
     assert 'url' not in config['server'], 'O APK não deve depender de servidor remoto'
 info = {
-    'colorSelectionAssetsVerified': len(selection['assets']),
+    'specialIngredientAssetsVerified': len(ingredients['assets']),
     'visualSoundAssetsVerified': len(visual_sound['assets']),
     'file': apk.name, 'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
     'applicationId': package[1], 'versionCode': int(package[2]), 'versionName': package[3],

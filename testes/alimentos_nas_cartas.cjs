@@ -1,0 +1,45 @@
+const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=require('node:fs');
+const out=process.env.PANELINHA_TEST_OUTPUT||'/workspace/work/alimentos-nas-cartas';
+(async()=>{
+ fs.mkdirSync(out,{recursive:true});const b=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});
+ try{
+  const p=await b.newPage({viewport:{width:1280,height:800},hasTouch:true}),errors=[];p.on('pageerror',e=>errors.push(e.message));
+  await p.goto('http://127.0.0.1:8000');await p.locator('#singlePlayerBtn').click();await p.locator('#profileContinueBtn').click();await p.locator('#startBtn').click();await p.waitForTimeout(600);
+  async function fixture(type,reveal=true){await p.evaluate(({type,reveal})=>{
+   const s=CartasTest.getState();PanelinhaTableBridge.setOnline(s);s.round++;
+   Object.assign(s,{online:false,paused:false,phase:'playing',current:0,activeColor:'red',direction:-1,penalty:0,highest:0,lastPenalty:null,finisher:null,blockedPlayer:null,unlockAt:0,presentationUntil:0,cutAnnounceUntil:0,deadline:0,drawn:null,cutOpen:false,pendingAction:null,lastDistribution:null,lastRotation:null,lastPenaltyPurchase:null,lastActor:null,unoWindow:null,preUno:false,reveal});Object.assign(s.o,{timeout:0,cut:true,infinite:false,duo:false,single:true,wild6:true});
+   let id=10000;const c=()=>({id:++id,type:'num',color:'red',num:7});s.players.forEach((player,i)=>{player.hand=[{id:i?++id:99000,type,color:null},...Array.from({length:6},c)]});s.discard=[c()];s.deck=Array.from({length:40},c);s.deck.push({id:99900,type,color:null});PanelinhaTableBridge.render();
+  },{type,reveal});await p.waitForTimeout(220);}
+  async function tapCard(){const point=await p.locator('[data-card="99000"]').evaluate(n=>{const r=n.getBoundingClientRect();for(let y=Math.max(1,r.y+12);y<Math.min(innerHeight-2,r.bottom-4);y+=4)for(let x=Math.max(1,r.x+2);x<Math.min(innerWidth-2,r.right-2);x+=3)if(document.elementFromPoint(x,y)?.closest('[data-card]')===n)return{x,y};throw Error('Sem área acessível')});await p.touchscreen.tap(point.x,point.y);}
+  // Amostras ampliadas: imagem base original, alimentos, transparência e proteção do símbolo.
+  await p.evaluate(()=>{const g=document.createElement('section');g.id='foodGallery';g.style='position:fixed;inset:0;z-index:200;background:#30143e;display:flex;gap:32px;justify-content:center;align-items:center;--card-width:245px';g.innerHTML=['wild4','wild6','wild'].map(type=>PanelinhaCards.html({type})).join('');document.body.append(g)});
+  await p.waitForFunction(()=>[...document.querySelectorAll('#foodGallery img')].every(im=>im.complete&&im.naturalWidth));
+  const composition=await p.locator('#foodGallery>.card').evaluateAll(async nodes=>{
+   const boxes={wild4:[135,240,205,165],wild6:[120,205,245,192],wild:[105,230,260,190]},result=[];
+   for(const n of nodes){const type=n.dataset.cardType,base=n.querySelector('.card-image'),c=document.createElement('canvas');c.width=470;c.height=800;const ctx=c.getContext('2d');ctx.drawImage(base,0,0,470,800);const [x,y,w,h]=boxes[type];
+    for(const region of PanelinhaCards.foodRegions(type)){
+     const im=n.querySelector('[data-food='+region.color+'] img'),a=document.createElement('canvas');a.width=a.height=512;const ac=a.getContext('2d');ac.drawImage(im,0,0);const data=ac.getImageData(0,0,512,512).data;let left=512,top=512,right=0,bottom=0;
+     for(let yy=0;yy<512;yy++)for(let xx=0;xx<512;xx++)if(data[(yy*512+xx)*4+3]){left=Math.min(left,xx);top=Math.min(top,yy);right=Math.max(right,xx+1);bottom=Math.max(bottom,yy+1);}
+     const clear=hover=>{const k=hover?1.06:1,dy=hover?-.1*region.size:0;const l=region.x+region.size/2+(left/512-.5)*region.size*k,r=region.x+region.size/2+(right/512-.5)*region.size*k,t=region.y+region.size/2+(top/512-.5)*region.size*k+dy,b=region.y+region.size/2+(bottom/512-.5)*region.size*k+dy;return l>=0&&t>=0&&r<=470&&b<=800&&(r<=x||l>=x+w||b<=y||t>=y+h);};
+     const pixels=ctx.getImageData(Math.round(region.x+region.size/2)-2,Math.round(region.y+region.size/2)-2,5,5).data,rgb=[0,0,0];for(let i=0;i<pixels.length;i+=4)for(let channel=0;channel<3;channel++)rgb[channel]+=pixels[i+channel]/25;
+     const [r,g,b]=rgb.map(v=>v/255),max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;let hue=!d?0:max===r?60*((g-b)/d%6):max===g?60*((b-r)/d+2):60*((r-g)/d+4);if(hue<0)hue+=360;
+     result.push({type,color:region.color,src:im.getAttribute('src'),clear:clear(false),hoverClear:clear(true),hue,saturation:max?d/max:0,fit:getComputedStyle(im).objectFit,events:getComputedStyle(im).pointerEvents,base:getComputedStyle(base).transform});
+    }
+   }return result;
+  });
+  assert.equal(composition.length,12);for(const item of composition){assert.ok(item.clear&&item.hoverClear,JSON.stringify(item));assert.equal(item.fit,'contain');assert.equal(item.events,'none');assert.equal(item.base,'none');const h=item.hue;assert.ok(item.saturation>.12&&({red:h<30||h>330,yellow:h>=30&&h<80,blue:h>=175&&h<280,green:h>=80&&h<175})[item.color],JSON.stringify(item));}
+  await p.screenshot({path:out+'/tres-cartas.png'});fs.writeFileSync(out+'/posicionamento.json',JSON.stringify(composition,null,2));await p.locator('#foodGallery').evaluate(n=>n.remove());
+  console.log('PASS 12 posicionamentos: PNG integral, cor do jato amostrada na arte base, símbolo central livre e limites preservados em repouso/hover');
+  for(const type of ['wild4','wild6','wild']){
+   await fixture(type);assert.equal(await p.locator('[data-card="99000"] .card-food').count(),4);for(const i of [1,2,3])assert.equal(await p.locator('#player'+i+' .card-food').count(),4);
+   await p.locator('[data-card="99000"]').hover();await p.waitForTimeout(220);const hover=await p.locator('[data-card="99000"] .card-food-image').evaluateAll(ns=>ns.map(n=>{const s=getComputedStyle(n),m=new DOMMatrix(s.transform);return{scale:m.a,dy:m.f,height:parseFloat(s.height)};}));for(const h of hover)assert.ok(Math.abs(h.scale-1.06)<.002&&Math.abs(h.dy+h.height*.1)<.02,JSON.stringify(h));
+   await fixture(type,false);assert.equal(await p.locator('.seat .card-food').count(),0);
+   await tapCard();assert.equal(await p.locator('.hand-picked').count(),1);assert.equal(await p.locator('.color-picker').count(),0);assert.equal(await p.evaluate(()=>CartasTest.getState().discard.length),1);
+   await p.waitForTimeout(220);const staticOnTouch=await p.locator('.hand-picked .card-food-image').evaluateAll(ns=>ns.every(n=>new DOMMatrix(getComputedStyle(n).transform).a===1));assert.ok(staticOnTouch);
+   await tapCard();await p.locator('.color-picker').waitFor();assert.equal(await p.locator('.color-picker-card .card-food').count(),4);assert.equal(await p.locator('.color-picker-choices').count(),0);await p.locator('[data-color=red]').tap();assert.equal(await p.locator('.played-card .card-food').count(),4);await p.locator('.played-card').waitFor({state:'detached'});assert.equal(await p.locator('#discard .discard-top .card-food').count(),4);
+   await fixture(type,false);await p.locator('#buyBtn').tap();await p.locator('[data-effect=draw]').waitFor();assert.equal(await p.locator('[data-effect=draw] .card-food').count(),4);await p.locator('.draw-choice').waitFor();assert.equal(await p.locator('.draw-choice .card-food').count(),4);await p.locator('.draw-choice-actions button').filter({hasText:'Guardar'}).tap();await p.locator('[data-effect=draw-keep]').waitFor();assert.equal(await p.locator('[data-effect=draw-keep] .card-food').count(),4);await p.locator('[data-effect=draw-keep]').waitFor({state:'detached',timeout:6000});assert.equal(await p.locator('[data-card="99900"] .card-food').count(),4);assert.equal(await p.evaluate(()=>CartasTest.getState().players[0].hand.length),8);
+  }
+  const variants=await p.evaluate(()=>['wild4','wild6','wild'].map(type=>{const n=document.createElement('div');n.innerHTML=PanelinhaCards.html({type},{back:true});return{foods:n.querySelectorAll('.card-food').length,white:!n.querySelector('.gold-card'),layers:PanelinhaCards.layers({type,hidden:true}).length}}));for(const v of variants)assert.deepEqual(v,{foods:0,white:true,layers:1});
+  assert.deepEqual(errors,[]);console.log('PASS +4/+6/Coringa na mão humana, oponentes revelados, hover, dois toques, compra, voo de descarte e pilha final; sigilo/verso, mão de oito cartas e limpeza sem erros preservados');
+ }finally{await b.close();}
+})().catch(e=>{console.error(e);process.exitCode=1});
