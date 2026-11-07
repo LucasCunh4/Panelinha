@@ -15,4 +15,15 @@ Verificações essenciais efetivamente executadas:
 - Movimento reduzido congela órbita, oculta partículas e retoma corretamente; nenhum erro JavaScript registrado.
 - `npm run build` e `git diff --check`: aprovados. Recursos/sons/hashes e 52 PNGs originais preservados. Nenhuma suíte extensa ou teste de regras executado; motor e controles não alterados.
 
-APK final, certificado, código de versão, link e resultado da etapa Android serão acrescentados após o workflow existente. Verificações em navegador não substituem Android físico. Nenhuma alteração de applicationId, assinatura, Secrets, origem, dados locais ou orientação.
+[Baixar APK 0.2.46 / código 6602 diretamente, sem ZIP](https://github.com/LucasCunh4/Panelinha/actions/runs/42337469160/artifacts/13560432503). Requer sessão no GitHub; retenção até 05/02/2027.
+
+[Workflow #46](https://github.com/LucasCunh4/Panelinha/actions/runs/42337469160): compilação e assinatura aprovadas. Única execução final solicitada, preservando o APK auxiliar interno do teste de atualização existente. O APK real baixado foi novamente verificado com `ferramentas/verificar_apk.py`: assinatura APK v2, certificado fixo, pacote, orientação, origem, 52 cartas/recursos/sons e código web exato conferidos. Metadados locais idênticos aos do Actions; SHA-256 igual ao digest do artefato.
+
+- Pacote: `com.lucascunha.panelinha.teste`; origem `https://localhost`.
+- Certificado geração 2: `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`.
+- `versionCode` **6602 > 6502**, compatível com atualização da geração 2 sem desinstalar. Sem mudança de chave, Secrets, dados locais, landscape ou imersão.
+- SHA-256 APK: `93b41d9c74f9b96da3a10a246b856e615711c4c733d4926337af041e8ce2d9d6`.
+
+**Instrumentação Android não aprovada:** o emulador/ADB ficou `offline` durante `a_imagesAndThreeBotsOffline`. Há somente início do primeiro teste, sem conclusão: **0/13 testes Android concluídos**. Nenhuma falha de asserção do aplicativo registrada nesses resultados; causa raiz da perda do emulador não determinada. Instalação por cima com retenção de dados **não executada**, permanece pendente. Release corretamente pulada pelo gate existente; APK assinado disponível como artefato direto. Nenhum teste desativado. Verificações em navegador não substituem Android físico.
+
+Publicação web existente atualizada, versão `1d2f3eb6-c8ed-4ef4-855f-9efb620cdfb4`; HTML, `mesa.js` e `mesa.css` publicados conferidos byte a byte com o build. Sem alteração da lógica autoritativa, bindings, conta ou credenciais.
