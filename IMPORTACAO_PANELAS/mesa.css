@@ -10,7 +10,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 .playing .container { margin:0; padding:0; max-width:none; }
 .playing main > header,.playing .foot { display:none; }
 #game,.stove-shell,.table { position:fixed; inset:0; width:100%; height:100%; margin:0; padding:0; }
-.table { --card-width:clamp(44px,7.3vh,72px); --seat-width:clamp(70px,18vw,132px); --flame:#ff6464; display:block; overflow:hidden; isolation:isolate; }
+.table { --card-base-width:clamp(44px,7.3vh,72px); --seat-width:clamp(70px,18vw,132px); --flame:#ff6464; display:block; overflow:hidden; isolation:isolate; }
 .table[data-active-color=blue]{--flame:#5cbcff}.table[data-active-color=green]{--flame:#68f184}.table[data-active-color=yellow]{--flame:#ffe36b}
 .stove-scene { position:absolute; width:1672px; height:941px; left:0; top:0; transform-origin:0 0; transform:translate(var(--scene-x,0px),var(--scene-y,0px)) scale(var(--scene-scale,1)); pointer-events:none; z-index:-2; }
 .stove-background { display:block; width:1672px; height:941px; max-width:none; }
@@ -68,7 +68,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 .modal-wrap{z-index:30}.modal{max-height:calc(100vh - 24px);overflow:auto}.colorbtn{width:60px;height:60px;min-width:60px}
 @media(orientation:landscape) and (max-height:600px){
- .table{--card-width:clamp(39px,11.3vh,56px);--seat-width:clamp(80px,13vw,125px)}
+ .table{--card-base-width:clamp(39px,11.3vh,56px);--seat-width:clamp(80px,13vw,125px)}
  .seat.top{top:max(8px,env(safe-area-inset-top));width:min(36%,290px);padding:3px 8px}.seat.top .pan-avatar{width:24px;height:22px}.seat.top .name{font-size:10px}.seat.top .sub{font-size:9px}.seat.top .subhand{padding:5px 5px 2px}.subhand .card.mini{width:19px;min-width:19px;height:39px}
  .seat.left,.seat.right{top:43%}.pan-avatar{width:31px;height:28px}.seat .name{font-size:11px}.back{min-height:28px;padding-top:3px}.hidden-card{width:16px;height:24px}
  .hand-panel{left:17%;right:17%}
@@ -163,7 +163,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 .hand button:not(:disabled):hover .card {transform:none}
 
 /* Atualização da mesa: dimensões, pilha física e efeitos ligados ao estado. */
-.table {--card-width:clamp(48px,7.9vh,80px);--discard-width:calc(var(--card-width)*1.08);--pile-width:calc(var(--card-width)*.66);--opponent-card:clamp(32px,4.9vh,46px)}
+.table {--card-base-width:clamp(48px,7.9vh,80px);--discard-width:calc(var(--card-width)*1.08);--pile-width:calc(var(--card-width)*.66);--opponent-card:clamp(32px,4.9vh,46px)}
 .burner {transform:translate(-50%,-50%) scale(var(--heat-scale,1));filter:brightness(var(--heat-brightness,1));transition:transform 420ms ease,filter 420ms ease}
 .table[data-active-color=red] .flame-red,.table[data-active-color=blue] .flame-blue,.table[data-active-color=green] .flame-green,.table[data-active-color=yellow] .flame-yellow {opacity:var(--heat-opacity,.74)}
 .flame {transition:opacity 420ms ease}
@@ -205,7 +205,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 .block-effect {position:fixed;inset:0;pointer-events:none;filter:drop-shadow(0 2px 4px #211329)}
 .block-effect>span {position:absolute;transform:translate(-50%,-50%);font-size:64px;line-height:1;color:#ffdf91;text-shadow:0 0 18px #ab4b2a;background:#3d203bda;border-radius:50%;padding:5px}
 @media(orientation:landscape) and (max-height:600px){
- .table{--card-width:clamp(42px,11.9vh,62px);--opponent-card:clamp(28px,8.5vh,36px)}
+ .table{--card-base-width:clamp(42px,11.9vh,62px);--opponent-card:clamp(28px,8.5vh,36px)}
  .table>.draw-stack{left:calc(50% - var(--discard-width)*.5 - 32px - max(44px,var(--pile-width)));top:var(--burner-y)}
  .seat.top .subhand{--opponent-card:clamp(25px,8.5vh,34px);height:calc(var(--opponent-card)*var(--card-aspect) + 12px)}
  .seat.top .back,.seat.top .subhand{padding:5px 8px}
@@ -221,14 +221,14 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 .seat.right .turn-clock {left:-20px;right:auto;top:calc(50% - 17px)}
 
 /* Refinamentos: o mesmo PNG e os mesmos controles, com dimensões moderadas. */
-.table {--card-width:clamp(50px,8.25vh,84px);--discard-width:calc(var(--card-width)*1.1);--opponent-card:clamp(34px,5.15vh,49px);--pile-safe-left:max(14px,env(safe-area-inset-left))}
+.table {--card-base-width:clamp(50px,8.25vh,84px);--discard-width:calc(var(--card-width)*1.1);--opponent-card:clamp(34px,5.15vh,49px);--pile-safe-left:max(14px,env(safe-area-inset-left))}
 .table>.draw-stack {left:var(--pile-left,14px);top:var(--pile-top,var(--burner-y))}
 .seat.top .subhand {--opponent-card:clamp(38px,5.35vh,55px)}
 .seat.left,.seat.right {top:calc(var(--burner-y) + clamp(52px,7.5vh,76px))}
 .hand-heading {transform:translateY(18px)}
 .table[data-active-color=yellow] .flame-yellow {opacity:min(.96,calc(var(--heat-opacity,.74)*1.15))}
 @media(orientation:landscape) and (max-height:600px){
- .table{--card-width:clamp(44px,12.35vh,65px);--opponent-card:clamp(29px,8.9vh,38px)}
+ .table{--card-base-width:clamp(44px,12.35vh,65px);--opponent-card:clamp(29px,8.9vh,38px)}
  .seat.top{top:max(4px,env(safe-area-inset-top))}.seat.top .subhand{--opponent-card:clamp(26px,8.8vh,36px)}
  .seat.left,.seat.right{top:48%}
  .hand-heading{transform:translateY(4px)}
@@ -241,7 +241,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 @media(orientation:landscape) and (max-height:600px){.hand-panel{display:block}.hand-panel>.hand-heading{transform:translateY(4px)}}
 
 /* Tamanho-base comum: o leque adapta a sobreposição, sem miniaturizar adversários. */
-.table {--card-width:clamp(54px,9.3vh,92px);--discard-width:var(--card-width);--pile-width:var(--card-width);--opponent-card:var(--card-width)}
+.table {--card-base-width:clamp(54px,9.3vh,92px);--discard-width:var(--card-width);--pile-width:var(--card-width);--opponent-card:var(--card-width)}
 .seat.top .subhand {--opponent-card:var(--card-width)}
 #pile::before {display:none}
 #pile .pile-layer {position:absolute;inset:0;transform:translate(calc(var(--depth)*-1px),calc(var(--depth)*1.5px));z-index:calc(6 - var(--depth));pointer-events:none}
@@ -259,7 +259,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
  .seat.left .back,.seat.right .back,.seat.left .subhand,.seat.right .subhand {width:100%;height:var(--side-fan);transform:translate(-50%,-50%);padding:10px 3px}
 }
 @media(orientation:landscape) and (max-height:600px){
- .table {--card-width:clamp(46px,13.7vh,72px);--opponent-card:var(--card-width)}
+ .table {--card-base-width:clamp(46px,13.7vh,72px);--opponent-card:var(--card-width)}
  .seat.top .subhand {--opponent-card:var(--card-width)}
  .seat.top .seat-identity {position:absolute;left:auto;right:calc(100% + 6px);top:8px;width:76px}
  .seat.top .back,.seat.top .subhand {margin:0;padding:3px 8px;height:calc(var(--card-width)*var(--card-aspect) + 8px)}
@@ -336,7 +336,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 .back>.hidden-card,.subhand>.card {transition:margin-left 180ms ease,transform 180ms ease}
 
 /* Espaço para o aviso acima das cartas mesmo nas telas horizontais mais baixas. */
-@media(orientation:landscape) and (max-height:420px){.table {--card-width:clamp(38px,12.3vh,54px)}.hand {padding-bottom:12px}}
+@media(orientation:landscape) and (max-height:420px){.table {--card-base-width:clamp(38px,12.3vh,54px)}.hand {padding-bottom:12px}}
 #turnCue {right:auto;bottom:auto;line-height:1;max-width:calc(100% - 40px);transform:translateX(-50%);font-size:clamp(17px,2.8vw,28px)}
 
 
@@ -388,3 +388,7 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 .hand>button:focus-visible{outline:0}
 .hand>button:focus-visible>.card{outline:2px solid #fff0b3;outline-offset:2px}
 @media(prefers-reduced-motion:reduce){.hand>button>.card{transition:none}}
+
+/* Escala única: leques, montes e animações usam as dimensões externas reais. */
+.table {--card-display-scale:1.05;--card-width:calc(var(--card-base-width) * var(--card-display-scale))}
+@media(orientation:landscape) and (max-height:340px){.table {--card-display-scale:1.02}}

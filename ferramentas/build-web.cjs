@@ -10,13 +10,17 @@ if(manifest.assets.length!==23||manifest.normalCombinations!==52)throw Error('S�
 for(const entry of manifest.assets){
   const bytes=fs.readFileSync(path.join(source,entry.path));
   if(bytes.length!==entry.bytes||crypto.createHash('sha256').update(bytes).digest('hex')!==entry.sha256)throw Error(`Arte divergente: ${entry.path}`);
-  if(bytes.readUInt32BE(16)!==470||bytes.readUInt32BE(20)!==800||bytes[25]!==6)throw Error(`PNG precisa ser RGBA 470x800: ${entry.path}`);
+  const unit=entry.path.startsWith('assets/cartas/elementos/');
+  if(bytes.readUInt32BE(16)!==entry.width||bytes.readUInt32BE(20)!==entry.height||bytes[25]!==6)throw Error(`Dimensões/RGBA divergentes: ${entry.path}`);
+  if(!unit&&(entry.width!==470||entry.height!==800))throw Error(`Fundo/especial precisa ser RGBA 470x800: ${entry.path}`);
+  if(unit&&(!entry.path.endsWith('_unitario.png')||entry.width<=0||entry.height<=0))throw Error(`Símbolo unitário inválido: ${entry.path}`);
 }
+if(manifest.assets.filter(a=>a.path.startsWith('assets/cartas/elementos/')&&a.path.endsWith('_unitario.png')).length!==13)throw Error('São 13 PNGs unitários para três instâncias por carta normal');
 const cardFiles=fs.readdirSync(path.join(source,'assets/cartas'),{recursive:true}).filter(n=>n.endsWith('.png')).map(n=>'assets/cartas/'+n).sort();
 if(JSON.stringify(cardFiles)!==JSON.stringify(manifest.assets.map(a=>a.path).sort()))throw Error('Arquivo de carta ausente ou excedente');
 for(const name of manifest.removedRepositoryFiles||[])if(fs.existsSync(path.join(root,name)))throw Error(`Arte/arquivo substituído ainda no repositório: ${name}`);
 for(const name of ['index.html',...fs.readdirSync(source).filter(n=>/\.(js|css)$/.test(n))]){
-  if(/assets\/(especiais|padronizadas|cartas_mais4_mais6|cartas\/(vermelho|azul|verde|amarelo))\//.test(fs.readFileSync(path.join(source,name),'utf8')))throw Error(`Referência antiga em ${name}`);
+  if(/assets\/(especiais|padronizadas|cartas_mais4_mais6|cartas\/(vermelho|azul|verde|amarelo))\/|elementos\/[^'"\s]*retrabalhado_470x800/.test(fs.readFileSync(path.join(source,name),'utf8')))throw Error(`Referência antiga em ${name}`);
 }
 const mesa = JSON.parse(fs.readFileSync(path.join(source, 'documentacao/MANIFESTO_MESA_V1.json')));
 for (const entry of mesa.asset_files) {

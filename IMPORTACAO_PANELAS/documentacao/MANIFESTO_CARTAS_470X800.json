@@ -6,129 +6,100 @@
     "width": 520,
     "height": 850,
     "outerRadius": 70,
-    "innerRadius": 45,
-    "symbolOffsetY": -20
+    "innerRadius": 45
   },
   "normalCombinations": 52,
   "assets": [
     {
-      "path": "assets/cartas/fundos/fundo_amarelo_retrabalhado_470x800.png",
-      "width": 470,
-      "height": 800,
-      "bytes": 455337,
-      "sha256": "31e89873e9addc056a018adc192308068b7e4b81ca819b98277c7e8319de45f8"
+      "path": "assets/cartas/elementos/bloqueio_unitario.png",
+      "width": 314,
+      "height": 313,
+      "bytes": 83367,
+      "sha256": "fed51dd2b0570922aaaa2b92d1bdb51c946d29116cf28c0700ba943c938e4668"
     },
     {
-      "path": "assets/cartas/fundos/fundo_azul_retrabalhado_470x800.png",
-      "width": 470,
-      "height": 800,
-      "bytes": 464816,
-      "sha256": "d60e07c341f25fe25f8daa5766ef546d410dba222f41bf6295a3905507e6d710"
+      "path": "assets/cartas/elementos/inverter_unitario.png",
+      "width": 314,
+      "height": 314,
+      "bytes": 72788,
+      "sha256": "240333d2269042afb4adec16fcfb26618382c568d62df974704aed11f1b0d4f9"
     },
     {
-      "path": "assets/cartas/fundos/fundo_verde_retrabalhado_470x800.png",
-      "width": 470,
-      "height": 800,
-      "bytes": 490262,
-      "sha256": "11048c3bd393b6def3e29719ac42fe676000745ae24e48c817f291f29ae5f560"
+      "path": "assets/cartas/elementos/mais2_unitario.png",
+      "width": 313,
+      "height": 313,
+      "bytes": 78408,
+      "sha256": "d7282b4af7dbdb06b155c5d4e90f18a486aafd769ddb2e744e4acdaeea7246f3"
     },
     {
-      "path": "assets/cartas/fundos/fundo_vermelho_retrabalhado_470x800.png",
-      "width": 470,
-      "height": 800,
-      "bytes": 451045,
-      "sha256": "5a4931468c959c7969f0015c513ecf08b6aa1dc40d54092cf58196231e218024"
+      "path": "assets/cartas/elementos/numero_0_unitario.png",
+      "width": 314,
+      "height": 314,
+      "bytes": 69990,
+      "sha256": "4ff4d68077a05ead35c8e0991a3db0da2ff87cd0f61f3ff86113c85773a7f6ec"
     },
     {
-      "path": "assets/cartas/elementos/bloqueio_retrabalhado_470x800.png",
-      "width": 470,
-      "height": 800,
-      "bytes": 253963,
-      "sha256": "7b33b4eeecf6f669e991a790be04a990b5f5b23de9aaf2066be0cacdb3ca2239"
+      "path": "assets/cartas/elementos/numero_1_unitario.png",
+      "width": 313,
+      "height": 314,
+      "bytes": 53634,
+      "sha256": "a193c1c6a77fe9efab711dc3647fcbecc57f16cdadcbae4ae6c83c5537990caa"
     },
     {
-      "path": "assets/cartas/elementos/inverter_retrabalhado_470x800.png",
-      "width": 470,
-      "height": 800,
-      "bytes": 234101,
-      "sha256": "64ec9c3ca716df32a478a949758ed4f0169d054e7626e73b866352f630216245"
+      "path": "assets/cartas/elementos/numero_2_unitario.png",
+      "width": 313,
+      "height": 314,
+      "bytes": 70986,
+      "sha256": "96940662221a11652d073ea650fe5badd0e08ed255e60afb175d7020c59840e8"
     },
     {
-      "path": "assets/cartas/elementos/mais2_retrabalhado_470x800.png",
-      "width": 470,
-      "height": 800,
-      "bytes": 247195,
-      "sha256": "e68c998ed69f5c672220928a0c9ed1f91d02528c08f64cecf490036915df6c9d"
+      "path": "assets/cartas/elementos/numero_3_unitario.png",
+      "width": 314,
+      "height": 314,
+      "bytes": 70972,
+      "sha256": "f93f496b04c3be128411868487bef29276c8e9797a25722645b216c061956871"
     },
     {
-      "path": "assets/cartas/elementos/numero_0_retrabalhado_470x800.png",
-      "width": 470,
-      "height": 800,
-      "bytes": 196627,
-      "sha256": "bcb47cb545c0e490b7f3e4b80933f6535d941083b680897ff503b1ab4d6d225d"
+      "path": "assets/cartas/elementos/numero_4_unitario.png",
+      "width": 314,
+      "height": 313,
+      "bytes": 69905,
+      "sha256": "c27ddfa36fb5f098b8df91e0bd7588b715af3e1c80dd074aff89f86449e30aff"
     },
     {
-      "path": "assets/cartas/elementos/numero_1_retrabalhado_470x800.png",
-      "width": 470,
-      "height": 800,
-      "bytes": 164765,
-      "sha256": "5416765da92264d83ebb82374ae39fda6bb92c82baf92f60c6db977950b9eb6f"
+      "path": "assets/cartas/elementos/numero_5_unitario.png",
+      "width": 313,
+      "height": 313,
+      "bytes": 72638,
+      "sha256": "9bcb5722e840abfc6ab6f50a3e0f1da848e85be55c2af95c4e48cdebc6adf306"
     },
     {
-      "path": "assets/cartas/elementos/numero_2_retrabalhado_470x800.png",
-      "width": 470,
-      "height": 800,
-      "bytes": 220792,
-      "sha256": "41407843ab609720fe6ed17f0a8a0be1d701110eb6c3288f8a707a86db5349ac"
+      "path": "assets/cartas/elementos/numero_6_unitario.png",
+      "width": 313,
+      "height": 313,
+      "bytes": 74169,
+      "sha256": "ee0c979dbf6f77762a22b0fc7f373f2f5eddaab1156b902fa59408d21121235a"
     },
     {
-      "path": "assets/cartas/elementos/numero_3_retrabalhado_470x800.png",
-      "width": 470,
-      "height": 800,
-      "bytes": 208056,
-      "sha256": "6f9a8cd65c79c011637e0143614583b0362d57fd2987e7e35a9e30c9620455ce"
+      "path": "assets/cartas/elementos/numero_7_unitario.png",
+      "width": 314,
+      "height": 313,
+      "bytes": 66854,
+      "sha256": "381ad0ed9ac9672bc90f46bcb57c1b8b682ba308614a61d1510146d745d60376"
     },
     {
-      "path": "assets/cartas/elementos/numero_4_retrabalhado_470x800.png",
-      "width": 470,
-      "height": 800,
-      "bytes": 207901,
-      "sha256": "15c46791a9735e5c22dde1d69ccf44a1118327117df8f424adac513d79b921b7"
+      "path": "assets/cartas/elementos/numero_8_unitario.png",
+      "width": 314,
+      "height": 313,
+      "bytes": 72058,
+      "sha256": "6a22e62682303de7557b478d86308ab9bd3df21fc15c9add403e34586e4c0c5d"
     },
     {
-      "path": "assets/cartas/elementos/numero_5_retrabalhado_470x800.png",
-      "width": 470,
-      "height": 800,
-      "bytes": 222016,
-      "sha256": "c110f2a869081b2b12ee3ab787d82939cb4f700131756f12a0440880aeac9ad5"
-    },
-    {
-      "path": "assets/cartas/elementos/numero_6_retrabalhado_470x800.png",
-      "width": 470,
-      "height": 800,
-      "bytes": 223968,
-      "sha256": "ced2ecc51b94d6675125299235fa9165ac6d509e3c7641a52a2889801146361b"
-    },
-    {
-      "path": "assets/cartas/elementos/numero_7_retrabalhado_470x800.png",
-      "width": 470,
-      "height": 800,
-      "bytes": 196547,
-      "sha256": "2dc4edf8448bf27b886e0ae44aab807fdfd2be42ade6402cbdc1e77a6aced1e2"
-    },
-    {
-      "path": "assets/cartas/elementos/numero_8_retrabalhado_470x800.png",
-      "width": 470,
-      "height": 800,
-      "bytes": 219264,
-      "sha256": "35a6fe75db18da0ed1ffaffd074f0d9815003da989ff4f2720f4251c170cabfd"
-    },
-    {
-      "path": "assets/cartas/elementos/numero_9_retrabalhado_470x800.png",
-      "width": 470,
-      "height": 800,
-      "bytes": 224980,
-      "sha256": "29baf7a32079923473302413b077190263bc465c3bb4d05e21d49fcc4bd9bb42"
+      "path": "assets/cartas/elementos/numero_9_unitario.png",
+      "width": 313,
+      "height": 313,
+      "bytes": 75651,
+      "sha256": "41789efc15c79b7635e1bd47bccac5cb55888bfc82a00d09329a1c18adc37959"
     },
     {
       "path": "assets/cartas/especiais/carta_curinga.png",
@@ -171,6 +142,34 @@
       "height": 800,
       "bytes": 528582,
       "sha256": "7a400f667d1659840326e3687754b7dc1f6f9c60500b99e8f938212d60365565"
+    },
+    {
+      "path": "assets/cartas/fundos/fundo_amarelo_retrabalhado_470x800.png",
+      "width": 470,
+      "height": 800,
+      "bytes": 455337,
+      "sha256": "31e89873e9addc056a018adc192308068b7e4b81ca819b98277c7e8319de45f8"
+    },
+    {
+      "path": "assets/cartas/fundos/fundo_azul_retrabalhado_470x800.png",
+      "width": 470,
+      "height": 800,
+      "bytes": 464816,
+      "sha256": "d60e07c341f25fe25f8daa5766ef546d410dba222f41bf6295a3905507e6d710"
+    },
+    {
+      "path": "assets/cartas/fundos/fundo_verde_retrabalhado_470x800.png",
+      "width": 470,
+      "height": 800,
+      "bytes": 490262,
+      "sha256": "11048c3bd393b6def3e29719ac42fe676000745ae24e48c817f291f29ae5f560"
+    },
+    {
+      "path": "assets/cartas/fundos/fundo_vermelho_retrabalhado_470x800.png",
+      "width": 470,
+      "height": 800,
+      "bytes": 451045,
+      "sha256": "5a4931468c959c7969f0015c513ecf08b6aa1dc40d54092cf58196231e218024"
     }
   ],
   "packages": [
@@ -179,12 +178,12 @@
       "sha256": "7059137ceeddaa62407609703c86c0a15aa997836c58500a0c132cdcdaaaca78"
     },
     {
-      "path": "panelinha_numeros_retrabalhados_470x800.zip",
-      "sha256": "ad2d01b93b0adc62a2bc536a931578115702368a21321d7f6fa273bd06f93aef"
-    },
-    {
       "path": "panelinha_especiais_e_verso_aprovados_470x800.zip",
       "sha256": "c440399e1ad8ad26d80b39e3d7070a92d240cb0a544e031f7a1cd0b1c6d43c79"
+    },
+    {
+      "path": "panelinha_numeros_unitarios_png.zip",
+      "sha256": "2cf8e2d3d4bccd0ac3eeac8388fdd92443592063f028ed474c5afe22746c7a43"
     }
   ],
   "removedRepositoryFiles": [
@@ -291,6 +290,21 @@
     "IMPORTACAO_PANELAS/documentacao/MANIFESTO_INTERACAO_V2.json",
     "IMPORTACAO_PANELAS/documentacao/MANIFESTO_LIQUIDIFICADOR.json",
     "IMPORTACAO_PANELAS/documentacao/MANIFESTO_MAIS4_MAIS6.json",
-    "IMPORTACAO_PANELAS/documentacao/MANIFESTO_PADRAO_400X850.json"
-  ]
+    "IMPORTACAO_PANELAS/documentacao/MANIFESTO_PADRAO_400X850.json",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/bloqueio_retrabalhado_470x800.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/inverter_retrabalhado_470x800.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/mais2_retrabalhado_470x800.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_0_retrabalhado_470x800.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_1_retrabalhado_470x800.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_2_retrabalhado_470x800.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_3_retrabalhado_470x800.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_4_retrabalhado_470x800.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_5_retrabalhado_470x800.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_6_retrabalhado_470x800.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_7_retrabalhado_470x800.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_8_retrabalhado_470x800.png",
+    "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_9_retrabalhado_470x800.png",
+    "panelinha_numeros_retrabalhados_470x800.zip"
+  ],
+  "symbolComposition": "background + center + top-left + bottom-right; three instances of one unit PNG"
 }
