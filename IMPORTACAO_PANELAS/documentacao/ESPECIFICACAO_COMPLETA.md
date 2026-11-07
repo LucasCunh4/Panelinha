@@ -4,6 +4,8 @@
 **Natureza:** registro das decisões tomadas no ChatGPT, não um inventário de funcionalidades implementadas.  
 **Projeto:** jogo de cartas casual com temática de panelas, inspirado na estrutura clássica de combinação de cor/número, para exatamente 4 jogadores online; modo de treino local com 1 humano + 3 bots.
 
+> Artes vigentes: 23 PNGs aprovados 470×800 em `assets/cartas/{fundos,elementos,especiais}`. São 52 combinações dinâmicas, cinco especiais completas e verso. Borda externa de 25 px (branca nas normais/verso, dourada nas especiais), total 520×850. Os antigos 52 PNGs completos, overlays e artes 400×850 foram excluídos. A seção visual histórica abaixo não autoriza restaurá-los; use `cartas.js`, `cartas.css` e `MANIFESTO_CARTAS_470X800.json`.
+
 ## 0. Fonte de verdade e prioridades
 
 - **Código-base efetivamente existente:** `index.html` e `assets/cartas/` na raiz deste pacote. É o protótipo local V3, com 3 bots e imagens PNG de 52 faces coloridas.

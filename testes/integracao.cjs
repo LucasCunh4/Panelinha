@@ -13,9 +13,9 @@ const base = process.env.PANELAS_TEST_URL || 'http://127.0.0.1:8000/';
  try {
   await page.clock.install();
   await page.goto(base);await page.locator('#singlePlayerBtn').click();await page.locator('#profileContinueBtn').click();
-  const manifest=JSON.parse(fs.readFileSync(path.join(root,'documentacao/MANIFESTO_52_PNG.json')));
-  assert.equal(manifest.files.length,52);
-  for (const f of manifest.files) {
+  const manifest=JSON.parse(fs.readFileSync(path.join(root,'documentacao/MANIFESTO_CARTAS_470X800.json')));
+  assert.equal(manifest.assets.length,23);
+  for (const f of manifest.assets) {
    assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,f.path))).digest('hex'),f.sha256);
    const response=await page.request.get(new URL(f.path,base).href);
    assert.equal(response.status(),200,f.path);
@@ -24,8 +24,8 @@ const base = process.env.PANELAS_TEST_URL || 'http://127.0.0.1:8000/';
   const decoded=await page.evaluate(async files=>Promise.all(files.map(async f=>{
    const image=new Image(); image.src=f.path; await image.decode();
    return image.naturalWidth>0 && image.naturalHeight>0;
-  })),manifest.files);
-  assert.ok(decoded.every(Boolean)); console.log('PASS 52/52 PNGs: SHA-256, HTTP 200 e decodificação no Chromium móvel');
+  })),manifest.assets);
+  assert.ok(decoded.every(Boolean)); console.log('PASS 23/23 PNGs (52 combinações): SHA-256, HTTP 200 e decodificação no Chromium móvel');
   await page.locator('#startBtn').tap();
   assert.equal(await page.evaluate(()=>CartasTest.getState().players.length),4);
   assert.ok(await page.locator('#game').isVisible());
@@ -146,14 +146,10 @@ const base = process.env.PANELAS_TEST_URL || 'http://127.0.0.1:8000/';
   await page.clock.runFor(500);
   assert.ok(await page.evaluate(()=>{const s=CartasTest.getState();return s.penalty===0&&s.current===1&&s.players[0].hand.length===window.beforeTimeout+20;}));
   console.log('PASS cronômetro cobra +20 integral');
-  // Força falha de rede para verificar o fallback textual existente.
-  await page.route('**/assets/cartas/**/*.png',route=>route.abort());
-  await page.evaluate(()=>{const s=CartasTest.getState();s.players[0].hand=[{id:30000,type:'num',color:'red',num:7}];document.querySelector('#useCardArt').checked=true;document.querySelector('#useCardArt').onchange();});
-  await page.locator('[data-card="30000"] .asset-unavailable').waitFor();
-  await page.locator('[data-card="30000"] .art-fallback').waitFor({state:'visible'});
-  assert.ok(await page.locator('[data-card="30000"] .art-fallback').isVisible());
-  console.log('PASS fallback textual quando PNG falha');
-  await page.unroute('**/assets/cartas/**/*.png');
+  // Nenhum renderer textual ou fallback de arte antiga: os PNGs aprovados são a única fonte.
+  assert.equal(await page.locator('.art-fallback,.asset-unavailable').count(),0);
+  assert.ok(await page.locator('#hand .card img').evaluateAll(imgs=>imgs.every(im=>im.complete&&im.naturalWidth===470&&im.naturalHeight===800)));
+  console.log('PASS somente PNGs aprovados em camadas, sem fallback visual legado');
   for(const viewport of [{width:844,height:390},{width:1280,height:800}]) {
    await page.setViewportSize(viewport);
    assert.ok(await page.locator('#game').isVisible());

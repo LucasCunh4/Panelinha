@@ -62,7 +62,7 @@ const out=process.env.PANELINHA_TEST_OUTPUT||'/workspace/work/refino-compras-sem
     assert.equal(await visibleHand(),9);assert.equal(await page.locator('.penalty-purchase-transition,[data-effect=draw],.draw-choice').count(),0);const penaltyLog=await page.evaluate(()=>drawLog);assert.equal(penaltyLog.filter(e=>e.overlap).length,0);assert.deepEqual(penaltyLog.map(e=>[e.duration,e.delay]),[[1000,0],[1000,1060]]);
     console.log('PASS punição sequencial mais rápida/fixa, sem escolhas proibidas, bloqueio até prazo compartilhado de 2260ms');
     await fixture();await page.evaluate(()=>{const s=CartasTest.getState(),card={id:95001,type:'wild6',color:null};s.players[1].hand.push(card);PanelasMesa.recordDraw(s,1,card);PanelinhaTableBridge.render()});
-    assert.equal(await page.locator('[data-card-id="95001"]').getAttribute('data-presentation'),'direct');assert.equal(await page.locator('[data-card-id="95001"] img').getAttribute('src'),'assets/padronizadas/verso_oficial_400x850.png');assert.equal(await page.locator('.draw-choice,[data-presentation=preview]').count(),0);await page.waitForTimeout(950);assert.equal(await page.locator('[data-card-id="95001"]').count(),0);
+    assert.equal(await page.locator('[data-card-id="95001"]').getAttribute('data-presentation'),'direct');assert.equal(await page.locator('[data-card-id="95001"] img').getAttribute('src'),'assets/cartas/especiais/verso_roxo.png');assert.equal(await page.locator('.draw-choice,[data-presentation=preview]').count(),0);await page.waitForTimeout(950);assert.equal(await page.locator('[data-card-id="95001"]').count(),0);
     console.log('PASS compra alheia direta e fechada; nenhuma prévia privada é mostrada');
     }
     for(const [width,height]of[[844,390],[1280,800]]){

@@ -1,125 +1,28 @@
 /* Seletor de apresentação: o motor continua sendo o único responsável pela jogada. */
 (() => {
   'use strict';
-  const assets='assets/especiais/';
-  // Coordenadas do MANIFESTO_ASSETS.json. As quatro imagens ocupam a mesma base 2:3.
-  const ingredients=[
-    ['tomates','red','Vermelho — tomates',.05371,.15625,.37598,.24089],
-    ['queijos','yellow','Amarelo — queijos',.56152,.15951,.39844,.23763],
-    ['mirtilos','blue','Azul — mirtilos',.04492,.39062,.40039,.22917],
-    ['alfaces','green','Verde — alfaces',.55273,.39062,.41992,.22917]
-  ];
-  // Bases e overlays NOVOS alinhados ao mesmo canvas 400x850.
-  const penaltyLayouts={
-    "wild4": {
-      "base": "assets/cartas_mais4_mais6/carta_mais4_base_sem_ingredientes.png",
-      "layers": {
-        "tomates": {
-          "path": "assets/cartas_mais4_mais6/carta_mais4_tomates_overlay_full.png",
-          "rect": [
-            54,
-            203,
-            116,
-            115
-          ]
-        },
-        "queijos": {
-          "path": "assets/cartas_mais4_mais6/carta_mais4_queijos_overlay_full.png",
-          "rect": [
-            202,
-            206,
-            151,
-            92
-          ]
-        },
-        "mirtilos": {
-          "path": "assets/cartas_mais4_mais6/carta_mais4_mirtilos_overlay_full.png",
-          "rect": [
-            33,
-            413,
-            100,
-            78
-          ]
-        },
-        "alfaces": {
-          "path": "assets/cartas_mais4_mais6/carta_mais4_alfaces_overlay_full.png",
-          "rect": [
-            268,
-            413,
-            111,
-            96
-          ]
-        }
-      }
-    },
-    "wild6": {
-      "base": "assets/cartas_mais4_mais6/carta_mais6_base_sem_ingredientes.png",
-      "layers": {
-        "tomates": {
-          "path": "assets/cartas_mais4_mais6/carta_mais6_tomates_overlay_full.png",
-          "rect": [
-            51,
-            176,
-            123,
-            119
-          ]
-        },
-        "queijos": {
-          "path": "assets/cartas_mais4_mais6/carta_mais6_queijos_overlay_full.png",
-          "rect": [
-            199,
-            180,
-            155,
-            108
-          ]
-        },
-        "mirtilos": {
-          "path": "assets/cartas_mais4_mais6/carta_mais6_mirtilos_overlay_full.png",
-          "rect": [
-            30,
-            370,
-            108,
-            99
-          ]
-        },
-        "alfaces": {
-          "path": "assets/cartas_mais4_mais6/carta_mais6_alfaces_overlay_full.png",
-          "rect": [
-            260,
-            368,
-            123,
-            117
-          ]
-        }
-      }
-    }
-  };
-  function ingredientHTML(layout,[name,color,label,x,y,w,h]){
-    const data=layout?.layers[name],path=data?.path||`${assets}escolher_cor_${name}_overlay_full.png`;
-    if(data){const r=data.rect;[x,y,w,h]=[r[0]/400,r[1]/850,r[2]/400,r[3]/850];}
-    const hit=layout?`left:clamp(22px,${(x+w/2)*100}%,calc(100% - 22px));top:clamp(22px,${(y+h/2)*100}%,calc(100% - 22px));width:max(44px,${w*100}%);height:max(44px,${h*100}%);transform:translate(-50%,-50%)`:`left:${x*100}%;top:${y*100}%;width:${w*100}%;height:${h*100}%`;
-    return `<div class="ingredient-layer" data-ingredient="${color}" style="--origin-x:${(x+w/2)*100}%;--origin-y:${(y+h/2)*100}%"><img src="${path}" alt="" draggable="false"></div><button type="button" class="colorbtn ingredient-hit" data-color="${color}" aria-label="${label}" style="${hit}"></button>`;
-  }
-  function wildChoicesHTML(){
-    // Os quatro símbolos de cor fazem parte do PNG completo, sem ingredientes sobrepostos.
-    return [['red','Vermelho',35,32],['yellow','Amarelo',50,32],['blue','Azul',35,40],['green','Verde',50,40]].map(([color,label,x,y])=>
-      `<div class="ingredient-layer wild-color-highlight" data-ingredient="${color}" style="left:${x}%;top:${y}%;width:15%;height:8%;--origin-x:50%;--origin-y:50%"></div><button type="button" class="colorbtn ingredient-hit wild-color-hit" data-color="${color}" aria-label="${label}" style="left:${color==='red'||color==='blue'?7:51}%;top:${color==='red'||color==='yellow'?22:42}%;width:42%;height:18%"></button>`).join('');
+  // Regiões das quatro cores na ilustração completa aprovada (canvas 470×800).
+  // A arte é renderizada uma única vez; somente o feedback de interação é sobreposto.
+  const regions=[['red','Vermelho',35,140,170,180],['yellow','Amarelo',260,130,190,190],['blue','Azul',20,345,175,170],['green','Verde',275,340,175,190]];
+  function choicesHTML(){
+    return regions.map(([color,label,x,y,w,h])=>{
+      const style=`left:${x/470*100}%;top:${y/800*100}%;width:${w/470*100}%;height:${h/800*100}%`;
+      return `<div class="ingredient-layer color-zone" data-ingredient="${color}" style="${style};--zone-color:var(--choice-${color})"></div><button type="button" class="colorbtn ingredient-hit" data-color="${color}" aria-label="${label}" style="${style}"></button>`;
+    }).join('');
   }
   let closeCurrent=null;
   function open(root,{cardType,choose,cancel}){
     // Recusa explícita: especiais sem escolha jamais usam este componente.
     if(!['wild','wild4','wild6'].includes(cardType))return false;
     const type=cardType;
-    const layout=penaltyLayouts[type],base=layout?.base||`${assets}Coringa_400x850.png`;
     const title=type==='wild4'?'+4 — Escolher cor':type==='wild6'?'+6 — Escolher cor':'Escolher cor';
-    const hint=type==='wild'?'Toque na cor desejada':'Toque em um ingrediente';
+    const hint='Toque na cor desejada na carta';
     closeCurrent?.();
     const previous=document.activeElement;
-    const overlay=document.createElement('div');overlay.className='modal-wrap color-picker';overlay.dataset.cardType=type;overlay.classList.toggle('penalty-picker',!!layout);
+    const overlay=document.createElement('div');overlay.className='modal-wrap color-picker';overlay.dataset.cardType=type;overlay.classList.toggle('penalty-picker',type!=='wild');
     overlay.innerHTML=`<section class="color-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="colorPickerTitle" aria-describedby="colorPickerHint">
       <h2 id="colorPickerTitle">${title}</h2><p id="colorPickerHint">${hint}</p>
-      <div class="color-picker-card"><img class="color-picker-base" src="${base}" alt="" draggable="false">
-      ${type==='wild'?wildChoicesHTML():ingredients.map(ingredient=>ingredientHTML(layout,ingredient)).join('')}
+      <div class="color-picker-card">${PanelinhaCards.html({type},{label:title})}<div class="color-picker-content">${choicesHTML()}</div>
       </div><button type="button" class="btn alt" id="cancelColor">Cancelar</button>
       <span class="sr-only" role="status" aria-live="polite"></span>
     </section>`;

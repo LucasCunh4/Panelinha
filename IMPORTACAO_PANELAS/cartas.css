@@ -1,0 +1,13 @@
+/* Referência única: conteúdo 470×800 + 25 px EXTERNOS = 520×850. */
+:root{--card-aspect:1.6346153846153846;--card-ratio:520 / 850;--card-border-color:#fff}
+.card.art-card{position:relative;display:inline-block;flex:none;width:var(--card-width,60px);min-width:0;height:calc(var(--card-width,60px)*var(--card-aspect));aspect-ratio:var(--card-ratio);padding:0;border:0;border-radius:var(--card-radius-x) / var(--card-radius-y);background:transparent;box-shadow:0 3px 6px #0006;overflow:visible;vertical-align:middle}
+.card.art-card.gold-card{--card-border-color:#edbd56}
+.card-frame{position:absolute;inset:0;border-radius:inherit;background:var(--card-border-color);pointer-events:none}
+/* Percentuais de cada eixo: nenhuma borda é pintada sobre a arte. */
+.card.art-card>.card-face{position:absolute;left:var(--card-inset-x);top:var(--card-inset-y);width:var(--card-face-width);height:var(--card-face-height);pointer-events:none}
+.card.art-card .card-image{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;max-height:none;aspect-ratio:470 / 800;object-fit:contain;border:0;border-radius:0;filter:none;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.card.art-card.mini,.card.art-card.hidden-card{width:var(--opponent-card,var(--card-width,60px));height:calc(var(--opponent-card,var(--card-width,60px))*var(--card-aspect));min-width:0}
+.card.art-card.hidden-card,.card.art-card.deck-back{background:transparent;border:0;box-shadow:none;filter:drop-shadow(0 2px 3px #0007)}
+.card.art-card.hidden-card::after{content:none}
+.table-effect-card>.card,.played-card .card,.flying-card .card{width:100%;height:100%;min-width:0}
+.color-picker-card>.card{width:100%;height:100%;min-width:0;box-shadow:none}

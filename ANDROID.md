@@ -1,3 +1,5 @@
+> Migração visual 470×800: os 52 PNGs completos antigos e todas as artes especiais/versos anteriores foram retirados. O build/APK agora exigem os 23 PNGs de `MANIFESTO_CARTAS_470X800.json`, 52 combinações em camadas e moldura externa 520×850. Pacote, assinatura e origem permanecem os mesmos. Emulador continua opcional, desligado por padrão. Registros de versões abaixo são históricos.
+
 # Panelinha Teste — Android
 
 Entrega atual: [multiplayer Fase 3](MULTIPLAYER_FASE_3_RESULTADOS.md). Pausa/retomada, bot por inatividade e reconexão usam a mesma mesa e o servidor autoritativo. O motor offline e a identidade Android permanecem intactos. APK **0.2.38/c5802** assinado e verificado, com download direto no relatório. O AVD ficou offline no primeiro caso (0/13 concluídos); retenção real de dados após atualização ainda pendente.

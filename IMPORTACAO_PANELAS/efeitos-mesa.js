@@ -1,7 +1,6 @@
 /* Apresentação limitada ao snapshot privado recebido. Não decide nem altera regras. */
 (() => {'use strict';
   const $=id=>document.getElementById(id),motion=matchMedia('(prefers-reduced-motion: reduce)');
-  const back='assets/padronizadas/verso_oficial_400x850.png';
   let owner=null,round=null,previous=null,pressure=null,frame=0,decision=null,lastOrigin=null,seenPurchase=0;
   const draws=new Set(),masked=new Set(),nodes=new Set(),incoming=new Map();
   let prepared=[],arrivalLayout=false,queued=[],drawTimer=null,renderFrame=null;
@@ -11,7 +10,7 @@
   function cardNode(card,visible){
     const wrap=document.createElement('div');wrap.className='table-effect-card';
     if(visible&&card&&!card.hidden)wrap.innerHTML=bridge().cardHTML(card);
-    else{const image=new Image();image.src=back;image.alt='Carta virada para baixo';image.draggable=false;wrap.append(image);}
+    else wrap.innerHTML=PanelinhaCards.html(null,{label:'Carta virada para baixo'});
     return wrap;
   }
   function sprite(card,visible,point,kind){
@@ -55,7 +54,7 @@
     }));
   }
   function bundlePoint(p,actor){
-    const points=p.points[actor],fallback=point(actor,null),width=Math.max(28,Math.min(46,fallback.width)),height=width*850/400;
+    const points=p.points[actor],fallback=point(actor,null),width=Math.max(28,Math.min(46,fallback.width)),height=width*PanelinhaCards.aspect;
     const x=points.length?points.reduce((n,v)=>n+v.x,0)/points.length:fallback.x;
     const y=points.length?points.reduce((n,v)=>n+v.y,0)/points.length:fallback.y;
     return {x:Math.max(width/2+10,Math.min(innerWidth-width/2-10,x)),y:Math.max(height/2+8,Math.min(innerHeight-height/2-8,y)),width,height};
@@ -75,7 +74,7 @@
       p.meta.transfers.forEach(transfer=>{
         const from=p.bundles[transfer.from],to=p.bundles[transfer.to],n=document.createElement('div');n.className='rotation-pack table-flight';n.dataset.effect='rotation-move';n.dataset.from=transfer.from;n.dataset.to=transfer.to;
         Object.assign(n.style,{left:from.x+'px',top:from.y+'px',width:from.width+'px',height:from.height+'px'});
-        for(let i=0;i<Math.min(6,transfer.count);i++){const image=new Image();image.src=back;image.alt='';image.style.transform=`translate(${i*1.5}px,${i*-1.5}px) rotate(${(i%3-1)*2}deg)`;n.append(image);}
+        for(let i=0;i<Math.min(6,transfer.count);i++){n.insertAdjacentHTML('beforeend',PanelinhaCards.html(null));const image=n.lastElementChild;image.style.transform=`translate(${i*1.5}px,${i*-1.5}px) rotate(${(i%3-1)*2}deg)`;}
         $('playAnimations').append(n);nodes.add(n);
         const angle=point=>Math.atan2((point.y-centerPoint.y)/ry,(point.x-centerPoint.x)/rx),radius=point=>Math.hypot((point.x-centerPoint.x)/rx,(point.y-centerPoint.y)/ry);
         const a=angle(from),b=angle(to),clockwise=p.meta.direction===-1;let delta=b-a;
@@ -184,8 +183,8 @@
     if(renderFrame!==null)return;renderFrame=requestAnimationFrame(()=>{renderFrame=null;if(bridge().getState()===s)bridge().render();});
   }
   function previewPoint(card){
-    const height=Math.min(innerHeight*.5,300),standard=['wild','wild4','wild6','dist','rotate'].includes(card?.type);
-    return{x:innerWidth/2,y:innerHeight*.46,width:height*(standard?400:420)/850,height,angle:0};
+    const height=Math.min(innerHeight*.5,300);
+    return{x:innerWidth/2,y:innerHeight*.46,width:height*PanelinhaCards.ratio,height,angle:0};
   }
   function transform(start,p){return `translate(calc(-50% + ${p.x-start.x}px),calc(-50% + ${p.y-start.y}px)) rotate(${p.angle||0}deg) scale(${p.width/start.width},${p.height/start.height})`;}
   function curvedFrames(start,end,from,to,offset,duration,fade=false){
@@ -251,7 +250,7 @@
   function startFlight(item,s,progress=0){
     const {actor,id,card,eligible,duration,purchase}=item,detailed=actor===0;
     const start={x:item.x,y:item.y,width:item.width,height:item.height,angle:0};
-    if(detailed)start.height=start.width*850/(['wild','wild4','wild6','dist','rotate'].includes(card?.type)?400:420);
+    start.height=start.width*PanelinhaCards.aspect;
     const destination=PanelasMesa.incomingPoint(actor,card),preview=previewPoint(card);
     const landing=eligible?0:detailed?item.pace.landing:80,mainDuration=duration-landing;
     const n=sprite(card,detailed,start,'draw');Object.assign(n.dataset,{actor,cardId:id,presentation:detailed?'preview':'direct',duration,delay:item.delay,stage:'flight'});

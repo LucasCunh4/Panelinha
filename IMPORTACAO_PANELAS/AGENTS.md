@@ -1,9 +1,9 @@
 # AGENTS — Instruções ao agente no projeto PANELAS
 
 - Leia `documentacao/ESPECIFICACAO_COMPLETA.md` e `documentacao/ESTADO_ATUAL_E_PROXIMOS_PASSOS.md` antes de alterar lógica.
-- Preserve o código jogável local no `index.html`, as 52 cartas na pasta `assets/cartas/` e o modo de teste 1 humano + 3 bots.
+- Preserve o código jogável local no `index.html`, os 23 PNGs aprovados na pasta `assets/cartas/` (52 combinações em camadas, cinco especiais e verso) e o modo de teste 1 humano + 3 bots.
 - **Não** implementar modo power-ups sem definição do usuário.
-- As cartas V3 existentes são apenas **ilustrações temporárias**. Os defeitos visuais conhecidos foram registrados, não tentar consertar com recortes de prancha sem autorização.
+- Atualização aprovada: artes 470×800, borda externa 25 px, total 520×850. Use `cartas.js`/`cartas.css` e `MANIFESTO_CARTAS_470X800.json`; nunca restaure PNGs, ZIPs, sprites ou fallback das cartas substituídas.
 - Não substituir as regras personalizadas pelas regras oficiais do UNO.
 - Validar comportamento com testes, em especial penalidades acumuladas obrigatórias, corte numa jogada separada, bot, Panela de Pressão com redução sorteada de 1–3 (mínimo 1), demais com diferença máxima 2 e autor isento ao bater e soma de pontos.
 - Corrigir a exibição de PNGs rodando o app sob servidor HTTP, não presumir acesso a `file://` no Android.
@@ -14,7 +14,7 @@
 
 - Tela inicial e navegação ficam em `menu.css` / `navegacao.js`; reutilize `#menu` e preserve o motor. Telas Criar/Entrar são preparação visual, sem backend/códigos fictícios. Voltar deve confirmar saída de partida ativa e respeitar a hierarquia, inclusive no Android.
 - A identificação em `perfil.js` fica entre Início e Configurações/Multiplayer. Nome/avatar locais usam `panelinha.player.v1`; escape nomes em HTML, preserve os bots e não apague outras chaves. O APK usa `sensorLandscape` e categoria `game`, com imersão permanente. `wild6` é opcional, ativada por padrão, aplicada somente em novas partidas. O brilho de compra usa disponibilidade real de cartas/desafio, e o crescimento da mão não sinaliza corte fora do turno como turno normal.
-- Verso e frente da Panela usam somente `assets/padronizadas/*_400x850.png`, com `MANIFESTO_PADRAO_400X850.json`. Não restaurar as duas versões antigas de `assets/especiais/`; as outras 11 imagens especiais permanecem. Reutilizar os componentes e `contain`, sem cortar, esticar, adicionar bordas ou alterar as demais artes.
+- Todas as frentes, versos e animações usam `PanelinhaCards`. Normais: fundo + símbolo, sem texto desenhado; especiais completas sem overlays de arte. Seletor usa a carta completa nova e zonas interativas, sem ingredientes ou bases antigas. Dimensões vêm de `PanelinhaCards.geometry`; arte integral dentro da moldura externa, branca nas normais/verso e dourada nas especiais.
 
 - Panela de Pressão (`dist`) nunca abre seletor nem escolhe cor; conserva a cor ativa e resolve redistribuição própria. Somente Coringa/+4/+6 usam `COLOR_CHOOSERS` e o seletor de ingredientes. A classificação de incolores é separada da escolha de cor.
 

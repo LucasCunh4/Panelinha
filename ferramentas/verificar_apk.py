@@ -1,4 +1,4 @@
-"""Verifica o APK real: assinatura fixa, metadados e cópia exata do jogo/52 PNGs."""
+"""Verifica o APK real: assinatura fixa, metadados e cópia exata do jogo/23 PNGs e 52 combinações."""
 import hashlib
 import json
 import os
@@ -37,49 +37,25 @@ if os.environ.get('PANELINHA_VERSION_CODE'):
     assert package[2] == os.environ['PANELINHA_VERSION_CODE'], 'versionCode divergente'
 if os.environ.get('PANELINHA_VERSION_NAME'):
     assert package[3] == os.environ['PANELINHA_VERSION_NAME'], 'versionName divergente'
-manifest = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_52_PNG.json').read_text())
+manifest = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_CARTAS_470X800.json').read_text())
 with zipfile.ZipFile(apk) as archive:
     prefix = 'assets/public/'
     pngs = [p for p in archive.namelist() if p.startswith(prefix + 'assets/cartas/') and p.endswith('.png')]
-    assert len(pngs) == 52, f'Quantidade incorreta no APK: {len(pngs)}'
-    for entry in manifest['files']:
-        assert hashlib.sha256(archive.read(prefix + entry['path'])).hexdigest() == entry['sha256'], entry['path']
+    expected_pngs = sorted(prefix+a['path'] for a in manifest['assets'])
+    assert sorted(pngs) == expected_pngs and len(pngs) == 23, 'Devem existir somente os 23 novos PNGs de cartas'
+    assert manifest['normalCombinations'] == 52
+    for entry in manifest['assets']:
+        data = archive.read(prefix + entry['path'])
+        assert len(data) == entry['bytes'] and hashlib.sha256(data).hexdigest() == entry['sha256'], entry['path']
+        assert data[:8] == b'\x89PNG\r\n\x1a\n' and struct.unpack('>II', data[16:24]) == (470,800) and data[25] == 6, 'PNG deve ser RGBA 470x800'
+    for retired in ['assets/especiais/', 'assets/padronizadas/', 'assets/cartas_mais4_mais6/']:
+        assert not any(n.startswith(prefix+retired) for n in archive.namelist()), 'Artes substituídas no APK: '+retired
     mesa = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_MESA_V1.json').read_text())
     for entry in mesa['asset_files']:
         assert hashlib.sha256(archive.read(prefix + entry['path'])).hexdigest() == entry['sha256'], entry['path']
     menu = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_MENU_V1.json').read_text())
     for entry in menu['assets']:
         assert hashlib.sha256(archive.read(prefix + entry['path'])).hexdigest() == entry['sha256'], entry['path']
-    especiais = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_ESPECIAIS_V1.json').read_text())
-    assert len(especiais['assets']) == 11
-    for entry in especiais['assets']:
-        assert hashlib.sha256(archive.read(prefix + entry['path'])).hexdigest() == entry['sha256'], entry['path']
-    penalidades = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_MAIS4_MAIS6.json').read_text())
-    assert len(penalidades['assets']) == 22
-    for entry in penalidades['assets']:
-        data = archive.read(prefix + entry['path'])
-        assert hashlib.sha256(data).hexdigest() == entry['sha256'], entry['path']
-        assert data[:8] == b'\x89PNG\r\n\x1a\n' and struct.unpack('>II', data[16:24]) == (entry['width'],entry['height']) and data[25] == 6, 'PNG +4/+6 deve ter dimensões do manifesto e RGBA'
-    interacao = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_INTERACAO_V2.json').read_text())
-    assert len(interacao['assets']) == 2
-    for entry in interacao['assets']:
-        assert hashlib.sha256(archive.read(prefix + entry['path'])).hexdigest() == entry['sha256'], entry['path']
-    padrao = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_PADRAO_400X850.json').read_text())
-    assert len(padrao['assets']) == 2
-    for entry in padrao['assets']:
-        data = archive.read(prefix + entry['path'])
-        assert hashlib.sha256(data).hexdigest() == entry['sha256'], entry['path']
-        assert data[:8] == b'\x89PNG\r\n\x1a\n' and struct.unpack('>II', data[16:24]) == (400,850) and data[25] == 6, 'PNG padronizado deve ser RGBA 400x850'
-    liquidificador = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_LIQUIDIFICADOR.json').read_text())
-    assert len(liquidificador['assets']) == 1
-    for entry in liquidificador['assets']:
-        data = archive.read(prefix + entry['path'])
-        assert hashlib.sha256(data).hexdigest() == entry['sha256'], entry['path']
-        assert data[:8] == b'\x89PNG\r\n\x1a\n' and struct.unpack('>II', data[16:24]) == (400,850) and data[25] == 6, 'Liquidificador deve ser RGBA 400x850'
-    for old in especiais['supersededAssets']['paths']:
-        assert prefix + old not in archive.namelist(), f'Arte substituída ainda empacotada: {old}'
-    for old in penalidades['supersededAssets']['paths']:
-        assert prefix+old not in archive.namelist(), f'Arte +4/+6 antiga ainda empacotada: {old}'
     visual_sound = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_VISUAL_SONORO.json').read_text())
     assert len(visual_sound['assets']) == 69
     for entry in visual_sound['assets']:
@@ -87,7 +63,7 @@ with zipfile.ZipFile(apk) as archive:
         assert len(data) == entry['bytes'] and hashlib.sha256(data).hexdigest() == entry['sha256'], entry['path']
         if 'width' in entry:
             assert struct.unpack('>II', data[16:24]) == (entry['width'], entry['height']), entry['path']
-    for name in ['podio.js', 'podio.css', 'partida-ui.js', 'partida-ui.css', 'efeitos-mesa.js', 'efeitos-mesa.css', 'online.js', 'online.css', 'motor.js', 'multiplayer-config.js', 'multiplayer-connection.js', 'multiplayer.js', 'multiplayer.css', 'menu-arte.js', 'menu-arte.css', 'sons.js', 'sons.css', 'anuncios.js', 'anuncios.css', 'seletores.js', 'seletores.css', 'perfil.js', 'escolher-cor.js', 'escolher-cor.css', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js']:
+    for name in ['cartas.js', 'cartas.css', 'podio.js', 'podio.css', 'partida-ui.js', 'partida-ui.css', 'efeitos-mesa.js', 'efeitos-mesa.css', 'online.js', 'online.css', 'motor.js', 'multiplayer-config.js', 'multiplayer-connection.js', 'multiplayer.js', 'multiplayer.css', 'menu-arte.js', 'menu-arte.css', 'sons.js', 'sons.css', 'anuncios.js', 'anuncios.css', 'seletores.js', 'seletores.css', 'perfil.js', 'escolher-cor.js', 'escolher-cor.css', 'mesa.css', 'mesa.js', 'menu.css', 'navegacao.js']:
         assert archive.read(prefix + name) == (root / 'IMPORTACAO_PANELAS' / name).read_bytes(), f'Jogo alterado no APK: {name}'
     original_html = (root / 'IMPORTACAO_PANELAS/index.html').read_bytes()
     has_compat = prefix + 'android-compat.js' in archive.namelist()
@@ -106,8 +82,8 @@ info = {
     'file': apk.name, 'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
     'applicationId': package[1], 'versionCode': int(package[2]), 'versionName': package[3],
     'certificateSha256': match[1].lower(), 'pngsVerified': len(pngs), 'origin': identity['origin'], 'androidCompat': has_compat,
-    'orientation': 'sensorLandscape', 'appCategory': 'game', 'signingGeneration': identity.get('signingGeneration', 1), 'mesaAssetsVerified': len(mesa['asset_files']), 'menuAssetsVerified': len(menu['assets']), 'specialAssetsVerified': len(especiais['assets']), 'penaltyAssetsVerified': len(penalidades['assets']), 'standardCardAssetsVerified': len(padrao['assets']), 'interactiveBasesVerified': len(interacao['assets']), 'blenderAssetsVerified': len(liquidificador['assets']),
+    'orientation': 'sensorLandscape', 'appCategory': 'game', 'signingGeneration': identity.get('signingGeneration', 1), 'mesaAssetsVerified': len(mesa['asset_files']), 'menuAssetsVerified': len(menu['assets']), 'cardAssetsVerified': len(manifest['assets']), 'normalCombinations': manifest['normalCombinations'], 'cardGeometry': manifest['reference'],
 }
 apk.with_suffix('.json').write_text(json.dumps(info, indent=2) + '\n')
 print(json.dumps(info, indent=2))
-print('OK: APK assinado, identidade fixa e 52 PNGs/jogo originais empacotados.')
+print('OK: APK assinado, identidade fixa e 23 PNGs oficiais/52 combinações e jogo empacotados.')

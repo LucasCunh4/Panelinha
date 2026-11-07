@@ -79,7 +79,7 @@
     displayed.forEach((card,i)=>{
       const view=show?format(card,true):'back';let node=record.cards.get(card.id);
       if(!node||node._cardView!==view){
-        const holder=document.createElement('div');holder.innerHTML=show?view:'<span class="hidden-card"></span>';
+        const holder=document.createElement('div');holder.innerHTML=show?view:PanelinhaCards.html(null,{classes:'hidden-card',label:'Carta virada para baixo'});
         changed=true;const next=holder.firstElementChild;next.dataset.handCard=String(card.id);next._cardView=view;
         if(node)node.replaceWith(next);node=next;record.cards.set(card.id,node);
       }
@@ -284,7 +284,7 @@
           <feComposite in="light" in2="outline" operator="in" result="edge"/>
           <feMerge result="lit"><feMergeNode in="glow"/><feMergeNode in="edge"/></feMerge>
           <feComposite in="lit" in2="clearance" operator="out"/>
-        </filter></defs><g filter="url(#pileAuraFilter)">${layers.map(()=>'<image href="assets/padronizadas/verso_oficial_400x850.png" preserveAspectRatio="xMidYMid meet"/>').join('')}</g></svg>`);
+        </filter></defs><g filter="url(#pileAuraFilter)">${layers.map(()=>'<rect fill="white"/>').join('')}</g></svg>`);
       aura=$('pileAura');pileAuraSize='';
     }
     const parent=button.getBoundingClientRect();
@@ -300,9 +300,10 @@
     aura.style.cssText=`left:${offsetX-pad}px;top:${offsetY-pad}px;width:${w+pad*2}px;height:${h+pad*2}px`;
     const filter=$('pileAuraFilter');
     for(const [name,value] of Object.entries({x:-pad,y:-pad,width:w+pad*2,height:h+pad*2}))filter.setAttribute(name,value);
-    aura.querySelectorAll('image').forEach((image,i)=>{
+    aura.querySelectorAll('g>rect').forEach((image,i)=>{
       const {filter,...rect}=geometry[i];
       for(const [name,value] of Object.entries(rect))image.setAttribute(name,value);
+      image.setAttribute('rx',rect.width*PanelinhaCards.geometry.radius/PanelinhaCards.geometry.width);
       image.style.filter=filter;
     });
   }
@@ -461,9 +462,9 @@
     if(!target||reducedMotion.matches||typeof target.animate!=='function')return;
     const card=target.querySelector('.card'),r=card.getBoundingClientRect();
     if(!r.width||!r.height||!play.width||!play.height)return;
-    if(card.dataset.cardType==='wild')play.height=play.width*850/400;
+    play.height=play.width*PanelinhaCards.aspect;
     const tx=r.x+r.width/2,ty=r.y+r.height/2;
-    const dx=tx-play.x,dy=ty-play.y,sx=card.offsetWidth/play.width,sy=card.dataset.cardType==='wild'?sx:card.offsetHeight/play.height;
+    const dx=tx-play.x,dy=ty-play.y,sx=card.offsetWidth/play.width,sy=sx;
     const key=Number(target.dataset.visualKey),angle=rotation(target),arc=Math.min(46,Math.hypot(dx,dy)*.12),duration=540;
     const sprite=document.createElement('div');sprite.className='played-card flying-card';
     Object.assign(sprite.style,{left:`${play.x-play.width/2}px`,top:`${play.y-play.height/2}px`,width:`${play.width}px`,height:`${play.height}px`});
@@ -702,7 +703,7 @@
     }
     previous = { state, round:state.round, direction:state.direction };
 
-    if(!$('pile').children.length)$('pile').innerHTML = Array.from({length:5},(_,i)=>`<span class="pile-layer deck-back" aria-hidden="true" style="--depth:${5-i}"></span>`).join('')+'<div class="card deck-back"></div>';
+    if(!$('pile').children.length)$('pile').innerHTML = Array.from({length:6},(_,i)=>PanelinhaCards.html(null,{classes:i<5?'pile-layer deck-back':'deck-back',depth:5-i,label:'Monte de compra'})).join('');
     attr($('pile'),'aria-label','Monte de compra');
     layoutPileAura();
     document.querySelector('.draw-stack .stack-label').textContent = state.lastPenaltyPurchase&&Date.now()<(state.presentationUntil||0)?`COMPRANDO ${state.lastPenaltyPurchase.count}`:state.penalty ? `COMPRAR +${state.penalty}` : 'COMPRAR';

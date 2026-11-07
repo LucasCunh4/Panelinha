@@ -1,0 +1,14 @@
+const {chromium}=require('playwright'),assert=require('node:assert/strict');
+(async()=>{const b=await chromium.launch({executablePath:'/usr/bin/chromium',args:['--no-sandbox']});try{
+ const p=await b.newPage({viewport:{width:844,height:390}});await p.goto('http://127.0.0.1:8000');await p.locator('#singlePlayerBtn').click();await p.locator('#profileContinueBtn').click();await p.locator('#startBtn').click();await p.waitForTimeout(600);
+ await p.evaluate(()=>{const s=CartasTest.getState();PanelinhaTableBridge.setOnline(s);s.round++;Object.assign(s,{phase:'playing',current:0,activeColor:'red',penalty:0,highest:0,unlockAt:0,presentationUntil:0,drawn:null,cutOpen:false,finisher:null,pendingAction:null,lastDistribution:null,lastRotation:null,lastPenaltyPurchase:null});s.o.timeout=0;s.players[0].hand=[{id:99000,type:'num',color:'blue',num:1}];s.discard=[{id:99999,type:'num',color:'red',num:7}];PanelinhaTableBridge.render()});
+ const gaps=await p.evaluate(async()=>{
+  const source=document.getElementById('pileAura'),copy=source.cloneNode(true),w=parseFloat(source.style.width),h=parseFloat(source.style.height),factor=4;
+  copy.removeAttribute('style');copy.setAttribute('xmlns','http://www.w3.org/2000/svg');copy.setAttribute('width',w);copy.setAttribute('height',h);
+  const render=async svg=>{const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)],{type:'image/svg+xml'}));try{const image=new Image();image.src=url;await image.decode();const c=document.createElement('canvas');c.width=Math.ceil(w*factor);c.height=Math.ceil(h*factor);const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(image,0,0,c.width,c.height);return{data:ctx.getImageData(0,0,c.width,c.height).data,w:c.width,h:c.height}}finally{URL.revokeObjectURL(url)}};
+  const halo=await render(copy);copy.querySelector('g').removeAttribute('filter');const ref=await render(copy),alpha=(r,x,y)=>r.data[(y*r.w+x)*4+3],cx=Math.floor(ref.w/2),cy=Math.floor(ref.h/2);
+  const edge=(vertical,sign)=>{const len=vertical?ref.h:ref.w,start=sign<0?0:len-1,step=sign<0?1:-1;let at=start;while(at>=0&&at<len&&(vertical?alpha(ref,cx,at):alpha(ref,at,cy))<8)at+=step;let pixel=at;while(pixel>=0&&pixel<len&&(vertical?alpha(halo,cx,pixel):alpha(halo,pixel,cy))<8)pixel-=step;return Math.abs(pixel-at)/factor};
+  let overlap=0;for(let y=0;y<ref.h;y++)for(let x=0;x<ref.w;x++)if(alpha(ref,x,y)>8&&alpha(halo,x,y)>8)overlap++;
+  return{distance:[edge(true,-1),edge(true,1),edge(false,-1),edge(false,1)],overlap};
+ });assert.equal(gaps.overlap,0);assert.ok(gaps.distance.every(n=>n>=4.25&&n<=6.5),JSON.stringify(gaps));assert.ok(Math.max(...gaps.distance)-Math.min(...gaps.distance)<=.75,JSON.stringify(gaps));console.log('PASS halo na intensidade máxima sem contato com as seis molduras; afastamento simétrico: '+JSON.stringify(gaps));
+}finally{await b.close()}})().catch(e=>{console.error(e);process.exitCode=1});
