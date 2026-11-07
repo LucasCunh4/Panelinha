@@ -44,4 +44,14 @@ Comparação com a base confirmou os 19 PNGs de números/símbolos/especiais/ver
 
 Não há service worker/precache/CacheStorage no cliente atual. `PanelinhaCards` mantém cache de imagens em memória por caminho; os quatro caminhos novos impedem reutilização dos PNGs anteriores em uma página atualizada. Build reconstrói dist e cópia do Capacitor foi renovada, sem fundos antigos. Nenhuma limpeza dos dados locais do usuário.
 
-APK/publicação final serão verificados após registrar o código. Emulador e aparelho Android físico não utilizados; testes nativos de instalação/atualização/persistência não são declarados aprovados.
+## Publicação e APK final
+
+Versão web publicada no Worker existente (`11a618eb-6034-410a-acea-0636a6ed88d8`). `cartas.js` e os quatro fundos publicados conferidos byte a byte com o build; os quatro caminhos antigos já não servem PNGs. Cache-Control confirmado `public, max-age=0, must-revalidate`, com ETags atuais; nomes novos das imagens impedem reutilização dos fundos antigos. `/health` confirmou Fase 3 ativa, sem alterar servidor, bindings/configuração ou criar sala pública.
+
+[APK direto 0.2.53/c7302](https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.53/Panelinha-Teste-v0.2.53-c7302.apk), 68.794.461 bytes, HTTP 200.
+
+[Workflow 42418210937](https://github.com/LucasCunh4/Panelinha/actions/runs/42418210937): aprovado, execução 53, fonte `7493f86dc5f556529fe2fa02ad266cde78c821ec`. Um único APK compilado/assinado, emulador ignorado por opção.
+
+Verificador `ferramentas/verificar_apk.py` executado também sobre o APK real baixado da Release: aprovado. SHA-256 `bf8456f05907509ca1f6412a5a1ff0da7f00d79876d0334c2b5f1c1258a62736`. Metadados regenerados idênticos ao CI: 23 PNGs, 52 combinações, quatro fundos novos RGB, demais recursos e código web conferidos, sem fundos substituídos. Mesma geometria, pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`, certificado registrado em `android-identity.json` e geração 2 da versão anterior; assinatura v2 e sensorLandscape confirmados. Código 7302 > 7202, compatível com atualização direta. Nenhuma chave/Secret criado ou alterado.
+
+Emulador e aparelho Android físico não utilizados; instalação, atualização e preservação efetiva de dados em dispositivo não foram executadas. Não são declaradas aprovadas.
