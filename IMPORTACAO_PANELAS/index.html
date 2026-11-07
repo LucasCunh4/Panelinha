@@ -131,13 +131,6 @@
           </div>
           <svg id="stoveDirection" class="stove-direction" viewBox="0 0 490 490" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <defs>
-              <linearGradient id="cometGold" gradientUnits="userSpaceOnUse">
-                <stop offset="0" stop-color="#c77e19" stop-opacity="0"/>
-                <stop offset=".35" stop-color="#e6a82e" stop-opacity=".18"/>
-                <stop offset=".7" stop-color="#ffd673" stop-opacity=".65"/>
-                <stop offset="1" stop-color="#fff1bc" stop-opacity="1"/>
-              </linearGradient>
-              <linearGradient id="cometWhite" gradientUnits="userSpaceOnUse"><stop stop-color="#fff3c2" stop-opacity="0"/><stop offset=".55" stop-color="#ffe9ae" stop-opacity=".25"/><stop offset="1" stop-color="#fffef2" stop-opacity="1"/></linearGradient>
               <radialGradient id="cometHalo"><stop stop-color="#fff7d7" stop-opacity=".85"/><stop offset="1" stop-color="#f6c35c" stop-opacity="0"/></radialGradient>
               <filter id="cometGlow" filterUnits="userSpaceOnUse" x="-20" y="-20" width="530" height="530"><feGaussianBlur stdDeviation="3"/></filter>
             </defs>
@@ -357,7 +350,7 @@ function colorForPlay(card,hand){return rules.colorForPlay(card,hand);}
 function bestColor(cards){return rules.bestColor(cards);}
 function clickHandCard(cardId){
   if(!s||s.phase!=='playing')return;
-  if(s.current!==0){s.message='Fora do seu turno, toque na carta com o balão de faca quando aparecer.';render();return;}
+  if(!checkCards(0,[cardId],s.current!==0)){s.message=s.penalty?penaltyText():'Carta inválida para esta jogada.';render();return;}
   chooseCards(0,[cardId]);
 }
 function cutHuman(){
@@ -388,9 +381,9 @@ $('hand').innerHTML=cards.map(c=>{
   const enabled=checkCards(0,[c.id],false);
   const cutting=cutCard?.id===c.id;
   const reason=c.type==='dist'&&!canDistribute(c)?'Panela de Pressão indisponível: não há outro destinatário para receber a redução ou penalidade.':(cutting?'Cortar':enabled?'Jogar':'Indisponível')+' '+description(c);
-  return `<button type="button" ${cutting?'id="cutBtn" class="cut-eligible"':''} style="border:0;background:none;padding:0" data-card="${c.id}" data-hand-color="${c.color||'wild'}" aria-label="${reason}" title="${reason}" ${enabled||cutting?'':'disabled'}>${cardHTML(c,false,false,!(enabled||cutting))}${cutting?'<span class="cut-bubble"><img src="assets/mesa/corte_faca_balao.png" alt="CORTAR" draggable="false"></span>':''}</button>`;
+  return `<button type="button" ${cutting?'id="cutBtn" class="cut-eligible"':''} style="border:0;background:none;padding:0" data-card="${c.id}" data-hand-color="${c.color||'wild'}" aria-label="${reason}" title="${reason}" data-rule-disabled="${!(enabled||cutting)}">${cardHTML(c,false,false,!(enabled||cutting))}${cutting?'<span class="cut-bubble"><img src="assets/mesa/corte_faca_balao.png" alt="CORTAR" draggable="false"></span>':''}</button>`;
 }).join('');
-$('hand').querySelectorAll('[data-card]').forEach(b=>b.onclick=()=>b.id==='cutBtn'?cutHuman():clickHandCard(Number(b.dataset.card)));
+$('hand').querySelectorAll('[data-card]').forEach(b=>b.onclick=()=>clickHandCard(Number(b.dataset.card)));
 if(s.phase!=='playing'){
   $('controls').innerHTML=finishControlHTML();
   $('nextRound')?.addEventListener('click',newRound);$('newMatch')?.addEventListener('click',startMatch);$('backLobby')?.addEventListener('click',backToMenu);

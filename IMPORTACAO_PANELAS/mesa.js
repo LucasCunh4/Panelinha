@@ -90,6 +90,27 @@
 
   // Organização visual: os botões permanecem filhos do mesmo leque e conservam IDs.
   let expandedColor=null,handPinned=false,hoverTimer=null,leaveTimer=null,handOwner=null,handRound=null,handScrollFrame=null,handLayoutVersion=0;
+  let pickedCard=null,selectionOwner=null,selectionKey=null,restoreHandFocus=null,handGesture=null;
+  function handInteractionReady(state=$state()){
+    return !!state&&state.phase==='playing'&&!state.paused&&!state.pendingAction&&Date.now()>=(state.presentationUntil||0)&&
+      (!state.online||!!window.PanelinhaOnline?.connected&&!state.players[0].substituted);
+  }
+  function $state(){return window.PanelinhaTableBridge?.getState();}
+  function paintHandSelection(){
+    for(const card of $('hand').children){const picked=card.dataset.card===pickedCard;card.classList.toggle('hand-picked',picked);card.setAttribute('aria-pressed',String(picked));}
+  }
+  function clearHandSelection(){pickedCard=null;paintHandSelection();}
+  function handPointer(type){
+    const hand=$('hand');if(hand.dataset.pointer!==type){hand.dataset.pointer=type;if(type!=='touch'){clearHandSelection();handPinned=false;}}
+  }
+  function rememberHand(state){
+    const hand=$('hand'),focus=document.activeElement;
+    restoreHandFocus=hand.contains(focus)&&focus.matches(':focus-visible')?{id:focus.dataset.card,index:[...hand.children].indexOf(focus)}:null;
+    const key=JSON.stringify([state.round,state.token,state.current,state.phase,state.activeColor,state.penalty,state.blockedPlayer,state.paused,state.pendingAction?.cardId,state.presentationUntil,state.lastDistribution?.serial,state.lastRotation?.serial,state.players[0].hand.map(c=>c.id)]);
+    // Mantém a geometria antiga até capturar a origem da animação de descarte.
+    if(selectionOwner!==state||selectionKey!==key||!handInteractionReady(state))pickedCard=null;
+    selectionOwner=state;selectionKey=key;
+  }
   function cancelHandTimers(){cancelAnimationFrame(handScrollFrame);clearTimeout(hoverTimer);clearTimeout(leaveTimer);hoverTimer=leaveTimer=null;}
   function layoutHand(savedScroll,instant=true,focusId=null){
     cancelAnimationFrame(handScrollFrame);const version=++handLayoutVersion;
@@ -121,8 +142,8 @@
     cards.forEach((card,i)=>{
       if(card.dataset.ruleDisabled===undefined){card.dataset.ruleDisabled=String(card.disabled);card.dataset.ruleLabel=card.getAttribute('aria-label')||'';}
       const selected=compact&&card.dataset.handColor===expandedColor;
-      card.disabled=compact?false:card.dataset.ruleDisabled==='true';
-      card.setAttribute('aria-disabled',String(selected&&handPinned?card.dataset.ruleDisabled==='true':!compact&&card.disabled));
+      card.disabled=!handInteractionReady();
+      card.setAttribute('aria-disabled',String(card.disabled||card.dataset.ruleDisabled==='true'));
       card.setAttribute('aria-label',compact&&!selected?`${card.dataset.ruleLabel} · Expandir ${colorNames[card.dataset.handColor]||'cartas sem cor fixa'}`:card.dataset.ruleLabel);
       card.classList.toggle('group-expanded',selected);
       card.style.marginLeft=i?`${steps[i]-width}px`:'0px';
@@ -148,7 +169,7 @@
       Promise.all(cards.flatMap(c=>c.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})))).then(()=>{if(version===handLayoutVersion){cancelAnimationFrame(handScrollFrame);align();}});
     }
     handLayout={count:n,overflow,compact,color:expandedColor};
-    hand.setAttribute('aria-label',compact?'Suas cartas em um leque contínuo. Toque uma cor para expandir e depois escolha a carta. Deslize a mão se necessário.':'Suas cartas');
+    hand.setAttribute('aria-label',(compact?'Suas cartas em um leque contínuo. Deslize a mão se necessário. ':'Suas cartas. ')+'No toque: selecione e toque novamente para jogar. Com mouse ou teclado: ative uma vez.');
     if(instant){hand.getBoundingClientRect();requestAnimationFrame(()=>hand.classList.remove('layout-instant'));}
     followTurnCue(!instant);
   }
@@ -159,19 +180,34 @@
     cancelHandTimers();if(!expandedColor)return;expandedColor=null;handPinned=false;layoutHand(undefined,false);
   }
   const hand=$('hand');
-  hand.addEventListener('click',event=>{
-    if(!hand.classList.contains('grouped-hand'))return;
-    const card=event.target.closest('[data-card]');if(!card){closeHandGroup();return;}
-    // A faca continua acessível de imediato, inclusive durante a janela de corte.
-    if(event.target.closest('.cut-bubble'))return;
-    if(expandedColor!==card.dataset.handColor||!handPinned){
-      event.preventDefault();event.stopImmediatePropagation();openHandGroup(card.dataset.handColor,true,card.dataset.card);return;
-    }
-    if(card.dataset.ruleDisabled==='true'){event.preventDefault();event.stopImmediatePropagation();$('message').textContent='Esta carta não pode ser jogada agora.';}
+  const stopHandClick=event=>{event.preventDefault();event.stopImmediatePropagation();};
+  hand.addEventListener('pointerdown',event=>{
+    const type=event.pointerType==='touch'||event.pointerType==='pen'?'touch':'mouse';handPointer(type);clearTimeout(hoverTimer);
+    handGesture={pointerId:event.pointerId,type,x:event.clientX,y:event.clientY,scroll:hand.scrollLeft,moved:false};
   },true);
+  hand.addEventListener('pointermove',event=>{
+    if(handGesture?.pointerId===event.pointerId&&Math.hypot(event.clientX-handGesture.x,event.clientY-handGesture.y)>9){handGesture.moved=true;clearHandSelection();}
+  },{passive:true});
+  hand.addEventListener('pointercancel',()=>{if(handGesture)handGesture.moved=true;clearHandSelection();});
+  hand.addEventListener('scroll',()=>{if(handGesture&&Math.abs(hand.scrollLeft-handGesture.scroll)>4)handGesture.moved=true;},{passive:true});
+  hand.addEventListener('click',event=>{
+    const card=event.target.closest('[data-card]'),gesture=handGesture;handGesture=null;
+    if(!card){clearHandSelection();closeHandGroup();return;}
+    if(gesture?.moved||!handInteractionReady()||PanelinhaTableEffects.drawing(Number(card.dataset.card))){stopHandClick(event);return;}
+    // Usa a origem do evento, não maxTouchPoints: mouse continua com um clique em híbridos.
+    const pointer=event.pointerType,type=pointer?(pointer==='mouse'?'mouse':'touch'):event.detail===0?'keyboard':event.sourceCapabilities?.firesTouchEvents?'touch':gesture?.type||'mouse';
+    handPointer(type);
+    if(type==='touch'&&pickedCard!==card.dataset.card){
+      stopHandClick(event);pickedCard=card.dataset.card;
+      if(hand.classList.contains('grouped-hand')&&expandedColor!==card.dataset.handColor)openHandGroup(card.dataset.handColor,true,pickedCard);
+      paintHandSelection();
+    }
+    // Segundo toque, mouse e teclado seguem para o mesmo comando validado pelo motor.
+  },true);
+  hand.addEventListener('pointerover',event=>{if(event.pointerType==='mouse')handPointer('mouse');});
   let lastPointer=null;
   hand.addEventListener('pointermove',event=>{
-    if(event.pointerType!=='mouse'||event.buttons||!matchMedia('(hover:hover)').matches||!hand.classList.contains('grouped-hand'))return;
+    if(event.pointerType!=='mouse'||event.buttons||!hand.classList.contains('grouped-hand'))return;
     if(lastPointer&&Math.hypot(event.clientX-lastPointer.x,event.clientY-lastPointer.y)<5)return;
     lastPointer={x:event.clientX,y:event.clientY};
     clearTimeout(leaveTimer);clearTimeout(hoverTimer);const card=event.target.closest('[data-card]');
@@ -183,9 +219,22 @@
   hand.addEventListener('pointerleave',()=>{
     clearTimeout(hoverTimer);if(!handPinned)leaveTimer=setTimeout(()=>closeHandGroup(),500);
   });
-  document.addEventListener('pointerdown',event=>{if(!hand.contains(event.target))closeHandGroup()},true);
-  document.addEventListener('click',event=>{if(!hand.contains(event.target))closeHandGroup()},true);
-  hand.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();closeHandGroup()}});
+  document.addEventListener('pointerdown',event=>{if(!hand.contains(event.target)){handGesture=null;clearHandSelection();closeHandGroup()}},true);
+  document.addEventListener('click',event=>{if(!hand.contains(event.target)){clearHandSelection();closeHandGroup()}},true);
+  hand.addEventListener('focusin',event=>{
+    const card=event.target.closest('[data-card]');if(!card||!card.matches(':focus-visible'))return;
+    handPointer('keyboard');if(hand.classList.contains('grouped-hand')&&expandedColor!==card.dataset.handColor)openHandGroup(card.dataset.handColor,true,card.dataset.card);
+  });
+  hand.addEventListener('keydown',event=>{
+    handGesture=null;handPointer('keyboard');
+    if(event.key==='Escape'){event.preventDefault();clearHandSelection();closeHandGroup();return;}
+    const cards=[...hand.children].filter(c=>!c.disabled),index=cards.indexOf(event.target.closest('[data-card]'));
+    if(index<0||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+    event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?cards.length-1:Math.max(0,Math.min(cards.length-1,index+(event.key==='ArrowRight'?1:-1))),card=cards[next];
+    if(hand.classList.contains('grouped-hand')&&expandedColor!==card.dataset.handColor)openHandGroup(card.dataset.handColor,true,card.dataset.card);
+    card.focus({preventScroll:true});
+    const r=card.getBoundingClientRect(),h=hand.getBoundingClientRect();if(r.left<h.left+8)hand.scrollLeft-=h.left+8-r.left;else if(r.right>h.right-8)hand.scrollLeft+=r.right-h.right+8;
+  });
   function fan(container,largeAt,savedScroll){
     if(container.id==='hand'){layoutHand(savedScroll);return;}
     const cards=[...container.children],n=cards.length;if(!n)return;
@@ -378,6 +427,7 @@
 
   // Chamado antes de o render existente substituir a mão: lê geometria, não regras.
   function beforeRender(state) {
+    rememberHand(state);
     pendingPlay = null;
     const card = state.discard[state.discard.length - 1];
     if (!snapshot || snapshot.state !== state || snapshot.round !== state.round ||
@@ -439,7 +489,7 @@
   }
 
   // Um único relógio visual, independente dos timers do jogo. A direção vem do motor.
-  const COMET_PERIOD=3600,COMET_SPAN=.225,COMET_SAMPLES=512;
+  const COMET_PERIOD=3600,COMET_SPAN=.90,COMET_SAMPLES=512;
   let cometPoints=[],cometPhase=0,cometTravel=1,cometLastTime=null,cometFrame=null,cometActive=false;
   function cometPoint(phase){
     const position=((phase%1+1)%1)*COMET_SAMPLES,index=Math.floor(position),fraction=position-index;
@@ -450,12 +500,27 @@
     if(cometLastTime!==null&&!reducedMotion.matches&&!document.hidden)cometPhase=((cometPhase+(time-cometLastTime)/COMET_PERIOD*cometTravel)%1+1)%1;
     cometLastTime=time;
   }
+  let cometFade=null;
+  function createCometFade(){
+    const svg=$('stoveDirection'),defs=svg.querySelector('defs'),ns=svg.namespaceURI;
+    const node=(tag,attrs,parent)=>{const n=document.createElementNS(ns,tag);for(const [key,value]of Object.entries(attrs))n.setAttribute(key,value);parent.append(n);return n;};
+    const mask=node('mask',{id:'cometFade',maskUnits:'userSpaceOnUse',x:-20,y:-20,width:530,height:530,'mask-type':'luminance'},defs);
+    // Trechos locais: uma cauda quase completa não pode usar um gradiente entre
+    // duas pontas próximas, que apagaria o lado oposto da órbita.
+    const parts=Array.from({length:16},(_,i)=>{
+      const gradient=node('linearGradient',{id:'cometFade'+i,gradientUnits:'userSpaceOnUse'},defs);
+      for(const j of [0,1]){const value=Math.round(255*(i+j)/16);node('stop',{offset:j,'stop-color':`rgb(${value},${value},${value})`},gradient);}
+      const path=node('path',{fill:'none',stroke:`url(#cometFade${i})`,'stroke-width':44,'stroke-linejoin':'round'},mask);
+      return{gradient,path};
+    });
+    $('cometTail').setAttribute('mask','url(#cometFade)');return parts;
+  }
   function paintComet(){
     if(!cometPoints.length)return;
-    const head=cometPoint(cometPhase),tail=cometPoint(cometPhase-cometTravel*COMET_SPAN),near=cometPoint(cometPhase-cometTravel*.002);
+    const head=cometPoint(cometPhase),near=cometPoint(cometPhase-cometTravel*.002);
     // Fitas contínuas com largura crescente até a ponta; todas seguem a mesma órbita.
-    const points=Array.from({length:25},(_,i)=>{
-      const t=i/24,phase=cometPhase-cometTravel*COMET_SPAN*(1-t),p=cometPoint(phase),q=cometPoint(phase+cometTravel*.001);
+    const points=Array.from({length:97},(_,i)=>{
+      const t=i/96,phase=cometPhase-cometTravel*COMET_SPAN*(1-t),p=cometPoint(phase),q=cometPoint(phase+cometTravel*.001);
       const dx=q.x-p.x,dy=q.y-p.y,length=Math.hypot(dx,dy)||1;
       return{...p,t,nx:-dy/length,ny:dx/length};
     });
@@ -466,8 +531,13 @@
     $('cometTailGlow').setAttribute('d',ribbon(8.5,.85));
     $('cometTrail').setAttribute('d',ribbon(2.8,1.1));
     $('cometCore').setAttribute('d',ribbon(.85,1.6));
-    for(const id of ['cometGold','cometWhite'])for(const [key,value]of Object.entries({x1:tail.x,y1:tail.y,x2:head.x,y2:head.y}))$(id).setAttribute(key,value.toFixed(2));
-    for(const [id,index]of [['cometReflectionA',19],['cometReflectionB',22]]){const p=points[index];$(id).setAttribute('transform',`translate(${p.x.toFixed(2)} ${p.y.toFixed(2)})`);}
+    if(!cometFade)cometFade=createCometFade();
+    cometFade.forEach(({gradient,path},i)=>{
+      const part=points.slice(i*6,i*6+7),a=part[0],b=part.at(-1);
+      path.setAttribute('d',part.map((p,j)=>(j?'L':'M')+p.x.toFixed(2)+' '+p.y.toFixed(2)).join(' '));
+      for(const [key,value]of Object.entries({x1:a.x,y1:a.y,x2:b.x,y2:b.y}))gradient.setAttribute(key,value.toFixed(2));
+    });
+    for(const [id,index]of [['cometReflectionA',85],['cometReflectionB',92]]){const p=points[index];$(id).setAttribute('transform',`translate(${p.x.toFixed(2)} ${p.y.toFixed(2)})`);}
     const angle=Math.atan2(head.y-near.y,head.x-near.x)*180/Math.PI;
     $('cometHead').setAttribute('transform',`translate(${head.x.toFixed(3)} ${head.y.toFixed(3)}) rotate(${angle.toFixed(2)})`);
   }
@@ -650,6 +720,8 @@
       }
     }
     fan($('hand'), innerWidth < 360 ? 7 : 9, savedScroll);
+    paintHandSelection();
+    if(restoreHandFocus){const cards=[...$('hand').children],target=cards.find(c=>c.dataset.card===restoreHandFocus.id)||cards[Math.min(restoreHandFocus.index,cards.length-1)];if(target&&!target.disabled)target.focus({preventScroll:true});restoreHandFocus=null;}
     positionTurnCue();
     const top=state.discard[state.discard.length-1];
     displayedTop=top?.id ?? null;
@@ -683,5 +755,5 @@
     positionTurnCue();layoutOpponentNames();
   });
   nativeTable(false);
-  window.PanelasMesa = { handPoint,incomingPoint,takeDraws,maskCards,render, renderSeat, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {cancelAnimationFrame(namesLayoutFrame);for(const nameplate of opponentNames.values())nameplate.remove();opponentNames.clear();PanelinhaTableEffects.reset();cancelAnimationFrame(cueLayoutFrame);cueAnimation?.cancel();cueAnimation=null;cueOwner=null;cueRound=null;wasHumanTurn=false;$('turnCue').hidden=true;$('hand').classList.remove('human-turn');$('hand').dataset.turnScale='1';$('buyBtn').classList.remove('mandatory-buy');clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
+  window.PanelasMesa = { handPoint,incomingPoint,takeDraws,maskCards,render, renderSeat, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {pickedCard=null;selectionOwner=selectionKey=restoreHandFocus=handGesture=null;paintHandSelection();cancelAnimationFrame(namesLayoutFrame);for(const nameplate of opponentNames.values())nameplate.remove();opponentNames.clear();PanelinhaTableEffects.reset();cancelAnimationFrame(cueLayoutFrame);cueAnimation?.cancel();cueAnimation=null;cueOwner=null;cueRound=null;wasHumanTurn=false;$('turnCue').hidden=true;$('hand').classList.remove('human-turn');$('hand').dataset.turnScale='1';$('buyBtn').classList.remove('mandatory-buy');clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
 })();

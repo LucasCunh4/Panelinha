@@ -44,7 +44,7 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 ## 3. Jogada padrão, compra e liberdade de estratégia
 
 - Jogar carta de **mesma cor** ou **mesmo número** da carta no descarte, ou carta especial legal; a cor ativa escolhida por incolores deve ser respeitada quando não há penalidade acumulada.
-- Não há seleção múltipla. **Um toque na carta joga imediatamente.** Ao utilizar uma carta e possuir outra idêntica para corte, surge o comando sobre a carta correspondente; só então pode jogar a segunda separadamente.
+- Não há seleção múltipla. **No toque, o primeiro toque seleciona/levanta uma carta; o segundo na mesma carta tenta jogar. Com mouse, um clique; com teclado, Enter/Espaço.** Ao utilizar uma carta e possuir outra idêntica para corte, surge o comando sobre a carta correspondente; só então pode jogar a segunda separadamente.
 - Compra normal: pode comprar **uma** carta e jogá-la se desejar; pode **guardar** a carta comprada mesmo que seja válida e encerrar o turno. Também pode comprar voluntariamente mesmo tendo uma jogada na mão.
 - Compra infinita (opção do host): compra até obter uma carta jogável. Especial incolor comprada pode ser **guardada**, encerrando imediatamente a compra/turno sem jogar. Não obrigar uso de especiais que usuário decidiu segurar.
 - Quando não há cartas no monte, embaralhar **todas as cartas do descarte, exceto a carta superior**, formando novo monte.
@@ -142,7 +142,7 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 - Avatares: **panelas sem rostos**, com acessórios engraçados (óculos, coroas, chapéus etc.); conjuntos ilustrados para escolher; mostrar nome+avatar, sem chat/reações.
 - Orientação retrato e paisagem. Jogador local **embaixo**; parceiro em duplas **em cima**; adversários nas laterais; em individual restante dos 3 nas posições livres.
 - Mão própria em **leque** quando pequena e adaptada para rolagem horizontal quando grande. Cartas alheias pequenas viradas para baixo com quantidade visível. Mão do parceiro, em duplas, **aberta em tamanho menor**.
-- Toque direto na carta joga. No desktop, hover **eleva levemente** a carta. Corte deve aparecer **em cima da carta correspondente**, não em botão separado longe da mão. Pequena pausa real após cada descarte para corte; jogador da vez destacado por brilho/contorno no avatar.
+- No toque, selecionar e confirmar com segundo toque na mesma carta. No desktop, hover **eleva levemente** a carta e um clique tenta jogar. Corte deve aparecer **em cima da carta correspondente**, não em botão separado longe da mão. Pequena pausa real após cada descarte para corte; jogador da vez destacado por brilho/contorno no avatar.
 - Mostrar SEMPRE carta central, direção do jogo, cor ativa, quem joga, quantidade de cartas e penalidade pendente. Mostrar penalidades grandes como **+12** no centro, com impacto visual e cartas voando; animação temática: panela derrama cartas sobre jogador punido.
 - Coringa/+4/+6: escolha entre **quatro botões grandes tradicionais** de cor.
 - Cartas: estilo cartoon colorido com **número/símbolo grande**, detalhes culinários sem atrapalhar legibilidade; especiais coloridas +2, Bloqueio (círculo com barra diagonal), Inverter (duas setas curvas opostas formando círculo). +4,+6,Coringa,Panela de Pressão,Liquidificador incolores ainda não têm arte definitiva.
