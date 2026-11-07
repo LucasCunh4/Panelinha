@@ -46,4 +46,14 @@ As 23 artes de cartas foram comparadas byte a byte com a base e permanecem intac
 - `testes/cartas_470x800.cjs`, somente escopo `colors`: aprovado. Doze escolhas reais no motor, cor/penalidade corretas, acúmulos permitidos de +4/+6, +4 proibido sobre +6, cancelamento, prévia de carta intacta e recursos previamente carregados disponíveis offline. Sem exceções JavaScript ou imagens quebradas.
 - CRC/SHA, sintaxe JS/Python, `git diff --check`, `npm run build` e `npx cap copy android`: aprovados. Os quatro PNGs estão também em dist/Capacitor; cartas originais e código preservado conferidos.
 
-Publicação/APK finais a conferir após salvar o código. Nenhum emulador ou Android físico executado; instalação/atualização/persistência real e desempenho em aparelho permanecem não testados.
+## Publicação e APK final
+
+Versão web publicada no Worker existente (`abef9052-1b35-479c-92fe-26053db81a62`); oito arquivos modificados (HTML, estilos, seletor e quatro PNGs) baixados e conferidos byte a byte com o build. Saúde Fase 3 confirmada, sem modificar código/configuração do servidor ou criar salas públicas.
+
+[APK direto 0.2.55/c7502](https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.55/Panelinha-Teste-v0.2.55-c7502.apk), 62.657.623 bytes. Download completo realizado pelo próprio link direto.
+
+[Workflow 42422484264](https://github.com/LucasCunh4/Panelinha/actions/runs/42422484264): aprovado, execução 55, fonte `840e723d0c881d5b481865f60594308276b3e4be`. Uma compilação de APK, com emulador ignorado por opção. A API do GitHub retornou 503 ao iniciar o download pelo CLI; o download pelos URLs diretos da Release terminou normalmente. Não foi uma falha da compilação ou do aplicativo.
+
+`ferramentas/verificar_apk.py` também executado sobre o APK real baixado: aprovado. SHA-256 `5b1377db128e031b153d51b49d5cae13ad5c9a7e088b9330011a8f6fe810b133`. Metadados regenerados idênticos aos do CI. Conferidos quatro ingredientes RGBA 512×512, inventário/bytes/hashes, 23 artes de cartas preservadas, 52 combinações, código web e demais recursos. Mesma geometria, pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`, assinatura v2/certificado da geração 2 de `android-identity.json` e sensorLandscape. Código 7502 > 7402, compatível com atualização direta. Nenhuma chave ou Secret criado/alterado.
+
+Nenhum emulador ou Android físico executado; instalação/atualização/persistência real e desempenho em aparelho permanecem não testados e não são declarados aprovados.

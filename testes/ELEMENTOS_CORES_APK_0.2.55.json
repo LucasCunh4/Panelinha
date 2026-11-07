@@ -1,0 +1,43 @@
+{
+  "colorSelectionAssetsVerified": 4,
+  "visualSoundAssetsVerified": 69,
+  "file": "Panelinha-Teste-v0.2.55-c7502.apk",
+  "sha256": "5b1377db128e031b153d51b49d5cae13ad5c9a7e088b9330011a8f6fe810b133",
+  "applicationId": "com.lucascunha.panelinha.teste",
+  "versionCode": 7502,
+  "versionName": "0.2.55",
+  "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+  "pngsVerified": 23,
+  "origin": "https://localhost",
+  "androidCompat": true,
+  "orientation": "sensorLandscape",
+  "appCategory": "game",
+  "signingGeneration": 2,
+  "mesaAssetsVerified": 6,
+  "menuAssetsVerified": 2,
+  "cardAssetsVerified": 23,
+  "normalCombinations": 52,
+  "cardGeometry": {
+    "contentWidth": 470,
+    "contentHeight": 800,
+    "border": 25,
+    "width": 520,
+    "height": 850,
+    "outerRadius": 70,
+    "innerRadius": 45
+  },
+  "sourceCommit": "840e723d0c881d5b481865f60594308276b3e4be",
+  "workflowRun": 42422484264,
+  "workflowConclusion": "success",
+  "downloadUrl": "https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.55/Panelinha-Teste-v0.2.55-c7502.apk",
+  "previousVersionCode": 7402,
+  "workerVersion": "abef9052-1b35-479c-92fe-26053db81a62",
+  "cardDimensionsChanged": false,
+  "androidTests": {
+    "status": "not-run",
+    "reason": "emulator-disabled-by-option",
+    "emulatorStarted": false,
+    "instrumentationExecuted": false,
+    "upgradePersistenceTested": false
+  }
+}
