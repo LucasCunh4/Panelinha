@@ -1,8 +1,11 @@
 import json
+import os
 from pathlib import Path
 import sys
 name, code = sys.argv[1:3]
 identity = json.loads(Path('android-identity.json').read_text())
+status = os.environ.get('PANELINHA_ANDROID_TEST_RESULT', 'not-run')
+android_result = 'Testes Android não executados por opção; nenhum emulador iniciado. Instalação, atualização e retenção de dados não testadas.' if status in {'skipped', 'not-run'} else f'Resultado dos testes Android nesta execução: {status}.'
 print(f'''Panelinha Teste v{name} — versionCode {code}
 
 APK de testes Capacitor com jogo local offline, 1 humano + 3 bots e laboratório.
@@ -17,10 +20,11 @@ sem desinstalar nem limpar dados.
 applicationId: `{identity['applicationId']}`
 Certificado SHA-256: `{identity['certificateSha256']}`
 
-A automação verifica assinatura/52 PNGs e só publica após os testes Android
-em modo offline e atualização com dados locais preservados.
+A automação verifica assinatura, identidade, integridade e recursos do APK.
+{android_result}
 O jogo atual não salva a partida em andamento ao fechar.
 
-Esta é uma versão de testes, sem multiplayer. Consulte ANDROID.md para o histórico,
+Esta é uma versão de testes com Um jogador offline e multiplayer no servidor configurado.
+Consulte ANDROID.md para o histórico,
 assinatura persistente, requisitos e próximas versões.
 ''')

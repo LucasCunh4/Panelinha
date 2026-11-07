@@ -137,6 +137,7 @@
                 <stop offset=".7" stop-color="#ffd673" stop-opacity=".65"/>
                 <stop offset="1" stop-color="#fff1bc" stop-opacity="1"/>
               </linearGradient>
+              <linearGradient id="cometWhite" gradientUnits="userSpaceOnUse"><stop stop-color="#fff3c2" stop-opacity="0"/><stop offset=".55" stop-color="#ffe9ae" stop-opacity=".25"/><stop offset="1" stop-color="#fffef2" stop-opacity="1"/></linearGradient>
               <radialGradient id="cometHalo"><stop stop-color="#fff7d7" stop-opacity=".85"/><stop offset="1" stop-color="#f6c35c" stop-opacity="0"/></radialGradient>
               <filter id="cometGlow" filterUnits="userSpaceOnUse" x="-20" y="-20" width="530" height="530"><feGaussianBlur stdDeviation="3"/></filter>
             </defs>
@@ -144,6 +145,8 @@
             <g id="cometTail">
               <path id="cometTailGlow" class="comet-tail-glow"/>
               <path id="cometTrail" class="comet-trail"/>
+              <path id="cometCore" class="comet-core"/>
+              <g class="comet-reflections" fill="#fff5d4"><g id="cometReflectionA"><circle class="comet-spark" r=".8"/></g><g id="cometReflectionB"><circle class="comet-spark" r="1.1"/></g></g>
             </g>
             <g id="cometHead">
               <circle r="13" fill="url(#cometHalo)"/>

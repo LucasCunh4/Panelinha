@@ -2,6 +2,12 @@ name: APK Android de testes
 
 on:
   workflow_dispatch:
+    inputs:
+      run_emulator:
+        description: 'Executar instrumentação e atualização no emulador (opcional)'
+        type: boolean
+        required: false
+        default: false
   push:
     branches: [main, android/apk-testes]
     paths:
@@ -25,6 +31,8 @@ jobs:
   apk:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
+    env:
+      RUN_ANDROID_EMULATOR: ${{ github.event_name == 'workflow_dispatch' && inputs.run_emulator == true }}
     steps:
       - name: Conferir assinatura antes de baixar ferramentas
         env:
@@ -83,16 +91,35 @@ jobs:
       - name: Compilar web, sincronizar e assinar APK real
         id: build
         run: |
-          python3 ferramentas/compilar_android.py --secrets-dir "$RUNNER_TEMP/panelinha-signing" --code '${{ steps.version.outputs.code }}' --name '${{ steps.version.outputs.name }}' --test-apk
-          cp android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk "$RUNNER_TEMP/panelinha-instrumentation.apk"
-          python3 ferramentas/compilar_android.py --secrets-dir "$RUNNER_TEMP/panelinha-signing" --code '${{ steps.version.outputs.nextcode }}' --name '${{ steps.version.outputs.name }}-upgrade-check'
+          test_args=()
+          if test "$RUN_ANDROID_EMULATOR" = 'true'; then test_args+=(--test-apk); fi
+          python3 ferramentas/compilar_android.py --secrets-dir "$RUNNER_TEMP/panelinha-signing" --code '${{ steps.version.outputs.code }}' --name '${{ steps.version.outputs.name }}' "${test_args[@]}"
+          if test "$RUN_ANDROID_EMULATOR" = 'true'; then
+            cp android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk "$RUNNER_TEMP/panelinha-instrumentation.apk"
+            python3 ferramentas/compilar_android.py --secrets-dir "$RUNNER_TEMP/panelinha-signing" --code '${{ steps.version.outputs.nextcode }}' --name '${{ steps.version.outputs.name }}-upgrade-check'
+          fi
+      - name: Registrar Android não executado por opção
+        if: env.RUN_ANDROID_EMULATOR != 'true'
+        run: |
+          mkdir -p artifacts/testes-android
+          python3 - <<'PYTHON'
+          import json
+          from pathlib import Path
+          Path('artifacts/testes-android/status.json').write_text(json.dumps({
+              'status': 'not-run', 'reason': 'emulator-disabled-by-option',
+              'emulatorStarted': False, 'instrumentationExecuted': False,
+              'upgradePersistenceTested': False
+          }, indent=2) + chr(10))
+          PYTHON
       - name: Habilitar KVM para testes
+        if: env.RUN_ANDROID_EMULATOR == 'true'
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
       - name: Testar APK offline e atualização preservando dados
         id: android_tests
+        if: env.RUN_ANDROID_EMULATOR == 'true'
         uses: reactivecircus/android-emulator-runner@4c44018e59b437e86cdfc41da381398f93ed8808 # v2
         with:
           api-level: 35
@@ -107,7 +134,7 @@ jobs:
           disable-animations: true
           script: bash ferramentas/testar_android.sh 'artifacts/Panelinha-Teste-v${{ steps.version.outputs.name }}-c${{ steps.version.outputs.code }}.apk' 'artifacts/Panelinha-Teste-v${{ steps.version.outputs.name }}-upgrade-check-c${{ steps.version.outputs.nextcode }}.apk' "$RUNNER_TEMP/panelinha-instrumentation.apk"
       - name: Diagnosticar falha do emulador
-        if: failure()
+        if: failure() && env.RUN_ANDROID_EMULATOR == 'true' && steps.android_tests.outcome == 'failure'
         run: |
           mkdir -p artifacts/testes-android
           free -h > artifacts/testes-android/runner-memory.txt
@@ -156,6 +183,8 @@ jobs:
           with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as report:
               report.write(f"[Baixar {os.environ['APK_NAME']} diretamente, sem extração]({os.environ['APK_URL']})\n\n")
               report.write('O download do artefato exige sessão no GitHub. Metadados e diagnósticos ficam em artefatos separados.\n\n')
+              if os.environ['ANDROID_RESULT'] == 'skipped':
+                  report.write('**Android não executado por opção:** nenhum emulador iniciado; instalação/atualização/persistência não testadas.\n\n')
               report.write(f"Resultado da etapa de testes Android: **{os.environ['ANDROID_RESULT']}**. Compilação/assinatura não substituem a aprovação dos testes.\n")
           PYTHON
       - name: Guardar resultados Android
@@ -171,6 +200,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_NAME: ${{ steps.version.outputs.name }}
           RELEASE_CODE: ${{ steps.version.outputs.code }}
+          PANELINHA_ANDROID_TEST_RESULT: ${{ steps.android_tests.outcome }}
         run: |
           python3 ferramentas/notas_release.py "$RELEASE_NAME" "$RELEASE_CODE" > "$RUNNER_TEMP/panelinha-release.md"
           if git ls-remote --exit-code --tags origin "refs/tags/v$RELEASE_NAME" >/dev/null; then

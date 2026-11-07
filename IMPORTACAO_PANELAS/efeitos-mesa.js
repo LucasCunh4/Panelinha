@@ -4,7 +4,7 @@
   const back='assets/padronizadas/verso_oficial_400x850.png';
   let owner=null,round=null,previous=null,pressure=null,frame=0,decision=null,lastOrigin=null,seenPurchase=0;
   const draws=new Set(),masked=new Set(),nodes=new Set(),incoming=new Map();
-  let prepared=[],arrivalLayout=false;
+  let prepared=[],arrivalLayout=false,queued=[],drawTimer=null,renderFrame=null;
   const drawKey=(actor,id)=>actor+':'+id;
   function handCards(s,actor){return s.players[actor].hand.filter(c=>!incoming.has(drawKey(actor,c.id)));}
   const bridge=()=>window.PanelinhaTableBridge;
@@ -30,7 +30,7 @@
     remove(previousDecision.node);
     if(deliver)placeDecision(previousDecision);else masked.delete(previousDecision.id);
   }
-  function reset(){clearTimeout(frame);pressure=null;previous=null;owner=null;round=null;seenPurchase=0;closeDecision();lastOrigin=null;draws.clear();masked.clear();incoming.clear();prepared=[];arrivalLayout=false;for(const n of [...nodes])remove(n);$('table').classList.remove('pressure-transition','pressure-hands-hidden','penalty-purchase-transition');}
+  function reset(){clearTimeout(frame);clearTimeout(drawTimer);cancelAnimationFrame(renderFrame);drawTimer=renderFrame=null;queued=[];pressure=null;previous=null;owner=null;round=null;seenPurchase=0;closeDecision();lastOrigin=null;draws.clear();masked.clear();incoming.clear();prepared=[];arrivalLayout=false;for(const n of [...nodes])remove(n);$('table').classList.remove('pressure-transition','pressure-hands-hidden','penalty-purchase-transition');}
   function clock(s){return pressure.duration-(s.paused?s.remaining?.presentation||0:Math.max(0,(s.presentationUntil||0)-Date.now()));}
   function animatePressure(s,p,elapsed){
     if(motion.matches)return;
@@ -118,7 +118,7 @@
     for(const [key,item]of incoming)if(!s.players[item.actor].hand.some(c=>c.id===item.id)){incoming.delete(key);masked.delete(item.id);}
     const actual=s.players.map(p=>p.hand),kind=s.lastRotation?.serial?'rotation':'pressure',meta=kind==='rotation'?s.lastRotation:s.lastDistribution;
     if(meta?.serial&&(!pressure||pressure.serial!==meta.serial||pressure.kind!==kind)&&((s.presentationUntil||0)>Date.now()||s.paused&&s.remaining?.presentation)){
-      for(const entry of draws)remove(entry.node);draws.clear();masked.clear();incoming.clear();prepared=[];
+      for(const entry of draws)remove(entry.node);draws.clear();masked.clear();incoming.clear();prepared=[];queued=[];clearTimeout(drawTimer);drawTimer=null;
       for(const n of [...nodes])if(n.dataset.effect==='received')remove(n);
       // Nunca reaproveitar uma mão secreta de outro cliente. Reconexões usam versos.
       const old=previous||meta.beforeCounts.map((n,actor)=>Array.from({length:n},(_,i)=>({id:-1000000-actor*10000-i,hidden:true})));
@@ -135,20 +135,22 @@
     const oldPositions=arrivalLayout?new Map([...$('hand').children].map(n=>{const r=n.getBoundingClientRect();return[n.dataset.card,{x:r.x+r.width/2,y:r.y+r.height/2}]})):null;arrivalLayout=false;
     if(busy&&elapsed<(pressure.kind==='rotation'?940:1260))s.players.forEach((p,i)=>p.hand=pressure.old[i]);
     try{render();if(lastOrigin&&!s.players[0].hand.some(c=>c.id===lastOrigin.id))lastOrigin=null;}finally{s.players.forEach((p,i)=>p.hand=actual[i]);}
-    if(oldPositions&&!motion.matches)for(const n of $('hand').children){const old=oldPositions.get(n.dataset.card);if(!old)continue;const r=n.getBoundingClientRect(),dx=old.x-r.x-r.width/2,dy=old.y-r.y-r.height/2;if(Math.hypot(dx,dy)>.5){const end=getComputedStyle(n).transform;n.animate([{transform:`translate(${dx}px,${dy}px) ${end}`},{transform:end}],{duration:220,easing:'cubic-bezier(.2,.7,.2,1)'});}}
+    if(oldPositions&&!motion.matches){
+      // Lê toda a geometria antes de escrever animações, sem layout alternado por carta.
+      const shifts=[...$('hand').children].map(n=>{const old=oldPositions.get(n.dataset.card);if(!old)return null;const r=n.getBoundingClientRect();return{n,dx:old.x-r.x-r.width/2,dy:old.y-r.y-r.height/2,end:getComputedStyle(n).transform}}).filter(v=>v&&Math.hypot(v.dx,v.dy)>.5);
+      for(const {n,dx,dy,end}of shifts)n.animate([{transform:`translate(${dx}px,${dy}px) ${end}`},{transform:end}],{duration:220,easing:'cubic-bezier(.2,.7,.2,1)'});
+    }
     previous=actual.map(h=>h.map(c=>({...c})));
-    if(!busy&&!decision&&!draws.size&&s.drawn!==null)showDecision(s);
+    if(!busy&&!decision&&!draws.size&&!queued.some(item=>item.actor===0)&&s.drawn!==null)showDecision(s);
     if(busy){
       if(pressure.kind==='rotation')animateRotation(s,pressure,elapsed);else{animatePressure(s,pressure,elapsed);dealPressure(s,pressure,elapsed);}
       for(const n of nodes)if(/^(pressure|rotation)-/.test(n.dataset.effect||''))for(const a of n.getAnimations())s.paused?a.pause():a.play();
       clearTimeout(frame);if(!s.paused){const next=(pressure.kind==='rotation'?[690,940,1580,2000]:[690,1260,2000]).find(t=>t>elapsed+1)||2000;frame=setTimeout(()=>{if(bridge().getState()===s)bridge().render();},Math.max(16,next-elapsed));}
     }else if(pressure){for(const n of [...nodes])if(/^(pressure|rotation)-/.test(n.dataset.effect||''))remove(n);if(pressure.kind==='pressure'&&!pressure.notified){pressure.notified=true;showReceived(s,pressure.meta);}}
     if(purchaseBusy){
-      const progress=penaltyProgress(s);
-      for(const entry of draws)if(entry.purchase===purchase.serial){entry.animation.currentTime=progress;s.paused?entry.animation.pause():entry.animation.play();}
       clearTimeout(frame);if(!s.paused)frame=setTimeout(()=>{if(bridge().getState()===s)bridge().render();},Math.max(1,s.presentationUntil-Date.now()));
     }
-    for(const entry of draws)if(!entry.purchase)s.paused?entry.animation.pause():entry.animation.play();
+    syncDrawMotion(s);pumpDraws(s);
     refreshDecision(s);
     window.PanelinhaMatchUI?.mountScore(s,!busy&&!purchaseBusy);
     window.PanelinhaMatchUI?.mountPodium?.(s,!busy&&!purchaseBusy);
@@ -172,63 +174,119 @@
         const event={...original,card,id:card?.id??original.id},eligible=!forced&&actor===0&&s.drawn===event.id&&bridge().canPlayDraw(event.id);
         const duration=actor===0?(eligible?plan.approach:plan.items[i].duration):(forced?650:850),delay=plan.items[i].delay;
         if(forced&&progress>=delay+duration)return;
-        const item={...event,eligible,duration,delay,progress,purchase:forced?purchase.serial:null};
+        const item={...event,eligible,duration,delay,progress,pace:PanelinhaRules.DRAW_PACES[forced?'penalty':'normal'],purchase:forced?purchase.serial:null};
         if(s.players[actor].hand.some(c=>c.id===item.id))incoming.set(drawKey(actor,item.id),item);
         prepared.push(item);
       });
     }
   }
-  function arrive(item,s){
-    incoming.delete(drawKey(item.actor,item.id));masked.delete(item.id);arrivalLayout=true;
-    if(bridge().getState()===s)bridge().render();
+  function requestRender(s){
+    if(renderFrame!==null)return;renderFrame=requestAnimationFrame(()=>{renderFrame=null;if(bridge().getState()===s)bridge().render();});
+  }
+  function previewPoint(card){
+    const height=Math.min(innerHeight*.5,300),standard=['wild','wild4','wild6','dist','rotate'].includes(card?.type);
+    return{x:innerWidth/2,y:innerHeight*.46,width:height*(standard?400:420)/850,height,angle:0};
+  }
+  function transform(start,p){return `translate(calc(-50% + ${p.x-start.x}px),calc(-50% + ${p.y-start.y}px)) rotate(${p.angle||0}deg) scale(${p.width/start.width},${p.height/start.height})`;}
+  function curvedFrames(start,end,from,to,offset,duration,fade=false){
+    const lerp=(a,b,t)=>a+(b-a)*t,dx=to.x-from.x,dy=to.y-from.y;
+    const c1={x:from.x+dx*.25,y:from.y+dy*.15-14},c2={x:to.x-dx*.18,y:to.y-dy*.2-12};
+    return Array.from({length:19},(_,i)=>{
+      const t=i/18,u=t*t*(3-2*t),v=1-u;
+      const p={x:v*v*v*from.x+3*v*v*u*c1.x+3*v*u*u*c2.x+u*u*u*to.x,y:v*v*v*from.y+3*v*v*u*c1.y+3*v*u*u*c2.y+u*u*u*to.y,width:lerp(from.width,to.width,u),height:lerp(from.height,to.height,u),angle:lerp(from.angle||0,to.angle||0,u)-Math.sin(t*Math.PI)*2};
+      return{offset:(offset+t*duration)/end,opacity:fade?Math.min(1,t*6):1,transform:transform(start,p)};
+    });
+  }
+  function elapsed(item,s){return item.purchase?(item.purchase===s.lastPenaltyPurchase?.serial?penaltyProgress(s):Infinity):performance.now()-item.clock.base;}
+  function syncDrawMotion(s){
+    const halted=!!s.paused||document.hidden,now=performance.now();
+    for(const clock of new Set(queued.filter(item=>!item.purchase).map(item=>item.clock))){
+      if(halted&&clock.pausedAt===null)clock.pausedAt=now;
+      else if(!halted&&clock.pausedAt!==null){clock.base+=now-clock.pausedAt;clock.pausedAt=null;}
+    }
+    for(const entry of draws){
+      const animation=entry.animation;if(!animation)continue;
+      if(entry.purchase){
+        const expected=Math.max(0,elapsed(entry.item,s)-entry.item.delay-(entry.stage==='landing'?entry.mainDuration:0));
+        // Não buscar a timeline em cada render: corrige somente retomada ou desvio real.
+        if(Number.isFinite(expected)&&(entry.wasPaused||Math.abs((Number(animation.currentTime)||0)-expected)>100))animation.currentTime=expected;
+      }
+      if(halted&&animation.playState!=='paused')animation.pause();
+      else if(!halted&&animation.playState==='paused')animation.play();
+      entry.wasPaused=halted;
+    }
+  }
+  function pumpDraws(s){
+    clearTimeout(drawTimer);drawTimer=null;if(owner!==s||s.paused||document.hidden)return;
+    let next=Infinity,changed=false;
+    for(const item of [...queued]){
+      const time=elapsed(item,s);
+      if(item.purchase&&time>=item.delay+item.duration){queued.splice(queued.indexOf(item),1);incoming.delete(drawKey(item.actor,item.id));masked.delete(item.id);changed=true;continue;}
+      if((item.actor===0&&decision)||[...draws].some(entry=>entry.actor===item.actor))continue;
+      const due=item.delay-time;
+      if(due>1){next=Math.min(next,due);continue;}
+      queued.splice(queued.indexOf(item),1);
+      if(!item.purchase&&time>item.delay)item.clock.base+=time-item.delay;
+      startFlight(item,s,item.purchase?Math.max(0,time-item.delay):0);
+    }
+    if(changed){arrivalLayout=true;requestRender(s);}
+    if(Number.isFinite(next))drawTimer=setTimeout(()=>pumpDraws(s),Math.max(1,next));
+  }
+  function finishArrival(entry,s){
+    draws.delete(entry);remove(entry.node);masked.delete(entry.id);PanelasMesa.maskCards();pumpDraws(s);
+  }
+  function land(entry,s){
+    entry.animation.onfinish=null;
+    const item=entry.item;
+    if(owner!==s||!s.players[item.actor].hand.some(c=>c.id===item.id)){finishArrival(entry,s);return;}
+    // O leque abre só esta vaga quando a carta já alcançou a mão.
+    incoming.delete(drawKey(item.actor,item.id));arrivalLayout=true;bridge().render();
+    const target=point(item.actor,item.id),from=entry.destination;
+    entry.stage='landing';entry.node.dataset.stage='landing';
+    const animation=entry.node.animate([{opacity:1,transform:transform(entry.start,from)},{opacity:1,transform:transform(entry.start,target)}],{duration:entry.landing,easing:'cubic-bezier(.2,.65,.3,1)',fill:'forwards'});
+    entry.animation=animation;
+    if(item.purchase){animation.currentTime=Math.max(0,elapsed(item,s)-item.delay-entry.mainDuration);if(s.paused)animation.pause();}
+    animation.onfinish=()=>finishArrival(entry,s);
+  }
+  function startFlight(item,s,progress=0){
+    const {actor,id,card,eligible,duration,purchase}=item,detailed=actor===0;
+    const start={x:item.x,y:item.y,width:item.width,height:item.height,angle:0};
+    if(detailed)start.height=start.width*850/(['wild','wild4','wild6','dist','rotate'].includes(card?.type)?400:420);
+    const destination=PanelasMesa.incomingPoint(actor,card),preview=previewPoint(card);
+    const landing=eligible?0:detailed?item.pace.landing:80,mainDuration=duration-landing;
+    const n=sprite(card,detailed,start,'draw');Object.assign(n.dataset,{actor,cardId:id,presentation:detailed?'preview':'direct',duration,delay:item.delay,stage:'flight'});
+    let frames;
+    if(detailed){
+      const approach=eligible?duration:item.pace.approach;
+      frames=curvedFrames(start,mainDuration,{...start,angle:-4},preview,0,approach,true);
+      if(!eligible){const leave=approach+item.pace.hold;frames.push({offset:leave/mainDuration,opacity:1,transform:transform(start,preview)});frames.push(...curvedFrames(start,mainDuration,preview,destination,leave,mainDuration-leave).slice(1));}
+    }else frames=curvedFrames(start,mainDuration,start,destination,0,mainDuration,true);
+    const animation=n.animate(frames,{duration:mainDuration,easing:'linear',fill:'forwards'});
+    const entry={actor,id,node:n,animation,purchase,item,start,destination,landing,mainDuration,stage:'flight',wasPaused:false};
+    masked.add(id);draws.add(entry);
+    if(purchase){animation.currentTime=progress;if(s.paused)animation.pause();}
+    animation.onfinish=()=>{
+      if(eligible&&owner===s&&bridge().canPlayDraw(id)&&!s.pendingAction){draws.delete(entry);remove(n);showDecision(s,card);pumpDraws(s);}
+      else land(entry,s);
+    };
   }
   function animateDraws(_events,s){
     const ends=new Map(),batch=prepared;prepared=[];
     if(motion.matches){showDecision(s);return ends;}
+    const clocks=new Map();
     for(const item of batch){
-      const {actor,id,card,eligible,duration,delay,progress,purchase}=item,detailed=actor===0;
-      const start={x:item.x,y:item.y,width:item.width,height:item.height};
-      if(detailed&&card?.type==='wild')start.height=start.width*850/400;
-      const end=PanelasMesa.incomingPoint(actor,card),n=sprite(card,detailed,start,'draw');
-      Object.assign(n.dataset,{actor,cardId:id,presentation:detailed?'preview':'direct',duration,delay});
-      const height=Math.min(innerHeight*.5,300),width=height*400/850,cx=innerWidth/2,cy=innerHeight*.46;
-      const transform=(x,y,w,h,angle=0)=>`translate(calc(-50% + ${x-start.x}px),calc(-50% + ${y-start.y}px)) rotate(${angle}deg) scale(${w/start.width},${h/start.height})`;
-      const preview=transform(cx,cy,width,height),destination=transform(end.x,end.y,end.width,end.height,end.angle||0);
-      const frames=detailed?(eligible?[
-        {opacity:0,transform:transform(start.x,start.y,start.width*.96,start.height*.96,-5),easing:'ease-out'},
-        {offset:.15,opacity:1,transform:transform(start.x,start.y-8,start.width*1.02,start.height*1.02,-4),easing:'cubic-bezier(.4,0,.3,1)'},
-        {offset:.5,opacity:1,transform:transform(start.x+(cx-start.x)*.4,start.y+(cy-start.y)*.4-18,start.width*1.45,start.height*1.45,-3),easing:'cubic-bezier(.2,.65,.3,1)'},
-        {opacity:1,transform:preview}
-      ]:[
-        {opacity:0,transform:transform(start.x,start.y,start.width*.96,start.height*.96,-5),easing:'ease-out'},
-        {offset:.06,opacity:1,transform:transform(start.x,start.y-8,start.width*1.02,start.height*1.02,-4),easing:'cubic-bezier(.4,0,.3,1)'},
-        {offset:.2,opacity:1,transform:transform(start.x+(cx-start.x)*.4,start.y+(cy-start.y)*.4-18,start.width*1.45,start.height*1.45,-3),easing:'cubic-bezier(.2,.65,.3,1)'},
-        {offset:.4,opacity:1,transform:preview},{offset:.8,opacity:1,transform:preview,easing:'cubic-bezier(.4,0,.2,1)'},
-        {opacity:1,transform:destination}
-      ]):[
-        {opacity:0,transform:transform(start.x,start.y,start.width,start.height)},
-        {offset:.08,opacity:1},
-        {offset:.45,opacity:1,transform:transform((start.x+end.x)/2,(start.y+end.y)/2-18,(start.width+end.width)/2,(start.height+end.height)/2,(end.angle||0)*.5)},
-        {opacity:1,transform:destination}
-      ];
-      const animation=n.animate(frames,{duration,delay,easing:detailed?'linear':'cubic-bezier(.25,.5,.25,1)',fill:'both'});
-      masked.add(id);const entry={id,node:n,animation,purchase};draws.add(entry);ends.set(id,delay+duration);
-      if(purchase){animation.currentTime=progress;if(s.paused)animation.pause();}
-      animation.onfinish=()=>{
-        draws.delete(entry);remove(n);
-        if(eligible&&bridge().getState()===s&&bridge().canPlayDraw(id)&&!s.pendingAction){showDecision(s,card);bridge().render();}
-        else arrive(item,s);
-      };
-    }return ends;
+      if(!clocks.has(item.actor))clocks.set(item.actor,{base:performance.now(),pausedAt:null});
+      item.clock=clocks.get(item.actor);queued.push(item);ends.set(item.id,item.delay+item.duration);
+    }
+    syncDrawMotion(s);pumpDraws(s);return ends;
   }
   function placeDecision(old){
     const s=bridge().getState(),card=s?.players[0].hand.find(c=>c.id===old.id);if(!card)return;
-    const item={actor:0,id:old.id};
     if(motion.matches){incoming.delete(drawKey(0,old.id));masked.delete(old.id);arrivalLayout=true;return;}
-    const start=old.point,end=PanelasMesa.incomingPoint(0,card),n=sprite(card,true,start,'draw-keep');
-    const animation=n.animate([{transform:'translate(-50%,-50%)'},{transform:`translate(calc(-50% + ${end.x-start.x}px),calc(-50% + ${end.y-start.y}px)) rotate(${end.angle||0}deg) scale(${end.width/start.width},${end.height/start.height})`}],{duration:500,easing:'cubic-bezier(.3,0,.2,1)',fill:'both'});
-    masked.add(old.id);const entry={id:old.id,node:n,animation,purchase:null};draws.add(entry);
-    animation.onfinish=()=>{draws.delete(entry);remove(n);arrive(item,s);};
+    const start=old.point,destination=PanelasMesa.incomingPoint(0,card),n=sprite(card,true,start,'draw-keep'),landing=120,mainDuration=380;
+    const animation=n.animate(curvedFrames(start,mainDuration,start,destination,0,mainDuration),{duration:mainDuration,easing:'linear',fill:'forwards'});
+    const item={actor:0,id:old.id,card,delay:0},entry={actor:0,id:old.id,node:n,animation,purchase:null,item,start,destination,landing,mainDuration,stage:'flight'};
+    masked.add(old.id);draws.add(entry);animation.onfinish=()=>land(entry,s);
   }
   function refreshDecision(s){
     if(!decision)return;
@@ -240,7 +298,7 @@
   }
   function showDecision(s,card=s.players[0].hand.find(c=>c.id===s.drawn)){
     if(decision||!card||!bridge().canPlayDraw(card.id)||s.pendingAction)return;
-    const height=Math.min(innerHeight*.5,300),width=height*400/850,p={x:innerWidth/2,y:innerHeight*.46,width,height};
+    const p=previewPoint(card);
     const n=sprite(card,true,p,'draw-choice');n.classList.add('draw-choice');
     const controls=document.createElement('div');controls.className='draw-choice-actions';
     for(const [label,run]of[['Jogar',()=>bridge().playDraw(card.id)],['Guardar',()=>bridge().keepDraw()]]){
@@ -250,6 +308,7 @@
     n.append(controls);n.setAttribute('role','group');n.setAttribute('aria-label','Carta comprada: jogar ou guardar');decision={node:n,id:card.id,card,point:p,busy:false};
     incoming.set(drawKey(0,card.id),{actor:0,id:card.id,card});masked.add(card.id);PanelasMesa.maskCards();refreshDecision(s);
   }
-  motion.addEventListener('change',()=>{for(const n of [...nodes])if(n.dataset.effect!=='draw-choice')remove(n);draws.clear();masked.clear();incoming.clear();if(decision){incoming.set(drawKey(0,decision.id),{actor:0,id:decision.id});masked.add(decision.id);}bridge()?.render();});
+  motion.addEventListener('change',()=>{for(const n of [...nodes])if(n.dataset.effect!=='draw-choice')remove(n);draws.clear();queued=[];clearTimeout(drawTimer);drawTimer=null;masked.clear();incoming.clear();if(decision){incoming.set(drawKey(0,decision.id),{actor:0,id:decision.id});masked.add(decision.id);}bridge()?.render();});
+  document.addEventListener('visibilitychange',()=>{if(owner===bridge()?.getState())bridge().render();});
   window.PanelinhaTableEffects={paint,reset,animateDraws,handCards,drawing:id=>masked.has(id),playOrigin:id=>decision?.id===id?{...decision.point,node:decision.node.querySelector('.card'),angle:0}:lastOrigin?.id===id?lastOrigin:null};
 })();

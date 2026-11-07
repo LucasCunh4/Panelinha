@@ -439,7 +439,7 @@
   }
 
   // Um único relógio visual, independente dos timers do jogo. A direção vem do motor.
-  const COMET_PERIOD=3000,COMET_SPAN=.225,COMET_SAMPLES=512;
+  const COMET_PERIOD=3600,COMET_SPAN=.225,COMET_SAMPLES=512;
   let cometPoints=[],cometPhase=0,cometTravel=1,cometLastTime=null,cometFrame=null,cometActive=false;
   function cometPoint(phase){
     const position=((phase%1+1)%1)*COMET_SAMPLES,index=Math.floor(position),fraction=position-index;
@@ -453,10 +453,21 @@
   function paintComet(){
     if(!cometPoints.length)return;
     const head=cometPoint(cometPhase),tail=cometPoint(cometPhase-cometTravel*COMET_SPAN),near=cometPoint(cometPhase-cometTravel*.002);
-    // Uma só cauda contínua: gradiente da extremidade transparente até a ponta.
-    const d=Array.from({length:25},(_,i)=>{const p=cometPoint(cometPhase-cometTravel*COMET_SPAN*(1-i/24));return(i?'L':'M')+p.x.toFixed(2)+' '+p.y.toFixed(2)}).join(' ');
-    $('cometTrail').setAttribute('d',d);$('cometTailGlow').setAttribute('d',d);
-    const gradient=$('cometGold');for(const [key,value]of Object.entries({x1:tail.x,y1:tail.y,x2:head.x,y2:head.y}))gradient.setAttribute(key,value.toFixed(2));
+    // Fitas contínuas com largura crescente até a ponta; todas seguem a mesma órbita.
+    const points=Array.from({length:25},(_,i)=>{
+      const t=i/24,phase=cometPhase-cometTravel*COMET_SPAN*(1-t),p=cometPoint(phase),q=cometPoint(phase+cometTravel*.001);
+      const dx=q.x-p.x,dy=q.y-p.y,length=Math.hypot(dx,dy)||1;
+      return{...p,t,nx:-dy/length,ny:dx/length};
+    });
+    const ribbon=(width,power)=>{
+      const edge=sign=>points.map(p=>`${(p.x+sign*p.nx*width*Math.pow(p.t,power)).toFixed(2)} ${(p.y+sign*p.ny*width*Math.pow(p.t,power)).toFixed(2)}`);
+      return 'M'+edge(1).join(' L')+' L'+edge(-1).reverse().join(' L')+' Z';
+    };
+    $('cometTailGlow').setAttribute('d',ribbon(8.5,.85));
+    $('cometTrail').setAttribute('d',ribbon(2.8,1.1));
+    $('cometCore').setAttribute('d',ribbon(.85,1.6));
+    for(const id of ['cometGold','cometWhite'])for(const [key,value]of Object.entries({x1:tail.x,y1:tail.y,x2:head.x,y2:head.y}))$(id).setAttribute(key,value.toFixed(2));
+    for(const [id,index]of [['cometReflectionA',19],['cometReflectionB',22]]){const p=points[index];$(id).setAttribute('transform',`translate(${p.x.toFixed(2)} ${p.y.toFixed(2)})`);}
     const angle=Math.atan2(head.y-near.y,head.x-near.x)*180/Math.PI;
     $('cometHead').setAttribute('transform',`translate(${head.x.toFixed(3)} ${head.y.toFixed(3)}) rotate(${angle.toFixed(2)})`);
   }

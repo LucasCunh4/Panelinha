@@ -12,7 +12,7 @@ const CUT_PAUSE_MS=2200; // tempo mínimo antes de o próximo jogador agir; cort
 
 const CUT_UNO_GRACE_MS=300;
 // Ritmos fixos: o tamanho da sequência nunca altera duração ou intervalo.
-const DRAW_PACES=Object.freeze({normal:Object.freeze({interval:1300,duration:2400,approach:960}),penalty:Object.freeze({interval:480,duration:1000,approach:400})});
+const DRAW_PACES=Object.freeze({normal:Object.freeze({interval:2460,duration:2400,approach:960,hold:840,landing:120}),penalty:Object.freeze({interval:1060,duration:1000,approach:320,hold:320,landing:100})});
 function drawSequence(count,kind='normal'){
   const pace=DRAW_PACES[kind]||DRAW_PACES.normal;
   const items=Array.from({length:count},(_,i)=>({delay:i*pace.interval,duration:pace.duration}));
