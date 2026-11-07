@@ -17,4 +17,12 @@ Base: HEAD `d2d5dd2`, APK 0.2.47/c6702, checkout limpo e idêntico à branch rem
 
 Nenhum emulador ou teste de instrumentação, instalação/atualização ou persistência Android executado. Desempenho e sensação no dispositivo físico aguardam teste do usuário. Testes anteriores mantidos; apenas expectativa da cauda atualizada no teste específico.
 
-APK final e publicação: a registrar após o GitHub Actions.
+## Entrega
+
+Execução única [42389486516](https://github.com/LucasCunh4/Panelinha/actions/runs/42389486516) **aprovada**; nenhuma etapa de emulador/KVM/instrumentação executada. Artefato registra `not-run` e `emulatorStarted: false`.
+
+APK **0.2.48/c6802**, superior ao anterior c6702. `ferramentas/verificar_apk.py` aprovado no APK real baixado: assinatura v2, certificado geração 2, pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`, landscape, código web e todos os recursos aprovados. Hash, tamanho e metadados locais conferem com a Release e o artefato bruto. Mesma identidade e código crescente permitem atualizar sem desinstalar; instalação e retenção efetiva de dados no Android físico não foram executadas.
+
+[Download direto do APK, sem ZIP](https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.48/Panelinha-Teste-v0.2.48-c6802.apk).
+
+Web publicada no Worker existente (`693c66fc-3f77-4640-b599-c6fc34f7ffbc`), sem mudanças de configuração/motor. Hashes dos três arquivos alterados conferidos contra `dist`; saúde Fase 3 ativa. Não foram executadas baterias extensas nem gerados APKs intermediários.
