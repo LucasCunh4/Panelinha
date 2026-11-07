@@ -64,4 +64,12 @@ Alguns PNGs unitários enviados têm fragmentos pretos no topo, visíveis por ex
 
 Nenhum emulador ou aparelho Android físico utilizado. Instalação, atualização real/persistência e desempenho em hardware Android não são declarados aprovados.
 
-APK final: compilação/assinatura/verificação pelo workflow existente a concluir após este registro. Identidade geração 2 preservada, sem criação de chave ou alteração dos Secrets.
+## APK final e publicação
+
+[APK direto 0.2.51/c7102](https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.51/Panelinha-Teste-v0.2.51-c7102.apk), 61.002.794 bytes, link HTTP 200.
+
+[Workflow 42412340320](https://github.com/LucasCunh4/Panelinha/actions/runs/42412340320): aprovado, execução 51, compilação única de APK, emulador ignorado por opção. Fonte `b4be1d74c09eac638e81bea4edf7bfeedd797f4d`.
+
+Verificador real `ferramentas/verificar_apk.py` executado também sobre o APK baixado da Release: aprovado. SHA-256 `4cc632b89bb92de6f6747a12799f8da546a18a7a077bf699ff6b2af2e774975c`. Metadados regenerados idênticos ao CI: 23 PNGs (13 unitários), 52 combinações, bytes do jogo web e recursos aprovados; sem símbolos antigos. Assinatura v2/geração 2 e certificado de `android-identity.json` confirmados, pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`, `sensorLandscape`. Código 7102 > 7002 e identidade inalterada permitem atualização direta da geração 2; instalação e retenção efetiva no dispositivo não foram executadas. Nenhuma chave ou Secret criado/alterado.
+
+Versão web publicada no Worker existente, ID `2eca4e01-c96b-403c-b67f-b8fdc582896e`, preservando código/configuração do servidor e Durable Objects. Os 16 arquivos novos/modificados foram baixados e conferidos byte a byte com o build; recurso antigo não é servido e `/health` confirmou Fase 3 ativa. A primeira sonda Python sem User-Agent recebeu HTTP 403; a conferência com User-Agent de navegador passou. Nenhuma sala pública criada.
