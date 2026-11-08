@@ -18,6 +18,8 @@ def allocate(releases, run, attempt):
         tag = re.fullmatch(r'v0\.2\.(\d+)(?:-r\d+)?', release.get('tag_name', ''))
         if tag:
             highest_patch = max(highest_patch, int(tag[1]))
+        for value in re.findall(r'\bversionCode[:=\s`]*(\d+)',(release.get('body') or '')):
+            highest_code=max(highest_code,int(value))
         for asset in release.get('assets', []):
             match = re.fullmatch(r'Panelinha-Teste-v[0-9A-Za-z.-]+-c(\d+)\.apk', asset.get('name', ''))
             if match:

@@ -7,3 +7,14 @@
 .color-picker-food-targets{position:absolute;left:var(--card-inset-x);top:var(--card-inset-y);width:var(--card-face-width);height:var(--card-face-height)}
 .color-picker .ingredient-hit{position:absolute;min-width:44px;min-height:44px;transform:translate(-50%,-50%);border:0;border-radius:45%;padding:0;background:transparent;box-shadow:none;opacity:1;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-touch-callout:none}
 .color-picker .ingredient-hit:focus-visible{outline:2px solid #ffe5a4;outline-offset:2px}.color-picker .ingredient-hit:disabled{opacity:1;cursor:default}
+
+.color-picker-dialog{display:flex;flex-direction:column;align-items:center;gap:12px}
+.color-picker h2{font:clamp(16px,3.4vh,25px)/1.15 PanelinhaDisplay,system-ui;color:#ffe2a2;margin:0;text-align:center}
+.color-picker-card{--picker-height:min(510px,calc(100vh - 145px))}
+@supports(height:100svh){.color-picker-card{--picker-height:min(510px,calc(100svh - 145px))}}
+.color-picker .btn{min-height:44px;border:1px solid #d7ab67}
+.color-picker.viewing-table{background:transparent;pointer-events:none;align-items:flex-start;padding-top:max(10px,env(safe-area-inset-top))}
+.color-picker.viewing-table .color-picker-dialog{pointer-events:none}
+.color-picker #resumeColorChoice{pointer-events:auto;box-shadow:0 4px 18px #10071ec9;background:#442452}
+.color-picker [hidden]{display:none!important}
+@media(orientation:landscape) and (max-height:500px){.color-picker-dialog{display:grid;grid-template-columns:auto auto;grid-template-areas:"title card" "view card";column-gap:24px;max-width:100%}.color-picker h2{grid-area:title;max-width:210px;align-self:end}.color-picker-card{grid-area:card;--picker-height:calc(100vh - 40px)}#viewColorTable{grid-area:view;align-self:start}.color-picker.viewing-table .color-picker-dialog{display:block}}

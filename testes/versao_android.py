@@ -43,3 +43,5 @@ class VersionTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+assert allocate([{"tag_name":"v0.2.80","body":"Panelinha — versionCode 12345","assets":[{"name":"panelinha.apk"}]}],58,1)[0] > 12345

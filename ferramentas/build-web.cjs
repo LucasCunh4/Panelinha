@@ -11,7 +11,7 @@ for(const entry of manifest.assets){
   const bytes=fs.readFileSync(path.join(source,entry.path));
   if(bytes.length!==entry.bytes||crypto.createHash('sha256').update(bytes).digest('hex')!==entry.sha256)throw Error(`Arte divergente: ${entry.path}`);
   const unit=entry.path.startsWith('assets/cartas/elementos/');
-  const colorType=entry.path.startsWith('assets/cartas/fundos/')?2:6; // novos fundos RGB; demais RGBA
+  const colorType=entry.mode==='RGB'?2:6; // novos fundos RGB; demais RGBA
   if(bytes.readUInt32BE(16)!==entry.width||bytes.readUInt32BE(20)!==entry.height||bytes[25]!==colorType)throw Error(`Dimensões/formato PNG divergentes: ${entry.path}`);
   if(!unit&&(entry.width!==470||entry.height!==800))throw Error(`Fundo/especial precisa ser 470x800: ${entry.path}`);
   if(unit&&(!/^(numero_[0-9]|mais2|bloqueio|inverter)\.png$/.test(path.basename(entry.path))||entry.width!==512||entry.height!==512))throw Error(`Símbolo V3 inválido: ${entry.path}`);

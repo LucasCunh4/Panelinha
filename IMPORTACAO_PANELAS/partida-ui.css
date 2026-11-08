@@ -47,3 +47,11 @@ label.setting.has-setting-info{display:grid!important;grid-template-columns:minm
  right:calc((var(--table-avatar) + 10px - var(--counter-anchor-width))/2 - 8px);
  bottom:calc((var(--table-avatar) + 10px - var(--identity-height))/2 - 7px);
 }
+
+/* Identificação local fora do leque, com espaço inferior seguro. */
+.table{--table-avatar:clamp(43px,11.4vh,62px)}
+.local-identity{order:3;display:flex;align-items:center;justify-content:center;gap:8px;position:absolute;left:50%;bottom:max(3px,env(safe-area-inset-bottom));transform:translateX(-50%);height:32px;white-space:nowrap;color:#fff0cb;font:600 clamp(11px,2.8vh,15px)/1.2 system-ui;pointer-events:none}
+.local-identity>.pan-avatar{width:30px;height:30px;min-width:30px;flex:none;border-radius:50%;overflow:hidden}
+.hand-panel{padding-bottom:34px}.hand-heading{display:none!important}
+.sound-settings>summary{min-width:44px;width:44px;font-size:23px;padding:9px;text-align:center}
+@media(max-height:360px){.table{--table-avatar:40px}.hand-panel{padding-bottom:27px}.local-identity{height:25px;font-size:11px}.local-identity>.pan-avatar{width:24px;height:24px;min-width:24px}}

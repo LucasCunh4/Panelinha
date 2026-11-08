@@ -76,7 +76,7 @@
     panel.querySelector('[data-sfx-mute]').addEventListener('change',e=>setMuted(e.target.checked));panel.querySelector('[data-sfx-volume]').addEventListener('input',e=>setVolume(Number(e.target.value)/100));parent.append(panel);
   }
   const settings=document.createElement('details');settings.id='soundSettings';settings.className='sound-settings';
-  const summary=document.createElement('summary');summary.textContent='♪ Som';summary.setAttribute('aria-label','Opções de som');settings.append(summary);controls(settings,'menu');document.body.append(settings);
+  const summary=document.createElement('summary');summary.textContent='⚙';summary.setAttribute('aria-label','Configurações');summary.title='Configurações';settings.append(summary);controls(settings,'menu');document.body.append(settings);
   controls(document.querySelector('.table-menu-panel'),'mesa');syncControls();
   function closeSettings(){if(!settings.open)return false;settings.open=false;return true;}
   document.addEventListener('pointerdown',e=>{unlock();if(settings.open&&!settings.contains(e.target))closeSettings();},{capture:true,passive:true});

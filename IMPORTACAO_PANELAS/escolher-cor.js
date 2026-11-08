@@ -19,9 +19,9 @@
     const previous=document.activeElement;
     const overlay=document.createElement('div');overlay.className='modal-wrap color-picker';overlay.dataset.cardType=type;overlay.classList.toggle('penalty-picker',type!=='wild');
     overlay.innerHTML=`<section class="color-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="colorPickerTitle">
-      <h2 id="colorPickerTitle" class="sr-only">${title}</h2>
+      <h2 id="colorPickerTitle">Escolha uma cor para continuar.</h2>
       <div class="color-picker-card">${PanelinhaCards.html({type},{label:title})}<div class="color-picker-food-targets" role="group" aria-label="Escolha um alimento na carta">${choicesHTML(type)}</div></div>
-      <button type="button" id="cancelColor" hidden tabindex="-1">Cancelar escolha</button>
+      <button type="button" id="viewColorTable" class="btn alt">Visualizar mesa</button><button type="button" id="resumeColorChoice" class="btn good" hidden>Voltar à escolha de cor</button><button type="button" id="cancelColor" hidden tabindex="-1">Cancelar escolha</button>
       <span class="sr-only" role="status" aria-live="polite"></span>
     </section>`;
     let accepted=false,closed=false,animation=null;
@@ -31,10 +31,13 @@
       if(closeCurrent===close)closeCurrent=null;
     }
     function cancelChoice(){if(accepted){close();return;}close();cancel();if(previous?.isConnected)previous.focus({preventScroll:true});}
+    let viewing=false;
+    function viewTable(value){viewing=value;overlay.classList.toggle('viewing-table',value);overlay.querySelector('#resumeColorChoice').hidden=!value;overlay.querySelector('#viewColorTable').hidden=value;overlay.querySelector('.color-picker-card').hidden=value;overlay.querySelector('#colorPickerTitle').hidden=value;overlay.querySelector('[role=\"dialog\"]').setAttribute('aria-modal',String(!value));(value?overlay.querySelector('#resumeColorChoice'):overlay.querySelector('[data-color]')).focus({preventScroll:true});}
+    overlay.querySelector('#viewColorTable').onclick=()=>viewTable(true);overlay.querySelector('#resumeColorChoice').onclick=()=>viewTable(false);
     function keys(event){
-      if(event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation();cancelChoice();}
+      if(event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation();if(viewing)viewTable(false);else cancelChoice();}
       if(event.key==='Tab'){
-        const buttons=[...overlay.querySelectorAll('button:not(:disabled):not([hidden])')];
+        const buttons=[...overlay.querySelectorAll('button:not(:disabled):not([hidden])')].filter(b=>b.getClientRects().length);
         const i=buttons.indexOf(document.activeElement);
         event.preventDefault();buttons[i<0?(event.shiftKey?buttons.length-1:0):(i+(event.shiftKey?-1:1)+buttons.length)%buttons.length]?.focus({preventScroll:true});
       }
@@ -60,12 +63,12 @@
         animation.onfinish=close;
       });
     });
-    overlay.querySelector('#cancelColor').onclick=cancelChoice;
-    overlay.addEventListener('click',event=>{if(event.target===overlay)cancelChoice();});
+    overlay.querySelector('#cancelColor').onclick=()=>viewing?viewTable(false):cancelChoice();
+    overlay.addEventListener('click',event=>{if(event.target===overlay&&!viewing)cancelChoice();});
     root.innerHTML='';root.append(overlay);closeCurrent=close;
     document.addEventListener('keydown',keys,true);
     // Foco inicial no diálogo, sem simular hover sobre uma cor no dispositivo de toque.
     const dialog=overlay.querySelector('[role="dialog"]');dialog.tabIndex=-1;dialog.focus({preventScroll:true});
   }
-  window.PanelinhaColorPicker={open};
+  window.PanelinhaColorPicker={open,close:()=>closeCurrent?.()};
 })();

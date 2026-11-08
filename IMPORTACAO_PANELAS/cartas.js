@@ -25,13 +25,13 @@
   });
   const root='assets/cartas/',colors={red:'vermelho',blue:'azul',yellow:'amarelo',green:'verde'};
   const actions={draw2:'mais2',skip:'bloqueio',reverse:'inverter'};
-  const specials={wild4:'carta_mais4',wild6:'carta_mais6',wild:'carta_curinga',rotate:'carta_liquidificador',dist:'carta_panela_de_pressao'};
+  const specials={wild4:'carta_mais4_redesenhada_470x800',wild6:'carta_mais6_redesenhada_470x800',wild:'carta_curinga_redesenhada_470x800',rotate:'carta_liquidificador',dist:'carta_panela_de_pressao'};
   // Coordenadas no conteúdo 470×800, sem deslocar a arte, a moldura ou o símbolo central.
   const foodAssets={red:['Vermelho','Tomate','tomate_panelinha_512.png'],yellow:['Amarelo','Queijo','queijo_panelinha_512.png'],blue:['Azul','Mirtilos','mirtilos_panelinha_512.png'],green:['Verde','Alface','alface_panelinha_512.png']};
   const foodLayout=Object.freeze(Object.fromEntries(Object.entries({
-    wild4:[['red',55,165,100],['yellow',302,138,110],['blue',52,374,100],['green',314,372,104]],
-    wild6:[['red',48,165,100],['yellow',333,133,104],['blue',40,340,100],['green',349,329,92]],
-    wild:[['red',50,176,96],['yellow',307,145,110],['blue',42,395,100],['green',324,390,104]]
+    wild4:[['red',55,155,116],['yellow',323,155,116],['blue',25,350,112],['green',327,355,112]],
+    wild6:[['red',45,160,112],['yellow',347,120,100],['blue',23,360,108],['green',342,363,108]],
+    wild:[['red',55,160,118],['yellow',339,132,108],['blue',30,370,112],['green',327,397,112]]
   }).map(([type,regions])=>[type,Object.freeze(regions.map(([color,x,y,size])=>{
     const [label,food,file]=foodAssets[color];return Object.freeze({color,label,food,x,y,size,path:'assets/ingredientes-especiais/'+file});
   }))])));
@@ -45,7 +45,7 @@
     const face=symbolKey(card);
     if(!colors[card.color]||!face)throw Error('Carta visual desconhecida: '+card.type);
     const symbol=root+'elementos/'+face+'.png';
-    return [root+'fundos/fundo_'+colors[card.color]+'_novo_470x800.png',symbol,symbol,symbol];
+    return [root+'fundos/'+(card.color==='green'?'fundo_verde_claro_470x800.png':'fundo_'+colors[card.color]+'_novo_470x800.png'),symbol,symbol,symbol];
   }
   const cache=new Map();
   function preload(path){

@@ -20,7 +20,7 @@ const out=process.env.PANELINHA_TEST_OUTPUT||'/workspace/work/alimentos-nas-cart
    }));
    assert.equal(layout.old,0);assert.equal(layout.preview,1);assert.equal(layout.images.length,4);
    for(const im of layout.images){assert.ok(im.src.endsWith('/'+mapping[im.color]));assert.deepEqual(im.natural,[512,512]);assert.ok(Math.abs(im.w/im.h-1)<.001);assert.equal(im.fit,'contain');assert.equal(im.opacity,'1');assert.equal(im.animation,'none');assert.equal(im.dy,0);assert.equal(im.scale,1);assert.equal(im.alpha,0);assert.equal(im.preview,true);assert.ok(im.x>=0&&im.y>=8&&im.right<=width&&im.bottom<=height,JSON.stringify({width,height,im}));}
-   assert.equal(await p.locator('#colorPickerHint').count(),0);assert.equal(await p.locator('#colorPickerTitle').getAttribute('class'),'sr-only');assert.equal(await p.locator('#cancelColor').isVisible(),false);
+   assert.equal(await p.locator('#colorPickerHint').count(),0);assert.equal(await p.locator('#colorPickerTitle').textContent(),'Escolha uma cor para continuar.');assert.equal(await p.locator('#cancelColor').isVisible(),false);
    for(const b of layout.buttons.filter(b=>b.w&&b.h)){assert.ok(b.x>=0&&b.y>=0&&b.right<=width+.5&&b.bottom<=height+.5,JSON.stringify({width,height,b}));assert.ok(b.w>=44&&b.h>=36);if(b.color){assert.equal(b.background,'rgba(0, 0, 0, 0)');assert.equal(b.border,'0px');}}
    await p.screenshot({path:path.join(out,type+'-'+width+'.png')});await p.keyboard.press('Escape');assert.equal(await p.evaluate(()=>colorCancels),1);
   }
@@ -35,6 +35,7 @@ const out=process.env.PANELINHA_TEST_OUTPUT||'/workspace/work/alimentos-nas-cart
   }
   await open('wild');await p.locator('[data-color=green]').dispatchEvent('pointerdown',{pointerType:'touch'});assert.equal(await p.locator('.food-pressed').count(),1);assert.deepEqual(await p.evaluate(()=>colorCalls),[]);await p.locator('[data-color=green]').tap();assert.deepEqual(await p.evaluate(()=>colorCalls),['green']);await p.locator('.color-picker').waitFor({state:'hidden'});
   await open('wild6');await p.keyboard.press('Tab');assert.equal(await p.locator('[data-color=red]').evaluate(n=>n===document.activeElement),true);await p.keyboard.press('Enter');assert.deepEqual(await p.evaluate(()=>colorCalls),['red']);await p.locator('.color-picker').waitFor({state:'hidden'});
+  await open('wild4');await p.locator('#viewColorTable').click();assert.equal(await p.locator('.color-picker-card').isVisible(),false);assert.deepEqual(await p.evaluate(()=>colorCalls),[]);await p.locator('#resumeColorChoice').click();assert.equal(await p.locator('.color-picker-card').isVisible(),true);await p.keyboard.press('Escape');
   await open('wild4');await p.locator('.color-picker').click({position:{x:4,y:4}});assert.equal(await p.evaluate(()=>colorCancels),1);
   await p.locator('#singlePlayerBtn').click();await p.locator('#profileContinueBtn').click();await p.locator('#startBtn').click();await p.waitForTimeout(600);
   await open('wild');await p.evaluate(()=>PanelinhaNavigation.back({native:true}));assert.equal(await p.locator('.color-picker').count(),0);assert.equal(await p.evaluate(()=>colorCancels),1);

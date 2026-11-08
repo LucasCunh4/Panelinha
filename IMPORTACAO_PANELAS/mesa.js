@@ -8,7 +8,8 @@
   let cueOwner=null,cueRound=null,wasHumanTurn=false,cueAnimation=null,cueLayoutFrame=null;
   let snapshot = null, pendingPlay = null;
   let displayedTop = null;
-  const flights = new Set();
+  const flights = new Set(), playLocks=new Set();
+  const playing=()=>playLocks.size>0||pendingPlay!==null;
   let pendingDraws = [], handLayout = null, nativePlaying = null, clockKey = null;
   const drawingIds = new Set();
   let discardTrail=[],trailState=null,trailRound=null,visualSequence=0;
@@ -57,7 +58,7 @@
       record={owner:state,text,label,team,count,area,cards:new Map()};seatRecords.set(seat,record);
     }
     if(record.text.parentNode!==record.label||record.team.parentNode!==record.label){record.label.textContent='';record.label.append(record.text,record.team);}
-    const active=state.phase==='playing'&&state.current===id;seat.classList.toggle('active',active);
+    const active=state.phase==='playing'&&state.current===id&&!playing()&&!window.PanelinhaTableEffects?.dealing()&&Date.now()>=(state.presentationUntil||0)&&Date.now()>=(state.playUntil||0);seat.classList.toggle('active',active);
     if(id!==0){
       let nameplate=opponentNames.get(id);
       if(!nameplate){nameplate=document.createElement('span');nameplate.className='opponent-name';nameplate.dataset.player=String(id);nameplate.setAttribute('aria-hidden','true');$('table').append(nameplate);opponentNames.set(id,nameplate);}
@@ -92,7 +93,7 @@
   let expandedColor=null,handPinned=false,hoverTimer=null,leaveTimer=null,handOwner=null,handRound=null,handScrollFrame=null,handLayoutVersion=0;
   let restoreHandFocus=null,handGesture=null;
   function handInteractionReady(state=$state()){
-    return !!state&&state.phase==='playing'&&!state.paused&&!state.pendingAction&&Date.now()>=(state.presentationUntil||0)&&
+    return !!state&&state.phase==='playing'&&!state.paused&&!state.pendingAction&&!window.PanelinhaTableEffects?.dealing()&&(!playing()||!!state.cutOpen&&state.current!==0)&&Date.now()>=(state.presentationUntil||0)&&
       (!state.online||!!window.PanelinhaOnline?.connected&&!state.players[0].substituted);
   }
   function $state(){return window.PanelinhaTableBridge?.getState();}
@@ -392,14 +393,14 @@
     const effect=document.createElement('div');effect.className='block-effect';effect.dataset.blocked=String(play.blocked);
     effect.innerHTML=`<svg viewBox="0 0 ${innerWidth} ${innerHeight}" width="100%" height="100%"><defs><marker id="blockArrow-${play.id}" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="#ffe4a0"/></marker></defs><line x1="${cx}" y1="${cy}" x2="${tx}" y2="${ty}" stroke="#ffe4a0" stroke-width="3" stroke-dasharray="7 4" marker-end="url(#blockArrow-${play.id})"/></svg><span style="left:${cx}px;top:${cy}px">⊘</span>`;
     $('playAnimations').append(effect);
-    const animation=effect.animate([{opacity:0},{offset:.22,opacity:1},{offset:.75,opacity:1},{opacity:0}],{duration:850,delay,fill:'both'});
+    const animation=effect.animate([{opacity:0},{offset:.22,opacity:1},{offset:.75,opacity:1},{opacity:0}],{duration:PanelinhaRules.PLAY_TIMING.block,delay,fill:'both'});
     const flight={node:effect,animation,kind:'effect'};flights.add(flight);
-    animation.onfinish=()=>{effect.remove();flights.delete(flight);};
+    const cleanup=()=>{effect.remove();flights.delete(flight);};animation.finished.then(cleanup,cleanup);return animation.finished.catch(()=>{});
     (seat.querySelector('.seat-identity')||seat).animate([{filter:'brightness(1)'},{offset:.35,filter:'brightness(1.8)',color:'#ffbe9b'},{filter:'brightness(1)'}],{duration:700,delay,easing:'ease-out'});
   }
 
   function clearFlights() {
-    pendingPlay = null;pendingDraws=[];drawingIds.clear();
+    pendingPlay = null;pendingDraws=[];drawingIds.clear();for(const lock of playLocks)lock.release();playLocks.clear();
     for (const flight of flights) { flight.animation.cancel(); flight.node.remove(); }
     flights.clear();
     $('discard').classList.remove('receiving-card');maskCards();
@@ -452,7 +453,7 @@
     play.height=play.width*PanelinhaCards.aspect;
     const tx=r.x+r.width/2,ty=r.y+r.height/2;
     const dx=tx-play.x,dy=ty-play.y,sx=card.offsetWidth/play.width,sy=sx;
-    const key=Number(target.dataset.visualKey),angle=rotation(target),arc=Math.min(46,Math.hypot(dx,dy)*.12),duration=540;
+    const key=Number(target.dataset.visualKey),angle=rotation(target),arc=Math.min(46,Math.hypot(dx,dy)*.12),duration=PanelinhaRules.PLAY_TIMING.flight;
     const sprite=document.createElement('div');sprite.className='played-card flying-card';
     Object.assign(sprite.style,{left:`${play.x-play.width/2}px`,top:`${play.y-play.height/2}px`,width:`${play.width}px`,height:`${play.height}px`});
     Object.assign(sprite.dataset,{actor:String(play.actor),cardId:String(play.id),originX:String(play.x),originY:String(play.y),targetX:String(tx),targetY:String(ty)});
@@ -468,26 +469,37 @@
       {opacity:1,transform:transform(dx,dy,angle,sx,sy)}
     ],{duration,delay,easing:'cubic-bezier(.22,.55,.25,1)',fill:'both'});
     const flight={node:sprite,animation,kind:'play',id:play.id,key};flights.add(flight);maskCards();
-    animation.onfinish=()=>{
+    let released=false,timer;
+    const lock={release(){if(released)return;released=true;clearTimeout(timer);playLocks.delete(lock);requestAnimationFrame(()=>{if(window.PanelinhaTableBridge?.getState())PanelinhaTableBridge.render();});}};playLocks.add(lock);
+    // Completion is driven by WAAPI, not a fixed turn delay. A bounded fallback
+    // handles a broken/cancelled animation without leaving the match locked.
+    timer=setTimeout(lock.release,delay+duration+PanelinhaRules.PLAY_TIMING.block+1000);
+    animation.finished.then(async()=>{
       sprite.remove();flights.delete(flight);maskCards();
       const landed=$('discard').querySelector(`[data-visual-key="${key}"] .card`);
-      if(landed&&!reducedMotion.matches)landed.animate([{transform:'scale(1.035)'},{transform:'scale(1)'}],{duration:140,easing:'ease-out'});
-    };
-    animateBlock(play,delay+duration*.7);
+      const settle=landed&&!reducedMotion.matches?landed.animate([{transform:'scale(1.035)'},{transform:'scale(1)'}],{duration:PanelinhaRules.PLAY_TIMING.settle,easing:'ease-out'}).finished:Promise.resolve();
+      const block=animateBlock(play,0)||Promise.resolve();await Promise.allSettled([settle,block]);
+    },()=>{sprite.remove();flights.delete(flight);maskCards();}).finally(lock.release);
+
   }
 
   // Um único relógio visual, independente dos timers do jogo. A direção vem do motor.
   const COMET_PERIOD=3600,COMET_SPAN=.90,COMET_SAMPLES=512;
-  let cometPoints=[],cometPhase=0,cometTravel=1,cometLastTime=null,cometFrame=null,cometActive=false;
+  let cometPoints=[],cometPhase=0,cometTravel=1,cometLastTime=null,cometFrame=null,cometActive=false,cometTarget=1,cometFlip=null;
   function cometPoint(phase){
     const position=((phase%1+1)%1)*COMET_SAMPLES,index=Math.floor(position),fraction=position-index;
     const a=cometPoints[index],b=cometPoints[(index+1)%COMET_SAMPLES];
     return{x:a.x+(b.x-a.x)*fraction,y:a.y+(b.y-a.y)*fraction};
   }
   function advanceComet(time){
-    if(cometLastTime!==null&&!reducedMotion.matches&&!document.hidden)cometPhase=((cometPhase+(time-cometLastTime)/COMET_PERIOD*cometTravel)%1+1)%1;
+    if(cometLastTime!==null&&!reducedMotion.matches&&!document.hidden){
+      let speed=cometTravel;
+      if(cometFlip){const progress=t=>Math.max(0,Math.min(1,(t-cometFlip.at)/400));const t0=progress(cometLastTime),t1=progress(time);speed=cometFlip.from*(Math.cos(Math.PI*t0)+Math.cos(Math.PI*t1))/2;if(t1>=.5)cometTravel=cometTarget;if(t1>=1){cometTravel=cometTarget;cometFlip=null;}}
+      cometPhase=((cometPhase+(time-cometLastTime)/COMET_PERIOD*speed)%1+1)%1;
+    }
     cometLastTime=time;
   }
+
   let cometFade=null;
   function createCometFade(){
     const svg=$('stoveDirection'),defs=svg.querySelector('defs'),ns=svg.namespaceURI;
@@ -508,7 +520,7 @@
     const head=cometPoint(cometPhase),near=cometPoint(cometPhase-cometTravel*.002);
     // Fitas contínuas com largura crescente até a ponta; todas seguem a mesma órbita.
     const points=Array.from({length:97},(_,i)=>{
-      const t=i/96,phase=cometPhase-cometTravel*COMET_SPAN*(1-t),p=cometPoint(phase),q=cometPoint(phase+cometTravel*.001);
+      const t=i/96,phase=cometPhase-cometTravel*COMET_SPAN*(cometFlip?.at?(.4+.6*Math.abs(Math.cos(Math.PI*Math.min(1,(performance.now()-cometFlip.at)/400)))):1)*(1-t),p=cometPoint(phase),q=cometPoint(phase+cometTravel*.001);
       const dx=q.x-p.x,dy=q.y-p.y,length=Math.hypot(dx,dy)||1;
       return{...p,t,nx:-dy/length,ny:dx/length};
     });
@@ -540,7 +552,7 @@
   function stopComet(){cometActive=false;syncCometMotion();}
   function tableDirection(direction){
     // Avança até o instante da inversão antes de trocar o sinal: a ponta não salta.
-    advanceComet(performance.now());cometTravel=direction===-1?1:-1;
+    const time=performance.now();advanceComet(time);const target=direction===-1?1:-1;if(target!==cometTarget){cometTarget=target;if(reducedMotion.matches)cometTravel=target;else cometFlip={at:time,from:cometTravel};}
     $('table').dataset.direction=String(direction);cometActive=true;paintComet();syncCometMotion();
   }
 
@@ -646,7 +658,8 @@
     nativeTable(true);
     if(handOwner!==state||handRound!==state.round){cancelHandTimers();expandedColor=null;handPinned=false;handLayout=null;handOwner=state;handRound=state.round;}
     document.body.classList.add('playing');
-    const humanTurn=state.phase==='playing'&&state.current===0&&Date.now()>=state.unlockAt&&(!state.online||!state.paused&&!state.players[0].substituted&&window.PanelinhaOnline?.connected);
+    const humanTurn=state.phase==='playing'&&state.current===0&&!playing()&&!PanelinhaTableEffects.dealing()&&Date.now()>=(state.presentationUntil||0)&&Date.now()>=state.unlockAt&&(!state.online||!state.paused&&!state.players[0].substituted&&window.PanelinhaOnline?.connected);
+    const identity=$('localIdentity');if(identity){const avatar=state.players[0].avatar||state.identity?.avatar||PanelinhaProfile.current.avatar;const label=`Você · ${state.players[0].hand.length} cartas`;if(identity.dataset.avatar!==avatar){identity.innerHTML=PanelinhaProfile.avatarHTML(avatar)+'<span></span>';identity.dataset.avatar=avatar;}identity.querySelector('span:last-child').textContent=label;}
     $('hand').dataset.turnScale=humanTurn?'1.06':'1';
     $('hand').classList.toggle('human-turn',humanTurn);
     $('buyBtn').classList.toggle('mandatory-buy',mustBuy);
@@ -709,6 +722,7 @@
     }
     fan($('hand'), innerWidth < 360 ? 7 : 9, savedScroll);
     if(restoreHandFocus){const cards=[...$('hand').children],target=cards.find(c=>c.dataset.card===restoreHandFocus.id)||cards[Math.min(restoreHandFocus.index,cards.length-1)];if(target&&!target.disabled)target.focus({preventScroll:true});restoreHandFocus=null;}
+    $('table').classList.toggle('play-presentation',playing());
     positionTurnCue();
     const top=state.discard[state.discard.length-1];
     displayedTop=top?.id ?? null;
@@ -742,5 +756,5 @@
     positionTurnCue();layoutOpponentNames();
   });
   nativeTable(false);
-  window.PanelasMesa = { handPoint,incomingPoint,takeDraws,maskCards,render, renderSeat, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {restoreHandFocus=handGesture=null;cancelAnimationFrame(namesLayoutFrame);for(const nameplate of opponentNames.values())nameplate.remove();opponentNames.clear();PanelinhaTableEffects.reset();cancelAnimationFrame(cueLayoutFrame);cueAnimation?.cancel();cueAnimation=null;cueOwner=null;cueRound=null;wasHumanTurn=false;$('turnCue').hidden=true;$('hand').classList.remove('human-turn');$('hand').dataset.turnScale='1';$('buyBtn').classList.remove('mandatory-buy');clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
+  window.PanelasMesa = { playing, handPoint,incomingPoint,takeDraws,maskCards,render, renderSeat, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {restoreHandFocus=handGesture=null;cancelAnimationFrame(namesLayoutFrame);for(const nameplate of opponentNames.values())nameplate.remove();opponentNames.clear();PanelinhaTableEffects.reset();cancelAnimationFrame(cueLayoutFrame);cueAnimation?.cancel();cueAnimation=null;cueOwner=null;cueRound=null;wasHumanTurn=false;$('turnCue').hidden=true;$('hand').classList.remove('human-turn');$('hand').dataset.turnScale='1';$('buyBtn').classList.remove('mandatory-buy');clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
 })();

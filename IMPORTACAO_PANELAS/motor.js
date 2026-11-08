@@ -11,8 +11,10 @@ const VALUE={num:2,draw2:4,skip:4,reverse:4,wild4:6,wild6:8,wild:10,dist:10,rota
 const CUT_PAUSE_MS=2200; // tempo mínimo antes de o próximo jogador agir; corte aparece imediatamente
 
 const CUT_UNO_GRACE_MS=300;
+const PLAY_TIMING=Object.freeze({flight:540,settle:140,block:450});
+const DEAL_TIMING=Object.freeze({interval:42,flight:220,settle:100});
 // Ritmos fixos: o tamanho da sequência nunca altera duração ou intervalo.
-const DRAW_PACES=Object.freeze({normal:Object.freeze({interval:2460,duration:2400,approach:960,hold:840,landing:120}),penalty:Object.freeze({interval:80,duration:120,approach:0,hold:0,landing:20,settle:40})});
+const DRAW_PACES=Object.freeze({normal:Object.freeze({interval:2020,duration:1960,approach:760,hold:620,landing:100}),penalty:Object.freeze({interval:80,duration:120,approach:0,hold:0,landing:20,settle:40})});
 function drawSequence(count,kind='normal'){
   const pace=DRAW_PACES[kind]||DRAW_PACES.normal;
   const items=Array.from({length:count},(_,i)=>({delay:i*pace.interval,duration:pace.duration}));
@@ -119,15 +121,15 @@ function rotateHands(exclude=[],actor=null){
   log(`Liquidificador: mãos transferidas no sentido ${s.direction===-1?'horário':'anti-horário'}.`);
 }
 
-function newRound(starter=0,direction=1){PanelinhaSFX.event('round-prepare');PanelinhaAnnouncements.round(s);clearJobs();s.token++;s.round++;s.players.forEach(p=>p.hand=[]);s.deck=buildDeck(s.o);s.discard=[];s.direction=direction;s.current=starter;s.penalty=0;s.highest=0;s.lastPenalty=null;s.finisher=null;s.drawn=null;s.preUno=false;s.unoWindow=null;s.cutOpen=false;s.unlockAt=0;s.lastActor=null;s.lastDistribution=null;s.lastRotation=null;s.roundScore=null;s.finalStandings=null;s.cutAnnounceUntil=0;s.blockedPlayer=null;s.lastPenaltyPurchase=null;s.presentationUntil=0;s.pendingAction=null;s.phase='playing';s.message='';for(let j=0;j<7;j++)for(const p of s.players)drawCard(p.id);let first=s.deck.pop();s.discard.push(first);s.activeColor=first.color||pick(COLORS);log(`Rodada ${s.round}: carta inicial ${description(first)}.`);
+function newRound(starter=0,direction=1){PanelinhaSFX.event('round-prepare');PanelinhaAnnouncements.round(s);clearJobs();s.token++;s.round++;s.players.forEach(p=>p.hand=[]);s.deck=buildDeck(s.o);s.discard=[];s.direction=direction;s.current=starter;s.penalty=0;s.highest=0;s.lastPenalty=null;s.finisher=null;s.drawn=null;s.preUno=false;s.unoWindow=null;s.cutOpen=false;s.unlockAt=0;s.lastActor=null;s.lastDistribution=null;s.lastRotation=null;s.roundScore=null;s.finalStandings=null;s.cutAnnounceUntil=0;s.blockedPlayer=null;s.lastPenaltyPurchase=null;s.presentationUntil=0;s.playUntil=0;s.dealUntil=0;s.lastPlay=null;s.lastDeal=null;s.lastNormalPurchase=null;s.botDrawPending=null;s.pendingAction=null;s.phase='playing';s.message='';for(let j=0;j<7;j++)for(const p of s.players)drawCard(p.id);let first=s.deck.pop();s.discard.push(first);s.activeColor=first.color||pick(COLORS);log(`Rodada ${s.round}: carta inicial ${description(first)}.`);
 if(first.type==='skip'){s.blockedPlayer=starter;s.current=(starter+s.direction+4)%4;log('Bloqueio inicial: primeiro jogador pulado.');}
 else if(first.type==='reverse'){s.direction*=-1;s.current=(starter+s.direction+4)%4;log('Inverter inicial: sentido invertido.');}
 else if(power(first)){s.penalty=power(first);s.highest=power(first);log(`Penalidade inicial de +${s.penalty}.`);}
 else if(first.type==='dist')redistribute();
 else if(first.type==='rotate')rotateHands();
-if(s.finisher!==null){finishRound();return;}PanelinhaSFX.event('round-start');startTurn();}
+if(s.finisher!==null){finishRound();return;}const count=s.players.reduce((n,p)=>n+p.hand.length,0),duration=Math.max(0,count-1)*DEAL_TIMING.interval+DEAL_TIMING.flight+DEAL_TIMING.settle;s.lastDeal={round:s.round,duration,interval:DEAL_TIMING.interval,flight:DEAL_TIMING.flight,order:[0,1,2,3],counts:s.players.map(p=>p.hand.length)};s.dealUntil=now()+duration;s.presentationUntil=s.dealUntil;PanelinhaSFX.event('round-start');startTurn();}
 
-function canActNow(){return !!s&&!s.paused&&now()>=Math.max(s.unlockAt||0,s.presentationUntil||0);}
+function canActNow(){return !!s&&!s.paused&&!ctx.visualBusy?.()&&now()>=Math.max(s.unlockAt||0,s.presentationUntil||0,s.playUntil||0);}
 
 function closeUnoOnAction(){s.unoWindow=null;s.cutAnnounceUntil=0;s.blockedPlayer=null;}
 
@@ -176,7 +178,8 @@ function applyPlay(id,ids,isCut,color){
   closeUnoOnAction();
   p.hand=p.hand.filter(q=>q.id!==c.id);
   s.discard.push(c);if(c.type!=='rotate'&&c.type!=='dist')s.activeColor=c.color||color||s.activeColor;
-  s.drawn=null;s.pendingAction=null;s.lastActor=id;s.lastDistribution=null;s.lastRotation=null;s.lastPenaltyPurchase=null;
+  s.drawn=null;s.pendingAction=null;s.lastActor=id;s.lastDistribution=null;s.lastRotation=null;s.lastPenaltyPurchase=null;s.lastNormalPurchase=null;
+  s.lastPlay={serial:(s.playSerial=(s.playSerial||0)+1),actor:id,cardId:c.id,flight:PLAY_TIMING.flight,settle:PLAY_TIMING.settle,block:c.type==='skip'?PLAY_TIMING.block:0};s.playUntil=now()+PLAY_TIMING.flight+Math.max(PLAY_TIMING.settle,s.lastPlay.block);
   PanelinhaSFX.event('card-played',{cardType:c.type,cut:isCut});
   log(`${names(id)} ${isCut?'CORTOU com':'jogou'} ${description(c)}${COLOR_CHOOSERS.has(c.type)&&p.hand.length?' (cor: '+CN[s.activeColor]+')':''}.`);
   if(p.hand.length===1){const announced=preAnnounced(id)||(!human(id)&&(ctx.random?ctx.random():Math.random())<.75);if(announced){log(`${names(id)} anunciou ÚLTIMA CARTA.`);if(!human(id))PanelinhaAnnouncements.announce(s,id,names(id),'after-play');}else{s.unoWindow={id};log(`${names(id)} ficou com 1 carta sem anunciar!`);}}
@@ -216,14 +219,14 @@ function holdPenaltyPurchase(actor,count,reason){
 
 function finishPenaltyDraw(id){clearJobs();closeUnoOnAction();let amount=s.penalty;let got=drawMany(id,amount);holdPenaltyPurchase(id,got,'penalty');PanelinhaSFX.event('penalty-resolved',{amount});log(`${names(id)} comprou ${got} cartas da penalidade (+${amount}) e perdeu o turno.`);s.penalty=0;s.highest=0;s.lastPenalty=null;if(s.finisher!==null){finishRound();return;}s.current=nextActive(id);startTurn();}
 
-function challenge(id=0){if(!canChallenge(id)||!canActNow())return;clearJobs();closeUnoOnAction();const offender=s.lastPenalty.id,total=s.penalty;
+function challenge(id=0){if(s.pendingAction)return;if(!canChallenge(id)||!canActNow())return;clearJobs();closeUnoOnAction();const offender=s.lastPenalty.id,total=s.penalty;
 if(s.lastPenalty.illegal){const got=drawMany(offender,total);holdPenaltyPurchase(offender,got,'challenge');PanelinhaSFX.event('penalty-resolved',{amount:total});log(`Desafio CORRETO: ${names(offender)} recebeu +${total}. ${ctx.online?names(id):'Você'} mantém o turno.`);s.penalty=0;s.highest=0;s.lastPenalty=null;startTurn();}
 else{const got=drawMany(id,total+2);holdPenaltyPurchase(id,got,'challenge');PanelinhaSFX.event('penalty-resolved',{amount:total+2});log(`Desafio INCORRETO: ${ctx.online?names(id):'você'} recebeu +${total+2} e perdeu a vez.`);s.penalty=0;s.highest=0;s.lastPenalty=null;if(s.finisher!==null){finishRound();return;}s.current=nextActive(id);startTurn();}}
 
-function buy(id=0){if(!s||s.phase!=='playing'||s.current!==id||s.drawn!==null||!canActNow())return;clearJobs();closeUnoOnAction();if(s.penalty){finishPenaltyDraw(id);return;}let got=null,n=0;do{got=drawCard(id);if(!got)break;n++;}while(s.o.infinite&&!canPlay(got)&&n<200);log(`${names(id)} comprou ${n} carta(s).`);if(got&&canPlay(got)){s.drawn=got.id;s.message='Você pode jogar a carta comprada ou guardá-la e passar.';render();}
+function buy(id=0){if(!s||s.phase!=='playing'||s.current!==id||s.pendingAction||s.drawn!==null||!canActNow())return;clearJobs();closeUnoOnAction();if(s.penalty){finishPenaltyDraw(id);return;}let got=null,n=0;do{got=drawCard(id);if(!got)break;n++;}while(s.o.infinite&&!canPlay(got)&&n<200);log(`${names(id)} comprou ${n} carta(s).`);if(got&&canPlay(got)){s.drawn=got.id;s.message='Você pode jogar a carta comprada ou guardá-la e passar.';render();}
 else{s.message='Nenhuma carta válida comprada. Turno encerrado.';s.current=nextActive(id);startTurn();}}
 
-function keepPass(id=0){if(s.phase!=='playing'||s.current!==id||s.drawn===null||!canActNow())return;clearJobs();log(`${names(id)} guardou a carta comprada e passou.`);s.drawn=null;s.current=nextActive(id);startTurn();}
+function keepPass(id=0){if(s.pendingAction)return;if(s.phase!=='playing'||s.current!==id||s.drawn===null||!canActNow())return;clearJobs();log(`${names(id)} guardou a carta comprada e passou.`);s.drawn=null;s.current=nextActive(id);startTurn();}
 
 // A mesma validação do descarte cobre turno normal, carta comprada e corte.
 function canAnnounceUNO(id=0){
@@ -297,15 +300,16 @@ render();}
 function victories(id){return s.pastWinners?s.pastWinners.filter(x=>x===id).length:0;}
 
 function botTurn(){if(!s||s.phase!=='playing'||human(s.current)||s.pendingAction)return;if(!canActNow()){queueBots();return;}let id=s.current;
+if(s.botDrawPending?.actor===id){const pending=s.botDrawPending;s.botDrawPending=null;s.lastNormalPurchase=null;const card=s.players[id].hand.find(c=>c.id===pending.cardId);if(pending.playable&&card&&canPlay(card)){applyPlay(id,[card.id],false,colorForPlay(card,s.players[id].hand.filter(c=>c.id!==card.id)));return;}s.current=nextActive(id);startTurn();return;}
 const p=s.players[id];let choices=p.hand.filter(canPlay);let chosen=null;
 if(s.penalty){const defending=choices.filter(c=>power(c));if(defending.length)chosen=defending.sort((a,b)=>power(a)-power(b))[0];}
 else if(choices.length){let numeric=choices.filter(c=>c.type==='num');let colored=choices.filter(c=>!isColorless(c)&&c.type!=='num');let regularWild=choices.filter(c=>c.type==='wild');let specials=choices.filter(c=>isColorless(c)&&c.type!=='wild');chosen=pick(numeric.length?numeric:colored.length?colored:regularWild.length?regularWild:specials);}
 if(chosen){let color=colorForPlay(chosen,p.hand.filter(c=>c.id!==chosen.id));applyPlay(id,[chosen.id],false,color);return;}
 if(s.penalty){finishPenaltyDraw(id);return;}
 let drawn=null,n=0;do{drawn=drawCard(id);if(!drawn)break;n++;}while(s.o.infinite&&!canPlay(drawn)&&n<200);log(`${names(id)} comprou ${n} carta(s).`);
-if(drawn&&canPlay(drawn)){// Bots use a bought special only when they have no other ordinary play.
-let normal=p.hand.some(c=>c.id!==drawn.id&&c.type==='num'&&canPlay(c));if(!normal){applyPlay(id,[drawn.id],false,colorForPlay(drawn,p.hand.filter(c=>c.id!==drawn.id)));return;}}
-s.current=nextActive(id);startTurn();}
+const normal=drawn&&p.hand.some(c=>c.id!==drawn.id&&c.type==='num'&&canPlay(c));
+s.botDrawPending={actor:id,cardId:drawn?.id??null,playable:!!drawn&&canPlay(drawn)&&!normal};
+const duration=drawSequence(n,'normal').duration;s.lastNormalPurchase={actor:id,count:n,duration};s.presentationUntil=now()+duration;s.unlockAt=Math.max(s.unlockAt||0,s.presentationUntil);if(s.deadline)s.deadline+=duration;render();queueBots();}
 
 function colorForPlay(card,hand){return card.color||(COLOR_CHOOSERS.has(card.type)?bestColor(hand):s.activeColor);}
 
@@ -313,5 +317,5 @@ function bestColor(cards){let counts=COLORS.map(color=>({color,n:cards.filter(c=
 const functions={make,shuffle,descriptor,description,isColorless,equals,power,buildDeck,log,top,nextActive,refill,drawCard,drawMany,redistribute,rotateHands,newRound,holdPenaltyPurchase,canActNow,closeUnoOnAction,canDistribute,canPlay,checkCards,resolvePressurePlay,applyPlay,finishPenaltyDraw,challenge,buy,keepPass,canAnnounceUNO,announceUNO,canReportUNO,reportUno,handPoints,specialCount,effectCount,numberCount,rankPlayers,finishRound,finalStandings,victories,botTurn,colorForPlay,bestColor,canChallenge};
 return Object.fromEntries(Object.entries(functions).map(([name,fn])=>[name,(...args)=>{s=ctx.getState();return fn(...args)}]));
 }
-globalThis.PanelinhaRules=Object.freeze({create,COLORS,CN,TYPES,SHORT,COLORLESS,COLOR_CHOOSERS,SPECIAL,VALUE,CUT_PAUSE_MS,CUT_UNO_GRACE_MS,DRAW_PACES,drawSequence});
+globalThis.PanelinhaRules=Object.freeze({create,COLORS,CN,TYPES,SHORT,COLORLESS,COLOR_CHOOSERS,SPECIAL,VALUE,CUT_PAUSE_MS,CUT_UNO_GRACE_MS,DRAW_PACES,drawSequence,PLAY_TIMING,DEAL_TIMING});
 })();

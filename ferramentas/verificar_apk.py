@@ -27,7 +27,7 @@ metadata = subprocess.check_output([str(aapt), 'dump', 'badging', str(apk)], tex
 package = re.search(r"package: name='([^']+)' versionCode='(\d+)' versionName='([^']+)'", metadata)
 assert package and package[1] == identity['applicationId'], 'applicationId divergente'
 assert int(package[2]) >= identity['firstVersionCode'], 'versionCode anterior à geração de assinatura ativa'
-assert "application-label:'Panelinha Teste'" in metadata, 'Nome do app incorreto'
+assert "application-label:'Panelinha'" in metadata, 'Nome do app incorreto'
 assert "sdkVersion:'24'" in metadata and "targetSdkVersion:'36'" in metadata
 assert 'application-debuggable' not in metadata, 'Distribuir somente APK release'
 xml = subprocess.check_output([str(aapt), 'dump', 'xmltree', str(apk), 'AndroidManifest.xml'], text=True)
@@ -40,6 +40,9 @@ if os.environ.get('PANELINHA_VERSION_NAME'):
 manifest = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_CARTAS_470X800.json').read_text())
 with zipfile.ZipFile(apk) as archive:
     prefix = 'assets/public/'
+    launcher_pngs=[n for n in archive.namelist() if n.startswith('res/mipmap-') and re.search(r'/ic_launcher(?:_round|_foreground)?\.png$',n)]
+    assert len(launcher_pngs)==15, 'Ícones Android legados/adaptativos incompletos'
+    assert any(n.endswith('/ic_launcher.xml') and 'anydpi' in n for n in archive.namelist()), 'Ícone adaptativo ausente'
     pngs = [p for p in archive.namelist() if p.startswith(prefix + 'assets/cartas/') and p.endswith('.png')]
     expected_pngs = sorted(prefix+a['path'] for a in manifest['assets'])
     assert sorted(pngs) == expected_pngs and len(pngs) == 23, 'Devem existir somente os 23 novos PNGs de cartas'
@@ -47,7 +50,7 @@ with zipfile.ZipFile(apk) as archive:
     for entry in manifest['assets']:
         data = archive.read(prefix + entry['path'])
         assert len(data) == entry['bytes'] and hashlib.sha256(data).hexdigest() == entry['sha256'], entry['path']
-        color_type = 2 if entry['path'].startswith('assets/cartas/fundos/') else 6  # fundos RGB; demais RGBA
+        color_type = 2 if entry.get('mode')=='RGB' else 6  # fundos RGB; demais RGBA
         assert data[:8] == b'\x89PNG\r\n\x1a\n' and struct.unpack('>II', data[16:24]) == (entry['width'],entry['height']) and data[25] == color_type, 'Dimensões/formato PNG divergentes: '+entry['path']
         unit = entry['path'].startswith('assets/cartas/elementos/')
         assert (re.fullmatch(r'assets/cartas/elementos/(numero_[0-9]|mais2|bloqueio|inverter)\.png',entry['path']) and (entry['width'],entry['height']) == (512,512)) if unit else (entry['width'],entry['height']) == (470,800), 'Formato de arte inesperado: '+entry['path']
@@ -90,6 +93,7 @@ with zipfile.ZipFile(apk) as archive:
     assert config['server']['hostname'] == 'localhost' and config['server']['androidScheme'] == 'https'
     assert 'url' not in config['server'], 'O APK não deve depender de servidor remoto'
 info = {
+    'appName': 'Panelinha', 'launcherIconsVerified':len(launcher_pngs),
     'specialIngredientAssetsVerified': len(ingredients['assets']),
     'visualSoundAssetsVerified': len(visual_sound['assets']),
     'file': apk.name, 'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),

@@ -96,7 +96,13 @@ jobs:
           python3 ferramentas/compilar_android.py --secrets-dir "$RUNNER_TEMP/panelinha-signing" --code '${{ steps.version.outputs.code }}' --name '${{ steps.version.outputs.name }}' "${test_args[@]}"
           if test "$RUN_ANDROID_EMULATOR" = 'true'; then
             cp android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk "$RUNNER_TEMP/panelinha-instrumentation.apk"
+            cp artifacts/panelinha.apk artifacts/panelinha-base.apk
+            cp artifacts/panelinha.json artifacts/panelinha-base.json
             python3 ferramentas/compilar_android.py --secrets-dir "$RUNNER_TEMP/panelinha-signing" --code '${{ steps.version.outputs.nextcode }}' --name '${{ steps.version.outputs.name }}-upgrade-check'
+            mv artifacts/panelinha.apk artifacts/panelinha-upgrade.apk
+            mv artifacts/panelinha.json artifacts/panelinha-upgrade.json
+            mv artifacts/panelinha-base.apk artifacts/panelinha.apk
+            mv artifacts/panelinha-base.json artifacts/panelinha.json
           fi
       - name: Registrar Android não executado por opção
         if: env.RUN_ANDROID_EMULATOR != 'true'
@@ -132,7 +138,7 @@ jobs:
           # Mantém as animações do app e todos os testes, inclusive imagens/offline.
           emulator-options: -no-window -gpu software -no-snapshot -noaudio -no-boot-anim -feature -Vulkan
           disable-animations: true
-          script: bash ferramentas/testar_android.sh 'artifacts/Panelinha-Teste-v${{ steps.version.outputs.name }}-c${{ steps.version.outputs.code }}.apk' 'artifacts/Panelinha-Teste-v${{ steps.version.outputs.name }}-upgrade-check-c${{ steps.version.outputs.nextcode }}.apk' "$RUNNER_TEMP/panelinha-instrumentation.apk"
+          script: bash ferramentas/testar_android.sh 'artifacts/panelinha.apk' 'artifacts/panelinha-upgrade.apk' "$RUNNER_TEMP/panelinha-instrumentation.apk"
       - name: Diagnosticar falha do emulador
         if: failure() && env.RUN_ANDROID_EMULATOR == 'true' && steps.android_tests.outcome == 'failure'
         run: |
@@ -158,7 +164,7 @@ jobs:
         if: always() && steps.build.outcome == 'success'
         uses: actions/upload-artifact@v7
         with:
-          path: artifacts/Panelinha-Teste-v${{ steps.version.outputs.name }}-c${{ steps.version.outputs.code }}.apk
+          path: artifacts/panelinha.apk
           archive: false
           if-no-files-found: error
           retention-days: 90
@@ -167,14 +173,14 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: metadados-apk-${{ github.run_number }}-${{ github.run_attempt }}
-          path: artifacts/Panelinha-Teste-v${{ steps.version.outputs.name }}-c${{ steps.version.outputs.code }}.json
+          path: artifacts/panelinha.json
           if-no-files-found: error
           retention-days: 90
       - name: Registrar link direto e resultado dos testes
         if: always() && steps.apk_download.outcome == 'success'
         env:
           APK_URL: ${{ steps.apk_download.outputs.artifact-url }}
-          APK_NAME: Panelinha-Teste-v${{ steps.version.outputs.name }}-c${{ steps.version.outputs.code }}.apk
+          APK_NAME: panelinha.apk
           ANDROID_RESULT: ${{ steps.android_tests.outcome }}
         run: |
           python3 - <<'PYTHON'
@@ -210,7 +216,7 @@ jobs:
             ref_status=$?
             test "$ref_status" -eq 2 || exit "$ref_status"
           fi
-          gh release create "v$RELEASE_NAME" "artifacts/Panelinha-Teste-v$RELEASE_NAME-c$RELEASE_CODE.apk" "artifacts/Panelinha-Teste-v$RELEASE_NAME-c$RELEASE_CODE.json" --target "$GITHUB_SHA" --title "Panelinha Teste v$RELEASE_NAME" --prerelease --notes-file "$RUNNER_TEMP/panelinha-release.md"
+          gh release create "v$RELEASE_NAME" "artifacts/panelinha.apk" "artifacts/panelinha.json" --target "$GITHUB_SHA" --title "Panelinha v$RELEASE_NAME" --prerelease --notes-file "$RUNNER_TEMP/panelinha-release.md"
       - name: Limpar material de assinatura do runner
         if: always()
         run: rm -rf "$RUNNER_TEMP/panelinha-signing"

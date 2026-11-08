@@ -4,9 +4,9 @@
     <application
         android:allowBackup="true"
         android:appCategory="game"
-        android:icon="@drawable/ic_panelinha"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/ic_panelinha"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 

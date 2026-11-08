@@ -102,11 +102,12 @@
       "sha256": "0a3f18b670e158d329e17964b0cd0510be1e5ed118ec8b9c857e26e2efefa89e"
     },
     {
-      "path": "assets/cartas/especiais/carta_curinga.png",
+      "path": "assets/cartas/especiais/carta_curinga_redesenhada_470x800.png",
       "width": 470,
       "height": 800,
-      "bytes": 676386,
-      "sha256": "a825ce929e3c2464f8352b6acff98b7ca024527ce1ddb807b0195f6a95a39365"
+      "bytes": 717470,
+      "sha256": "45b25cee9dd3d72bb8f4a7164b94b72f9c8958f1cf22955d0aae3ed4788b60e9",
+      "mode": "RGBA"
     },
     {
       "path": "assets/cartas/especiais/carta_liquidificador.png",
@@ -116,18 +117,20 @@
       "sha256": "442fd6a0638fa90abeb5b3c1c8c53b3c767602810c54093affc76c98be1c54a8"
     },
     {
-      "path": "assets/cartas/especiais/carta_mais4.png",
+      "path": "assets/cartas/especiais/carta_mais4_redesenhada_470x800.png",
       "width": 470,
       "height": 800,
-      "bytes": 645501,
-      "sha256": "2c524a8579bd41d3ebaa3b6fbf1bcbe94894cf33f8900d7c0a2ed6356d1f29b9"
+      "bytes": 664240,
+      "sha256": "2758a1753136f3455bc0f539592047fb643826de48c0bb929af00f580c4a60e3",
+      "mode": "RGBA"
     },
     {
-      "path": "assets/cartas/especiais/carta_mais6.png",
+      "path": "assets/cartas/especiais/carta_mais6_redesenhada_470x800.png",
       "width": 470,
       "height": 800,
-      "bytes": 707078,
-      "sha256": "116ccf4631bc69cc70c486b6d9d7603dff753ca17b77c934f08f2c294620dbf6"
+      "bytes": 739418,
+      "sha256": "a481b63201cc550b83a12aac0cafe2c2e05bb6c217dbc1794da2d050bf606135",
+      "mode": "RGBA"
     },
     {
       "path": "assets/cartas/especiais/carta_panela_de_pressao.png",
@@ -160,12 +163,12 @@
       "mode": "RGB"
     },
     {
-      "path": "assets/cartas/fundos/fundo_verde_novo_470x800.png",
+      "path": "assets/cartas/fundos/fundo_verde_claro_470x800.png",
       "width": 470,
       "height": 800,
-      "bytes": 455461,
-      "sha256": "20dbb6b5d8a129e3cb892afc45e96924aaff4f0268993c90ab5f209cc7feae20",
-      "mode": "RGB"
+      "bytes": 528881,
+      "sha256": "615daf49859c02f652c628111762a2888e8e685673d67d61d203418c737c377a",
+      "mode": "RGBA"
     },
     {
       "path": "assets/cartas/fundos/fundo_vermelho_novo_470x800.png",
@@ -178,16 +181,12 @@
   ],
   "packages": [
     {
-      "path": "panelinha_especiais_e_verso_aprovados_470x800.zip",
-      "sha256": "c440399e1ad8ad26d80b39e3d7070a92d240cb0a544e031f7a1cd0b1c6d43c79"
-    },
-    {
-      "path": "panelinha_fundos_normais_novos_470x800.zip",
-      "sha256": "203442471e7f50b21a9f186b56d8a67f300d35fb8696b26f2c646c1c6ad271c7"
-    },
-    {
       "path": "panelinha_numeros_simbolos_sombra_aprovados_v3.zip",
       "sha256": "e4dcda424e8dad5db407ce6dda4b45fea0a77411d7b50e0d0ed93bc88297c1be"
+    },
+    {
+      "path": "panelinha_4_artes_redesenhadas_aprovadas_470x800.zip",
+      "sha256": "b990225eae384a9b332d3b0c9a68e0bb34bcb17946f04d2627d7a7699bdafaaa"
     }
   ],
   "removedRepositoryFiles": [
@@ -341,7 +340,17 @@
     "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_7_refeito.png",
     "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_8_refeito.png",
     "IMPORTACAO_PANELAS/assets/cartas/elementos/numero_9_refeito.png",
-    "panelinha_numeros_refeitos_separados.zip"
+    "panelinha_numeros_refeitos_separados.zip",
+    "IMPORTACAO_PANELAS/assets/cartas/especiais/carta_curinga.png",
+    "IMPORTACAO_PANELAS/assets/cartas/especiais/carta_mais4.png",
+    "IMPORTACAO_PANELAS/assets/cartas/especiais/carta_mais6.png",
+    "IMPORTACAO_PANELAS/assets/cartas/fundos/fundo_verde_novo_470x800.png",
+    "panelinha_especiais_e_verso_aprovados_470x800.zip",
+    "panelinha_fundos_normais_novos_470x800.zip"
   ],
-  "symbolComposition": "background + center + top-left + bottom-right; three instances of one unit PNG"
+  "symbolComposition": "background + center + top-left + bottom-right; three instances of one unit PNG",
+  "approvedRedesignArchive": {
+    "path": "panelinha_4_artes_redesenhadas_aprovadas_470x800.zip",
+    "sha256": "b990225eae384a9b332d3b0c9a68e0bb34bcb17946f04d2627d7a7699bdafaaa"
+  }
 }

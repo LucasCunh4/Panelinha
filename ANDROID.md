@@ -22,7 +22,7 @@ O Android é um contêiner Capacitor 8.6.0 do jogo existente. `IMPORTACAO_PANELA
 
 ## Identidade permanente de atualização
 
-- Nome: **Panelinha Teste**.
+- Nome: **Panelinha**.
 - applicationId/namespace: **`com.lucascunha.panelinha.teste`**.
 - Origem local do WebView: **`https://localhost`**.
 - Certificado público SHA-256 registrado em `android-identity.json`.

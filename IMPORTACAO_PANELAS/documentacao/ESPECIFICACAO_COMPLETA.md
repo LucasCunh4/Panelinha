@@ -188,3 +188,13 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 - Punições usam 1000 ms por carta e intervalo fixo de 480 ms, sem aceleração progressiva. O prazo autoritativo é o tempo real da sequência mais 200 ms, limitado pela quantidade efetivamente comprada, sem ACK de cliente. Demais jogadores veem versos e deslocamento direto; o comprador vê as frentes.
 - Na decisão de compra ficam somente Jogar, Guardar e Última Carta quando elegível. Sem Guardar e passar separado nem anúncio duplicado fora do preview.
 - A mesa mostra somente os três avatares alheios, circulares e maiores, com nomes e contadores públicos; o próprio avatar continua no perfil/pódio. A chama recebe mais 3 px CSS à esquerda (além do deslocamento anterior), e a órbita inteira mais 2 px CSS para baixo; raios, correção inferior, direção, velocidade e intensidade são preservados.
+
+## Atualização de apresentação de 08/11/2026
+
+- Artes redesenhadas de Coringa/+4/+6 e fundo verde-claro; mesma geometria 520×850, borda externa 25.
+- Seletor com mensagem Escolha uma cor para continuar e Visualizar mesa, mantendo a ação pendente e o sigilo.
+- Distribuição inicial por `lastDeal`/`dealUntil`, quatro assentos alternados conforme o motor e sem mudança na quantidade lógica.
+- Descarte por `PLAY_TIMING`, `lastPlay`/`playUntil` e conclusão WAAPI no cliente; cortes permanecem na janela de 2,2 s e anúncio após corte em 300 ms. Bots aguardam a compra normal antes de efetivar descarte, preservando sua decisão.
+- Ritmo normal 1960 ms, intervalo fixo 2020 ms e aproximação 760 ms. Punição preservada em 120 ms por carta, intervalo 80 ms, acomodação 40 ms.
+- Inverter transiciona o cometa por 400 ms; Liquidificador move quatro montes compactos.
+- Aplicativo Panelinha, identificação local abaixo da mão e laboratório separado da interface de produção.

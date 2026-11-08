@@ -26,4 +26,6 @@
 
 - Fundos vigentes: quatro `fundo_*_novo_470x800.png` RGB em `assets/cartas/fundos/`; preservar os originais opacos. Demais cartas/símbolos continuam RGBA. A troca dos fundos não altera `symbolLayout`, geometria, bordas ou escala. Não restaurar os fundos `_retrabalhado_470x800` nem seu ZIP.
 
-- Interação vigente: um toque/clique na carta tenta jogar pelo comando original; sem seleção persistente/segundo toque. Preservar hover/foco, bloqueio durante transições e proteção contra arraste. Seletor mostra só a carta ampliada; título apenas acessível, cancelamento por fundo/Escape/Voltar.
+- Interação vigente: um toque/clique na carta tenta jogar pelo comando original; sem seleção persistente/segundo toque. Preservar hover/foco, bloqueio durante transições e proteção contra arraste. Seletor mostra a carta, a mensagem Escolha uma cor para continuar e Visualizar mesa; esta opção recolhe a escolha sem cancelar a ação pendente. Voltar retorna à escolha.
+
+- Apresentação compartilhada: `PLAY_TIMING` e `DEAL_TIMING` no motor publicam `playUntil`, `lastPlay` e `lastDeal` sem cartas secretas. Servidor protege o próximo descarte; cortes continuam na janela própria. Cliente espera Promises WAAPI com fallback limitado e limpeza. Liquidificador move somente quatro montes compactos. Laboratório fora do menu, opt-in local `?dev`. Nome Android Panelinha e artefato panelinha.apk; certificado/pacote/origem preservados.

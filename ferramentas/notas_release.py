@@ -6,9 +6,9 @@ name, code = sys.argv[1:3]
 identity = json.loads(Path('android-identity.json').read_text())
 status = os.environ.get('PANELINHA_ANDROID_TEST_RESULT', 'not-run')
 android_result = 'Testes Android não executados por opção; nenhum emulador iniciado. Instalação, atualização e retenção de dados não testadas.' if status in {'skipped', 'not-run'} else f'Resultado dos testes Android nesta execução: {status}.'
-print(f'''Panelinha Teste v{name} — versionCode {code}
+print(f'''Panelinha v{name} — versionCode {code}
 
-APK de testes Capacitor com jogo local offline, 1 humano + 3 bots e laboratório.
+APK de testes Capacitor com jogo local offline, 1 humano + 3 bots .
 Android 7.0 ou posterior. Toque no arquivo .apk abaixo para baixar e instalar.
 Assinatura permanente de testes, geração {identity.get('signingGeneration', 1)}.
 APKs antigos v0.1/v0.1.1 usam outro certificado e NÃO aceitam esta atualização.

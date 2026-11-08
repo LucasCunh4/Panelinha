@@ -4,7 +4,7 @@ import {DEFAULT_RULES} from '../src/protocol.mjs';
 import {createMatch,engine,perform,gameView,conserve,advance,nextWake} from '../src/game.mjs';
 function fixture(){
  const r={status:'lobby',rules:{...DEFAULT_RULES,timeout:15},players:[0,1,2,3].map(i=>({id:'p'+i,name:'Chef '+i,avatar:'frigideira-chef',bot:false,connected:true,ready:true,team:i%2+1}))};createMatch(r,1000);
- const s=r.game,{core}=engine(r,5000);Object.assign(s,{phase:'playing',current:0,direction:-1,activeColor:'red',penalty:0,highest:0,finisher:null,unlockAt:0,presentationUntil:0,lastDistribution:null,countdownAt:0,deadline:0,cutOpen:false,drawn:null,unoWindow:null,preUnoById:{},events:[]});
+ const s=r.game,{core}=engine(r,5000);Object.assign(s,{phase:'playing',blockedPlayer:null,current:0,direction:-1,activeColor:'red',penalty:0,highest:0,finisher:null,unlockAt:0,presentationUntil:0,lastDistribution:null,countdownAt:0,deadline:0,cutOpen:false,drawn:null,unoWindow:null,preUnoById:{},events:[]});
  const c=(t='num',color='red',n=7)=>core.make(t,color,n);s.discard=[c()];s.deck=Array.from({length:70},()=>c('num','blue',2));for(const p of s.players)p.hand=Array.from({length:8},()=>c());
  const seal=()=>s.cardCount=s.deck.length+s.discard.length+s.players.flatMap(p=>p.hand).length,actor=id=>r.players.find(p=>p.id===s.seats[id]);seal();return{r,s,core,c,seal,actor};
 }

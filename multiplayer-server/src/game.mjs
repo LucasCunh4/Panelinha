@@ -5,7 +5,7 @@ const Rules=globalThis.PanelinhaRules;
 const random=()=>randomInt(0x100000000)/0x100000000;
 const member=(room,seat)=>room.players.find(p=>p?.id===room.game.seats[seat]);
 export const automated=p=>!!p&&(p.bot||p.connected===false||p.idleBot===true);
-const TIMERS=['presentationUntil','unlockAt','deadline','countdownAt','botAt','botCutAt','reportAt','idleAt','cutAnnounceUntil'];
+const TIMERS=['presentationUntil','unlockAt','deadline','countdownAt','botAt','botCutAt','reportAt','idleAt','cutAnnounceUntil','playUntil','dealUntil'];
 const idleDelay=120000;
 function emit(game,type,data={}){
   game.events.push({id:++game.eventSerial,type,...data});
@@ -19,7 +19,7 @@ export function engine(room,now=Date.now()){
     const wait=s.starting?3000:(s.o.cut?pause:Math.min(400,pause));
     s.countdownAt=s.starting?now+3000:0;s.starting=false;
     const origin=Math.max(now,s.presentationUntil||0);
-    s.unlockAt=origin+wait;s.cutOpen=!!(s.o.cut&&pause>0&&s.finisher===null);
+    s.unlockAt=Math.max(s.countdownAt||origin+wait,s.presentationUntil||0,s.playUntil||0);s.cutOpen=!!(s.o.cut&&pause>0&&s.finisher===null);
     s.deadline=s.o.timeout?s.unlockAt+s.o.timeout*1000:0;
     s.idleAt=!s.o.timeout&&!automated(member(room,s.current))?s.unlockAt+idleDelay:0;
     s.botAt=automated(member(room,s.current))?Math.max(now+700,s.unlockAt+20):0;
@@ -112,7 +112,7 @@ export function pauseMatch(room,now=Date.now()){
   // A contagem de entrada é reapresentada integralmente na retomada. Prazos de
   // jogo ainda não abertos não perdem parte do turno por pausar nesse intervalo.
   const origin=Math.max(now,s.countdownAt||0);
-  s.frozen=Object.fromEntries(TIMERS.map(key=>[key,s[key]>0?Math.max(1,s[key]-origin):0]));
+  s.frozen=Object.fromEntries(TIMERS.map(key=>[key,s[key]>0?Math.max(1,s[key]-(['presentationUntil','playUntil','dealUntil'].includes(key)?now:origin)):0]));
   if(s.countdownAt){s.frozen.unlockAt=0;s.frozen.countdownAt=0;}
   for(const key of TIMERS)s[key]=0;
   s.paused=true;s.resumeAt=0;
@@ -141,6 +141,7 @@ export function advance(room,now=Date.now()){
     if(!s.resumeAt||now<s.resumeAt)return false;
     const release=s.resumeAt;
     for(const key of TIMERS)s[key]=s.frozen[key]>0?release+s.frozen[key]:0;
+    if(!s.frozen.unlockAt&&s.presentationUntil>release){s.unlockAt=Math.max(s.presentationUntil,s.playUntil||0);if(s.deadline)s.deadline+=s.unlockAt-release;}
     s.paused=false;s.resumeAt=0;s.frozen=null;emit(s,'sound',{name:'round-start'});
   }
   if(s.presentationUntil&&now<s.presentationUntil){refreshAutomation(room,now);return JSON.stringify(s)!==before;}
@@ -184,7 +185,7 @@ export function gameView(room,viewerId,now=Date.now()){
   const visible=seat=>seat===self||(s.o.duo&&seat%2===self%2);
   return {matchId:s.matchId,self,serverNow:now,o:{...s.o},round:s.round,phase:s.phase,activeColor:s.activeColor,direction:s.direction,current:s.current,
     penalty:s.penalty,highest:s.highest,finisher:s.finisher,drawn:s.current===self?s.drawn:null,cutOpen:s.cutOpen,cutAnnounceUntil:s.cutAnnounceUntil||0,unlockAt:s.unlockAt,deadline:s.deadline,
-    presentationUntil:s.presentationUntil||0,lastDistribution:s.lastDistribution,lastRotation:s.lastRotation||null,blockedPlayer:s.blockedPlayer??null,lastPenaltyPurchase:s.lastPenaltyPurchase?{...Object.fromEntries(Object.entries(s.lastPenaltyPurchase).filter(([key])=>key!=='cardIds')),...(s.lastPenaltyPurchase.actor===self?{cardIds:s.lastPenaltyPurchase.cardIds}:{})}:null,finalStandings:s.finalStandings||null,roundScore:s.roundScore||null,countdownAt:s.countdownAt,paused:!!s.paused,resumeAt:s.resumeAt||0,remaining:s.paused?{turn:s.frozen.deadline,cut:s.frozen.unlockAt,presentation:s.frozen.presentationUntil,cutAnnounce:s.frozen.cutAnnounceUntil}:null,lastActor:s.lastActor,preUno:!!s.preUnoById[self],unoWindow:s.unoWindow,teams:[...s.teams],
+    dealUntil:s.dealUntil||0,playUntil:s.playUntil||0,lastPlay:s.lastPlay||null,lastDeal:s.lastDeal||null,lastNormalPurchase:s.lastNormalPurchase||null,presentationUntil:s.presentationUntil||0,lastDistribution:s.lastDistribution,lastRotation:s.lastRotation||null,blockedPlayer:s.blockedPlayer??null,lastPenaltyPurchase:s.lastPenaltyPurchase?{...Object.fromEntries(Object.entries(s.lastPenaltyPurchase).filter(([key])=>key!=='cardIds')),...(s.lastPenaltyPurchase.actor===self?{cardIds:s.lastPenaltyPurchase.cardIds}:{})}:null,finalStandings:s.finalStandings||null,roundScore:s.roundScore||null,countdownAt:s.countdownAt,paused:!!s.paused,resumeAt:s.resumeAt||0,remaining:s.paused?{turn:s.frozen.deadline,cut:s.frozen.unlockAt,presentation:s.frozen.presentationUntil,cutAnnounce:s.frozen.cutAnnounceUntil}:null,lastActor:s.lastActor,preUno:!!s.preUnoById[self],unoWindow:s.unoWindow,teams:[...s.teams],
     summary:s.summary,winner:s.winner||null,winnerId:s.winnerId??null,winnerTeam:s.winnerTeam??null,token:s.token,deckCount:s.deck.length,discard:s.discard.slice(-3),message:s.current!==self&&s.message.startsWith('Você')?'':s.message,log:s.log.slice(0,40),
     players:s.players.map(p=>{const m=member(room,p.id);return {id:p.id,memberId:m.id,name:m.name,avatar:m.avatar,team:m.team,bot:m.bot,substituted:!m.bot&&automated(m),idleBot:!!m.idleBot,connected:m.connected!==false,score:p.score,count:p.hand.length,...(visible(p.id)?{hand:p.hand.map(c=>({...c}))}:{})};}),
     actions:{legal,cuts,draw,reclaim:!!member(room,self).idleBot,distributePossible:own.hand.filter(c=>c.type==='dist'&&core.canDistribute(c)).map(c=>c.id),pass:enabled&&s.phase==='playing'&&s.current===self&&core.canActNow()&&s.drawn!==null,challenge:enabled&&!!core.canChallenge(self)&&core.canActNow(),

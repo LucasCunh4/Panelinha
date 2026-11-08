@@ -1,6 +1,6 @@
 {
   "appId": "com.lucascunha.panelinha.teste",
-  "appName": "Panelinha Teste",
+  "appName": "Panelinha",
   "webDir": "dist",
   "server": {
     "hostname": "localhost",

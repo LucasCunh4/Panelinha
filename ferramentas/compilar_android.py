@@ -39,7 +39,7 @@ if args.test_apk:
 subprocess.run(command, cwd=root / 'android', env=env, check=True)
 output = root / 'artifacts'
 output.mkdir(exist_ok=True)
-apk = output / f'Panelinha-Teste-v{args.name}-c{args.code}.apk'
+apk = output / 'panelinha.apk'
 shutil.copyfile(root / 'android/app/build/outputs/apk/release/app-release.apk', apk)
 subprocess.run(['python3', str(root / 'ferramentas/verificar_apk.py'), str(apk)], cwd=root, env=env, check=True)
 print(f'APK verificado: {apk}')

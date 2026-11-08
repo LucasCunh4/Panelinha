@@ -22,3 +22,5 @@
 .draw-choice-actions .btn{min-width:80px;padding:8px 12px}
 .draw-choice-actions .draw-uno{min-width:106px;font-size:13px}
 @media(max-height:420px){.draw-choice-actions{top:calc(100% + 7px)}.draw-choice-actions .btn{min-height:44px}}
+
+.table.play-presentation[data-phase=gameOver] #controls,.table.play-presentation[data-phase=roundOver] #controls{visibility:hidden}

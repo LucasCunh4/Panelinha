@@ -3,7 +3,7 @@
   const $=id=>document.getElementById(id),motion=matchMedia('(prefers-reduced-motion: reduce)');
   let owner=null,round=null,previous=null,pressure=null,frame=0,decision=null,lastOrigin=null,seenPurchase=0;
   const draws=new Set(),masked=new Set(),nodes=new Set(),incoming=new Map();
-  let prepared=[],arrivalLayout=false,queued=[],drawTimer=null,renderFrame=null;
+  let prepared=[],arrivalLayout=false,queued=[],drawTimer=null,renderFrame=null,deal=null;
   const drawKey=(actor,id)=>actor+':'+id;
   function handCards(s,actor){return s.players[actor].hand.filter(c=>!incoming.has(drawKey(actor,c.id)));}
   const bridge=()=>window.PanelinhaTableBridge;
@@ -29,7 +29,7 @@
     remove(previousDecision.node);
     if(deliver)placeDecision(previousDecision);else masked.delete(previousDecision.id);
   }
-  function reset(){clearTimeout(frame);clearTimeout(drawTimer);cancelAnimationFrame(renderFrame);drawTimer=renderFrame=null;queued=[];pressure=null;previous=null;owner=null;round=null;seenPurchase=0;closeDecision();lastOrigin=null;draws.clear();masked.clear();incoming.clear();prepared=[];arrivalLayout=false;for(const n of [...nodes])remove(n);$('table').classList.remove('pressure-transition','pressure-hands-hidden','penalty-purchase-transition');}
+  function reset(){if(deal){clearTimeout(deal.fallback);deal=null;}clearTimeout(frame);clearTimeout(drawTimer);cancelAnimationFrame(renderFrame);drawTimer=renderFrame=null;queued=[];pressure=null;previous=null;owner=null;round=null;seenPurchase=0;closeDecision();lastOrigin=null;draws.clear();masked.clear();incoming.clear();prepared=[];arrivalLayout=false;for(const n of [...nodes])remove(n);$('table').classList.remove('pressure-transition','pressure-hands-hidden','penalty-purchase-transition');}
   function clock(s){return pressure.duration-(s.paused?s.remaining?.presentation||0:Math.max(0,(s.presentationUntil||0)-Date.now()));}
   function animatePressure(s,p,elapsed){
     if(motion.matches)return;
@@ -60,42 +60,36 @@
     return {x:Math.max(width/2+10,Math.min(innerWidth-width/2-10,x)),y:Math.max(height/2+8,Math.min(innerHeight-height/2-8,y)),width,height};
   }
   function animateRotation(s,p,elapsed){
-    if(motion.matches)return;
-    if(elapsed>=690&&!p.collecting){
-      p.collecting=true;p.bundles=p.old.map((_,id)=>bundlePoint(p,id));
-      p.old.forEach((hand,actor)=>hand.forEach((card,i)=>{
-        const start=p.points[actor][i]||point(actor,card.id),end=p.bundles[actor],n=sprite(card,visible(s,actor),start,'rotation-collect');n.dataset.actor=actor;
-        const a=n.animate([{opacity:1,transform:`translate(-50%,-50%) rotate(${start.angle||0}deg)`},{opacity:1,transform:`translate(calc(-50% + ${end.x-start.x}px),calc(-50% + ${end.y-start.y}px)) rotate(${(i%3-1)*2}deg) scale(${end.width/start.width},${end.height/start.height})`}],{duration:Math.max(50,940-elapsed),easing:'cubic-bezier(.3,.1,.2,1)',fill:'forwards'});a.onfinish=()=>remove(n);
-      }));
+    if(motion.matches||elapsed<690||p.moving)return;p.moving=true;
+    p.bundles=p.old.map((_,id)=>bundlePoint(p,id));
+    const origin={x:innerWidth/2,y:innerHeight/2},rx=innerWidth*.39,ry=innerHeight*.34;
+    p.meta.transfers.forEach(transfer=>{
+      const from=p.bundles[transfer.from],to=p.bundles[transfer.to],pack=document.createElement('div');pack.className='rotation-pack table-flight';Object.assign(pack.dataset,{effect:'rotation-move',from:transfer.from,to:transfer.to});
+      Object.assign(pack.style,{left:from.x+'px',top:from.y+'px',width:from.width+'px',height:from.height+'px'});
+      // Only four bounded stacks travel. Never a sprite for every card.
+      for(let i=0;i<Math.min(6,transfer.count);i++){pack.insertAdjacentHTML('beforeend',PanelinhaCards.html(null));pack.lastElementChild.style.transform=`translate(${i*1.5}px,${i*-1.5}px) rotate(${(i%3-1)*2}deg)`;}
+      $('playAnimations').append(pack);nodes.add(pack);
+      const angle=q=>Math.atan2((q.y-origin.y)/ry,(q.x-origin.x)/rx),radius=q=>Math.hypot((q.x-origin.x)/rx,(q.y-origin.y)/ry);
+      let delta=angle(to)-angle(from);const clockwise=p.meta.direction===-1;if(clockwise&&delta<=0)delta+=Math.PI*2;if(!clockwise&&delta>=0)delta-=Math.PI*2;
+      const frames=[{offset:0,opacity:0,transform:'translate(-50%,-50%) scale(1.12)'},{offset:.15,opacity:1,transform:'translate(-50%,-50%) scale(1)'}];
+      for(let i=1;i<=16;i++){const t=i/16,theta=angle(from)+delta*t,rad=radius(from)+(radius(to)-radius(from))*t,x=i===16?to.x:origin.x+Math.cos(theta)*rx*rad,y=i===16?to.y:origin.y+Math.sin(theta)*ry*rad;frames.push({offset:.15+t*.70,opacity:1,transform:`translate(calc(-50% + ${x-from.x}px),calc(-50% + ${y-from.y}px)) rotate(${Math.sin(t*Math.PI)*(clockwise?5:-5)}deg) scale(${1+(to.width/from.width-1)*t})`});}
+      frames.push({...frames.at(-1),offset:1,opacity:0});
+      const animation=pack.animate(frames,{duration:Math.max(80,2000-elapsed),easing:'ease-in-out',fill:'both'});animation.finished.then(()=>remove(pack),()=>remove(pack));
+      for(const [i,card]of [...pack.children].entries())card.animate([{transform:card.style.transform},{offset:.84,transform:card.style.transform},{transform:`translate(${(i-2.5)*5}px,${Math.abs(i-2.5)}px) rotate(${(i-2.5)*4}deg)`}],{duration:Math.max(80,2000-elapsed),fill:'both'});
+    });
+  }
+  function beginDeal(s){
+    const meta=s.lastDeal;if(deal||!meta||meta.round!==s.round||(s.dealUntil||0)<=Date.now()||motion.matches)return;
+    const progress=Math.max(0,meta.duration-(s.dealUntil-Date.now())),start=center(),animations=[];deal={round:s.round,done:false};
+    const counts=meta.counts||s.players.map(p=>p.hand.length),max=Math.max(...counts);let sequence=0;
+    for(let i=0;i<max;i++)for(const actor of meta.order){const card=s.players[actor].hand[i];if(!card)continue;const delay=sequence++*meta.interval,finish=delay+meta.flight;if(progress>=finish)continue;
+      incoming.set(drawKey(actor,card.id),{actor,id:card.id});masked.add(card.id);
+      const target=PanelasMesa.handPoint(actor,card.id,true),width=actor===0?start.width:start.width*.9,end={...target,width,height:width*PanelinhaCards.aspect},node=sprite(card,false,start,'initial-deal');node.dataset.actor=actor;node.dataset.cardId=card.id;
+      const animation=node.animate(curvedFrames(start,meta.flight,start,end,0,meta.flight,true),{delay:Math.max(0,delay-progress),duration:Math.max(40,meta.flight-Math.max(0,progress-delay)),fill:'both',easing:'linear'});animations.push(animation.finished.catch(()=>{}));
+      const arrive=()=>{remove(node);incoming.delete(drawKey(actor,card.id));masked.delete(card.id);arrivalLayout=true;requestRender(s);};animation.finished.then(arrive,arrive);
     }
-    if(elapsed>=940&&!p.moving){
-      p.moving=true;p.bundles=p.bundles||p.old.map((_,id)=>bundlePoint(p,id));
-      const centerPoint={x:innerWidth/2,y:innerHeight/2},rx=innerWidth*.39,ry=innerHeight*.34;
-      p.meta.transfers.forEach(transfer=>{
-        const from=p.bundles[transfer.from],to=p.bundles[transfer.to],n=document.createElement('div');n.className='rotation-pack table-flight';n.dataset.effect='rotation-move';n.dataset.from=transfer.from;n.dataset.to=transfer.to;
-        Object.assign(n.style,{left:from.x+'px',top:from.y+'px',width:from.width+'px',height:from.height+'px'});
-        for(let i=0;i<Math.min(6,transfer.count);i++){n.insertAdjacentHTML('beforeend',PanelinhaCards.html(null));const image=n.lastElementChild;image.style.transform=`translate(${i*1.5}px,${i*-1.5}px) rotate(${(i%3-1)*2}deg)`;}
-        $('playAnimations').append(n);nodes.add(n);
-        const angle=point=>Math.atan2((point.y-centerPoint.y)/ry,(point.x-centerPoint.x)/rx),radius=point=>Math.hypot((point.x-centerPoint.x)/rx,(point.y-centerPoint.y)/ry);
-        const a=angle(from),b=angle(to),clockwise=p.meta.direction===-1;let delta=b-a;
-        if(clockwise&&delta<=0)delta+=Math.PI*2;if(!clockwise&&delta>=0)delta-=Math.PI*2;
-        const r0=radius(from),r1=radius(to),frames=Array.from({length:13},(_,i)=>{
-          const t=i/12,theta=a+delta*t,r=r0+(r1-r0)*t,x=i===12?to.x:i===0?from.x:centerPoint.x+Math.cos(theta)*rx*r,y=i===12?to.y:i===0?from.y:centerPoint.y+Math.sin(theta)*ry*r;
-          return {offset:t,transform:`translate(calc(-50% + ${x-from.x}px),calc(-50% + ${y-from.y}px)) rotate(${Math.sin(t*Math.PI)*(clockwise?6:-6)}deg) scale(${1+(to.width/from.width-1)*t})`};
-        });
-        const animation=n.animate(frames,{duration:Math.max(80,1580-elapsed),easing:'cubic-bezier(.25,.1,.25,1)',fill:'forwards'});animation.onfinish=()=>remove(n);
-      });
-    }
-    if(elapsed>=1580&&!p.opening){
-      p.opening=true;
-      s.players.forEach(player=>{
-        if(!p.meta.active.includes(player.id))return;const start=p.bundles[player.id];
-        player.hand.forEach((card,i)=>{
-          const end=point(player.id,card.id),n=sprite(card,visible(s,player.id),start,'rotation-open');n.dataset.actor=player.id;
-          const a=n.animate([{transform:'translate(-50%,-50%)'},{transform:`translate(calc(-50% + ${end.x-start.x}px),calc(-50% + ${end.y-start.y}px)) rotate(${end.angle||0}deg) scale(${end.width/start.width},${end.height/start.height})`}],{duration:Math.max(80,1950-elapsed),easing:'cubic-bezier(.2,.75,.2,1)',fill:'forwards'});a.onfinish=()=>remove(n);
-        });
-      });
-    }
+    const current=deal;function complete(){if(deal!==current||current.done)return;if(s.paused||document.hidden){current.deferred=true;return;}current.done=true;clearTimeout(current.fallback);for(const n of [...nodes])if(n.dataset.effect==='initial-deal')remove(n);for(const [key,item]of incoming)if(!queued.some(q=>drawKey(q.actor,q.id)===key)){incoming.delete(key);masked.delete(item.id);}requestRender(s);}
+    current.complete=complete;Promise.allSettled(animations).then(complete);current.fallback=setTimeout(complete,Math.max(0,s.dealUntil-Date.now())+1000);
   }
   function showReceived(s,meta){
     for(const n of [...nodes])if(n.dataset.effect==='received')remove(n);
@@ -113,10 +107,13 @@
   }
   function paint(s,render){
     if(owner!==s||round!==s.round){reset();owner=s;round=s.round;}
+    beginDeal(s);if(deal?.deferred&&!s.paused&&!document.hidden)deal.complete();
     if(decision&&(!s.players[0].hand.some(c=>c.id===decision.id)||s.pendingAction||s.drawn!==decision.id)){const keep=s.players[0].hand.find(c=>c.id===decision.id);closeDecision(!!keep&&!s.pendingAction);}
     for(const [key,item]of incoming)if(!s.players[item.actor].hand.some(c=>c.id===item.id)){incoming.delete(key);masked.delete(item.id);}
+    if(deal&&!deal.done)for(const n of nodes)if(n.dataset.effect==='initial-deal')for(const a of n.getAnimations())s.paused?a.pause():a.play();
     const actual=s.players.map(p=>p.hand),kind=s.lastRotation?.serial?'rotation':'pressure',meta=kind==='rotation'?s.lastRotation:s.lastDistribution;
-    if(meta?.serial&&(!pressure||pressure.serial!==meta.serial||pressure.kind!==kind)&&((s.presentationUntil||0)>Date.now()||s.paused&&s.remaining?.presentation)){
+    const swapping=!s.lastNormalPurchase&&!s.lastPenaltyPurchase;
+    if(swapping&&meta?.serial&&(!pressure||pressure.serial!==meta.serial||pressure.kind!==kind)&&((s.presentationUntil||0)>Date.now()||s.paused&&s.remaining?.presentation)){
       for(const entry of draws)remove(entry.node);draws.clear();masked.clear();incoming.clear();prepared=[];queued=[];clearTimeout(drawTimer);drawTimer=null;
       for(const n of [...nodes])if(n.dataset.effect==='received')remove(n);
       // Nunca reaproveitar uma mão secreta de outro cliente. Reconexões usam versos.
@@ -124,7 +121,7 @@
       const top=s.discard.at(-1);
       pressure={kind,meta,serial:meta.serial,duration:meta.duration,old:old.map(h=>h.filter(c=>c.id!==top.id)),points:old.map((h,actor)=>h.filter(c=>c.id!==top.id).map(c=>point(actor,c.id)))};
     }
-    const matches=pressure&&meta?.serial===pressure.serial&&kind===pressure.kind;
+    const matches=swapping&&pressure&&meta?.serial===pressure.serial&&kind===pressure.kind;
     const elapsed=matches?Math.max(0,clock(s)):Infinity,busy=!!matches&&elapsed<pressure.duration;
     const purchase=s.lastPenaltyPurchase,purchaseBusy=!!purchase&&(s.paused?(s.remaining?.presentation||0)>0:Date.now()<(s.presentationUntil||0));
     $('table').classList.toggle('penalty-purchase-transition',purchaseBusy);
@@ -151,8 +148,8 @@
     }
     syncDrawMotion(s);pumpDraws(s);
     refreshDecision(s);
-    window.PanelinhaMatchUI?.mountScore(s,!busy&&!purchaseBusy);
-    window.PanelinhaMatchUI?.mountPodium?.(s,!busy&&!purchaseBusy);
+    window.PanelinhaMatchUI?.mountScore(s,!busy&&!purchaseBusy&&!PanelasMesa.playing()&&!(deal&&!deal.done));
+    window.PanelinhaMatchUI?.mountPodium?.(s,!busy&&!purchaseBusy&&!PanelasMesa.playing()&&!(deal&&!deal.done));
   }
   function penaltyProgress(s){return Math.max(0,s.lastPenaltyPurchase.duration-(s.paused?(s.remaining?.presentation||0):Math.max(0,(s.presentationUntil||0)-Date.now())));}
   function prepareDraws(events,s,busy){
@@ -163,7 +160,7 @@
       const actor=purchase.actor,player=s.players[actor],r=$('pile').getBoundingClientRect();
       const cards=actor===0&&purchase.cardIds?purchase.cardIds.map(id=>player.hand.find(c=>c.id===id)).filter(Boolean):player.hand.slice(-purchase.count);
       events=cards.map(card=>({actor,id:card.id,card,x:r.x+r.width/2,y:r.y+r.height/2,width:r.width,height:r.height}));
-    }else if(Date.now()<(s.presentationUntil||0))return;
+    }else if(Date.now()<(s.presentationUntil||0)&&!s.lastNormalPurchase)return;
     const groups=new Map();for(const event of events){if(!groups.has(event.actor))groups.set(event.actor,[]);groups.get(event.actor).push(event);}
     for(const [actor,group]of groups){
       const plan=PanelinhaRules.drawSequence(group.length,forced?'penalty':'normal'),tail=s.players[actor].hand.slice(-group.length),progress=forced?penaltyProgress(s):0;
@@ -309,5 +306,5 @@
   }
   motion.addEventListener('change',()=>{for(const n of [...nodes])if(n.dataset.effect!=='draw-choice')remove(n);draws.clear();queued=[];clearTimeout(drawTimer);drawTimer=null;masked.clear();incoming.clear();if(decision){incoming.set(drawKey(0,decision.id),{actor:0,id:decision.id});masked.add(decision.id);}bridge()?.render();});
   document.addEventListener('visibilitychange',()=>{if(owner===bridge()?.getState())bridge().render();});
-  window.PanelinhaTableEffects={paint,reset,animateDraws,handCards,drawing:id=>masked.has(id),playOrigin:id=>decision?.id===id?{...decision.point,node:decision.node.querySelector('.card'),angle:0}:lastOrigin?.id===id?lastOrigin:null};
+  window.PanelinhaTableEffects={dealing:()=>!!deal&&!deal.done,paint,reset,animateDraws,handCards,drawing:id=>masked.has(id),playOrigin:id=>decision?.id===id?{...decision.point,node:decision.node.querySelector('.card'),angle:0}:lastOrigin?.id===id?lastOrigin:null};
 })();
