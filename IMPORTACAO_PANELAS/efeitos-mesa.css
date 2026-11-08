@@ -13,7 +13,9 @@
 .flame{translate:var(--flame-offset,-4.5px) 0}
 @keyframes flame-flicker{0%,100%{filter:saturate(1.12) brightness(.98)}19%{filter:saturate(1.16) brightness(1.04)}48%{filter:saturate(1.1) brightness(1)}76%{filter:saturate(1.14) brightness(1.02)}}
 @media(prefers-reduced-motion:reduce){.table-flight{will-change:auto}.flame{filter:saturate(1.12) brightness(1)}}
-.rotation-pack>.card{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.rotation-pack{isolation:isolate}
+.rotation-layer{position:absolute;inset:0;transform-origin:50% 50%;pointer-events:none}
+.rotation-layer>.card{display:block;width:100%!important;height:100%!important;min-width:0!important;pointer-events:none}
 .pressure-received{position:fixed;transform:translate(-50%,-50%);padding:7px 14px;border:1px solid #f6d183;border-radius:99px;background:linear-gradient(#75458b,#352044);box-shadow:0 3px 12px #15071c99;color:#fff0b9;font:clamp(28px,5vh,38px)/1 PanelinhaDisplay,system-ui,sans-serif;pointer-events:none;white-space:nowrap}
 .penalty-purchase-transition #controls,.penalty-purchase-transition #turnCue{visibility:hidden}
 .penalty-purchase-transition #hand{pointer-events:none}

@@ -59,24 +59,72 @@
     const y=points.length?points.reduce((n,v)=>n+v.y,0)/points.length:fallback.y;
     return {x:Math.max(width/2+10,Math.min(innerWidth-width/2-10,x)),y:Math.max(height/2+8,Math.min(innerHeight-height/2-8,y)),width,height};
   }
-  function animateRotation(s,p,elapsed){
-    if(motion.matches||elapsed<690||p.moving)return;p.moving=true;
-    p.bundles=p.old.map((_,id)=>bundlePoint(p,id));
-    const origin={x:innerWidth/2,y:innerHeight/2},rx=innerWidth*.39,ry=innerHeight*.34;
-    p.meta.transfers.forEach(transfer=>{
-      const from=p.bundles[transfer.from],to=p.bundles[transfer.to],pack=document.createElement('div');pack.className='rotation-pack table-flight';Object.assign(pack.dataset,{effect:'rotation-move',from:transfer.from,to:transfer.to});
-      Object.assign(pack.style,{left:from.x+'px',top:from.y+'px',width:from.width+'px',height:from.height+'px'});
-      // Only four bounded stacks travel. Never a sprite for every card.
-      for(let i=0;i<Math.min(6,transfer.count);i++){pack.insertAdjacentHTML('beforeend',PanelinhaCards.html(null));pack.lastElementChild.style.transform=`translate(${i*1.5}px,${i*-1.5}px) rotate(${(i%3-1)*2}deg)`;}
-      $('playAnimations').append(pack);nodes.add(pack);
-      const angle=q=>Math.atan2((q.y-origin.y)/ry,(q.x-origin.x)/rx),radius=q=>Math.hypot((q.x-origin.x)/rx,(q.y-origin.y)/ry);
-      let delta=angle(to)-angle(from);const clockwise=p.meta.direction===-1;if(clockwise&&delta<=0)delta+=Math.PI*2;if(!clockwise&&delta>=0)delta-=Math.PI*2;
-      const frames=[{offset:0,opacity:0,transform:'translate(-50%,-50%) scale(1.12)'},{offset:.15,opacity:1,transform:'translate(-50%,-50%) scale(1)'}];
-      for(let i=1;i<=16;i++){const t=i/16,theta=angle(from)+delta*t,rad=radius(from)+(radius(to)-radius(from))*t,x=i===16?to.x:origin.x+Math.cos(theta)*rx*rad,y=i===16?to.y:origin.y+Math.sin(theta)*ry*rad;frames.push({offset:.15+t*.70,opacity:1,transform:`translate(calc(-50% + ${x-from.x}px),calc(-50% + ${y-from.y}px)) rotate(${Math.sin(t*Math.PI)*(clockwise?5:-5)}deg) scale(${1+(to.width/from.width-1)*t})`});}
-      frames.push({...frames.at(-1),offset:1,opacity:0});
-      const animation=pack.animate(frames,{duration:Math.max(80,2000-elapsed),easing:'ease-in-out',fill:'both'});animation.finished.then(()=>remove(pack),()=>remove(pack));
-      for(const [i,card]of [...pack.children].entries())card.animate([{transform:card.style.transform},{offset:.84,transform:card.style.transform},{transform:`translate(${(i-2.5)*5}px,${Math.abs(i-2.5)}px) rotate(${(i-2.5)*4}deg)`}],{duration:Math.max(80,2000-elapsed),fill:'both'});
+  function rotationPose(dx=0,dy=0,angle=0,scale=1){return `translate(${dx}px,${dy}px) rotate(${angle}deg) scale(${scale})`;}
+  function rotationLayer(card,show,pack){
+    const layer=document.createElement('div');layer.className='rotation-layer';layer.dataset.cardId=card.id;
+    layer.innerHTML=show&&!card.hidden?bridge().cardHTML(card):PanelinhaCards.html(null);pack.append(layer);return layer;
+  }
+  function compactRotation(record){
+    if(record.compact)return;record.compact=true;record.pack.dataset.stage='stack';
+    record.layers.forEach((layer,i)=>{
+      for(const a of layer.getAnimations())a.cancel();
+      if(i>=6){layer.remove();return;}
+      layer.innerHTML=PanelinhaCards.html(null);layer.style.transform=rotationPose(i*1.4,-i*1.4,(i%3-1)*2);
     });
+    record.layers=record.layers.slice(0,6);
+  }
+  function animateRotation(s,p,elapsed){
+    const timing=PanelinhaRules.ROTATION_TIMING;
+    if(motion.matches||elapsed<timing.collect)return;
+    if(p.packs?.some(record=>!record.pack.isConnected))p.packs=null;
+    if(!p.packs){
+      p.bundles=p.old.map((_,id)=>bundlePoint(p,id));p.packs=[];
+      const origin={x:innerWidth/2,y:innerHeight/2},rx=innerWidth*.39,ry=innerHeight*.34;
+      for(const transfer of p.meta.transfers){
+        const from=p.bundles[transfer.from],to=p.bundles[transfer.to],pack=document.createElement('div');
+        pack.className='rotation-pack table-flight';Object.assign(pack.dataset,{effect:'rotation-move',stage:'gather',from:transfer.from,to:transfer.to,count:transfer.count});
+        Object.assign(pack.style,{left:from.x+'px',top:from.y+'px',width:from.width+'px',height:from.height+'px'});
+        $('playAnimations').append(pack);nodes.add(pack);
+        const record={pack,transfer,from,to,layers:[],compact:false,opened:false};p.packs.push(record);
+        // Recolhimento local: todas as cartas partem de seu leque dentro de um só conjunto.
+        p.old[transfer.from].forEach((card,i)=>{
+          const start=p.points[transfer.from][i]||point(transfer.from,card.id),layer=rotationLayer(card,elapsed<timing.stack&&visible(s,transfer.from),pack);
+          const pose=rotationPose(start.x-from.x,start.y-from.y,start.angle||0,start.width/from.width),stack=rotationPose(Math.min(i,5)*1.4,-Math.min(i,5)*1.4,(i%3-1)*2);
+          layer.style.transform=stack;record.layers.push(layer);
+          if(elapsed<timing.stack){const a=layer.animate([{transform:pose},{transform:stack}],{duration:timing.stack-timing.collect,easing:'cubic-bezier(.22,.7,.2,1)',fill:'both'});a.currentTime=Math.max(0,elapsed-timing.collect);}
+        });
+        // Só os quatro montes circulam. A fase é retomada pelo relógio autoritativo.
+        const angle=q=>Math.atan2((q.y-origin.y)/ry,(q.x-origin.x)/rx),radius=q=>Math.hypot((q.x-origin.x)/rx,(q.y-origin.y)/ry);
+        let delta=angle(to)-angle(from);const clockwise=p.meta.direction===-1;
+        if(clockwise&&delta<=0)delta+=Math.PI*2;if(!clockwise&&delta>=0)delta-=Math.PI*2;
+        const duration=timing.end-timing.collect,at=t=>(t-timing.collect)/duration;
+        const frames=[{offset:0,transform:'translate(-50%,-50%)'},{offset:at(timing.depart),transform:'translate(-50%,-50%)'}];
+        for(let i=1;i<=20;i++){
+          const t=i/20,u=t*t*(3-2*t),theta=angle(from)+delta*u,rad=radius(from)+(radius(to)-radius(from))*u;
+          const x=i===20?to.x:origin.x+Math.cos(theta)*rx*rad,y=i===20?to.y:origin.y+Math.sin(theta)*ry*rad;
+          frames.push({offset:at(timing.depart+(timing.arrive-timing.depart)*t),transform:`translate(calc(-50% + ${x-from.x}px),calc(-50% + ${y-from.y}px)) rotate(${Math.sin(t*Math.PI)*(clockwise?5:-5)}deg) scale(${1+(to.width/from.width-1)*u})`});
+        }
+        frames.push({...frames.at(-1),offset:1});
+        const animation=pack.animate(frames,{duration,easing:'linear',fill:'both'});animation.currentTime=Math.max(0,elapsed-timing.collect);if(s.paused)animation.pause();
+        animation.finished.then(()=>remove(pack),()=>remove(pack));
+      }
+    }
+    for(const record of p.packs){
+      if(elapsed>=timing.stack)compactRotation(record);
+      if(elapsed>=timing.depart&&!record.opened)record.pack.dataset.stage='travel';
+      if(elapsed<timing.arrive||record.opened)continue;
+      record.opened=true;record.pack.dataset.stage='open';
+      for(const layer of record.layers)layer.remove();record.layers=[];
+      const actor=record.transfer.to;
+      // A frente recebida só aparece no destino e somente para a perspectiva autorizada.
+      s.players[actor].hand.forEach((card,i)=>{
+        const end=point(actor,card.id),layer=rotationLayer(card,visible(s,actor),record.pack);
+        const start=rotationPose(Math.min(i,5)*1.4,-Math.min(i,5)*1.4,(i%3-1)*2);
+        const finish=rotationPose((end.x-record.to.x)*record.from.width/record.to.width,(end.y-record.to.y)*record.from.width/record.to.width,end.angle||0,end.width/record.to.width);
+        layer.style.transform=finish;record.layers.push(layer);
+        const a=layer.animate([{transform:start},{transform:finish}],{duration:timing.end-timing.arrive,easing:'cubic-bezier(.2,.7,.2,1)',fill:'both'});a.currentTime=Math.max(0,elapsed-timing.arrive);if(s.paused)a.pause();
+      });
+    }
   }
   function beginDeal(s){
     const meta=s.lastDeal;if(deal||!meta||meta.round!==s.round||(s.dealUntil||0)<=Date.now()||motion.matches)return;
@@ -110,7 +158,7 @@
     beginDeal(s);if(deal?.deferred&&!s.paused&&!document.hidden)deal.complete();
     if(decision&&(!s.players[0].hand.some(c=>c.id===decision.id)||s.pendingAction||s.drawn!==decision.id)){const keep=s.players[0].hand.find(c=>c.id===decision.id);closeDecision(!!keep&&!s.pendingAction);}
     for(const [key,item]of incoming)if(!s.players[item.actor].hand.some(c=>c.id===item.id)){incoming.delete(key);masked.delete(item.id);}
-    if(deal&&!deal.done)for(const n of nodes)if(n.dataset.effect==='initial-deal')for(const a of n.getAnimations())s.paused?a.pause():a.play();
+    if(deal&&!deal.done)for(const n of nodes)if(n.dataset.effect==='initial-deal')for(const target of [n,...n.querySelectorAll('.rotation-layer')])for(const a of target.getAnimations()){if(s.paused&&a.playState==='running')a.pause();else if(!s.paused&&a.playState==='paused')a.play();}
     const actual=s.players.map(p=>p.hand),kind=s.lastRotation?.serial?'rotation':'pressure',meta=kind==='rotation'?s.lastRotation:s.lastDistribution;
     const swapping=!s.lastNormalPurchase&&!s.lastPenaltyPurchase;
     if(swapping&&meta?.serial&&(!pressure||pressure.serial!==meta.serial||pressure.kind!==kind)&&((s.presentationUntil||0)>Date.now()||s.paused&&s.remaining?.presentation)){
@@ -126,10 +174,10 @@
     const purchase=s.lastPenaltyPurchase,purchaseBusy=!!purchase&&(s.paused?(s.remaining?.presentation||0)>0:Date.now()<(s.presentationUntil||0));
     $('table').classList.toggle('penalty-purchase-transition',purchaseBusy);
     $('table').classList.toggle('pressure-transition',busy);
-    $('table').classList.toggle('pressure-hands-hidden',busy&&elapsed>=690);
+    $('table').classList.toggle('pressure-hands-hidden',busy&&elapsed>=690&&!motion.matches);
     prepareDraws(PanelasMesa.takeDraws(),s,busy);
     const oldPositions=arrivalLayout?new Map([...$('hand').children].map(n=>{const r=n.getBoundingClientRect();return[n.dataset.card,{x:r.x+r.width/2,y:r.y+r.height/2}]})):null;arrivalLayout=false;
-    if(busy&&elapsed<(pressure.kind==='rotation'?940:1260))s.players.forEach((p,i)=>p.hand=pressure.old[i]);
+    if(busy&&elapsed<(pressure.kind==='rotation'?(motion.matches?pressure.duration:PanelinhaRules.ROTATION_TIMING.depart):1260))s.players.forEach((p,i)=>p.hand=pressure.old[i]);
     try{render();if(lastOrigin&&!s.players[0].hand.some(c=>c.id===lastOrigin.id))lastOrigin=null;}finally{s.players.forEach((p,i)=>p.hand=actual[i]);}
     if(oldPositions&&!motion.matches){
       // Lê toda a geometria antes de escrever animações, sem layout alternado por carta.
@@ -140,8 +188,8 @@
     if(!busy&&!decision&&!draws.size&&!queued.some(item=>item.actor===0)&&s.drawn!==null)showDecision(s);
     if(busy){
       if(pressure.kind==='rotation')animateRotation(s,pressure,elapsed);else{animatePressure(s,pressure,elapsed);dealPressure(s,pressure,elapsed);}
-      for(const n of nodes)if(/^(pressure|rotation)-/.test(n.dataset.effect||''))for(const a of n.getAnimations())s.paused?a.pause():a.play();
-      clearTimeout(frame);if(!s.paused){const next=(pressure.kind==='rotation'?[690,940,1580,2000]:[690,1260,2000]).find(t=>t>elapsed+1)||2000;frame=setTimeout(()=>{if(bridge().getState()===s)bridge().render();},Math.max(16,next-elapsed));}
+      for(const n of nodes)if(/^(pressure|rotation)-/.test(n.dataset.effect||''))for(const target of [n,...n.querySelectorAll('.rotation-layer')])for(const a of target.getAnimations()){if(s.paused&&a.playState==='running')a.pause();else if(!s.paused&&a.playState==='paused')a.play();}
+      clearTimeout(frame);if(!s.paused){const next=(pressure.kind==='rotation'?Object.values(PanelinhaRules.ROTATION_TIMING):[690,1260,2000]).find(t=>t>elapsed+1)||2000;frame=setTimeout(()=>{if(bridge().getState()===s)bridge().render();},Math.max(16,next-elapsed));}
     }else if(pressure){for(const n of [...nodes])if(/^(pressure|rotation)-/.test(n.dataset.effect||''))remove(n);if(pressure.kind==='pressure'&&!pressure.notified){pressure.notified=true;showReceived(s,pressure.meta);}}
     if(purchaseBusy){
       clearTimeout(frame);if(!s.paused)frame=setTimeout(()=>{if(bridge().getState()===s)bridge().render();},Math.max(1,s.presentationUntil-Date.now()));
@@ -168,7 +216,7 @@
         // Snapshots ocultos têm IDs locais estáveis; eventos públicos não contêm IDs secretos.
         const card=actor!==0&&original.id<0&&!s.players[actor].hand.some(c=>c.id===original.id)?tail[i]||original.card:original.card;
         const event={...original,card,id:card?.id??original.id},eligible=!forced&&actor===0&&s.drawn===event.id&&bridge().canPlayDraw(event.id);
-        const duration=forced?plan.items[i].duration:actor===0?(eligible?plan.approach:plan.items[i].duration):850,delay=plan.items[i].delay;
+        const duration=forced?plan.items[i].duration:actor===0?(eligible?plan.approach:plan.items[i].duration):plan.opponent,delay=plan.items[i].delay;
         if(forced&&progress>=delay+duration)return;
         const item={...event,eligible,duration,delay,progress,pace:PanelinhaRules.DRAW_PACES[forced?'penalty':'normal'],purchase:forced?purchase.serial:null};
         if(s.players[actor].hand.some(c=>c.id===item.id))incoming.set(drawKey(actor,item.id),item);
@@ -249,7 +297,7 @@
     const start={x:item.x,y:item.y,width:item.width,height:item.height,angle:0};
     start.height=start.width*PanelinhaCards.aspect;
     const destination=PanelasMesa.incomingPoint(actor,card),preview=previewPoint(card);
-    const landing=eligible?0:purchase?item.pace.landing:detailed?item.pace.landing:80,mainDuration=duration-landing;
+    const landing=eligible?0:purchase?item.pace.landing:detailed?item.pace.landing:item.pace.opponentLanding,mainDuration=duration-landing;
     const n=sprite(card,detailed,start,'draw');Object.assign(n.dataset,{actor,cardId:id,presentation:previewed?'preview':'direct',duration,delay:item.delay,stage:'flight'});
     let frames;
     if(previewed){
@@ -279,7 +327,7 @@
   function placeDecision(old){
     const s=bridge().getState(),card=s?.players[0].hand.find(c=>c.id===old.id);if(!card)return;
     if(motion.matches){incoming.delete(drawKey(0,old.id));masked.delete(old.id);arrivalLayout=true;return;}
-    const start=old.point,destination=PanelasMesa.incomingPoint(0,card),n=sprite(card,true,start,'draw-keep'),landing=120,mainDuration=380;
+    const start=old.point,destination=PanelasMesa.incomingPoint(0,card),n=sprite(card,true,start,'draw-keep'),landing=PanelinhaRules.DRAW_PACES.normal.keepLanding,mainDuration=PanelinhaRules.DRAW_PACES.normal.keep;
     const animation=n.animate(curvedFrames(start,mainDuration,start,destination,0,mainDuration),{duration:mainDuration,easing:'linear',fill:'forwards'});
     const item={actor:0,id:old.id,card,delay:0},entry={actor:0,id:old.id,node:n,animation,purchase:null,item,start,destination,landing,mainDuration,stage:'flight'};
     masked.add(old.id);draws.add(entry);animation.onfinish=()=>land(entry,s);

@@ -198,3 +198,7 @@ Cores: **vermelho, azul, verde, amarelo**. Iniciar cada jogador com **7 cartas**
 - Ritmo normal 1960 ms, intervalo fixo 2020 ms e aproximação 760 ms. Punição preservada em 120 ms por carta, intervalo 80 ms, acomodação 40 ms.
 - Inverter transiciona o cometa por 400 ms; Liquidificador move quatro montes compactos.
 - Aplicativo Panelinha, identificação local abaixo da mão e laboratório separado da interface de produção.
+
+### Refinamento de cantos, alimentos e Liquidificador
+
+Símbolos dos cantos com referência 104×104 (antes 92×92), mantendo centro, bordas e geometria. Alimentos aproximadamente 5% maiores, vermelho acima, verde acima e amarelo à esquerda, ajustados individualmente às ilustrações. Liquidificador: carta pousa; mãos recolhem localmente de 690 a 1020 ms; montes partem em 1100 ms, chegam em 1740 ms e abrem até 2000 ms. Apenas os conjuntos viajam, com versos; frentes recebidas aparecem somente no destino autorizado. Todos os prazos de compra diminuem 20%: normal 1568 ms/intervalo 1616, aproximação 608, espera 496, encaixe 80; verso dos outros 680/64; Guardar 304+96; punição 96 ms/intervalo 64 e acomodação 32. Regras, quantidades, cortes e decisões preservados.

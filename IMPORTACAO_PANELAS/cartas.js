@@ -16,8 +16,8 @@
   const symbolLayout=Object.freeze({
     scale:1,
     center:Object.freeze({x:235,y:374,width:320,height:300}),
-    top:Object.freeze({insetX:40,insetY:38,width:92,height:92}),
-    bottom:Object.freeze({insetX:40,insetY:38,width:92,height:92}),
+    top:Object.freeze({insetX:40,insetY:38,width:104,height:104}),
+    bottom:Object.freeze({insetX:40,insetY:38,width:104,height:104}),
     overrides:Object.freeze({
       mais2:Object.freeze({center:Object.freeze({width:350})}),
       bloqueio:Object.freeze({center:Object.freeze({width:315,height:315})})
@@ -29,9 +29,9 @@
   // Coordenadas no conteúdo 470×800, sem deslocar a arte, a moldura ou o símbolo central.
   const foodAssets={red:['Vermelho','Tomate','tomate_panelinha_512.png'],yellow:['Amarelo','Queijo','queijo_panelinha_512.png'],blue:['Azul','Mirtilos','mirtilos_panelinha_512.png'],green:['Verde','Alface','alface_panelinha_512.png']};
   const foodLayout=Object.freeze(Object.fromEntries(Object.entries({
-    wild4:[['red',55,155,116],['yellow',323,155,116],['blue',25,350,112],['green',327,355,112]],
-    wild6:[['red',45,160,112],['yellow',347,120,100],['blue',23,360,108],['green',342,363,108]],
-    wild:[['red',55,160,118],['yellow',339,132,108],['blue',30,370,112],['green',327,397,112]]
+    wild4:[['red',52,138,122],['yellow',310,124,122],['blue',22,347,118],['green',324,334,118]],
+    wild6:[['red',42,143,118],['yellow',333,116,106],['blue',20,357,114],['green',339,342,114]],
+    wild:[['red',52,143,124],['yellow',324,129,114],['blue',27,367,118],['green',324,376,118]]
   }).map(([type,regions])=>[type,Object.freeze(regions.map(([color,x,y,size])=>{
     const [label,food,file]=foodAssets[color];return Object.freeze({color,label,food,x,y,size,path:'assets/ingredientes-especiais/'+file});
   }))])));

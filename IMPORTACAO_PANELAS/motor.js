@@ -12,9 +12,10 @@ const CUT_PAUSE_MS=2200; // tempo mínimo antes de o próximo jogador agir; cort
 
 const CUT_UNO_GRACE_MS=300;
 const PLAY_TIMING=Object.freeze({flight:540,settle:140,block:450});
+const ROTATION_TIMING=Object.freeze({collect:690,stack:1020,depart:1100,arrive:1740,end:2000});
 const DEAL_TIMING=Object.freeze({interval:42,flight:220,settle:100});
 // Ritmos fixos: o tamanho da sequência nunca altera duração ou intervalo.
-const DRAW_PACES=Object.freeze({normal:Object.freeze({interval:2020,duration:1960,approach:760,hold:620,landing:100}),penalty:Object.freeze({interval:80,duration:120,approach:0,hold:0,landing:20,settle:40})});
+const DRAW_PACES=Object.freeze({normal:Object.freeze({interval:1616,duration:1568,approach:608,hold:496,landing:80,opponent:680,opponentLanding:64,keep:304,keepLanding:96}),penalty:Object.freeze({interval:64,duration:96,approach:0,hold:0,landing:16,settle:32})});
 function drawSequence(count,kind='normal'){
   const pace=DRAW_PACES[kind]||DRAW_PACES.normal;
   const items=Array.from({length:count},(_,i)=>({delay:i*pace.interval,duration:pace.duration}));
@@ -115,8 +116,8 @@ function rotateHands(exclude=[],actor=null){
   for(const id of order){s.players[id].hand=next[id];if(s.preUnoById)delete s.preUnoById[id];}
   // Não publicar identidades de cartas: a interface só precisa da rota e contagem.
   if(actor!==null){
-    s.lastRotation={serial:(s.rotationSerial=(s.rotationSerial||0)+1),duration:2000,actor,direction:s.direction,active:order,transfers,beforeCounts,afterCounts:s.players.map(p=>p.hand.length)};
-    s.presentationUntil=now()+2000;
+    s.lastRotation={serial:(s.rotationSerial=(s.rotationSerial||0)+1),duration:ROTATION_TIMING.end,actor,direction:s.direction,active:order,transfers,beforeCounts,afterCounts:s.players.map(p=>p.hand.length)};
+    s.presentationUntil=now()+ROTATION_TIMING.end;
   }
   log(`Liquidificador: mãos transferidas no sentido ${s.direction===-1?'horário':'anti-horário'}.`);
 }
@@ -317,5 +318,5 @@ function bestColor(cards){let counts=COLORS.map(color=>({color,n:cards.filter(c=
 const functions={make,shuffle,descriptor,description,isColorless,equals,power,buildDeck,log,top,nextActive,refill,drawCard,drawMany,redistribute,rotateHands,newRound,holdPenaltyPurchase,canActNow,closeUnoOnAction,canDistribute,canPlay,checkCards,resolvePressurePlay,applyPlay,finishPenaltyDraw,challenge,buy,keepPass,canAnnounceUNO,announceUNO,canReportUNO,reportUno,handPoints,specialCount,effectCount,numberCount,rankPlayers,finishRound,finalStandings,victories,botTurn,colorForPlay,bestColor,canChallenge};
 return Object.fromEntries(Object.entries(functions).map(([name,fn])=>[name,(...args)=>{s=ctx.getState();return fn(...args)}]));
 }
-globalThis.PanelinhaRules=Object.freeze({create,COLORS,CN,TYPES,SHORT,COLORLESS,COLOR_CHOOSERS,SPECIAL,VALUE,CUT_PAUSE_MS,CUT_UNO_GRACE_MS,DRAW_PACES,drawSequence,PLAY_TIMING,DEAL_TIMING});
+globalThis.PanelinhaRules=Object.freeze({create,COLORS,CN,TYPES,SHORT,COLORLESS,COLOR_CHOOSERS,SPECIAL,VALUE,CUT_PAUSE_MS,CUT_UNO_GRACE_MS,DRAW_PACES,drawSequence,PLAY_TIMING,DEAL_TIMING,ROTATION_TIMING});
 })();
