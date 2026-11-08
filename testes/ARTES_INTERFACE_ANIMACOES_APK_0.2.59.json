@@ -1,0 +1,52 @@
+{
+  "appName": "Panelinha",
+  "launcherIconsVerified": 15,
+  "specialIngredientAssetsVerified": 4,
+  "visualSoundAssetsVerified": 69,
+  "file": "panelinha.apk",
+  "sha256": "6a916da8c298eefca4641fd272e69b9d5b5e505ce0b72c44d821ff86dd4cd9b0",
+  "applicationId": "com.lucascunha.panelinha.teste",
+  "versionCode": 7902,
+  "versionName": "0.2.59",
+  "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+  "pngsVerified": 23,
+  "origin": "https://localhost",
+  "androidCompat": true,
+  "orientation": "sensorLandscape",
+  "appCategory": "game",
+  "signingGeneration": 2,
+  "mesaAssetsVerified": 6,
+  "menuAssetsVerified": 2,
+  "cardAssetsVerified": 23,
+  "normalCombinations": 52,
+  "cardGeometry": {
+    "contentWidth": 470,
+    "contentHeight": 800,
+    "border": 25,
+    "width": 520,
+    "height": 850,
+    "outerRadius": 70,
+    "innerRadius": 45
+  },
+  "sourceCommit": "a3ebf00c5d66849dd4b1fd1e270f447a5dfcafec",
+  "implementationCommit": "f64276f6eba537f720368794866c247b48875942",
+  "workflowRun": 42502012030,
+  "workflowConclusion": "success",
+  "downloadUrl": "https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.59/panelinha.apk",
+  "previousVersionCode": 7702,
+  "workerVersion": "ddf50a98-105e-4b61-8a22-d581c9fed295",
+  "cardDimensionsChanged": false,
+  "previousAttempt": {
+    "workflowRun": 42501501854,
+    "conclusion": "failure",
+    "reason": "new-icon-check-did-not-resolve-AAPT2-shortened-resource-paths",
+    "published": false
+  },
+  "androidTests": {
+    "status": "not-run",
+    "reason": "emulator-disabled-by-option",
+    "emulatorStarted": false,
+    "instrumentationExecuted": false,
+    "upgradePersistenceTested": false
+  }
+}

@@ -123,7 +123,16 @@ Base: `fb7cfc0`, HEAD da branch `android/apk-testes`, com o ZIP novo adicionado 
 
 ## Publicação e limitações
 
-Compilação/assinatura e download do APK final serão registrados após o GitHub Actions. Emulador não executado, conforme orientação anterior. Não houve teste de instalação/atualização/persistência em dispositivo físico, desempenho de hardware ou sessão com quatro celulares reais. As verificações de toque/responsividade foram em Chromium; WebSocket e projeções autoritativas foram exercitados localmente. Não declarar essas verificações Android pendentes como aprovadas.
+APK final [panelinha.apk — 0.2.59/c7902](https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.59/panelinha.apk), **63.049.999 bytes**, publicado pelo [GitHub Actions 42502012030](https://github.com/LucasCunh4/Panelinha/actions/runs/42502012030), conclusão **success**, commit `a3ebf00c5d66849dd4b1fd1e270f447a5dfcafec`.
+
+O APK foi baixado integralmente e validado novamente com `ferramentas/verificar_apk.py`. Metadados regenerados idênticos ao CI: nome Panelinha, pacote `com.lucascunha.panelinha.teste`, código 7902 superior ao anterior 7702, assinatura v2 e geração 2, origem `https://localhost`, sensorLandscape, 23 artes e quatro ingredientes íntegros, código web correspondente, 15 variantes de ícones conferidas pixel a pixel e XML adaptativo correto. Identidade estática compatível com atualização direta sobre a geração 2, sem desinstalação.
+
+Certificado SHA-256: `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`.
+SHA-256 do APK: `6a916da8c298eefca4641fd272e69b9d5b5e505ce0b72c44d821ff86dd4cd9b0`.
+
+Web e servidor publicados no Worker existente `https://panelinha-lobby.lucas260802.workers.dev`, versão `ddf50a98-105e-4b61-8a22-d581c9fed295`. Doze arquivos/código/artes públicos conferidos contra o build; `/health` retornou `v:1, phase:3, gameplay:true`. Conta, bindings e configuração do servidor preservados. O commit posterior corrigiu somente o verificador/documentação, sem alterar o jogo publicado.
+
+Metadados registrados em `testes/ARTES_INTERFACE_ANIMACOES_APK_0.2.59.json`. Emulador não executado, conforme orientação anterior. Não houve teste de instalação/atualização/persistência em dispositivo físico, desempenho de hardware ou sessão com quatro celulares reais. As verificações de toque/responsividade foram em Chromium; WebSocket e projeções autoritativas foram exercitados localmente. Não declarar essas verificações Android pendentes como aprovadas.
 
 ### Correção da verificação Android antes da publicação
 
