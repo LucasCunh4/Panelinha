@@ -381,10 +381,10 @@ body.playing { overflow:hidden; height:100vh; height:100dvh; }
 
 /* Prévia individual sem alterar posição, tamanho ou margem das cartas vizinhas. */
 .hand>button>.card{transition:transform 170ms cubic-bezier(.2,.7,.2,1),filter 170ms ease}
-.hand[data-pointer=touch]>button:hover:not(.hand-picked):not(:focus-visible)>.card{transform:none;filter:none}
-.hand[data-pointer=touch]>button:hover:not(.hand-picked){z-index:auto}
-.hand[data-pointer=mouse]>button:hover>.card,.hand[data-pointer]>button.hand-picked>.card,.hand[data-pointer]>button:focus-visible>.card{transform:translateY(-12px);filter:drop-shadow(0 2px 6px #ffe1a08c)}
-.hand>button.hand-picked,.hand>button:focus-visible,.hand[data-pointer=mouse]>button:hover{z-index:8}
+.hand[data-pointer=touch]>button:hover:not(:focus-visible)>.card{transform:none;filter:none}
+.hand[data-pointer=touch]>button:hover{z-index:auto}
+.hand[data-pointer=mouse]>button:hover>.card,.hand[data-pointer]>button:focus-visible>.card{transform:translateY(-12px);filter:drop-shadow(0 2px 6px #ffe1a08c)}
+.hand>button:focus-visible,.hand[data-pointer=mouse]>button:hover{z-index:8}
 .hand>button:focus-visible{outline:0}
 .hand>button:focus-visible>.card{outline:2px solid #fff0b3;outline-offset:2px}
 @media(prefers-reduced-motion:reduce){.hand>button>.card{transition:none}}

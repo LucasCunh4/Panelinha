@@ -29,9 +29,9 @@
   // Coordenadas no conteúdo 470×800, sem deslocar a arte, a moldura ou o símbolo central.
   const foodAssets={red:['Vermelho','Tomate','tomate_panelinha_512.png'],yellow:['Amarelo','Queijo','queijo_panelinha_512.png'],blue:['Azul','Mirtilos','mirtilos_panelinha_512.png'],green:['Verde','Alface','alface_panelinha_512.png']};
   const foodLayout=Object.freeze(Object.fromEntries(Object.entries({
-    wild4:[['red',35,140,100],['yellow',338,145,106],['blue',30,352,106],['green',340,355,102]],
-    wild6:[['red',30,122,96],['yellow',338,110,102],['blue',16,326,96],['green',366,326,88]],
-    wild:[['red',17,150,90],['yellow',330,115,108],['blue',16,358,90],['green',368,365,86]]
+    wild4:[['red',55,165,100],['yellow',302,138,110],['blue',52,374,100],['green',314,372,104]],
+    wild6:[['red',48,165,100],['yellow',333,133,104],['blue',40,340,100],['green',349,329,92]],
+    wild:[['red',50,176,96],['yellow',307,145,110],['blue',42,395,100],['green',324,390,104]]
   }).map(([type,regions])=>[type,Object.freeze(regions.map(([color,x,y,size])=>{
     const [label,food,file]=foodAssets[color];return Object.freeze({color,label,food,x,y,size,path:'assets/ingredientes-especiais/'+file});
   }))])));

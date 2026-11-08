@@ -90,26 +90,18 @@
 
   // Organização visual: os botões permanecem filhos do mesmo leque e conservam IDs.
   let expandedColor=null,handPinned=false,hoverTimer=null,leaveTimer=null,handOwner=null,handRound=null,handScrollFrame=null,handLayoutVersion=0;
-  let pickedCard=null,selectionOwner=null,selectionKey=null,restoreHandFocus=null,handGesture=null;
+  let restoreHandFocus=null,handGesture=null;
   function handInteractionReady(state=$state()){
     return !!state&&state.phase==='playing'&&!state.paused&&!state.pendingAction&&Date.now()>=(state.presentationUntil||0)&&
       (!state.online||!!window.PanelinhaOnline?.connected&&!state.players[0].substituted);
   }
   function $state(){return window.PanelinhaTableBridge?.getState();}
-  function paintHandSelection(){
-    for(const card of $('hand').children){const picked=card.dataset.card===pickedCard;card.classList.toggle('hand-picked',picked);card.setAttribute('aria-pressed',String(picked));}
-  }
-  function clearHandSelection(){pickedCard=null;paintHandSelection();}
   function handPointer(type){
-    const hand=$('hand');if(hand.dataset.pointer!==type){hand.dataset.pointer=type;if(type!=='touch'){clearHandSelection();handPinned=false;}}
+    const hand=$('hand');if(hand.dataset.pointer!==type){hand.dataset.pointer=type;if(type!=='touch')handPinned=false;}
   }
-  function rememberHand(state){
+  function rememberHandFocus(){
     const hand=$('hand'),focus=document.activeElement;
     restoreHandFocus=hand.contains(focus)&&focus.matches(':focus-visible')?{id:focus.dataset.card,index:[...hand.children].indexOf(focus)}:null;
-    const key=JSON.stringify([state.round,state.token,state.current,state.phase,state.activeColor,state.penalty,state.blockedPlayer,state.paused,state.pendingAction?.cardId,state.presentationUntil,state.lastDistribution?.serial,state.lastRotation?.serial,state.players[0].hand.map(c=>c.id)]);
-    // Mantém a geometria antiga até capturar a origem da animação de descarte.
-    if(selectionOwner!==state||selectionKey!==key||!handInteractionReady(state))pickedCard=null;
-    selectionOwner=state;selectionKey=key;
   }
   function cancelHandTimers(){cancelAnimationFrame(handScrollFrame);clearTimeout(hoverTimer);clearTimeout(leaveTimer);hoverTimer=leaveTimer=null;}
   function layoutHand(savedScroll,instant=true,focusId=null){
@@ -169,7 +161,7 @@
       Promise.all(cards.flatMap(c=>c.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})))).then(()=>{if(version===handLayoutVersion){cancelAnimationFrame(handScrollFrame);align();}});
     }
     handLayout={count:n,overflow,compact,color:expandedColor};
-    hand.setAttribute('aria-label',(compact?'Suas cartas em um leque contínuo. Deslize a mão se necessário. ':'Suas cartas. ')+'No toque: selecione e toque novamente para jogar. Com mouse ou teclado: ative uma vez.');
+    hand.setAttribute('aria-label',(compact?'Suas cartas em um leque contínuo. Deslize a mão se necessário. ':'Suas cartas. ')+'Toque, clique ou ative uma carta pelo teclado para jogar.');
     if(instant){hand.getBoundingClientRect();requestAnimationFrame(()=>hand.classList.remove('layout-instant'));}
     followTurnCue(!instant);
   }
@@ -186,23 +178,18 @@
     handGesture={pointerId:event.pointerId,type,x:event.clientX,y:event.clientY,scroll:hand.scrollLeft,moved:false};
   },true);
   hand.addEventListener('pointermove',event=>{
-    if(handGesture?.pointerId===event.pointerId&&Math.hypot(event.clientX-handGesture.x,event.clientY-handGesture.y)>9){handGesture.moved=true;clearHandSelection();}
+    if(handGesture?.pointerId===event.pointerId&&Math.hypot(event.clientX-handGesture.x,event.clientY-handGesture.y)>9)handGesture.moved=true;
   },{passive:true});
-  hand.addEventListener('pointercancel',()=>{if(handGesture)handGesture.moved=true;clearHandSelection();});
+  hand.addEventListener('pointercancel',()=>{if(handGesture)handGesture.moved=true;});
   hand.addEventListener('scroll',()=>{if(handGesture&&Math.abs(hand.scrollLeft-handGesture.scroll)>4)handGesture.moved=true;},{passive:true});
   hand.addEventListener('click',event=>{
     const card=event.target.closest('[data-card]'),gesture=handGesture;handGesture=null;
-    if(!card){clearHandSelection();closeHandGroup();return;}
+    if(!card){closeHandGroup();return;}
     if(gesture?.moved||!handInteractionReady()||PanelinhaTableEffects.drawing(Number(card.dataset.card))){stopHandClick(event);return;}
     // Usa a origem do evento, não maxTouchPoints: mouse continua com um clique em híbridos.
     const pointer=event.pointerType,type=pointer?(pointer==='mouse'?'mouse':'touch'):event.detail===0?'keyboard':event.sourceCapabilities?.firesTouchEvents?'touch':gesture?.type||'mouse';
     handPointer(type);
-    if(type==='touch'&&pickedCard!==card.dataset.card){
-      stopHandClick(event);pickedCard=card.dataset.card;
-      if(hand.classList.contains('grouped-hand')&&expandedColor!==card.dataset.handColor)openHandGroup(card.dataset.handColor,true,pickedCard);
-      paintHandSelection();
-    }
-    // Segundo toque, mouse e teclado seguem para o mesmo comando validado pelo motor.
+    // Um único toque/clique segue para o comando original, validado pelo motor.
   },true);
   hand.addEventListener('pointerover',event=>{if(event.pointerType==='mouse')handPointer('mouse');});
   let lastPointer=null;
@@ -219,15 +206,15 @@
   hand.addEventListener('pointerleave',()=>{
     clearTimeout(hoverTimer);if(!handPinned)leaveTimer=setTimeout(()=>closeHandGroup(),500);
   });
-  document.addEventListener('pointerdown',event=>{if(!hand.contains(event.target)){handGesture=null;clearHandSelection();closeHandGroup()}},true);
-  document.addEventListener('click',event=>{if(!hand.contains(event.target)){clearHandSelection();closeHandGroup()}},true);
+  document.addEventListener('pointerdown',event=>{if(!hand.contains(event.target)){handGesture=null;closeHandGroup()}},true);
+  document.addEventListener('click',event=>{if(!hand.contains(event.target))closeHandGroup()},true);
   hand.addEventListener('focusin',event=>{
     const card=event.target.closest('[data-card]');if(!card||!card.matches(':focus-visible'))return;
     handPointer('keyboard');if(hand.classList.contains('grouped-hand')&&expandedColor!==card.dataset.handColor)openHandGroup(card.dataset.handColor,true,card.dataset.card);
   });
   hand.addEventListener('keydown',event=>{
     handGesture=null;handPointer('keyboard');
-    if(event.key==='Escape'){event.preventDefault();clearHandSelection();closeHandGroup();return;}
+    if(event.key==='Escape'){event.preventDefault();closeHandGroup();return;}
     const cards=[...hand.children].filter(c=>!c.disabled),index=cards.indexOf(event.target.closest('[data-card]'));
     if(index<0||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
     event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?cards.length-1:Math.max(0,Math.min(cards.length-1,index+(event.key==='ArrowRight'?1:-1))),card=cards[next];
@@ -428,7 +415,7 @@
 
   // Chamado antes de o render existente substituir a mão: lê geometria, não regras.
   function beforeRender(state) {
-    rememberHand(state);
+    rememberHandFocus();
     pendingPlay = null;
     const card = state.discard[state.discard.length - 1];
     if (!snapshot || snapshot.state !== state || snapshot.round !== state.round ||
@@ -721,7 +708,6 @@
       }
     }
     fan($('hand'), innerWidth < 360 ? 7 : 9, savedScroll);
-    paintHandSelection();
     if(restoreHandFocus){const cards=[...$('hand').children],target=cards.find(c=>c.dataset.card===restoreHandFocus.id)||cards[Math.min(restoreHandFocus.index,cards.length-1)];if(target&&!target.disabled)target.focus({preventScroll:true});restoreHandFocus=null;}
     positionTurnCue();
     const top=state.discard[state.discard.length-1];
@@ -756,5 +742,5 @@
     positionTurnCue();layoutOpponentNames();
   });
   nativeTable(false);
-  window.PanelasMesa = { handPoint,incomingPoint,takeDraws,maskCards,render, renderSeat, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {pickedCard=null;selectionOwner=selectionKey=restoreHandFocus=handGesture=null;paintHandSelection();cancelAnimationFrame(namesLayoutFrame);for(const nameplate of opponentNames.values())nameplate.remove();opponentNames.clear();PanelinhaTableEffects.reset();cancelAnimationFrame(cueLayoutFrame);cueAnimation?.cancel();cueAnimation=null;cueOwner=null;cueRound=null;wasHumanTurn=false;$('turnCue').hidden=true;$('hand').classList.remove('human-turn');$('hand').dataset.turnScale='1';$('buyBtn').classList.remove('mandatory-buy');clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
+  window.PanelasMesa = { handPoint,incomingPoint,takeDraws,maskCards,render, renderSeat, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {restoreHandFocus=handGesture=null;cancelAnimationFrame(namesLayoutFrame);for(const nameplate of opponentNames.values())nameplate.remove();opponentNames.clear();PanelinhaTableEffects.reset();cancelAnimationFrame(cueLayoutFrame);cueAnimation?.cancel();cueAnimation=null;cueOwner=null;cueRound=null;wasHumanTurn=false;$('turnCue').hidden=true;$('hand').classList.remove('human-turn');$('hand').dataset.turnScale='1';$('buyBtn').classList.remove('mandatory-buy');clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
 })();

@@ -57,7 +57,6 @@ public class OfflineGameTest {
     }
     void tap(String selector) throws Exception {
         tapOnce(selector);
-        if("true".equals(js("(()=>{const e=document.querySelector("+org.json.JSONObject.quote(selector)+");return !!e&&e.parentElement.id==='hand'&&e.classList.contains('hand-picked')})()"))) tapOnce(selector);
     }
     void tapOnce(String selector) throws Exception {
         long focusDeadline = SystemClock.uptimeMillis() + 30000;

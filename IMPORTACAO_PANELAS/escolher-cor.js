@@ -15,14 +15,13 @@
     if(!['wild','wild4','wild6'].includes(cardType))return false;
     const type=cardType;
     const title=type==='wild4'?'+4 — Escolher cor':type==='wild6'?'+6 — Escolher cor':'Escolher cor';
-    const hint='Toque no alimento da própria carta para escolher a cor';
     closeCurrent?.();
     const previous=document.activeElement;
     const overlay=document.createElement('div');overlay.className='modal-wrap color-picker';overlay.dataset.cardType=type;overlay.classList.toggle('penalty-picker',type!=='wild');
-    overlay.innerHTML=`<section class="color-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="colorPickerTitle" aria-describedby="colorPickerHint">
-      <h2 id="colorPickerTitle">${title}</h2><p id="colorPickerHint">${hint}</p>
+    overlay.innerHTML=`<section class="color-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="colorPickerTitle">
+      <h2 id="colorPickerTitle" class="sr-only">${title}</h2>
       <div class="color-picker-card">${PanelinhaCards.html({type},{label:title})}<div class="color-picker-food-targets" role="group" aria-label="Escolha um alimento na carta">${choicesHTML(type)}</div></div>
-      <button type="button" class="btn alt" id="cancelColor">Cancelar</button>
+      <button type="button" id="cancelColor" hidden tabindex="-1">Cancelar escolha</button>
       <span class="sr-only" role="status" aria-live="polite"></span>
     </section>`;
     let accepted=false,closed=false,animation=null;
@@ -35,7 +34,7 @@
     function keys(event){
       if(event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation();cancelChoice();}
       if(event.key==='Tab'){
-        const buttons=[...overlay.querySelectorAll('button:not(:disabled)')];
+        const buttons=[...overlay.querySelectorAll('button:not(:disabled):not([hidden])')];
         const i=buttons.indexOf(document.activeElement);
         event.preventDefault();buttons[i<0?(event.shiftKey?buttons.length-1:0):(i+(event.shiftKey?-1:1)+buttons.length)%buttons.length]?.focus({preventScroll:true});
       }
@@ -62,6 +61,7 @@
       });
     });
     overlay.querySelector('#cancelColor').onclick=cancelChoice;
+    overlay.addEventListener('click',event=>{if(event.target===overlay)cancelChoice();});
     root.innerHTML='';root.append(overlay);closeCurrent=close;
     document.addEventListener('keydown',keys,true);
     // Foco inicial no diálogo, sem simular hover sobre uma cor no dispositivo de toque.

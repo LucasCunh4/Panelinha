@@ -1,14 +1,9 @@
 /* A escolha usa os alimentos permanentes da carta, sem grade ou imagens separadas. */
 .color-picker{z-index:80;background:#160921ed;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));overscroll-behavior:contain;touch-action:manipulation}
-.color-picker-dialog{display:grid;grid-template-columns:minmax(150px,230px) auto;grid-template-areas:"title card" "hint card" "cancel card";align-items:center;column-gap:clamp(18px,4vw,40px);row-gap:10px;max-width:100%;max-height:100%;text-align:center;color:#fff1d9}
+.color-picker-dialog{position:relative;max-width:100%;max-height:100%;color:#fff1d9}
 .color-picker-dialog:focus{outline:none}
-.color-picker h2{grid-area:title;font:clamp(20px,3vw,28px) PanelinhaDisplay,system-ui,sans-serif;margin:0;color:#ffd57d;align-self:end}
-.color-picker p{grid-area:hint;margin:0;font-size:13px;line-height:1.4;color:#e6d3e9}
-.color-picker-card{grid-area:card;position:relative;flex:none;--picker-height:min(460px,calc(100vh - 40px));width:calc(var(--picker-height)/var(--card-aspect));height:var(--picker-height);aspect-ratio:var(--card-ratio);filter:drop-shadow(0 6px 18px #0008)}
-@supports(height:100svh){.color-picker-card{--picker-height:min(460px,calc(100svh - 40px))}}
+.color-picker-card{position:relative;flex:none;--picker-height:min(540px,calc(100vh - 40px));width:min(calc(var(--picker-height)/var(--card-aspect)),calc(100vw - 40px));height:auto;aspect-ratio:var(--card-ratio);filter:drop-shadow(0 6px 18px #0008)}
+@supports(height:100svh){.color-picker-card{--picker-height:min(540px,calc(100svh - 40px))}}
 .color-picker-food-targets{position:absolute;left:var(--card-inset-x);top:var(--card-inset-y);width:var(--card-face-width);height:var(--card-face-height)}
 .color-picker .ingredient-hit{position:absolute;min-width:44px;min-height:44px;transform:translate(-50%,-50%);border:0;border-radius:45%;padding:0;background:transparent;box-shadow:none;opacity:1;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-touch-callout:none}
 .color-picker .ingredient-hit:focus-visible{outline:2px solid #ffe5a4;outline-offset:2px}.color-picker .ingredient-hit:disabled{opacity:1;cursor:default}
-.color-picker #cancelColor{grid-area:cancel;justify-self:center;align-self:start;min-height:44px;padding:10px 22px;border:1px solid #b28b9c;background:#38223e;color:#fff1d9}
-@media(orientation:landscape) and (max-height:360px){.color-picker-dialog{grid-template-columns:minmax(140px,210px) auto;column-gap:18px;row-gap:6px}.color-picker h2{font-size:20px}.color-picker p{font-size:12px}.color-picker #cancelColor{min-height:36px;padding:7px 18px}}
-@media(orientation:portrait) and (max-width:540px){.color-picker-dialog{grid-template-columns:minmax(0,1fr);grid-template-areas:"title" "hint" "card" "cancel";justify-items:center;row-gap:8px;width:100%}.color-picker-card{--picker-height:min(460px,calc(100vh - 180px))}@supports(height:100svh){.color-picker-card{--picker-height:min(460px,calc(100svh - 180px))}}}
