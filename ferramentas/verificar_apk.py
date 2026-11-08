@@ -8,6 +8,7 @@ import struct
 import subprocess
 import sys
 import zipfile
+from verificar_icones import verify as verify_icons
 
 root = Path(__file__).resolve().parent.parent
 apk = Path(sys.argv[1]).resolve()
@@ -40,9 +41,13 @@ if os.environ.get('PANELINHA_VERSION_NAME'):
 manifest = json.loads((root / 'IMPORTACAO_PANELAS/documentacao/MANIFESTO_CARTAS_470X800.json').read_text())
 with zipfile.ZipFile(apk) as archive:
     prefix = 'assets/public/'
-    launcher_pngs=[n for n in archive.namelist() if n.startswith('res/mipmap-') and re.search(r'/ic_launcher(?:_round|_foreground)?\.png$',n)]
-    assert len(launcher_pngs)==15, 'Ícones Android legados/adaptativos incompletos'
-    assert any(n.endswith('/ic_launcher.xml') and 'anydpi' in n for n in archive.namelist()), 'Ícone adaptativo ausente'
+    resource_table=subprocess.check_output([str(tools/'aapt2'),'dump','resources',str(apk)],text=True)
+    launcher_records=verify_icons(archive,resource_table,root/'android/app/src/main/res')
+    for name in ['ic_launcher','ic_launcher_round']:
+        path=launcher_records[name]['variants']['anydpi-v26'][0]
+        tree=subprocess.check_output([str(aapt),'dump','xmltree',str(apk),path],text=True)
+        assert 'E: adaptive-icon' in tree and 'E: foreground' in tree and 'E: background' in tree, 'Composição adaptativa inválida'
+        assert launcher_records['ic_launcher_foreground']['id'] in tree, 'Foreground adaptativo divergente'
     pngs = [p for p in archive.namelist() if p.startswith(prefix + 'assets/cartas/') and p.endswith('.png')]
     expected_pngs = sorted(prefix+a['path'] for a in manifest['assets'])
     assert sorted(pngs) == expected_pngs and len(pngs) == 23, 'Devem existir somente os 23 novos PNGs de cartas'
@@ -93,7 +98,7 @@ with zipfile.ZipFile(apk) as archive:
     assert config['server']['hostname'] == 'localhost' and config['server']['androidScheme'] == 'https'
     assert 'url' not in config['server'], 'O APK não deve depender de servidor remoto'
 info = {
-    'appName': 'Panelinha', 'launcherIconsVerified':len(launcher_pngs),
+    'appName': 'Panelinha', 'launcherIconsVerified':15,
     'specialIngredientAssetsVerified': len(ingredients['assets']),
     'visualSoundAssetsVerified': len(visual_sound['assets']),
     'file': apk.name, 'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),

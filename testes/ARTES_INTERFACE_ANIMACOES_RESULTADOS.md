@@ -124,3 +124,11 @@ Base: `fb7cfc0`, HEAD da branch `android/apk-testes`, com o ZIP novo adicionado 
 ## Publicação e limitações
 
 Compilação/assinatura e download do APK final serão registrados após o GitHub Actions. Emulador não executado, conforme orientação anterior. Não houve teste de instalação/atualização/persistência em dispositivo físico, desempenho de hardware ou sessão com quatro celulares reais. As verificações de toque/responsividade foram em Chromium; WebSocket e projeções autoritativas foram exercitados localmente. Não declarar essas verificações Android pendentes como aprovadas.
+
+### Correção da verificação Android antes da publicação
+
+A execução [42501501854](https://github.com/LucasCunh4/Panelinha/actions/runs/42501501854) compilou e assinou com sucesso, mas foi recusada pelo novo verificador: o AAPT2 otimiza nomes para caminhos como `res/9w.png`, portanto contar nomes `res/mipmap-.../ic_launcher.png` era incorreto. Não foi falha de emulador ou do jogo, e nenhum APK dessa tentativa foi publicado.
+
+O verificador foi corrigido para resolver `mipmap/ic_launcher`, `ic_launcher_round` e `ic_launcher_foreground` pela tabela real do Android. Confere todas as 15 variantes, dimensões e pixels RGBA contra os PNGs fonte, inclusive após recompressão/remoção de alfa opaco pelo AAPT2, e valida a composição XML adaptativa/foreground. Assinatura, identidade e integridade continuam obrigatórias. `ferramentas/verificar_icones.py` e `testes/icones_android.py` foram adicionados.
+
+Teste do verificador aprovado com caminhos encurtados, rejeição de densidade ausente e arte incorreta. Também conferiu pixel a pixel as 15 variantes de um APK real anterior contra seus respectivos arquivos no Git, em diretório temporário removido após o teste. Apenas essa verificação foi corrigida; não foi necessário repetir os testes de interface nem alterar o aplicativo. Nova compilação necessária para disponibilizar o único APK final validado, sem publicar candidato intermediário.
