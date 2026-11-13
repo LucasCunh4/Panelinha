@@ -13,7 +13,7 @@ Base preservada: `02edbdf`, branch `android/apk-testes`, APK anterior 0.2.59/c79
 | +6 | (42,143,118) | (333,116,106) | (20,357,114) | (339,342,114) |
 | Coringa | (52,143,124) | (324,129,114) | (27,367,118) | (324,376,118) |
 
-O queijo da +4 também recebeu correção vertical para não encobrir a ponta do símbolo ampliado da própria ilustração. Os centros dos mirtilos foram preservados ao aumentar seu tamanho. Hitboxes do seletor usam as mesmas coordenadas; hover, proporção, transparência, mão, descarte e voos continuam no renderizador único.
+O queijo da +4 também recebeu correção vertical para não encobrir a ponta do símbolo principal da ilustração. Os centros dos mirtilos foram preservados ao aumentar seu tamanho. Hitboxes do seletor usam as mesmas coordenadas; hover, proporção, transparência, mão, descarte e voos continuam no renderizador único.
 
 - `efeitos-mesa.js/.css`: Liquidificador em etapas. Após a carta pousar, todas as cartas se recolhem das posições reais em um contêiner por jogador (690–1020 ms). Os montes se estabilizam em versos, partem em 1100 ms, chegam em 1740 ms e abrem no novo leque até 2000 ms. Somente quatro conjuntos circulam, com até seis camadas visíveis durante o trajeto; não há sprites individuais atravessando a mesa. As frentes recebidas aparecem somente no destino autorizado (humano/parceiro em Duplas). Quadro final coincide com as cartas reais do leque; pausa/retomada e retomada tardia seguem o relógio compartilhado. Redução de movimento e limpeza conservadas.
 - `motor.js`: `ROTATION_TIMING` centraliza essas etapas sem aumentar os 2000 ms totais. Regras, direção, transferências, quantidade de cartas e pontuação não mudaram.
@@ -45,4 +45,14 @@ Testes: novo `testes/refinos_pontas_liquidificador.cjs`; atualizados `testes/ref
 
 ## APK e limitações
 
-Publicação e validação do APK final serão registradas após o workflow. Emulador não executado. Sem teste de instalação/atualização, persistência ou desempenho em Android físico, nem sessão com quatro celulares reais. Toque/layout verificados em Chromium; regras e projeções multiplayer exercitadas localmente. Esses testes pendentes não são declarados aprovados.
+APK final [panelinha.apk — 0.2.60/c8002](https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.60/panelinha.apk), 63.050.919 bytes. [GitHub Actions 42506299233](https://github.com/LucasCunh4/Panelinha/actions/runs/42506299233): **success**, commit `641346c492f666eb125c6602587c1bb581c0e28f`. Uma única compilação Android nesta rodada, sem APK intermediário.
+
+Na retomada de 13/11/2026, diretório limpo e HEAD local/remoto confirmados; código, registros dos testes e logs da compilação preservados. Nenhuma perda de trabalho. Não foi necessário repetir testes ou compilar novamente.
+
+APK baixado integralmente e validado localmente com `ferramentas/verificar_apk.py`: assinatura v2 da geração 2, certificado `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`, pacote `com.lucascunha.panelinha.teste`, origem `https://localhost`, nome Panelinha, sensorLandscape, 23 artes-base, quatro alimentos, 15 variantes de ícones e código esperado. Metadados regenerados idênticos ao CI. Código 8002 superior ao anterior 7902; identidade compatível com atualização direta sem desinstalar.
+
+SHA-256 do APK: `b300aa99a11c2e507f8d451f8b1f685693b8d514059d3859b4147771bf36b3e7`.
+
+Versão web e Worker `d21b281a-26c7-46b1-8293-3a09c4d1fd6b` confirmados na retomada. Quatro arquivos públicos alterados conferidos byte a byte com o build e `/health` retornou `v:1, phase:3, gameplay:true`. O servidor/configurações não foram recriados.
+
+Metadados em `testes/REFINOS_PONTAS_LIQUIDIFICADOR_APK_0.2.60.json`. Emulador não executado. Sem teste de instalação/atualização, persistência ou desempenho em Android físico, nem sessão com quatro celulares reais. Toque/layout verificados em Chromium; regras e projeções multiplayer exercitadas localmente. Esses testes pendentes não são declarados aprovados.
