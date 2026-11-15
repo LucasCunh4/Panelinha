@@ -25,6 +25,14 @@ Evidências textuais em `evidencias-estabilidade-maos-botoes/`. Capturas locais 
 
 ## Android e publicação
 
-Compilação final pelo workflow existente, sem emulador, com os quatro Secrets atuais e verificador de identidade/integridade preservados. Dados do APK real e link serão registrados após a conclusão da execução.
+**[Baixar panelinha.apk 0.2.61 diretamente](https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.61/panelinha.apk)** — 63.053.035 bytes, sem ZIP.
+
+- Workflow [43660736797](https://github.com/LucasCunh4/Panelinha/actions/runs/43660736797), fonte `15605707700406ea32b3a4dd6d39950368bba83b`: **sucesso**, um APK final. Emulador explicitamente `skipped` por opção, sem instrumentação.
+- APK baixado da Release e verificado novamente com `ferramentas/verificar_apk.py`: assinatura v2, certificado ativo, nome, pacote, origem local, sensorLandscape/categoria game, ícones, todos os scripts idênticos ao fonte/build, 23 artes-base/52 combinações, quatro alimentos e 69 recursos visuais/sonoros aprovados. Metadados locais idênticos aos publicados pela CI.
+- `versionCode` **8102 > 8002**; `applicationId` **com.lucascunha.panelinha.teste**; origem **https://localhost**. Compatível com atualização direta das versões da geração 2, sem desinstalação ou limpeza de dados.
+- Certificado SHA-256: `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`.
+- SHA-256 do APK: `f2bba023912caba1cfb9d6530703a1ce384bc9450f25f220dc7b7bbdbc67b01a`.
+- Metadados completos: `ESTABILIDADE_MAOS_E_BOTOES_APK_0.2.61.json`.
+- Web publicada em https://panelinha-lobby.lucas260802.workers.dev, versão Worker `bfed46b5-91bf-4e61-a16a-9b225a69276f`. Sete arquivos afetados conferidos por SHA-256 contra `dist`; `/health` confirmou fase 3 e gameplay ativo. Código/regras e bindings do servidor preservados.
 
 Não executados: emulador/instrumentação, abertura em Android físico, atualização com conferência de retenção real de dados e medição de desempenho em aparelhos reais. Nenhum teste removido ou marcado como aprovado sem execução. Regras, `motor.js`, servidor, assets, sons, armazenamento, pacote e certificado não foram alterados.

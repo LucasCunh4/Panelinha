@@ -1,0 +1,59 @@
+{
+  "appName": "Panelinha",
+  "launcherIconsVerified": 15,
+  "specialIngredientAssetsVerified": 4,
+  "visualSoundAssetsVerified": 69,
+  "file": "panelinha.apk",
+  "sha256": "f2bba023912caba1cfb9d6530703a1ce384bc9450f25f220dc7b7bbdbc67b01a",
+  "applicationId": "com.lucascunha.panelinha.teste",
+  "versionCode": 8102,
+  "versionName": "0.2.61",
+  "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+  "pngsVerified": 23,
+  "origin": "https://localhost",
+  "androidCompat": true,
+  "orientation": "sensorLandscape",
+  "appCategory": "game",
+  "signingGeneration": 2,
+  "mesaAssetsVerified": 6,
+  "menuAssetsVerified": 2,
+  "cardAssetsVerified": 23,
+  "normalCombinations": 52,
+  "cardGeometry": {
+    "contentWidth": 470,
+    "contentHeight": 800,
+    "border": 25,
+    "width": 520,
+    "height": 850,
+    "outerRadius": 70,
+    "innerRadius": 45
+  },
+  "sourceCommit": "15605707700406ea32b3a4dd6d39950368bba83b",
+  "workflowRun": 43660736797,
+  "workflowConclusion": "success",
+  "downloadUrl": "https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.61/panelinha.apk",
+  "previousVersionCode": 8002,
+  "bytes": 63053035,
+  "browserChecks": "passed-targeted",
+  "emulatorExecuted": false,
+  "physicalAndroidExecuted": false,
+  "upgradePersistenceTested": false,
+  "webPublication": {
+    "url": "https://panelinha-lobby.lucas260802.workers.dev",
+    "workerVersion": "bfed46b5-91bf-4e61-a16a-9b225a69276f",
+    "health": {
+      "v": 1,
+      "phase": 3,
+      "gameplay": true
+    },
+    "files": {
+      "index.html": "56c6c4c79f18da0c38f6957855559a5c6c39a4fe8ca416d778993d6ff70d065d",
+      "mesa.js": "ea30682c1cb5f6a8472c1f35b3340e7b21776cfbd2d5b24db77f535b525f21ac",
+      "efeitos-mesa.js": "69e5f58af7cc11da444397646cb03991892d769390f4b8102bc5912f68e8e57e",
+      "efeitos-mesa.css": "d50d7d1f5ee4573b9dbe31c881e47c6d7b9e8400024aa8fb92526b067a6366f0",
+      "escolher-cor.js": "49c61829560f0dd0f68e2dae79c4c4066f30094446aababa6904696f90dd36d6",
+      "escolher-cor.css": "0da7cd5d54232b91d72aedc585e22f381172a976654ca6f989cc0438fe787fa9",
+      "partida-ui.css": "07b5ff6fde90d20ad8070cf0064363c744119b779ddc2043cd7829df22e3fc31"
+    }
+  }
+}
