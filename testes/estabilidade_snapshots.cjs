@@ -17,7 +17,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict');
         const game=G.gameView(room,viewer.id,Date.now());
         await p.evaluate(v=>PanelinhaOnline.receive(v),{status:'connected',selfId:viewer.id,state:{code:'123456',hostId:room.players[0].id,players:room.players,allReady:false,game}});
       };
-      await receive();await p.waitForTimeout(250);
+      await receive();await p.waitForTimeout(250);assert.equal(await p.locator('#localIdentity .local-player-name').textContent(),viewer.name);
       await p.evaluate(()=>{window.saved=[...document.querySelectorAll('#hand>[data-card],[data-hand-card]')];});
       for(let i=0;i<3;i++)await receive();
       assert.equal(await p.evaluate(()=>saved.every(n=>n.isConnected)),true);

@@ -1,0 +1,6 @@
+PASS 52 combinações: cantos 104 px, centro/geometria preservados e nenhum símbolo cortado
+PASS 844×390, Individual, direção -1: recolhe → pilha → giro → leque; privacidade, conservação e limpeza
+PASS 1280×800, Individual, direção 1: recolhe → pilha → giro → leque; privacidade, conservação e limpeza
+PASS 844×390, Duplas, direção 1: recolhe → pilha → giro → leque; privacidade, conservação e limpeza
+PASS 1280×800, Duplas, direção -1: recolhe → pilha → giro → leque; privacidade, conservação e limpeza
+PASS tempos de compra, apresentação, bots, Guardar e punição reduzidos em 20%; nenhum erro JavaScript

@@ -591,14 +591,14 @@
     const union=nodes=>{const rs=[...nodes].map(rect).filter(r=>r.w&&r.h);if(!rs.length)return null;const x=Math.min(...rs.map(r=>r.x)),y=Math.min(...rs.map(r=>r.y)),right=Math.max(...rs.map(r=>r.right)),bottom=Math.max(...rs.map(r=>r.bottom));return{x,y,right,bottom,w:right-x,h:bottom-y};};
     const hands=[0,1,2,3].map(id=>union((id===0?$('hand'):$('player'+id)).querySelectorAll('.card,.hidden-card')));
     const avatars=[0,1,2,3].map(id=>rect($('player'+id).querySelector('.pan-avatar')));
-    const occupied=[...hands.filter(Boolean),...avatars.filter(r=>r.w&&r.h),...[...document.querySelectorAll('.opponent-count')].map(rect)];
+    const occupied=[...hands.filter(Boolean),...avatars.filter(r=>r.w&&r.h),...[...document.querySelectorAll('.opponent-count,#localIdentity,#controls>.btn')].map(rect)];
     for(const id of ['buyBtn','discard','tableMenuBtn','turnClock','onlineConnectionNotice']){const node=$(id);if(node&&!node.hidden&&node.getClientRects().length){const r=rect(node);if(r.w&&r.h)occupied.push(r);}}
     const overlap=(a,b)=>Math.max(0,Math.min(a.right,b.right+4)-Math.max(a.x,b.x-4))*Math.max(0,Math.min(a.bottom,b.bottom+4)-Math.max(a.y,b.y-4));
     for(const id of [2,3,1]){
       const label=opponentNames.get(id);if(!label)continue;
       const avatar=avatars[id],hand=hands[id]||avatar,cx=avatar.x+avatar.w/2,cy=avatar.y+avatar.h/2;
       const below={max:Math.min(240,innerWidth*.25),place:(w,h)=>({x:cx-w/2,y:avatar.bottom+gap})};
-      const above={max:Math.min(240,innerWidth*.25),place:(w,h)=>({x:cx-w/2,y:hand.y-h-gap})};
+      const above={max:Math.min(240,innerWidth*.25),place:(w,h)=>({x:cx-w/2,y:Math.min(hand.y,avatar.y)-h-gap})};
       const candidates=id===2?[
         {max:Math.min(240,avatar.x-pad-gap),place:(w,h)=>({x:avatar.x-w-gap,y:cy-h/2})},
         below,above
@@ -639,6 +639,14 @@
     const scale = Math.max(width / 1672, height / 941);
     const x = (width - 1672 * scale) / 2, y = (height - 941 * scale) / 2;
     table.style.setProperty('--scene-scale', scale);
+    // Em celulares muito largos, cover amplia o cenário pela largura. Limita
+    // só a chama pela altura útil, sem deformar o fogão nem mover seu centro.
+    const compact=width>height&&height<=600;
+    const bottomSpace=parseFloat(getComputedStyle($('hand').parentElement).paddingBottom)||4;
+    // A máscara visível ocupa ~82% do diâmetro; compensa também a área segura
+    // inferior, aplicada uma única vez no painel, sem empurrar cartas ao fogo.
+    const flameDiameter=height*.42-Math.max(0,bottomSpace-4)*2.2;
+    table.style.setProperty('--flame-layout-scale',String(compact?Math.max(.35,Math.min(.8,flameDiameter/(490*scale))):1));
     // Deslocamento em pixels CSS, compensando a escala uniforme do cenário.
     table.style.setProperty('--orbit-left', `${836-4/scale}px`);
     table.style.setProperty('--orbit-top', `${451+2/scale}px`);
@@ -686,7 +694,15 @@
     if(handOwner!==state||handRound!==state.round){cancelHandTimers();expandedColor=null;handPinned=false;handLayout=null;handOwner=state;handRound=state.round;}
     document.body.classList.add('playing');
     const humanTurn=state.phase==='playing'&&state.current===0&&!playing()&&!PanelinhaTableEffects.dealing()&&Date.now()>=(state.presentationUntil||0)&&Date.now()>=state.unlockAt&&(!state.online||!state.paused&&!state.players[0].substituted&&window.PanelinhaOnline?.connected);
-    const identity=$('localIdentity');if(identity){const avatar=state.players[0].avatar||state.identity?.avatar||PanelinhaProfile.current.avatar;const label=`Você · ${state.players[0].hand.length} cartas`;if(identity.dataset.avatar!==avatar){identity.innerHTML=PanelinhaProfile.avatarHTML(avatar)+'<span></span>';identity.dataset.avatar=avatar;}identity.querySelector('span:last-child').textContent=label;}
+    const identity=$('localIdentity');if(identity){
+      const avatar=state.players[0].avatar||state.identity?.avatar||PanelinhaProfile.current.avatar;
+      const name=state.players[0].name||state.identity?.name||PanelinhaProfile.current.name;
+      if(identity.dataset.avatar!==avatar){identity.innerHTML=PanelinhaProfile.avatarHTML(avatar)+'<span><span class="local-player-name"></span><span class="local-player-count"></span></span>';identity.dataset.avatar=avatar;}
+      identity.querySelector('.local-player-name').textContent=name;
+      attr(identity.querySelector('.local-player-name'),'title',name);
+      identity.querySelector('.local-player-count').textContent=`${state.players[0].hand.length} cartas`;
+      attr(identity,'aria-label',`${name}, você, ${state.players[0].hand.length} cartas`);
+    }
     $('hand').dataset.turnScale=humanTurn?'1.06':'1';
     $('hand').classList.toggle('human-turn',humanTurn);
     $('buyBtn').classList.toggle('mandatory-buy',mustBuy);

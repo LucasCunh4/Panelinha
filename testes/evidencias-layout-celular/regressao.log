@@ -1,0 +1,8 @@
+PASS abertura: 28 cartas alternadas, mãos progressivas, ações bloqueadas e identificação; laboratório separado e configuração de som preservada
+PASS Coringa/+4/+6: visualizar mesa mantém escolha pendente, não compra nem revela adversários; retorno e cor aplicados
+PASS descarte bloqueia turno visual até conclusão; cancelamento limpa o voo e libera sem travar
+PASS Inverter muda direção real e rastro permanece contínuo durante a transição de 400ms
+PASS Liquidificador Individual/Duplas: quatro montes compactos, sem fila de cartas, mãos finais corretas e ocultação preservada
+PASS bot compra e só depois descarta, sem reativar animação antiga de troca nem expor a frente comprada
+PASS distribuição reaparece em nova rodada e ritmos normal/punição são independentes
+PASS servidor autoritativo: sem próximo descarte antes da apresentação, corte continua imediato e metadados não revelam cartas
