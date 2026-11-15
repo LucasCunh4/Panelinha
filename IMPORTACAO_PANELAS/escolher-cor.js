@@ -21,22 +21,50 @@
     overlay.innerHTML=`<section class="color-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="colorPickerTitle">
       <h2 id="colorPickerTitle">Escolha uma cor para continuar.</h2>
       <div class="color-picker-card">${PanelinhaCards.html({type},{label:title})}<div class="color-picker-food-targets" role="group" aria-label="Escolha um alimento na carta">${choicesHTML(type)}</div></div>
-      <button type="button" id="viewColorTable" class="btn alt">Visualizar mesa</button><button type="button" id="resumeColorChoice" class="btn good" hidden>Voltar à escolha de cor</button><button type="button" id="cancelColor" hidden tabindex="-1">Cancelar escolha</button>
+      <button type="button" id="viewColorTable" class="btn alt table-action" aria-pressed="false" aria-label="Mantenha pressionado para visualizar a mesa">Visualizar mesa</button><button type="button" id="cancelColor" hidden tabindex="-1">Cancelar escolha</button>
       <span class="sr-only" role="status" aria-live="polite"></span>
     </section>`;
-    let accepted=false,closed=false,animation=null;
+    let accepted=false,closed=false,animation=null,viewing=false,heldPointer=null,heldKey=null;
+    const view=overlay.querySelector('#viewColorTable');
     function close(){
-      if(closed)return;closed=true;animation?.cancel();overlay.remove();
+      if(closed)return;releaseView();closed=true;animation?.cancel();overlay.remove();
       document.removeEventListener('keydown',keys,true);
+      document.removeEventListener('keyup',keyUp,true);
+      window.removeEventListener('pointerup',pointerEnd,true);window.removeEventListener('pointercancel',pointerEnd,true);
+      window.removeEventListener('blur',releaseView);document.removeEventListener('visibilitychange',visibility);
       if(closeCurrent===close)closeCurrent=null;
     }
     function cancelChoice(){if(accepted){close();return;}close();cancel();if(previous?.isConnected)previous.focus({preventScroll:true});}
-    let viewing=false;
-    function viewTable(value){viewing=value;overlay.classList.toggle('viewing-table',value);overlay.querySelector('#resumeColorChoice').hidden=!value;overlay.querySelector('#viewColorTable').hidden=value;overlay.querySelector('.color-picker-card').hidden=value;overlay.querySelector('#colorPickerTitle').hidden=value;overlay.querySelector('[role=\"dialog\"]').setAttribute('aria-modal',String(!value));(value?overlay.querySelector('#resumeColorChoice'):overlay.querySelector('[data-color]')).focus({preventScroll:true});}
-    overlay.querySelector('#viewColorTable').onclick=()=>viewTable(true);overlay.querySelector('#resumeColorChoice').onclick=()=>viewTable(false);
+    function viewTable(value){
+      if(closed||accepted)return;viewing=value;overlay.classList.toggle('viewing-table',value);
+      view.setAttribute('aria-pressed',String(value));view.textContent=value?'Solte para voltar':'Visualizar mesa';
+      overlay.querySelector('.color-picker-card').setAttribute('aria-hidden',String(value));
+      overlay.querySelectorAll('[data-color]').forEach(b=>b.disabled=value);
+    }
+    function releaseView(){
+      const pointer=heldPointer;heldPointer=heldKey=null;viewTable(false);
+      if(pointer!==null&&view.hasPointerCapture?.(pointer))view.releasePointerCapture(pointer);
+    }
+    function pointerEnd(event){if(event.pointerId===heldPointer)releaseView();}
+    function keyUp(event){if(event.key===heldKey){event.preventDefault();event.stopImmediatePropagation();releaseView();}}
+    function visibility(){if(document.hidden)releaseView();}
+    view.addEventListener('pointerdown',event=>{
+      if(accepted||closed||!event.isPrimary||event.button!==0)return;
+      event.preventDefault();event.stopPropagation();view.focus({preventScroll:true});heldPointer=event.pointerId;
+      view.setPointerCapture?.(event.pointerId);viewTable(true);
+    });
+    view.addEventListener('lostpointercapture',pointerEnd);
+    view.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();});
+    view.addEventListener('blur',releaseView);
+    window.addEventListener('pointerup',pointerEnd,true);window.addEventListener('pointercancel',pointerEnd,true);
+    window.addEventListener('blur',releaseView);document.addEventListener('visibilitychange',visibility);
     function keys(event){
-      if(event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation();if(viewing)viewTable(false);else cancelChoice();}
+      if(event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation();if(viewing)releaseView();else cancelChoice();}
+      if(document.activeElement===view&&[' ','Enter'].includes(event.key)){
+        event.preventDefault();event.stopImmediatePropagation();if(!event.repeat&&!viewing){heldKey=event.key;viewTable(true);}
+      }
       if(event.key==='Tab'){
+        releaseView();
         const buttons=[...overlay.querySelectorAll('button:not(:disabled):not([hidden])')].filter(b=>b.getClientRects().length);
         const i=buttons.indexOf(document.activeElement);
         event.preventDefault();buttons[i<0?(event.shiftKey?buttons.length-1:0):(i+(event.shiftKey?-1:1)+buttons.length)%buttons.length]?.focus({preventScroll:true});
@@ -52,7 +80,7 @@
       button.addEventListener('pointerdown',()=>{if(!accepted)layer.classList.add('food-pressed');});
       button.addEventListener('pointercancel',()=>layer.classList.remove('food-pressed'));
       button.addEventListener('click',event=>{
-        event.preventDefault();event.stopPropagation();if(accepted||closed)return;
+        event.preventDefault();event.stopPropagation();if(accepted||closed||viewing)return;
         accepted=true;overlay.classList.add('color-confirmed');layer.classList.add('food-confirmed');
         overlay.querySelector('[role="status"]').textContent=button.getAttribute('aria-label');
         overlay.querySelectorAll('[data-color]').forEach(b=>{b.disabled=true;b.classList.remove('colorbtn');});
@@ -63,10 +91,11 @@
         animation.onfinish=close;
       });
     });
-    overlay.querySelector('#cancelColor').onclick=()=>viewing?viewTable(false):cancelChoice();
+    overlay.querySelector('#cancelColor').onclick=()=>viewing?releaseView():cancelChoice();
     overlay.addEventListener('click',event=>{if(event.target===overlay&&!viewing)cancelChoice();});
     root.innerHTML='';root.append(overlay);closeCurrent=close;
     document.addEventListener('keydown',keys,true);
+    document.addEventListener('keyup',keyUp,true);
     // Foco inicial no diálogo, sem simular hover sobre uma cor no dispositivo de toque.
     const dialog=overlay.querySelector('[role="dialog"]');dialog.tabIndex=-1;dialog.focus({preventScroll:true});
   }

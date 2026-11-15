@@ -89,6 +89,30 @@
     if(changed)opponentLayouts.delete(area);
   }
 
+  // A carta, suas imagens e o foco sobrevivem a renders que só mudam regras/turno.
+  // Recriar o leque reiniciava hover, decodificação e animações de chegada.
+  let humanCards=new Map(),humanOwner=null,humanRound=null;
+  function renderHand(state,cards,describe,format,play){
+    const hand=$('hand');
+    if(humanOwner!==state||humanRound!==state.round){
+      hand.replaceChildren();humanCards.clear();humanOwner=state;humanRound=state.round;
+    }
+    const ids=new Set(cards.map(c=>c.id));
+    for(const [id,node]of humanCards)if(!ids.has(id)){node.remove();humanCards.delete(id);}
+    cards.forEach((card,i)=>{
+      const {enabled,cutting,reason}=describe(card),view=format(card);let node=humanCards.get(card.id);
+      if(!node){node=document.createElement('button');node.type='button';node.style.cssText='border:0;background:none;padding:0';node.dataset.card=card.id;node.onclick=()=>play(Number(node.dataset.card));humanCards.set(card.id,node);}
+      if(node._cardView!==view){const holder=document.createElement('div');holder.innerHTML=view;const face=holder.firstElementChild;if(node.firstElementChild)node.firstElementChild.replaceWith(face);else node.append(face);node._cardView=view;}
+      attr(node,'data-hand-color',card.color||'wild');attr(node,'data-rule-disabled',String(!(enabled||cutting)));
+      attr(node,'data-rule-label',reason);attr(node,'aria-label',reason);attr(node,'title',reason);
+      node.firstElementChild.classList.toggle('is-invalid',!(enabled||cutting));
+      node.classList.toggle('cut-eligible',!!cutting);
+      if(cutting){attr(node,'id','cutBtn');if(!node.querySelector('.cut-bubble'))node.insertAdjacentHTML('beforeend','<span class="cut-bubble"><img src="assets/mesa/corte_faca_balao.png" alt="CORTAR" draggable="false"></span>');}
+      else{node.removeAttribute('id');node.querySelector('.cut-bubble')?.remove();}
+      if(hand.children[i]!==node)hand.insertBefore(node,hand.children[i]||null);
+    });
+  }
+
   // Organização visual: os botões permanecem filhos do mesmo leque e conservam IDs.
   let expandedColor=null,handPinned=false,hoverTimer=null,leaveTimer=null,handOwner=null,handRound=null,handScrollFrame=null,handLayoutVersion=0;
   let restoreHandFocus=null,handGesture=null;
@@ -108,7 +132,6 @@
   function layoutHand(savedScroll,instant=true,focusId=null){
     cancelAnimationFrame(handScrollFrame);const version=++handLayoutVersion;
     const hand=$('hand'),cards=[...hand.children],n=cards.length;
-    hand.classList.toggle('layout-instant',instant);
     if(!n){hand.classList.remove('grouped-hand','hand-overflow','scroll-hand');expandedColor=null;delete hand.dataset.expandedColor;return;}
     const style=getComputedStyle(hand),width=parseFloat(getComputedStyle(cards[0]).width);
     const room=hand.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
@@ -131,6 +154,9 @@
     }
     const positions=[0];for(let i=1;i<n;i++)positions[i]=positions[i-1]+steps[i];
     const total=positions[n-1]+width,overflow=total>room+1;
+    const key=`${room}:${width}:${compact}:${expandedColor}:${cards.map(c=>c.dataset.card+':'+c.dataset.handColor).join(',')}`;
+    const changed=handLayout?.key!==key;
+    if(instant&&changed)hand.classList.add('layout-instant');else if(!instant)hand.classList.remove('layout-instant');
     hand.classList.toggle('hand-overflow',overflow);
     cards.forEach((card,i)=>{
       if(card.dataset.ruleDisabled===undefined){card.dataset.ruleDisabled=String(card.disabled);card.dataset.ruleLabel=card.getAttribute('aria-label')||'';}
@@ -139,6 +165,7 @@
       card.setAttribute('aria-disabled',String(card.disabled||card.dataset.ruleDisabled==='true'));
       card.setAttribute('aria-label',compact&&!selected?`${card.dataset.ruleLabel} · Expandir ${colorNames[card.dataset.handColor]||'cartas sem cor fixa'}`:card.dataset.ruleLabel);
       card.classList.toggle('group-expanded',selected);
+      if(!changed)return;
       card.style.marginLeft=i?`${steps[i]-width}px`:'0px';
       const position=n<2?0:(i/(n-1)-.5)*2;
       card.style.setProperty('--fan-angle',`${position*(compact?3:6)}deg`);
@@ -161,9 +188,9 @@
       let frames=0;const follow=()=>{if(version!==handLayoutVersion)return;align();if(++frames<18)handScrollFrame=requestAnimationFrame(follow);};follow();
       Promise.all(cards.flatMap(c=>c.getAnimations().filter(a=>a.effect.getTiming().iterations!==Infinity).map(a=>a.finished.catch(()=>{})))).then(()=>{if(version===handLayoutVersion){cancelAnimationFrame(handScrollFrame);align();}});
     }
-    handLayout={count:n,overflow,compact,color:expandedColor};
+    handLayout={key,count:n,overflow,compact,color:expandedColor};
     hand.setAttribute('aria-label',(compact?'Suas cartas em um leque contínuo. Deslize a mão se necessário. ':'Suas cartas. ')+'Toque, clique ou ative uma carta pelo teclado para jogar.');
-    if(instant){hand.getBoundingClientRect();requestAnimationFrame(()=>hand.classList.remove('layout-instant'));}
+    if(instant&&changed){hand.getBoundingClientRect();requestAnimationFrame(()=>hand.classList.remove('layout-instant'));}
     followTurnCue(!instant);
   }
   function openHandGroup(color,pinned,focusId=null){
@@ -414,7 +441,7 @@
     return Math.atan2(b,a) * 180 / Math.PI;
   }
 
-  // Chamado antes de o render existente substituir a mão: lê geometria, não regras.
+  // Lê a geometria anterior antes de reconciliar as cartas, sem decidir regras.
   function beforeRender(state) {
     rememberHandFocus();
     pendingPlay = null;
@@ -756,5 +783,5 @@
     positionTurnCue();layoutOpponentNames();
   });
   nativeTable(false);
-  window.PanelasMesa = { playing, handPoint,incomingPoint,takeDraws,maskCards,render, renderSeat, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {restoreHandFocus=handGesture=null;cancelAnimationFrame(namesLayoutFrame);for(const nameplate of opponentNames.values())nameplate.remove();opponentNames.clear();PanelinhaTableEffects.reset();cancelAnimationFrame(cueLayoutFrame);cueAnimation?.cancel();cueAnimation=null;cueOwner=null;cueRound=null;wasHumanTurn=false;$('turnCue').hidden=true;$('hand').classList.remove('human-turn');$('hand').dataset.turnScale='1';$('buyBtn').classList.remove('mandatory-buy');clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
+  window.PanelasMesa = { playing, handPoint,incomingPoint,takeDraws,maskCards,render, renderSeat, renderHand, beforeRender, closeMenu, recordDraw, discardHTML, updateClock, reset:() => {restoreHandFocus=handGesture=null;cancelAnimationFrame(namesLayoutFrame);for(const nameplate of opponentNames.values())nameplate.remove();opponentNames.clear();PanelinhaTableEffects.reset();cancelAnimationFrame(cueLayoutFrame);cueAnimation?.cancel();cueAnimation=null;cueOwner=null;cueRound=null;wasHumanTurn=false;$('turnCue').hidden=true;$('hand').classList.remove('human-turn');$('hand').dataset.turnScale='1';$('buyBtn').classList.remove('mandatory-buy');clearFlights();cancelHandTimers();expandedColor=null;handPinned=false;handOwner=null;handRound=null;handLayoutVersion++;nativeTable(false);if($('turnClock'))$('turnClock').hidden=true;handLayout=null;clockKey=null;discardTrail=[];trailState=null;trailRound=null;closeMenu();document.body.classList.remove('playing');previous=null;snapshot=null;displayedTop=null;} };
 })();

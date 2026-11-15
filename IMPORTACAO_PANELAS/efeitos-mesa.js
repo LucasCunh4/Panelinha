@@ -3,6 +3,22 @@
   const $=id=>document.getElementById(id),motion=matchMedia('(prefers-reduced-motion: reduce)');
   let owner=null,round=null,previous=null,pressure=null,frame=0,decision=null,lastOrigin=null,seenPurchase=0;
   const draws=new Set(),masked=new Set(),nodes=new Set(),incoming=new Map();
+  const handMotions=new Map();
+  function finishHandMotions(){for(const a of handMotions.values())a.cancel();handMotions.clear();}
+  const handNodes=()=>[...document.querySelectorAll('#hand>[data-card],[data-hand-card]')];
+  function localShift(node,dx,dy,spaces){
+    // Os leques laterais são girados. Converte o deslocamento da tela para o
+    // plano local antes de compor o transform, mantendo escala e orientação.
+    let inverse=spaces.get(node.parentElement);
+    if(!inverse){
+      let matrix=new DOMMatrix();
+      for(let parent=node.parentElement;parent;parent=parent.parentElement){
+        const transform=getComputedStyle(parent).transform;if(transform!=='none')matrix=new DOMMatrix(transform).multiply(matrix);
+      }
+      inverse=matrix.inverse();spaces.set(node.parentElement,inverse);
+    }
+    return{x:inverse.a*dx+inverse.c*dy,y:inverse.b*dx+inverse.d*dy};
+  }
   let prepared=[],arrivalLayout=false,queued=[],drawTimer=null,renderFrame=null,deal=null;
   const drawKey=(actor,id)=>actor+':'+id;
   function handCards(s,actor){return s.players[actor].hand.filter(c=>!incoming.has(drawKey(actor,c.id)));}
@@ -29,11 +45,11 @@
     remove(previousDecision.node);
     if(deliver)placeDecision(previousDecision);else masked.delete(previousDecision.id);
   }
-  function reset(){if(deal){clearTimeout(deal.fallback);deal=null;}clearTimeout(frame);clearTimeout(drawTimer);cancelAnimationFrame(renderFrame);drawTimer=renderFrame=null;queued=[];pressure=null;previous=null;owner=null;round=null;seenPurchase=0;closeDecision();lastOrigin=null;draws.clear();masked.clear();incoming.clear();prepared=[];arrivalLayout=false;for(const n of [...nodes])remove(n);$('table').classList.remove('pressure-transition','pressure-hands-hidden','penalty-purchase-transition');}
+  function reset(){finishHandMotions();if(deal){clearTimeout(deal.fallback);deal=null;}clearTimeout(frame);clearTimeout(drawTimer);cancelAnimationFrame(renderFrame);drawTimer=renderFrame=null;queued=[];pressure=null;previous=null;owner=null;round=null;seenPurchase=0;closeDecision();lastOrigin=null;draws.clear();masked.clear();incoming.clear();prepared=[];arrivalLayout=false;for(const n of [...nodes])remove(n);$('table').classList.remove('pressure-transition','pressure-hands-hidden','penalty-purchase-transition');}
   function clock(s){return pressure.duration-(s.paused?s.remaining?.presentation||0:Math.max(0,(s.presentationUntil||0)-Date.now()));}
   function animatePressure(s,p,elapsed){
     if(motion.matches)return;
-    const middle=center(),collectAt=690,mixAt=1080,dealAt=1260,endAt=1900;
+    const middle=center(),collectAt=690,mixAt=1080;
     if(elapsed<collectAt||p.collecting)return;
     p.collecting=true;
     p.old.forEach((hand,actor)=>hand.forEach((card,i)=>{
@@ -42,15 +58,16 @@
       const a=n.animate([{transform:`translate(-50%,-50%) rotate(${start.angle||0}deg)`,opacity:1},{transform:`translate(calc(-50% + ${middle.x-start.x}px),calc(-50% + ${middle.y-start.y}px)) rotate(${(i%5-2)*7}deg) scale(.8)`,opacity:1}],{duration:Math.max(100,mixAt-elapsed),easing:'cubic-bezier(.4,0,.2,1)',fill:'forwards'});
       a.onfinish=()=>{if(!nodes.has(n))return;const b=n.animate([{translate:'0 0',rotate:'0deg'},{translate:'12px -5px',rotate:'12deg'},{translate:'-8px 4px',rotate:'-10deg'},{translate:'0 0',rotate:'0deg'}],{duration:180,fill:'forwards'});b.onfinish=()=>remove(n);};
     }));
-    p.dealAt=dealAt;p.endAt=endAt;
   }
   function dealPressure(s,p,elapsed){
     if(motion.matches||p.dealing||elapsed<1260)return;p.dealing=true;
     const middle=center();
     s.players.forEach(player=>player.hand.forEach((card,i)=>{
       const end=point(player.id,card.id),n=sprite(card,visible(s,player.id),middle,'pressure-deal');n.dataset.actor=player.id;
-      const delay=Math.min(180,i*12),duration=Math.max(120,1900-elapsed-delay);
-      const a=n.animate([{opacity:0,transform:'translate(-50%,-50%) scale(.8)'},{offset:.1,opacity:1},{opacity:1,transform:`translate(calc(-50% + ${end.x-middle.x}px),calc(-50% + ${end.y-middle.y}px)) rotate(${end.angle||0}deg) scale(${end.width/middle.width},${end.height/middle.height})`}],{duration,delay,easing:'cubic-bezier(.2,.7,.2,1)',fill:'both'});a.onfinish=()=>remove(n);
+      const delay=Math.min(180,i*12),duration=Math.max(1,p.duration-elapsed-delay);
+      // Mantém o último frame até a troca atômica pelas mãos reais. Antes, os
+      // sprites sumiam em 1900 ms, mas as mãos só reapareciam em 2000 ms.
+      n.animate([{opacity:0,transform:'translate(-50%,-50%) scale(.8)'},{offset:.1,opacity:1},{opacity:1,transform:`translate(calc(-50% + ${end.x-middle.x}px),calc(-50% + ${end.y-middle.y}px)) rotate(${end.angle||0}deg) scale(${end.width/middle.width},${end.height/middle.height})`}],{duration,delay,easing:'cubic-bezier(.2,.7,.2,1)',fill:'both'});
     }));
   }
   function bundlePoint(p,actor){
@@ -162,6 +179,7 @@
     const actual=s.players.map(p=>p.hand),kind=s.lastRotation?.serial?'rotation':'pressure',meta=kind==='rotation'?s.lastRotation:s.lastDistribution;
     const swapping=!s.lastNormalPurchase&&!s.lastPenaltyPurchase;
     if(swapping&&meta?.serial&&(!pressure||pressure.serial!==meta.serial||pressure.kind!==kind)&&((s.presentationUntil||0)>Date.now()||s.paused&&s.remaining?.presentation)){
+      finishHandMotions();arrivalLayout=false;
       for(const entry of draws)remove(entry.node);draws.clear();masked.clear();incoming.clear();prepared=[];queued=[];clearTimeout(drawTimer);drawTimer=null;
       for(const n of [...nodes])if(n.dataset.effect==='received')remove(n);
       // Nunca reaproveitar uma mão secreta de outro cliente. Reconexões usam versos.
@@ -176,13 +194,20 @@
     $('table').classList.toggle('pressure-transition',busy);
     $('table').classList.toggle('pressure-hands-hidden',busy&&elapsed>=690&&!motion.matches);
     prepareDraws(PanelasMesa.takeDraws(),s,busy);
-    const oldPositions=arrivalLayout?new Map([...$('hand').children].map(n=>{const r=n.getBoundingClientRect();return[n.dataset.card,{x:r.x+r.width/2,y:r.y+r.height/2}]})):null;arrivalLayout=false;
+    const oldPositions=arrivalLayout?new Map(handNodes().map(n=>{const r=n.getBoundingClientRect();return[n,{x:r.x+r.width/2,y:r.y+r.height/2}]})):null;arrivalLayout=false;
+    // Rebasa uma chegada sobre a posição visível atual; não empilha animações
+    // transform concorrentes, nem lê o destino ainda contaminado pelo voo anterior.
+    if(oldPositions){finishHandMotions();$('table').classList.add('hand-arrival-layout');}
     if(busy&&elapsed<(pressure.kind==='rotation'?(motion.matches?pressure.duration:PanelinhaRules.ROTATION_TIMING.depart):1260))s.players.forEach((p,i)=>p.hand=pressure.old[i]);
-    try{render();if(lastOrigin&&!s.players[0].hand.some(c=>c.id===lastOrigin.id))lastOrigin=null;}finally{s.players.forEach((p,i)=>p.hand=actual[i]);}
+    try{render();if(lastOrigin&&!s.players[0].hand.some(c=>c.id===lastOrigin.id))lastOrigin=null;}finally{s.players.forEach((p,i)=>p.hand=actual[i]);if(oldPositions){$('table').getBoundingClientRect();$('table').classList.remove('hand-arrival-layout');}}
     if(oldPositions&&!motion.matches){
       // Lê toda a geometria antes de escrever animações, sem layout alternado por carta.
-      const shifts=[...$('hand').children].map(n=>{const old=oldPositions.get(n.dataset.card);if(!old)return null;const r=n.getBoundingClientRect();return{n,dx:old.x-r.x-r.width/2,dy:old.y-r.y-r.height/2,end:getComputedStyle(n).transform}}).filter(v=>v&&Math.hypot(v.dx,v.dy)>.5);
-      for(const {n,dx,dy,end}of shifts)n.animate([{transform:`translate(${dx}px,${dy}px) ${end}`},{transform:end}],{duration:220,easing:'cubic-bezier(.2,.7,.2,1)'});
+      const shifts=handNodes().map(n=>{const old=oldPositions.get(n);if(!old)return null;const r=n.getBoundingClientRect();return{n,dx:old.x-r.x-r.width/2,dy:old.y-r.y-r.height/2,end:getComputedStyle(n).transform}}).filter(v=>v&&Math.hypot(v.dx,v.dy)>.5);
+      const spaces=new Map();for(const v of shifts)v.shift=localShift(v.n,v.dx,v.dy,spaces);
+      for(const {n,shift,end}of shifts){
+        const a=n.animate([{transform:`translate(${shift.x}px,${shift.y}px) ${end}`},{transform:end}],{duration:220,easing:'cubic-bezier(.2,.7,.2,1)'});handMotions.set(n,a);
+        const done=()=>{if(handMotions.get(n)===a)handMotions.delete(n);};a.finished.then(done,done);
+      }
     }
     previous=actual.map(h=>h.map(c=>({...c})));
     if(!busy&&!decision&&!draws.size&&!queued.some(item=>item.actor===0)&&s.drawn!==null)showDecision(s);
@@ -336,7 +361,7 @@
     if(!decision)return;
     const controls=decision.node.querySelector('.draw-choice-actions'),eligible=bridge().canAnnounce();
     let uno=controls.querySelector('.draw-uno');
-    if(eligible&&!uno){uno=document.createElement('button');uno.type='button';uno.id='drawUnoBtn';uno.className='btn warn draw-uno';uno.textContent='Última Carta';uno.onclick=()=>bridge().announce();controls.append(uno);}
+    if(eligible&&!uno){uno=document.createElement('button');uno.type='button';uno.id='drawUnoBtn';uno.className='btn warn table-action draw-uno';uno.textContent='Última Carta';uno.onclick=()=>bridge().announce();controls.append(uno);}
     if(!eligible)uno?.remove();
     for(const button of controls.children)button.disabled=!!decision.busy||!!s.paused||!!s.pendingAction||Date.now()<(s.presentationUntil||0);
   }
@@ -346,7 +371,7 @@
     const n=sprite(card,true,p,'draw-choice');n.classList.add('draw-choice');
     const controls=document.createElement('div');controls.className='draw-choice-actions';
     for(const [label,run]of[['Jogar',()=>bridge().playDraw(card.id)],['Guardar',()=>bridge().keepDraw()]]){
-      const b=document.createElement('button');b.type='button';b.className='btn '+(label==='Jogar'?'good':'alt');b.textContent=label;
+      const b=document.createElement('button');b.type='button';b.className='btn table-action '+(label==='Jogar'?'good':'alt');b.textContent=label;
       b.onclick=async()=>{const current=decision;if(!current||current.busy)return;current.busy=true;refreshDecision(s);try{await run();}finally{if(decision===current){current.busy=false;refreshDecision(s);}}};controls.append(b);
     }
     n.append(controls);n.setAttribute('role','group');n.setAttribute('aria-label','Carta comprada: jogar ou guardar');decision={node:n,id:card.id,card,point:p,busy:false};

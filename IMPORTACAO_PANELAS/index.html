@@ -343,13 +343,12 @@ $('handCount').textContent=s.players[0].hand.length+' cartas';
 const cards=[...PanelinhaTableEffects.handCards(s,0)].sort((a,b)=>(COLORS.indexOf(a.color)+1||9)-(COLORS.indexOf(b.color)+1||9)||a.type.localeCompare(b.type)||(a.num??0)-(b.num??0));
 const locked=s.phase==='playing'&&s.current===0&&!canActNow();
 const cutCard=findHumanCut(), handScroll=$('hand').scrollLeft;
-$('hand').innerHTML=cards.map(c=>{
+PanelasMesa.renderHand(s,cards,c=>{
   const enabled=checkCards(0,[c.id],false);
   const cutting=cutCard?.id===c.id;
   const reason=c.type==='dist'&&!canDistribute(c)?'Panela de Pressão indisponível: não há outro destinatário para receber a redução ou penalidade.':(cutting?'Cortar':enabled?'Jogar':'Indisponível')+' '+description(c);
-  return `<button type="button" ${cutting?'id="cutBtn" class="cut-eligible"':''} style="border:0;background:none;padding:0" data-card="${c.id}" data-hand-color="${c.color||'wild'}" aria-label="${reason}" title="${reason}" data-rule-disabled="${!(enabled||cutting)}">${cardHTML(c,false,false,!(enabled||cutting))}${cutting?'<span class="cut-bubble"><img src="assets/mesa/corte_faca_balao.png" alt="CORTAR" draggable="false"></span>':''}</button>`;
-}).join('');
-$('hand').querySelectorAll('[data-card]').forEach(b=>b.onclick=()=>clickHandCard(Number(b.dataset.card)));
+  return {enabled,cutting,reason};
+},cardHTML,clickHandCard);
 if(s.phase!=='playing'){
   $('controls').innerHTML=finishControlHTML();
   $('nextRound')?.addEventListener('click',newRound);$('newMatch')?.addEventListener('click',startMatch);$('backLobby')?.addEventListener('click',backToMenu);
@@ -359,7 +358,7 @@ if(s.phase!=='playing'){
   const canReport=s.online?s.actions.report&&PanelinhaOnline.connected:rules.canReportUNO(0);
   const penaltyBanner=mine&&s.penalty?`<div class="penalty-alert">⚠️ ${penaltyText()}</div>`:'';
 
-  $('controls').innerHTML=`${penaltyBanner}${mine&&canChallenge(0)?`<button id="challengeBtn" class="btn warn" ${locked?'disabled':''}>Desafiar +4${s.o.wild6===false?'':'/+6'}</button>`:''}${canCall?`<button id="unoBtn" class="btn good" ${s.preUno?'disabled':''}>ÚLTIMA CARTA!</button>`:''}${canReport?'<button id="reportBtn" class="btn warn">Denunciar última carta</button>':''}`;
+  $('controls').innerHTML=`${penaltyBanner}${mine&&canChallenge(0)?`<button id="challengeBtn" class="btn warn table-action" ${locked?'disabled':''}>Desafiar +4${s.o.wild6===false?'':'/+6'}</button>`:''}${canCall?`<button id="unoBtn" class="btn good table-action" ${s.preUno?'disabled':''}>ÚLTIMA CARTA!</button>`:''}${canReport?'<button id="reportBtn" class="btn warn table-action">Denunciar última carta</button>':''}`;
   $('buyBtn').disabled=!mine||s.drawn!==null||locked||!!s.pendingAction;
   $('buyBtn').setAttribute('aria-label',s.penalty?'Comprar penalidade de '+s.penalty+' cartas':'Comprar carta');
   $('buyBtn').onclick=buyHuman;

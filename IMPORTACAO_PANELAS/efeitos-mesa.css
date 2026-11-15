@@ -5,6 +5,12 @@
 .pressure-transition #hand,.pressure-transition .controls{pointer-events:none}
 .pressure-transition #controls{visibility:hidden}
 .pressure-hands-hidden #hand,.pressure-hands-hidden .seat .subhand,.pressure-hands-hidden .seat .back,.pressure-hands-hidden .seat .sub{visibility:hidden}
+/* Calcula o leque de destino uma única vez, sem medir cartas a meio de uma
+   transição CSS oculta e saltar para outra posição quando os sprites pousam. */
+.pressure-hands-hidden .back>.card,.pressure-hands-hidden .subhand>.card,.pressure-hands-hidden #hand>button{transition:none!important}
+/* A chegada usa uma única interpolação FLIP. Não combina margin-left animado
+   com transform concorrente, nem mede a carta nova ainda na posição padrão. */
+.hand-arrival-layout #hand>button,.hand-arrival-layout .back>.card,.hand-arrival-layout .subhand>.card{transition:none!important}
 .pressure-transition #turnCue{visibility:hidden}
 .draw-choice{pointer-events:auto;z-index:4}
 .draw-choice-actions{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);display:flex;gap:12px;white-space:nowrap}

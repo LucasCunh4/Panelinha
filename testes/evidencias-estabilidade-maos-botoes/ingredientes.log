@@ -1,0 +1,3 @@
+PASS três cartas/cinco tamanhos: quatro PNGs corretos, transparentes, opacos no desenho, proporção e controles visíveis; estado normal parado e sem grade separada ou imagens duplicadas
+PASS hover proporcional de -10%/1,06 em 180ms, retorno suave e vizinhos imóveis
+PASS 12 escolhas por mouse/toque, feedback móvel, teclado, cancelar/Escape, movimento reduzido, recursos carregados offline e recusa de Panela/Liquidificador; nenhum erro JS

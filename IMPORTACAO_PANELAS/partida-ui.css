@@ -1,3 +1,13 @@
+/* Ações contextuais: mesmo acabamento, conservando verde, vermelho e violeta. */
+.btn.table-action{--action-color:#805297;position:relative;isolation:isolate;box-sizing:border-box;min-height:44px;padding:10px 16px;border:1px solid #deb46e;border-radius:13px;background:linear-gradient(180deg,#ffffff14,transparent 48%,#14071d24),var(--action-color);box-shadow:inset 0 1px #fff3,inset 0 -2px #10071c45,0 3px 0 #211025,0 5px 12px #14082075;color:#fff3db;font:600 clamp(13px,2.6vh,16px)/1.15 PanelinhaDisplay,system-ui,sans-serif;letter-spacing:.02em;text-shadow:0 1px 2px #1a102b99;cursor:pointer;transition:filter 160ms ease,box-shadow 160ms ease,transform 160ms ease;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-touch-callout:none}
+.btn.table-action.alt{--action-color:#443149}.btn.table-action.good{--action-color:#286b56}.btn.table-action.warn{--action-color:#923e51}
+.btn.table-action:focus-visible{outline:3px solid #fff0b3;outline-offset:3px}
+@media(hover:hover){.btn.table-action:not(:disabled):hover{filter:brightness(1.14);box-shadow:inset 0 1px #fff4,inset 0 -2px #10071c45,0 3px 0 #211025,0 0 14px #edbf6a45}}
+.btn.table-action:not(:disabled):active{transform:translateY(2px);box-shadow:inset 0 2px 4px #160b2b80,0 1px 0 #211025}
+.btn.table-action:disabled{cursor:default;filter:saturate(.65);opacity:.58}
+@media(max-height:420px){.btn.table-action{padding:8px 12px}}
+@media(prefers-reduced-motion:reduce){.btn.table-action{transition:none}}
+
 /* Avatares e leques conservam seu eixo. Os nomes alheios usam rótulos independentes. */
 .seat .name,.seat .sub{display:none!important}
 .seat .seat-identity,.seat.top .seat-identity,.seat.top .seat-identity.long-name{display:flex;align-items:center;justify-content:center;position:relative;width:calc(var(--table-avatar) + 10px);max-width:none;min-width:0;min-height:0;padding:5px;gap:0;border-radius:50%}

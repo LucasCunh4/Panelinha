@@ -1,0 +1,4 @@
+PASS compras normais e +20: cartas/imagens existentes preservadas, chegadas progressivas, sem máscaras residuais e conservação exata
+PASS Panela Individual/Duplas em celular/tablet: recolhe quatro mãos, conserva cartas, mantém sprites até a troca sem intervalo vazio e preserva sigilo
+PASS botões de anúncio/denúncia/desafio/Jogar/Guardar tematizados, cores preservadas e ações funcionais de anúncio e Guardar
+PASS Coringa/+4/+6 em três tamanhos: segura com mouse/toque/Espaço/Enter, solta/cancela/perde foco e volta; nenhum cancelamento/cor involuntária; seleção e offline preservados
