@@ -1,0 +1,32 @@
+{
+  "appName": "Panelinha",
+  "launcherIconsVerified": 15,
+  "specialIngredientAssetsVerified": 4,
+  "visualSoundAssetsVerified": 69,
+  "file": "panelinha.apk",
+  "sha256": "a471817a97d235cb6412b7bb75e1db61eea723d0d576d5efee1165efe2153a9c",
+  "applicationId": "com.lucascunha.panelinha.teste",
+  "versionCode": 8302,
+  "versionName": "0.2.63",
+  "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+  "pngsVerified": 23,
+  "origin": "https://localhost",
+  "androidCompat": true,
+  "orientation": "sensorLandscape",
+  "appCategory": "game",
+  "signingGeneration": 2,
+  "mesaAssetsVerified": 6,
+  "menuAssetsVerified": 2,
+  "cardAssetsVerified": 23,
+  "normalCombinations": 52,
+  "cardGeometry": {
+    "contentWidth": 470,
+    "contentHeight": 800,
+    "border": 25,
+    "width": 520,
+    "height": 850,
+    "outerRadius": 70,
+    "innerRadius": 45
+  }
+}
+OK: APK assinado, identidade fixa e 23 PNGs oficiais/52 combinações e jogo empacotados.

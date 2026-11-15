@@ -1,0 +1,55 @@
+{
+  "appName": "Panelinha",
+  "launcherIconsVerified": 15,
+  "specialIngredientAssetsVerified": 4,
+  "visualSoundAssetsVerified": 69,
+  "file": "panelinha.apk",
+  "sha256": "a471817a97d235cb6412b7bb75e1db61eea723d0d576d5efee1165efe2153a9c",
+  "applicationId": "com.lucascunha.panelinha.teste",
+  "versionCode": 8302,
+  "versionName": "0.2.63",
+  "certificateSha256": "3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509",
+  "pngsVerified": 23,
+  "origin": "https://localhost",
+  "androidCompat": true,
+  "orientation": "sensorLandscape",
+  "appCategory": "game",
+  "signingGeneration": 2,
+  "mesaAssetsVerified": 6,
+  "menuAssetsVerified": 2,
+  "cardAssetsVerified": 23,
+  "normalCombinations": 52,
+  "cardGeometry": {
+    "contentWidth": 470,
+    "contentHeight": 800,
+    "border": 25,
+    "width": 520,
+    "height": 850,
+    "outerRadius": 70,
+    "innerRadius": 45
+  },
+  "sourceCommit": "82bb4cc21833a3fb8479d1b50dd9d003600c8e0b",
+  "workflowRun": 43664856487,
+  "workflowConclusion": "success",
+  "downloadUrl": "https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.63/panelinha.apk",
+  "previousVersionCode": 8202,
+  "bytes": 63054467,
+  "browserChecks": "passed-targeted",
+  "emulatorExecuted": false,
+  "physicalAndroidExecuted": false,
+  "upgradePersistenceTested": false,
+  "webPublication": {
+    "url": "https://panelinha-lobby.lucas260802.workers.dev",
+    "workerVersion": "944344de-0367-4bfc-9af8-5db63db2ea3b",
+    "health": {
+      "v": 1,
+      "phase": 3,
+      "gameplay": true
+    },
+    "files": {
+      "index.html": "56c6c4c79f18da0c38f6957855559a5c6c39a4fe8ca416d778993d6ff70d065d",
+      "mesa.js": "e6f053b722705d9086095f634f95e6f788a1224b80d5cfb288e5b7a66800a610",
+      "partida-ui.css": "ea036425dbba82c9efe4ac0e8075f03feb69ce5fd51ab968b29b3103f5973eda"
+    }
+  }
+}

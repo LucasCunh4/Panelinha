@@ -19,6 +19,19 @@ Código: `partida-ui.css` e uma classe de apresentação em `mesa.js`. Nenhuma r
 - `testes/layout_celular.cjs`: **aprovado**. Adicionadas verificações dos centros do contêiner, das cartas renderizadas e do alinhamento horizontal do avatar, com tolerância de 0,5 px; botões também são confrontados com as cartas laterais. Preservadas as 54 configurações em nove resoluções, mãos 7/20/40, fogo normal/+20, foco/expansão, três ações, nome longo e área inferior simulada de 24 px. Compra/Guardar/descarte reais no navegador aprovados.
 - `testes/refinos_pontas_liquidificador.cjs`: **aprovado**. Quatro rotações em Individual/Duplas, nos dois sentidos, com alinhamento no destino, conservação/privacidade e limpeza. 52 combinações e prazos de compra preservados.
 - Capturas de celular inspecionadas; `node --check` e `git diff --check` aprovados. Evidências em `evidencias-centralizacao-laterais/`; capturas locais em `/workspace/work/centralizacao-laterais/`.
-- Build web e APK serão registrados após a compilação e verificação do arquivo publicado.
+- Build web com verificação de assets: **aprovado**. [Workflow 43664856487](https://github.com/LucasCunh4/Panelinha/actions/runs/43664856487): **sucesso**, fonte `82bb4cc21833a3fb8479d1b50dd9d003600c8e0b`; um APK final, emulador explicitamente `skipped`.
+- APK baixado da Release e novamente verificado com `ferramentas/verificar_apk.py`: assinatura v2, certificado ativo, pacote, origem, sensorLandscape, ícones, código web idêntico ao fonte e recursos aprovados íntegros; metadados locais idênticos aos publicados pela CI.
+
+## APK final
+
+**[Baixar panelinha.apk 0.2.63 diretamente](https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.63/panelinha.apk)** — 63.054.467 bytes, sem ZIP.
+
+Código **8302 > 8202**, pacote **com.lucascunha.panelinha.teste**, origem **https://localhost**. Compatível com atualização direta das versões da geração 2, sem desinstalar ou limpar dados.
+
+Certificado SHA-256: `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`.
+
+SHA-256 do APK: `a471817a97d235cb6412b7bb75e1db61eea723d0d576d5efee1165efe2153a9c`. Metadados completos em `CENTRALIZACAO_LATERAIS_APK_0.2.63.json`.
+
+Web publicada em https://panelinha-lobby.lucas260802.workers.dev, versão Worker `944344de-0367-4bfc-9af8-5db63db2ea3b`; arquivos conferidos por SHA-256 contra o build e `/health` fase 3 saudável. Nenhuma regra/binding do servidor alterado.
 
 Sem emulador/instrumentação ou aparelho Android físico. Instalação, retenção real de dados e fluidez no aparelho continuam pendentes; nenhuma dessas verificações é declarada aprovada.
