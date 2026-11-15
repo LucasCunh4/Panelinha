@@ -25,6 +25,14 @@ Somente verificações direcionadas no Chromium/Playwright. Nenhum emulador ou i
 
 ## APK e limitações
 
-APK final será registrado após a compilação pelo workflow existente e verificação do arquivo real. Pacote, certificado geração 2 e origem local preservados; versionCode deve superar 8102.
+**[Baixar panelinha.apk 0.2.62 diretamente](https://github.com/LucasCunh4/Panelinha/releases/download/v0.2.62/panelinha.apk)** — 63.054.223 bytes, sem ZIP.
+
+- [Workflow 43663695226](https://github.com/LucasCunh4/Panelinha/actions/runs/43663695226): **sucesso**, fonte `afaf6f53bfbe54f5cca4c2b24a1585dd3f9fc3e5`. Um único APK final; emulador `skipped` por opção.
+- Build web com hashes dos assets: **aprovado**. APK real baixado e revalidado por `ferramentas/verificar_apk.py`: assinatura v2, pacote, certificado, origem, nome, sensorLandscape, categoria game, ícones, código web empacotado e recursos aprovados íntegros. Metadados locais idênticos aos publicados pela CI.
+- `versionCode` **8202 > 8102**, pacote **com.lucascunha.panelinha.teste**, origem **https://localhost**. Compatível com atualização direta da geração 2 sem desinstalar ou limpar dados.
+- Certificado SHA-256: `3918ce17b4aeb4f8eb56fd53dc7629151fadd12f13ea0fc3056310bf951fe509`.
+- SHA-256 do APK: `5252c5e904f16ac25ab30ade96a2119fc60f0a5b8a8546ef6b96231932a7e1e1`.
+- Metadados: `LAYOUT_CELULAR_APK_0.2.62.json`.
+- Web publicada em https://panelinha-lobby.lucas260802.workers.dev, versão Worker `4fc84e05-7583-45d7-8c70-49d532b54714`. Arquivos de layout conferidos por SHA-256 contra o build; `/health` confirma fase 3 saudável, sem alterações nas regras ou configurações do servidor.
 
 Pendentes: instalação/fluidez em Android físico, atualização com retenção real de dados e conferência dos recortes de um aparelho real. A área segura foi simulada no navegador, sem alegar teste físico. Nenhum teste existente removido ou desativado.
