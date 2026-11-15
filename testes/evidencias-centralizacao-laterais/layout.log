@@ -1,0 +1,5 @@
+PASS 54 layouts celular/tablet/desktop: mãos com 7/20/40 cartas, fogo normal/+20, proporções, recorte circular, identidade à esquerda e ausência de rolagem/contato com chama
+PASS nove layouts com três ações simultâneas e nome longo; leque de 40 expandido/foco por teclado: botões/avatares contidos e cartas sem contato com o fogo
+PASS leques laterais: centro do contêiner, cartas e avatar alinhados ao mesmo eixo do fogão, com erro menor que 0,5px; botões não cobrem mãos laterais
+PASS reserva inferior simulada de 24px em quatro celulares: aplicada uma vez, identidade segura e mão expandida afastada da chama
+PASS compra/Guardar e descarte com animações reais: contadores corretos, cartas chegam ao leque e um toque joga; sem erros JS

@@ -691,6 +691,8 @@
 
   function render(state, savedScroll, {mustBuy=false}={}) {
     nativeTable(true);
+    const actions=[...$('controls').children].filter(n=>n.classList.contains('btn'));
+    $('controls').classList.toggle('three-actions',state.phase==='playing'&&state.players[0].hand.length===2&&actions.length===3);
     if(handOwner!==state||handRound!==state.round){cancelHandTimers();expandedColor=null;handPinned=false;handLayout=null;handOwner=state;handRound=state.round;}
     document.body.classList.add('playing');
     const humanTurn=state.phase==='playing'&&state.current===0&&!playing()&&!PanelinhaTableEffects.dealing()&&Date.now()>=(state.presentationUntil||0)&&Date.now()>=state.unlockAt&&(!state.online||!state.paused&&!state.players[0].substituted&&window.PanelinhaOnline?.connected);

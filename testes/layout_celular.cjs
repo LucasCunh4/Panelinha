@@ -26,21 +26,29 @@ const out=process.env.PANELINHA_TEST_OUTPUT||'/workspace/work/layout-celular/fin
    const avatars=[...document.querySelectorAll('.seat .pan-avatar,#localIdentity>.pan-avatar')].map(rect),buttons=[...document.querySelectorAll('#controls>.btn')].map(rect),menu=rect(document.getElementById('tableMenuBtn')),flame=rect(document.querySelector('.flame-red'));
    const cards=[...document.querySelectorAll('#hand .card,#pile>.card,#discard .card')];
    const names=[...document.querySelectorAll('.opponent-name')].map(rect);
+   const burnerY=parseFloat(document.getElementById('table').style.getPropertyValue('--burner-y'));
+   const lateral=[1,3].map(id=>{
+    const area=document.querySelector(`#player${id} .back,#player${id} .subhand`),r=rect(area),cards=[...area.children].map(rect),avatar=rect(document.querySelector(`#player${id} .pan-avatar`));
+    const top=Math.min(...cards.map(r=>r.y)),bottom=Math.max(...cards.map(r=>r.bottom));
+    return{center:r.y+r.h/2,cardCenter:(top+bottom)/2,x:r.x+r.w/2,avatarX:avatar.x+avatar.w/2};
+   });
+   const sideCards=[...document.querySelectorAll('#player1 [data-hand-card],#player3 [data-hand-card]')].map(rect);
    return{size:[innerWidth,innerHeight],identity,firstCard:Math.min(...hand.map(r=>r.x)),handTop:Math.min(...hand.map(r=>r.y)),flameBottom:flame.y+flame.h*.91,
-    insideHand:hand.every(inside),insideAvatars:avatars.every(inside),insideNames:names.every(inside),circle:avatars.every(r=>Math.abs(r.w-r.h)<.1),insideButtons:buttons.every(inside),identityClear:hand.every(r=>overlap(r,identity)<1),buttonsClear:buttons.every(r=>hand.every(c=>overlap(r,c)<1)&&avatars.every(a=>overlap(r,a)<1)&&overlap(r,identity)<1),menuClear:avatars.every(r=>overlap(r,menu)<1),ratio:cards.every(n=>Math.abs(n.offsetWidth/n.offsetHeight-520/850)<.02),scroll:document.documentElement.scrollWidth>innerWidth||document.documentElement.scrollHeight>innerHeight,tableScroll:document.getElementById('table').scrollTop};
+    lateralCentered:innerHeight>600||lateral.every(r=>Math.abs(r.center-burnerY)<.5&&Math.abs(r.cardCenter-burnerY)<.5&&Math.abs(r.avatarX-r.x)<.5),lateral,
+    insideHand:hand.every(inside),insideAvatars:avatars.every(inside),insideNames:names.every(inside),circle:avatars.every(r=>Math.abs(r.w-r.h)<.1),insideButtons:buttons.every(inside),identityClear:hand.every(r=>overlap(r,identity)<1),buttonsClear:buttons.every(r=>hand.every(c=>overlap(r,c)<1)&&sideCards.every(c=>overlap(r,c)<1)&&avatars.every(a=>overlap(r,a)<1)&&overlap(r,identity)<1),menuClear:avatars.every(r=>overlap(r,menu)<1),ratio:cards.every(n=>Math.abs(n.offsetWidth/n.offsetHeight-520/850)<.02),scroll:document.documentElement.scrollWidth>innerWidth||document.documentElement.scrollHeight>innerHeight,tableScroll:document.getElementById('table').scrollTop};
   });}
   const results=[];
   for(const [width,height]of[[568,320],[667,375],[740,360],[844,390],[915,412],[1000,360],[1024,600],[1280,800],[1366,768]]){
    await p.setViewportSize({width,height});
    for(const n of [7,20,40])for(const penalty of [0,20]){
     await fixture(n,penalty);const data=await metrics();results.push({n,penalty,...data});
-    for(const key of ['insideHand','insideAvatars','insideNames','circle','insideButtons','identityClear','buttonsClear','menuClear','ratio'])assert.equal(data[key],true,`${width}×${height}/${n}/+${penalty}: ${key} ${JSON.stringify(data)}`);
+    for(const key of ['insideHand','insideAvatars','insideNames','circle','insideButtons','identityClear','buttonsClear','menuClear','ratio','lateralCentered'])assert.equal(data[key],true,`${width}×${height}/${n}/+${penalty}: ${key} ${JSON.stringify(data)}`);
     assert.ok(data.identity.right+3<data.firstCard,JSON.stringify(data));assert.ok(data.handTop>=data.flameBottom+2,`mão toca o envelope visível da chama: ${JSON.stringify(data)}`);
     assert.equal(data.scroll,false);assert.equal(data.tableScroll,0);
     if(n===20&&penalty===20)await p.screenshot({path:out+`/mesa-${width}.png`});
    }
    await fixture(2,4,true,'Nome muito comprido para conferir a identificação local');const data=await metrics();
-   assert.equal(await p.locator('#controls>.btn').count(),3);assert.ok(data.buttonsClear&&data.menuClear&&data.insideButtons&&data.identityClear,JSON.stringify(data));
+   assert.equal(await p.locator('#controls>.btn').count(),3);assert.ok(data.buttonsClear&&data.menuClear&&data.insideButtons&&data.identityClear&&data.lateralCentered,JSON.stringify(data));
    assert.equal(await p.locator('.local-player-name').getAttribute('title'),'Nome muito comprido para conferir a identificação local');
    if(width===568||width===844)await p.screenshot({path:out+`/acoes-${width}.png`});
    await fixture(40,20);await p.locator('#hand>button').first().focus();await p.keyboard.press('ArrowRight');
@@ -50,6 +58,7 @@ const out=process.env.PANELINHA_TEST_OUTPUT||'/workspace/work/layout-celular/fin
   fs.writeFileSync(out+'/geometria.json',JSON.stringify(results,null,2));
   console.log('PASS 54 layouts celular/tablet/desktop: mãos com 7/20/40 cartas, fogo normal/+20, proporções, recorte circular, identidade à esquerda e ausência de rolagem/contato com chama');
   console.log('PASS nove layouts com três ações simultâneas e nome longo; leque de 40 expandido/foco por teclado: botões/avatares contidos e cartas sem contato com o fogo');
+  console.log('PASS leques laterais: centro do contêiner, cartas e avatar alinhados ao mesmo eixo do fogão, com erro menor que 0,5px; botões não cobrem mãos laterais');
   for(const [width,height]of[[568,320],[740,360],[844,390],[1000,360]]){
    await p.setViewportSize({width,height});await p.evaluate(()=>document.getElementById('table').style.setProperty('--table-safe-bottom','24px'));
    await fixture(40,20);await p.locator('#hand>button').first().focus();await p.keyboard.press('ArrowRight');

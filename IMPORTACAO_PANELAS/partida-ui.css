@@ -85,10 +85,14 @@ label.setting.has-setting-info{display:grid!important;grid-template-columns:minm
  .hand-panel>.hand{height:calc(var(--card-width)*var(--card-aspect) + 52px);padding:34px 10px 8px}
  .hand-panel>.local-identity{font-size:12px;padding-bottom:8px}
  .local-identity>.pan-avatar{width:32px;height:32px;min-width:32px}
- .seat.left,.seat.right{--side-fan:calc(var(--opponent-card)*2.4);--identity-height:calc(var(--table-avatar) + 14px);top:calc(50% - 64px)}
- .table .seat.left .seat-identity,.table .seat.right .seat-identity{top:0;bottom:auto}
- .seat.left .back,.seat.right .back,.seat.left .subhand,.seat.right .subhand{top:calc(var(--identity-height) + var(--side-fan)*.5)}
+ /* O eixo das cartas independe do avatar/nome e é igual nos dois lados. */
+ .seat.left,.seat.right{--side-fan:calc(var(--opponent-card)*2.4);--identity-height:calc(var(--table-avatar) + 14px);top:var(--burner-y,50%);height:var(--side-fan)}
+ .table .seat.left .seat-identity,.table .seat.right .seat-identity{top:auto;bottom:calc(100% + 8px);left:50%}
+ .seat.left .back,.seat.right .back,.seat.left .subhand,.seat.right .subhand{top:50%}
  .hand-panel>#controls{gap:5px;padding-bottom:8px}
  .hand-panel>#controls>.btn{font-size:12px;padding:8px 5px;min-height:44px}
+ /* Três ações só surgem com duas cartas: usa o espaço livre ao lado delas,
+    evitando subir a mão lateral para acomodar uma coluna alta de botões. */
+ .hand-panel>#controls.three-actions{position:absolute;grid-area:auto;right:8px;bottom:max(4px,var(--table-safe-bottom));width:calc(var(--hand-side-space)*2 + 6px);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}
+ .hand-panel>#controls.three-actions>.btn:last-child{grid-column:1 / -1}
 }
-@media(orientation:landscape) and (max-height:360px){.table .seat.right .seat-identity{left:calc(50% - 24px)}}
